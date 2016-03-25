@@ -29,12 +29,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <!-- <Reference Include="FNA, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null" /> -->
+    <Reference Include="Microsoft.Xna.Framework" />
+    <Reference Include="Microsoft.Xna.Framework.Game" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics" />
     <Reference Include="Terraria">
       <HintPath>..\..\ref\tModLoader Linux v0.7.1.1\Terraria.exe</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TheInvisibleHand.cs" />
+    <Compile Include="CategoryDef.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IHEvent.cs" />
+    <Compile Include="IHOrganizer.cs" />
+    <Compile Include="IHPlayer.cs" />
+    <Compile Include="IHSmartStash.cs" />
+    <Compile Include="IHUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
