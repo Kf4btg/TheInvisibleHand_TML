@@ -1,0 +1,1 @@
+This mod implements a number of convenience features to make managing one's storage and inventory in Terraria as close to painless as possible, saving time and allowing the player to get back to enjoying the game.
