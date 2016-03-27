@@ -60,7 +60,8 @@ namespace InvisibleHand
             Categories.Add( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
             Categories.Add( ItemCat.DYE, 		item   	=> item.dye != 0);
             Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
-            Categories.Add( ItemCat.ORE, 		item   	=> item.createTile != -1 && (item.name.EndsWith("Ore") || Constants.TileGroupOre.Contains(item.createTile)) );
+            // Categories.Add( ItemCat.ORE, 		item   	=> item.createTile != -1 && (item.name.EndsWith("Ore") || Constants.TileGroupOre.Contains(item.createTile)) );
+            Categories.Add( ItemCat.ORE, 		item   	=> TileID.Sets.Ore[item.createTile] );
             Categories.Add( ItemCat.BAR, 		item   	=> item.createTile==TileID.MetalBars );
             Categories.Add( ItemCat.GEM, 		item   	=> item.createTile==TileID.ExposedGems );
             Categories.Add( ItemCat.SEED, 		item   	=> Constants.TileGroupSeed.Contains(item.createTile) || (item.createTile != -1 && item.name.EndsWith("Seeds") ));

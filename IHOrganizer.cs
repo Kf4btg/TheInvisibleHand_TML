@@ -73,7 +73,7 @@ namespace InvisibleHand
 
             // get copies of viable items from container.
             // will need a different list if locking is enabled
-            if (!source_is_chest && IHBase.ModOptions["LockingEnabled"])
+            if (!source_is_chest)
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
@@ -146,9 +146,6 @@ namespace InvisibleHand
             // if range param not specified, set it to whole container
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
-            // for clarity
-            var checkLocks = IHBase.ModOptions["LockingEnabled"]; //boolean
-
             // get copies of the items and send them off to be sorted
             var sortedItemList = OrganizeItems(GetItemCopies(container, chest, range));
             if (sortedItemList == null) return;
@@ -178,7 +175,7 @@ namespace InvisibleHand
             }
 
             int filled = 0; // num of slots filled (or locked) so far
-            if (!chest && checkLocks) // player inv with locking enabled
+            if (!chest) // player inv with locking enabled
             {
                 // copy the sorted items back to the original container
                 // (overwriting the current, unsorted contents)

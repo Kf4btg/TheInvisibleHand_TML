@@ -30,26 +30,26 @@ namespace InvisibleHand
                         select catGroup.Key).Distinct() //no duplicates
                         .ToList(); //store the query results
 
-            if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
-            {
+            // if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
+            // {
                 for (int i = 49; i >= 10; i--)  // reverse through player inv
                 {
-                    if (!pInventory[i].IsBlank() && !IHPlayer.SlotLocked(i)
+                    if (!pInventory[i].IsBlank() //&& !IHPlayer.SlotLocked(i)
                         && catList.Contains(pInventory[i].GetCategory()))
                     {
                         IHUtils.MoveItemToChest(i, sendNetMsg);
                     }
                 }
-            }
-            else //no locking
-            {
-                for (int i = 49; i >= 10; i--)
-                {
-                    // if chest contains a matching category
-                    if (!pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()))
-                        IHUtils.MoveItemToChest(i, sendNetMsg);
-                }
-            }
+            // }
+            // else //no locking
+            // {
+            //     for (int i = 49; i >= 10; i--)
+            //     {
+            //         // if chest contains a matching category
+            //         if (!pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()))
+            //             IHUtils.MoveItemToChest(i, sendNetMsg);
+            //     }
+            // }
             Recipe.FindRecipes();
         }
 

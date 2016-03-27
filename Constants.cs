@@ -1,7 +1,7 @@
-using Microsoft.Xna.Framework;
+// using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System;
-using TAPI;
+// using TAPI;
 using Terraria.ID;
 
 namespace InvisibleHand
@@ -81,27 +81,27 @@ namespace InvisibleHand
     public static class Constants
     {
         // pulled from Main.DrawInventory  !ref:Main:#22137.0#
-        public const float CHEST_INVENTORY_SCALE    = 0.755f;
-        public const float PLAYER_INVENTORY_SCALE   = 0.85f;
-
-        public static readonly Color InvSlotColor   = new Color( 63,  65, 151, 255);  // bluish
-        public static readonly Color ChestSlotColor = new Color(104,  52,  52, 255);  // reddish
-        public static readonly Color BankSlotColor  = new Color(130,  62, 102, 255);  // pinkish
-        public static readonly Color EquipSlotColor = new Color( 50, 106,  46, 255);  // greenish
-
-        // width and height of button
-        public const int ButtonW = 32;
-        public const int ButtonH = 32;
-
-        public static readonly ButtonPlot IconReplacersPlot
-            = new ButtonPlot(506, API.main.invBottom + 22,
-                               0, ButtonH + 2);
-
-        public static readonly ButtonPlot TextReplacersPlot
-            = new ButtonPlot(506, API.main.invBottom + 40, 0, 26);
-
-        public static readonly ButtonPlot InventoryButtonsPlot
-            = new ButtonPlot(496, 28, ButtonW + 4, 0);
+        // public const float CHEST_INVENTORY_SCALE    = 0.755f;
+        // public const float PLAYER_INVENTORY_SCALE   = 0.85f;
+        //
+        // public static readonly Color InvSlotColor   = new Color( 63,  65, 151, 255);  // bluish
+        // public static readonly Color ChestSlotColor = new Color(104,  52,  52, 255);  // reddish
+        // public static readonly Color BankSlotColor  = new Color(130,  62, 102, 255);  // pinkish
+        // public static readonly Color EquipSlotColor = new Color( 50, 106,  46, 255);  // greenish
+        //
+        // // width and height of button
+        // public const int ButtonW = 32;
+        // public const int ButtonH = 32;
+        //
+        // public static readonly ButtonPlot IconReplacersPlot
+        //     = new ButtonPlot(506, API.main.invBottom + 22,
+        //                        0, ButtonH + 2);
+        //
+        // public static readonly ButtonPlot TextReplacersPlot
+        //     = new ButtonPlot(506, API.main.invBottom + 40, 0, 26);
+        //
+        // public static readonly ButtonPlot InventoryButtonsPlot
+        //     = new ButtonPlot(496, 28, ButtonW + 4, 0);
 
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
@@ -180,10 +180,12 @@ namespace InvisibleHand
                     TileID.Signs,
                     TileID.Safes,
                     TileID.Thrones,
-                    TileID.WoodenPlank,
+                    // TileID.WoodenPlank,
                     TileID.Mannequin,
-                    TileID.Womannequin
+                    TileID.Womannequin,
+
             });
+
 
         public static readonly HashSet<int>
             TileGroupLighting = new HashSet<int>(new int[] {
@@ -195,7 +197,7 @@ namespace InvisibleHand
                     TileID.Candelabras,
                     TileID.Jackolanterns,
                     TileID.ChineseLanterns,
-                    TileID.SkullCandles,
+                    TileID.SkullLanterns,
                     TileID.Campfire,
                     TileID.FireflyinaBottle,
                     TileID.LightningBuginaBottle,
@@ -213,11 +215,11 @@ namespace InvisibleHand
 
         public static readonly HashSet<int>
             TileGroupWallDeco = new HashSet<int>(new int[] {
-                    TileID.Painting2x3,
-                    TileID.Painting3x2,
-                    TileID.Painting3x3,
-                    TileID.Painting4x3,
-                    TileID.Painting6x4
+                    // TileID.Painting2x3,
+                    // TileID.Painting3x2,
+                    // TileID.Painting3x3,
+                    // TileID.Painting4x3,
+                    // TileID.Painting6x4
             });
 
         public static readonly HashSet<int>
@@ -283,7 +285,7 @@ namespace InvisibleHand
                     TileID.Autohammer,
                     TileID.HeavyWorkBench,
                     TileID.BoneWelder,
-                    TileID.FleshCloningVaat,
+                    TileID.FleshCloningVat,
                     TileID.GlassKiln,
                     TileID.LihzahrdFurnace,
                     TileID.LivingLoom,
@@ -293,12 +295,13 @@ namespace InvisibleHand
                     TileID.HoneyDispenser
             }); // also blergh
 
-        public static readonly HashSet<int>
-            TileGroupOre = new HashSet<int>(new int[] {
-                    TileID.Meteorite,
-                    TileID.Obsidian,
-                    TileID.Hellstone
-            }); // (get others by name)
+        // public static readonly HashSet<int>
+            // TileGroupOre = new HashSet<int>(TileID.Sets.Ore);
+        // (new int[] {
+        //         TileID.Meteorite,
+        //         TileID.Obsidian,
+        //         TileID.Hellstone
+        // }); // (get others by name)
 
         public static readonly HashSet<int>
             TileGroupCoin = new HashSet<int>(new int[] {
@@ -326,15 +329,21 @@ namespace InvisibleHand
         public static readonly Dictionary<TIH, int> LangInterIndices;
 
         public static readonly Dictionary<TIH, string> DefaultButtonLabels;
-        public static readonly Dictionary<TIH, Action> DefaultClickActions;
+        // public static readonly Dictionary<TIH, Action> DefaultClickActions;
 
-        public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
+        // public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
 
         /// maps actions to the modoption defining their keybind
         public static readonly Dictionary<TIH, string>    ButtonActionToKeyBindOption;
 
         static Constants()
         {
+
+            TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsDoor);
+            TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsChair);
+            TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsTable);
+
+
             LangInterIndices = new Dictionary<TIH, int>
             {
                 {TIH.LootAll,    29},
@@ -365,48 +374,48 @@ namespace InvisibleHand
                 {TIH.CancelEdit,   "Cancel"}
             };
 
-            DefaultClickActions = new Dictionary<TIH, Action>
-            {
-                {TIH.None, None},  // now unused. Remove?
-
-                {TIH.Sort,         () => IHPlayer.Sort()},
-                {TIH.ReverseSort,  () => IHPlayer.Sort(true)},
-                {TIH.CleanStacks,  IHPlayer.CleanStacks},
-                // Chest-only
-                {TIH.SmartLoot,    IHSmartStash.SmartLoot},
-                {TIH.QuickStack,   IHUtils.DoQuickStack},
-                {TIH.SmartDeposit, IHSmartStash.SmartDeposit},
-                {TIH.DepositAll,   IHUtils.DoDepositAll},
-                {TIH.LootAll,      IHUtils.DoLootAll},
-                {TIH.Rename,       EditChest.DoChestEdit},
-                {TIH.SaveName,     EditChest.DoChestEdit},
-                {TIH.CancelEdit,   EditChest.CancelRename}
-            };
+            // DefaultClickActions = new Dictionary<TIH, Action>
+            // {
+            //     {TIH.None, None},  // now unused. Remove?
+            //
+            //     {TIH.Sort,         () => IHPlayer.Sort()},
+            //     {TIH.ReverseSort,  () => IHPlayer.Sort(true)},
+            //     {TIH.CleanStacks,  IHPlayer.CleanStacks},
+            //     // Chest-only
+            //     {TIH.SmartLoot,    IHSmartStash.SmartLoot},
+            //     {TIH.QuickStack,   IHUtils.DoQuickStack},
+            //     {TIH.SmartDeposit, IHSmartStash.SmartDeposit},
+            //     {TIH.DepositAll,   IHUtils.DoDepositAll},
+            //     {TIH.LootAll,      IHUtils.DoLootAll},
+            //     {TIH.Rename,       EditChest.DoChestEdit},
+            //     {TIH.SaveName,     EditChest.DoChestEdit},
+            //     {TIH.CancelEdit,   EditChest.CancelRename}
+            // };
 
             /************************************************
             * Make getting a button's texture (texels) easier
             */
-            ButtonGridIndexByActionType = new Dictionary<TIH, int>
-            {
-                {TIH.Sort,         0},
-
-                {TIH.ReverseSort,  1},
-
-                {TIH.LootAll,      2},
-
-                {TIH.DepositAll,   3},
-
-                {TIH.SmartDeposit, 4},
-
-                {TIH.CleanStacks,  5},
-
-                {TIH.QuickStack,   6},
-
-                {TIH.SmartLoot,    7},
-
-                {TIH.Rename,       8},
-                {TIH.SaveName,     8}   // this just varies by background color from Rename
-            };
+            // ButtonGridIndexByActionType = new Dictionary<TIH, int>
+            // {
+            //     {TIH.Sort,         0},
+            //
+            //     {TIH.ReverseSort,  1},
+            //
+            //     {TIH.LootAll,      2},
+            //
+            //     {TIH.DepositAll,   3},
+            //
+            //     {TIH.SmartDeposit, 4},
+            //
+            //     {TIH.CleanStacks,  5},
+            //
+            //     {TIH.QuickStack,   6},
+            //
+            //     {TIH.SmartLoot,    7},
+            //
+            //     {TIH.Rename,       8},
+            //     {TIH.SaveName,     8}   // this just varies by background color from Rename
+            // };
 
             /*************************************************
             * Map action types to the string used for the corresponding
@@ -431,42 +440,42 @@ namespace InvisibleHand
         }
 
         // a hack; don't know if it's necessary
-        public static void None() { }
+        // public static void None() { }
     }
 
     /// silly struct for defining the position of the first button in a set of
     /// buttons and the offset that will be used to calculate the position of
     /// any further buttons.
-    public struct ButtonPlot
-    {
-        public Vector2 Origin;
-        public Vector2 Offset;
-
-        public ButtonPlot(Vector2 origin, Vector2 offset)
-        {
-            this.Origin = origin;
-            this.Offset = offset;
-        }
-
-        public ButtonPlot(float origin_x, float origin_y, float offset_x, float offset_y)
-        {
-            this.Origin = new Vector2(origin_x, origin_y);
-            this.Offset = new Vector2(offset_x, offset_y);
-        }
-
-        /// Plot and return the position of a button based on the origin position
-        /// given in the ButtonPlot, shifted by the plot's Offset Vector
-        /// a number of times equal to the index (order number).
-        /// <example><code>
-        /// ButtonPlot bp = new ButtonPlot(10, 20, 0, 15);
-        /// Vector2 pos_buttonTheFirst = bp.GetPosition(0); // returns (10, 20): the initial position
-        /// Vector2 pos_buttonTheThird = bp.GetPosition(2); // returns (10, 50): X=(10 + 2*0), Y=(20 + 2*15)
-        ///</code></example>
-        public Vector2 GetPosition(int index)
-        {
-            return Origin + index * Offset;
-        }
-    }
+    // public struct ButtonPlot
+    // {
+    //     public Vector2 Origin;
+    //     public Vector2 Offset;
+    //
+    //     public ButtonPlot(Vector2 origin, Vector2 offset)
+    //     {
+    //         this.Origin = origin;
+    //         this.Offset = offset;
+    //     }
+    //
+    //     public ButtonPlot(float origin_x, float origin_y, float offset_x, float offset_y)
+    //     {
+    //         this.Origin = new Vector2(origin_x, origin_y);
+    //         this.Offset = new Vector2(offset_x, offset_y);
+    //     }
+    //
+    //     /// Plot and return the position of a button based on the origin position
+    //     /// given in the ButtonPlot, shifted by the plot's Offset Vector
+    //     /// a number of times equal to the index (order number).
+    //     /// <example><code>
+    //     /// ButtonPlot bp = new ButtonPlot(10, 20, 0, 15);
+    //     /// Vector2 pos_buttonTheFirst = bp.GetPosition(0); // returns (10, 20): the initial position
+    //     /// Vector2 pos_buttonTheThird = bp.GetPosition(2); // returns (10, 50): X=(10 + 2*0), Y=(20 + 2*15)
+    //     ///</code></example>
+    //     public Vector2 GetPosition(int index)
+    //     {
+    //         return Origin + index * Offset;
+    //     }
+    // }
 
     // /// because there's no void/none/null type
     // public sealed class None

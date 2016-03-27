@@ -1,6 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
-using TAPI.UIKit;
+// using TAPI.UIKit;
 using Terraria;
 
 namespace InvisibleHand
@@ -476,6 +476,11 @@ namespace InvisibleHand
             }
         }
 
+        public static Player getMyPlayer()
+        {
+            return Main.player[Main.myPlayer]
+        }
+
     #endregion
 
     #region gui_stuff
@@ -487,38 +492,38 @@ namespace InvisibleHand
 
         /// get source texels based on an index (defined in Constants class).
         /// the "+2" is due to the 2-pixel gap between the button faces in the grid png
-        public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
-        {
-            return active ?
-                new Rectangle(Constants.ButtonW + 2, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH) : //mouse-over
-                new Rectangle(0, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH); //inactive
-        }
-
-        ///Get source Texels for the button based what @action it performs
-        /// @param action
-        /// @param active - false = default/inactive button appearance;
-        ///                  true = focused/mouseover/active appearance
-        public static Rectangle? GetSourceRect(TIH action, bool active=false)
-        {
-            return RectFromGridIndex( Constants.ButtonGridIndexByActionType[action], active );
-        }
-
-        /// returns the key-bind (as a string) for the button with the given action.
-        /// return value will be something like "(X)"
-        public static string GetKeyTip(TIH action)
-        {
-            string kbopt;
-            if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
-                return IHBase.ButtonKeyTips[kbopt];
-
-            return "";
-        }
-
-        /// add Button to main mod-wide collection of all extant buttons
-        public static void AddToButtonStore(ICoreButton btn)
-        {
-            IHBase.Instance.ButtonStore.Add(btn.ID, btn);
-        }
+        // public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
+        // {
+        //     return active ?
+        //         new Rectangle(Constants.ButtonW + 2, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH) : //mouse-over
+        //         new Rectangle(0, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH); //inactive
+        // }
+        //
+        // ///Get source Texels for the button based what @action it performs
+        // /// @param action
+        // /// @param active - false = default/inactive button appearance;
+        // ///                  true = focused/mouseover/active appearance
+        // public static Rectangle? GetSourceRect(TIH action, bool active=false)
+        // {
+        //     return RectFromGridIndex( Constants.ButtonGridIndexByActionType[action], active );
+        // }
+        //
+        // /// returns the key-bind (as a string) for the button with the given action.
+        // /// return value will be something like "(X)"
+        // public static string GetKeyTip(TIH action)
+        // {
+        //     string kbopt;
+        //     if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
+        //         return IHBase.ButtonKeyTips[kbopt];
+        //
+        //     return "";
+        // }
+        //
+        // /// add Button to main mod-wide collection of all extant buttons
+        // public static void AddToButtonStore(ICoreButton btn)
+        // {
+        //     IHBase.Instance.ButtonStore.Add(btn.ID, btn);
+        // }
 
     #endregion
 
