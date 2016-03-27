@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
@@ -34,7 +35,7 @@ namespace InvisibleHand
             }
         }
 
-        public override void SaveCustomData(BinBuffer bb)
+        public override void SaveCustomData(BinaryWriter bb)
         {
             if (Main.gameMenu)
             {
@@ -75,7 +76,7 @@ namespace InvisibleHand
         }
 
         ///load back locked-slot state
-        public override void LoadCustomData(BinBuffer bb)
+        public override void LoadCustomData(BinaryReader bb)
         {
             if (bb.IsEmpty) return;
 
