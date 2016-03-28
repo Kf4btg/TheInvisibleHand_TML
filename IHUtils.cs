@@ -481,6 +481,11 @@ namespace InvisibleHand
             return Main.player[Main.myPlayer]
         }
 
+        public static IHPlayer getMyModPlayer()
+        {
+            
+        }
+
     #endregion
 
     #region gui_stuff

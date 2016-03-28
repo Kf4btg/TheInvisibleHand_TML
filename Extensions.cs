@@ -10,7 +10,16 @@ namespace InvisibleHand
     public static class IHExtensions
     {
 
-    #region itemExensions
+        #region backports
+
+        /// Backport the generic GetModPlayer from TModLoader-devel version
+        public static T GetModPlayer<T>(this Player player, Mod mod) where T : ModPlayer
+        {
+            return (T)player.GetModPlayer(mod, typeof(T).Name);
+        }
+        #endregion
+
+        #region itemExensions
         public static ItemCat GetCategory(this Item item)
         {
             foreach (ItemCat catID in Constants.CheckOrder)

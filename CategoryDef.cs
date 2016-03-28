@@ -72,7 +72,7 @@ namespace InvisibleHand
             Categories.Add( ItemCat.WALLDECO, 	item   	=> Constants.TileGroupWallDeco.Contains(item.createTile) );
             Categories.Add( ItemCat.BANNER, 	item   	=> item.createTile==TileID.Banners );
             Categories.Add( ItemCat.CLUTTER, 	item   	=> Constants.TileGroupClutter.Contains(item.createTile) );
-            Categories.Add( ItemCat.WOOD,       item    => ItemDef.itemGroups["g:Wood"].Contains(item) );
+            Categories.Add( ItemCat.WOOD,       item    => CraftGroup.Wood.Items.Contains(item.type));
             Categories.Add( ItemCat.BLOCK,   	item   	=> item.createTile != -1 && item.width==12 && item.height==12 && item.value==0 );
             Categories.Add( ItemCat.BRICK,   	item   	=> item.Matches(ItemCat.BLOCK) && (item.name.EndsWith("Brick")
                                                             || item.name.EndsWith("Slab") || item.name.EndsWith("Plating")) );

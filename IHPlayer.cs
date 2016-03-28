@@ -9,7 +9,17 @@ namespace InvisibleHand
 
     public class IHPlayer : ModPlayer
     {
-        private static IHPlayer Instance;
+        // private static IHPlayer Instance;
+        public static Player LocalPlayer {
+            get {
+                return Main.player[Main.myPlayer];
+            }
+        }
+        public static IHPlayer LocalIHPlayer {
+            get {
+                return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
+            }
+        }
 
         /// map of user-locked item slots in player inventory
         // private bool[] lockedSlots;
@@ -21,7 +31,7 @@ namespace InvisibleHand
 
         public override void Initialize()
         {
-            Instance = this;
+            // Instance = this;
 
             // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
             // lockedSlots = new bool[40]; //not the hotbar
