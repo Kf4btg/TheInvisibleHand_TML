@@ -9,16 +9,16 @@ namespace InvisibleHand
 
     public class IHPlayer : ModPlayer
     {
-        // private static IHPlayer Instance;
+        private static IHPlayer Instance;
         public static Player LocalPlayer {
             get {
                 return Main.player[Main.myPlayer];
             }
         }
-        public static IHPlayer LocalIHPlayer {
-            get {
-                return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
-            }
+
+        public static IHPlayer GetLocalIHPlayer(Mod mod)
+        {
+            return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
         }
 
         /// map of user-locked item slots in player inventory
@@ -31,7 +31,7 @@ namespace InvisibleHand
 
         public override void Initialize()
         {
-            // Instance = this;
+            Instance = this;
 
             // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
             // lockedSlots = new bool[40]; //not the hotbar
@@ -284,6 +284,12 @@ namespace InvisibleHand
         //
         //     Instance.lockedSlots[slotIndex - 10] = !Instance.lockedSlots[slotIndex - 10];
         // }
+
+        public bool SlotLocked(int slot)
+        {
+            return player.inventory[slot].favorited;
+        }
+
 
         /// <returns>True if indicated action is set to respect locked slots.</returns>
         public static bool ActionLocked(Player player, TIH actionID)

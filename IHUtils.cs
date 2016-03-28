@@ -1,5 +1,5 @@
 using System;
-using Microsoft.Xna.Framework;
+// using Microsoft.Xna.Framework;
 // using TAPI.UIKit;
 using Terraria;
 
@@ -37,7 +37,7 @@ namespace InvisibleHand
         */
         public static void DoDepositAll()
         {
-            DoDepositAll(Main.localPlayer);
+            DoDepositAll(IHPlayer.LocalPlayer);
         }
         public static void DoDepositAll(Player player)
         {
@@ -483,7 +483,7 @@ namespace InvisibleHand
 
         public static IHPlayer getMyModPlayer()
         {
-            
+
         }
 
     #endregion
