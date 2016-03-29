@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using Terraria.ModLoader;
 
 namespace InvisibleHand
 {
 	public class IHBase : Mod
-	{
-		public override void SetModInfo(out string name, ref ModProperties properties)
+    {
+
+        internal static int[] itemCategories;
+
+        public override void SetModInfo(out string name, ref ModProperties properties)
 		{
 			name = "TheInvisibleHand";
 			properties.Autoload = true;

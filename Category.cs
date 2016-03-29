@@ -14,6 +14,9 @@ namespace InvisibleHand
         // private string _name;
         // private int _primarykey;
 
+        // auto-incremented on each category added
+        private static int count=0;
+
         public string Name { get; private set; }
 
         /// This defines the primary order by which this category will sorted relative to other categories at its level. Should be unique for each category.
@@ -28,13 +31,16 @@ namespace InvisibleHand
         /// The function passed for this parameter will determine what Item Ids/Types get associated with this category.
         public Func<Item, bool> Matches { get; protected set; }
 
+        /// Indicates how narrow this category definition is (e.g. Pick has a higher CategoryLevel than Tool)
+        public int CategoryLevel { get; private set; }
 
-        public Category(string name, int primary_key, Func<Item, bool> matcher, Func<Item, Item, int> sorter)
+        public Category(string name, int level, Func<Item, bool> matcher, Func<Item, Item, int> sorter)
         {
             // TODO: verify uniqueness of primary_key
 
             Name = name;
-            PrimarySortKey = primary_key;
+            // PrimarySortKey = primary_key;
+            PrimarySortKey = count++;
 
             Matches = matcher;
             ItemSortKey = sorter;
