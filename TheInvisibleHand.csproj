@@ -51,7 +51,7 @@
     <Compile Include="IHPlayer.cs" />
     <Compile Include="IHSmartStash.cs" />
     <Compile Include="IHUtils.cs" />
-    <Compile Include="ModOption.cs" />
+    <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Items\CategoryEnum.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
