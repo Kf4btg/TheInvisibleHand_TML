@@ -123,5 +123,10 @@ namespace InvisibleHand
         {
             return o.Value;
         }
+
+        public static explicit operator int(KeyOption o)
+        {
+            return (int)o.Value;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
+using Microsoft.Xna.Framework.Input;
 
 namespace InvisibleHand
 {
@@ -45,10 +46,11 @@ namespace InvisibleHand
             }
         }
 
-        public override void SaveCustomData(BinaryWriter bb)
+        public override void SaveCustomData(BinaryWriter writer)
         {
             if (Main.gameMenu)
             {
+              // TODO: find somewhere else to do this
                 var lii = Constants.LangInterIndices;
                 // reset original chest-button strings if we're quitting to main
                 // menu, which should be indicated by checking:
@@ -76,33 +78,90 @@ namespace InvisibleHand
             // {
             //     bb.Write(l);
             // }
-            bb.Write(LockedActions.Count);
+
+            // TODO: refactor option-handling into separate lib, save the options there; query
+            // that during load to retrieve options
+            // Save modoptions
+            writer.Write(IHBase.ModOptions.Count);
+            foreach (var kvp in IHBase.ModOptions)
+            {
+              writer.Write(kvp.Key); // string optionname
+              writer.Write((bool)kvp.Value);
+            }
+            // save user-defined hotkeys
+            writer.Write(IHBase.HotKeys.Count);
+            foreach (var kvp in IHBase.HotKeys)
+            {
+              writer.Write(kvp.Key); // string action_name
+              writer.Write((int)kvp.Value); // int val of Keys enum value
+            }
+
+            // save locked action types
+            writer.Write(LockedActions.Count);
             //KeyValuePair<TIH, bool>
             foreach (var kvp in LockedActions)
             {
-                bb.Write((int)kvp.Key);
-                bb.Write(kvp.Value);
+                writer.Write((int)kvp.Key);
+                writer.Write(kvp.Value);
             }
         }
 
         ///load back locked-slot state
-        public override void LoadCustomData(BinaryReader bb)
+        public override void LoadCustomData(BinaryReader reader)
         {
-            if (bb.IsEmpty) return;
+            // if (bb.PeekChar()) return;
 
             // for (int i=0; i<lockedSlots.Length; i++)
             // {
             //     lockedSlots[i]=bb.ReadBool();
             // }
-            if (bb.IsEmpty) return;
+            // if (bb.IsEmpty) return;
 
-            int count = bb.ReadInt();
-            for (int i=0; i<count; i++)
+            try //mod options
             {
-                int aID = bb.ReadInt();
-                bool state = bb.ReadBool();
-                if (Enum.IsDefined(typeof(TIH), aID))
-                    LockedActions[(TIH)aID] = state;
+              int count = reader.ReadInt32();
+              for (int i = 0; i < count; i++)
+              {
+                  string optionName = reader.ReadString();
+                  bool state = reader.ReadBoolean();
+                  IHBase.ModOptions[optionName] = new BoolOption(mod, state);
+              }
+            }
+            catch (Exception e)
+            {
+              ErrorLogger.Log("Read Error: "+e.ToString());
+            }
+
+            try //key options
+            {
+              int count = reader.ReadInt32();
+              for (int i = 0; i < count; i++)
+              {
+                  string actionName = reader.ReadString();
+                  int keyval = reader.ReadInt32();
+                  if (Enum.IsDefined(typeof(Keys), keyval))
+                    IHBase.HotKeys[actionName] = new KeyOption(mod, (Keys)keyval);
+              }
+            }
+            catch (Exception e)
+            {
+              ErrorLogger.Log("Read Error: "+e.ToString());
+            }
+
+            try
+            {
+                int count = reader.ReadInt32();
+                for (int i = 0; i < count; i++)
+                {
+                    int actionID = reader.ReadInt32();
+                    bool state = reader.ReadBoolean();
+                    if (Enum.IsDefined(typeof(TIH), actionID))
+                        LockedActions[(TIH)actionID] = state;
+                }
+            }
+            catch (Exception e)
+            {
+              ErrorLogger.Log("Read Error: "+e.ToString());
             }
         }
 
