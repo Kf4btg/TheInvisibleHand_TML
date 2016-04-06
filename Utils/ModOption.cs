@@ -2,7 +2,7 @@ using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace InvisibleHand
+namespace InvisibleHand.Utils
 {
     /// T is the type of the option's value, usually a simple type such as int, bool, string, etc.
     public class ModOption<T>
