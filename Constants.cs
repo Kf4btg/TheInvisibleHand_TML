@@ -349,8 +349,8 @@ namespace InvisibleHand
                 {TIH.LootAll,    29},
                 {TIH.DepositAll, 30},
                 {TIH.QuickStack, 31},
-                {TIH.Rename,     61},
                 {TIH.SaveName,   47},
+                {TIH.Rename,     61},
                 {TIH.CancelEdit, 63}
             };
 
