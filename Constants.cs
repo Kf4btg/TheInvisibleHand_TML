@@ -1,7 +1,6 @@
-// using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
-// using TAPI;
 using Terraria.ID;
 
 namespace InvisibleHand
@@ -334,10 +333,36 @@ namespace InvisibleHand
         // public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
 
         /// maps actions to the modoption defining their keybind
-        public static readonly Dictionary<TIH, string>    ButtonActionToKeyBindOption;
+        public static readonly Dictionary<TIH, string> ButtonActionToKeyBindOption;
+
+        public static readonly Dictionary<string, bool> DefaultOptionValues;
+
+        public static readonly Dictionary<string, Keys> DefaultKeys;
+
 
         static Constants()
         {
+
+            DefaultOptionValues = new Dictionary<string, bool>
+            {
+                {"UseReplacers", true},
+                {"SortToEnd_Player", false},
+                {"SortToEnd_Chest", false},
+                {"ReverseSort_Player", false},
+                {"ReverseSort_Chest", false},
+
+            };
+
+            DefaultKeys = new Dictionary<string, Keys>
+            {
+                {"Sort", Keys.R},
+                {"Clean", Keys.T},
+                {"DepositAll", Keys.Z},
+                {"LootAll", Keys.X},
+                {"QuickStack", Keys.C},
+                // {"SmartDeposit"},
+                // {"SmartLoot"},
+            };
 
             TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsDoor);
             TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsChair);

@@ -41,13 +41,13 @@ namespace InvisibleHand
        /// <summary>
        /// Construct a list containing cloned copies of items in the given container, skipping blank (and optionally locked) slots.
        /// </summary>
-       /// <param name="source_container">The Item[] array of the container</param>
+       /// <param name="source_container">The IList<Item> array of the container</param>
        /// <param name="source_is_chest">Is the source container a chest? </param>
        /// <param name="rangeStart">index in source to start looking for items </param>
        /// <param name="rangeEnd">index in source to stop looking for items </param>
        /// <returns> The new list of copied items, or null if no items were
        /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
+        public static List<Item> GetItemCopies(IList<Item> source_container, bool source_is_chest, int rangeStart, int rangeEnd)
         {
             return GetItemCopies(source_container, source_is_chest, new Tuple<int, int>(rangeStart, rangeEnd));
         }
@@ -56,13 +56,13 @@ namespace InvisibleHand
         /// Construct a list containing cloned copies of items in the given
         /// container, skipping blank (and optionally locked) slots.
         /// </summary>
-        /// <param name="source_container">The Item[] array of the container</param>
+        /// <param name="source_container">The IList<Item> array of the container</param>
         /// <param name="source_is_chest">Is the source container a chest? </param>
         /// <param name="range">Starting and ending indices defining the subset of the
         /// source's slots to be searched for items.</param>
         /// <returns> The new list of copied items, or null if no items were
         /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
+        public static List<Item> GetItemCopies(IList<Item> source_container, bool source_is_chest, Tuple<int,int> range = null)
         {
             if (range == null) range = new Tuple<int,int>(0, source_container.Length -1);
 
@@ -110,8 +110,8 @@ namespace InvisibleHand
             Sort(player.inventory, false, reverse, 10, 49);
         }
 
-        // as above, but for the Item[] array of a chest
-        public static void SortChest(Item[] chestitems, bool reverse=false)
+        // as above, but for the IList<Item> array of a chest
+        public static void SortChest(IList<Item> chestitems, bool reverse=false)
         {
             ConsolidateStacks(chestitems);
 
@@ -136,12 +136,12 @@ namespace InvisibleHand
 
         FIXME (maybe?): the "item-moved" sound plays even if the order doesn't change.
         */
-        public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
+        public static void Sort(IList<Item> container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
             Sort(container, chest, reverse, new Tuple<int,int>(rangeStart, rangeEnd));
         }
 
-        public static void Sort(Item[] container, bool chest, bool reverse, Tuple<int,int> range = null)
+        public static void Sort(IList<Item> container, bool chest, bool reverse, Tuple<int,int> range = null)
         {
             // if range param not specified, set it to whole container
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
@@ -222,12 +222,12 @@ namespace InvisibleHand
         *  Adapted from "PutItem()" in ShockahBase.SBase
         *  @params container, rangeStart, rangeEnd
         */
-        public static void ConsolidateStacks(Item[] container, int rangeStart, int rangeEnd)
+        public static void ConsolidateStacks(IList<Item> container, int rangeStart, int rangeEnd)
         {
             ConsolidateStacks(container, new Tuple<int,int>(rangeStart, rangeEnd));
         }
 
-        public static void ConsolidateStacks(Item[] container, Tuple<int, int> range = null)
+        public static void ConsolidateStacks(IList<Item> container, Tuple<int, int> range = null)
         {
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
@@ -246,7 +246,7 @@ namespace InvisibleHand
 
         /// called by ConsolidateStacks, this takes a single item and searches a
         /// subset of the original range for other non-max stacks of that item
-        private static void StackItems(ref Item item, Item[] container, int rangeStart, int rangeEnd)
+        private static void StackItems(ref Item item, IList<Item> container, int rangeStart, int rangeEnd)
         {
             for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
             {

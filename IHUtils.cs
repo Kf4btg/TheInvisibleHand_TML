@@ -478,7 +478,7 @@ namespace InvisibleHand
 
         public static Player getMyPlayer()
         {
-            return Main.player[Main.myPlayer]
+            return Main.player[Main.myPlayer];
         }
 
         public static IHPlayer getMyModPlayer()

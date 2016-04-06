@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework.Input;
+using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {
@@ -20,6 +21,10 @@ namespace InvisibleHand
         public static IHPlayer GetLocalIHPlayer(Mod mod)
         {
             return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
+        }
+
+        public Item[] chestItems {
+            get { return Main.chest[player.chest].item; }
         }
 
         /// map of user-locked item slots in player inventory
@@ -89,8 +94,8 @@ namespace InvisibleHand
               writer.Write((bool)kvp.Value);
             }
             // save user-defined hotkeys
-            writer.Write(IHBase.HotKeys.Count);
-            foreach (var kvp in IHBase.HotKeys)
+            writer.Write(IHBase.ActionKeys.Count);
+            foreach (var kvp in IHBase.ActionKeys)
             {
               writer.Write(kvp.Key); // string action_name
               writer.Write((int)kvp.Value); // int val of Keys enum value
@@ -140,7 +145,7 @@ namespace InvisibleHand
                   string actionName = reader.ReadString();
                   int keyval = reader.ReadInt32();
                   if (Enum.IsDefined(typeof(Keys), keyval))
-                    IHBase.HotKeys[actionName] = new KeyOption(mod, (Keys)keyval);
+                    IHBase.ActionKeys[actionName] = new KeyOption(mod, (Keys)keyval);
               }
             }
             catch (Exception e)
@@ -176,16 +181,16 @@ namespace InvisibleHand
                 // inventory is open
                 // not shopping
                 // not talking to an npc
-            if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
+            if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && player.talkNPC==-1)
             {
                 // Sort inventory/chest
-                if (IHBase.ActionKeys["sort"].Pressed())
+                if (IHBase.ActionKeys["Sort"].Pressed())
                 {
                     Sort(KState.Special.Shift.Down());
                 }
 
                 //Consolidate Stacks
-                else if (IHBase.ActionKeys["cleanStacks"].Pressed())
+                else if (IHBase.ActionKeys["Clean"].Pressed())
                 {
                     CleanStacks();
                 }
@@ -194,15 +199,15 @@ namespace InvisibleHand
                     if ( player.chest == -1 ) return; //no action w/o open container
 
                     // smartloot or quickstack
-                    if (IHBase.ActionKeys["quickStack"].Pressed()) {
+                    if (IHBase.ActionKeys["QuickStack"].Pressed()) {
                         QuickStack(KState.Special.Shift.Down());
                     }
                     // smart-deposit or deposit-all
-                    else if (IHBase.ActionKeys["depositAll"].Pressed()) {
+                    else if (IHBase.ActionKeys["DepositAll"].Pressed()) {
                         DepositAll(KState.Special.Shift.Down());
                     }
                     // loot all
-                    else if (IHBase.ActionKeys["lootAll"].Pressed())
+                    else if (IHBase.ActionKeys["LootAll"].Pressed())
                         DoChestUpdateAction( IHUtils.DoLootAll );
                 }
             }
@@ -212,20 +217,22 @@ namespace InvisibleHand
         /// Takes an Action and will perform it wrapped in some net update code if we are a client. Otherwise it just does whatever it is.
         /// </summary>
         /// <param name="action">An Action (a lambda with no output)</param>
-        public static void DoChestUpdateAction(Action action)
+        // public static void DoChestUpdateAction(Action action)
+        public void DoChestUpdateAction(Action action)
         {
 
-            var player = Main.localPlayer;
+            var chestContents = chestItems; // cache this
+            // var player = Main.localPlayer;
             // check net status and make sure a non-bank chest is open
             // (bank-chests, i.e. piggy-bank & safe, are handled solely client-side)
             if (Main.netMode == 1 && player.chest > -1)
             {
-                Item[] oldItems = new Item[player.chestItems.Length];
+                Item[] oldItems = new Item[chestContents.Length];
 
                 // make an exact copy of the chest's original contents
                 for (int i = 0; i < oldItems.Length; i++)
                 {
-                    oldItems[i] = player.chestItems[i].Clone();
+                    oldItems[i] = chestContents[i].Clone();
                 }
 
                 // perform the requested action
@@ -236,10 +243,10 @@ namespace InvisibleHand
                 // if they do not match.
                 for (int i = 0; i < oldItems.Length; i++)
                 {
-                    var oldItem = oldItems[i];
-                    var newItem = player.chestItems[i];
+                    // var oldItem = oldItems[i];
+                    // var newItem = chestContents[i];
 
-                    if (oldItem.IsNotTheSameAs(newItem) || oldItem.stack != newItem.stack)
+                    if (oldItems[i].IsNotTheSameAs(chestContents[i]) || oldItems[i].stack != chestContents[i].stack)
                     {
                         IHUtils.SendNetMessage(i);
                     }
@@ -252,41 +259,42 @@ namespace InvisibleHand
         }
 
         /// performs the most appropriate sort action
-        public static void Sort(bool reverse = false)
+        public void Sort(bool reverse = false)
         {
             // NOTE: this used to check player.chestItems==null, but I once got a
             // "object reference not set to instance of object" or whatever kind of error
             // with that check elsewhere in the code. This should be safer and have the exact same result.
-            if ( Main.localPlayer.chest == -1 ) // no valid chest open, sort player inventory
+            if ( player.chest == -1 ) // no valid chest open, sort player inventory
                 // shift-pressed XOR Reverse-sort-mod-option:
                 //   this will reverse the sort IFF exactly one of these two bools is true
-                IHOrganizer.SortPlayerInv(Main.localPlayer,
+                IHOrganizer.SortPlayerInv(player,
                     reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
             else
                 // call sort on the Item[] array returned by chestItems
                 DoChestUpdateAction( () =>
-                    IHOrganizer.SortChest(Main.localPlayer.chestItems,
+                    IHOrganizer.SortChest(chestItems,
                     reverse ^ IHBase.ModOptions["ReverseSortChest"])
                 );
         }
 
         /// performs the most appropriate clean action
-        public static void CleanStacks()
+        public void CleanStacks()
         {
-            if ( Main.localPlayer.chest == -1 )
-                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50);
+
+            if ( player.chest == -1 )
+                IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
             else
                 DoChestUpdateAction(
-                    () => IHOrganizer.ConsolidateStacks(Main.localPlayer.chestItems));
+                    () => IHOrganizer.ConsolidateStacks(chestItems));
         }
 
         /// <summary>
         /// Performs QuickStack or SmartLoot action if an appropriate container is open.
         /// </summary>
         /// <param name="smartLoot">Perform SmartLoot action instead </param>
-        public static void QuickStack(bool smartLoot = false)
+        public void QuickStack(bool smartLoot = false)
         {
-            if ( Main.localPlayer.chest == -1 ) return;
+            if ( player.chest == -1 ) return;
 
             if (smartLoot)
                 DoChestUpdateAction( IHSmartStash.SmartLoot );
@@ -298,9 +306,9 @@ namespace InvisibleHand
         /// Performs DepositAll or smartDeposit action if an appropriate container is open.
         /// </summary>
         /// <param name="smartDeposit">Perform smartDeposit action instead </param>
-        public static void DepositAll(bool smartDeposit = false)
+        public void DepositAll(bool smartDeposit = false)
         {
-            if ( Main.localPlayer.chest == -1 ) return;
+            if ( player.chest == -1 ) return;
 
             if (smartDeposit)
                 DoChestUpdateAction( IHSmartStash.SmartDeposit );
