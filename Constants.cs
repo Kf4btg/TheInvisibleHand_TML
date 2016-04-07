@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
-using System;
+// using System;
 using Terraria.ID;
 
 namespace InvisibleHand
@@ -346,10 +346,10 @@ namespace InvisibleHand
             DefaultOptionValues = new Dictionary<string, bool>
             {
                 {"UseReplacers", true},
-                {"SortToEnd_Player", false},
-                {"SortToEnd_Chest", false},
-                {"ReverseSort_Player", false},
-                {"ReverseSort_Chest", false},
+                {"SortToEndPlayer", false},
+                {"SortToEndChest", false},
+                {"ReverseSortPlayer", false},
+                {"ReverseSortChest", false},
 
             };
 

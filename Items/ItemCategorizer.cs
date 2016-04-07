@@ -1,9 +1,9 @@
 // using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System;
+// using System.Collections.Generic;
+// using System;
 // using TAPI;
 using Terraria;
-using Terraria.ID;
+// using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace InvisibleHand.Items

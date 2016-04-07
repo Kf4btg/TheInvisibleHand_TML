@@ -20,7 +20,8 @@ namespace InvisibleHand
 
         // track Keyboard state (pressed keys)
         internal static KeyboardState prevState = Keyboard.GetState();
-        internal static KeyboardState currState = Keyboard.GetState();
+        // can just use Main.keyState for the current
+        // internal static KeyboardState currState = Keyboard.GetState();
 
         public static IHPlayer GetLocalIHPlayer(Mod mod)
         {
@@ -98,7 +99,7 @@ namespace InvisibleHand
               writer.Write(kvp.Key); // string optionname
               writer.Write((bool)kvp.Value);
             }
-            
+
             // save user-defined hotkeys
             writer.Write(IHBase.ActionKeys.Count);
             foreach (var kvp in IHBase.ActionKeys)
@@ -182,7 +183,7 @@ namespace InvisibleHand
         }
 
         public static bool KeyboardBusy() => Main.chatMode || Main.editSign || Main.editChest;
-        public static bool ShiftHeld() => Keys.LeftShift.Down(currState) || Keys.RightShift.Down(currState);
+        public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
 
         /// During this phase we check if the player has pressed any hotkeys;
         /// if so, the corresponding action is called, with the chest-related
@@ -190,7 +191,6 @@ namespace InvisibleHand
         /// issues during multiplayer.
         public override void PreUpdate()
         {
-            currState = Keyboard.GetState();
 
             //activate only if:
                 // not typing
@@ -200,13 +200,13 @@ namespace InvisibleHand
             if (!KeyboardBusy() && Main.playerInventory && Main.npcShop==0 && player.talkNPC==-1)
             {
                 // Sort inventory/chest
-                if (IHBase.ActionKeys["Sort"].Pressed(currState, prevState))
+                if (IHBase.ActionKeys["Sort"].Pressed(prevState))
                 {
                     Sort(ShiftHeld());
                 }
 
                 //Consolidate Stacks
-                else if (IHBase.ActionKeys["Clean"].Pressed(currState, prevState))
+                else if (IHBase.ActionKeys["Clean"].Pressed( prevState))
                 {
                     CleanStacks();
                 }
@@ -215,20 +215,20 @@ namespace InvisibleHand
                     if ( player.chest == -1 ) return; //no action w/o open container
 
                     // smartloot or quickstack
-                    if (IHBase.ActionKeys["QuickStack"].Pressed(currState, prevState)) {
+                    if (IHBase.ActionKeys["QuickStack"].Pressed(prevState)) {
                         QuickStack(ShiftHeld());
                     }
                     // smart-deposit or deposit-all
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed(currState, prevState)) {
+                    else if (IHBase.ActionKeys["DepositAll"].Pressed(prevState)) {
                         DepositAll(ShiftHeld());
                     }
                     // loot all
-                    else if (IHBase.ActionKeys["LootAll"].Pressed(currState, prevState))
+                    else if (IHBase.ActionKeys["LootAll"].Pressed(prevState))
                         DoChestUpdateAction( IHUtils.DoLootAll );
                 }
             }
 
-            prevState = currState;
+            prevState = Main.keyState;
         }
 
         /// <summary>

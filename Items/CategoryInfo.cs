@@ -1,8 +1,8 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System;
-using Terraria;
-using Terraria.ID;
+// using System;
+// using Terraria;
+// using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
@@ -21,7 +21,7 @@ namespace InvisibleHand.Items
         // some frequently needed properties
         public ToolType tool = ToolType.None;
         public WeaponType weapon = WeaponType.None;
-        
+
 
     }
 }

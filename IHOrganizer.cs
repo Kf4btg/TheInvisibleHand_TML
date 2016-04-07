@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Linq.Dynamic;
 using Terraria;
+using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {
@@ -77,7 +78,8 @@ namespace InvisibleHand
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (IHPlayer.SlotLocked(i) || source_container[i].IsBlank()) continue;
+                    // "favorited" is now what was "locked"
+                    if (source_container[i].favorited || source_container[i].IsBlank()) continue;
 
                     itemList.Add(source_container[i].Clone());
                     count++;
@@ -110,8 +112,8 @@ namespace InvisibleHand
             Sort(player.inventory, false, reverse, 10, 49);
         }
 
-        // as above, but for the IList<Item> array of a chest
-        public static void SortChest(IList<Item> chestitems, bool reverse=false)
+        // as above, but for the Item[] array of a chest
+        public static void SortChest(Item[] chestitems, bool reverse=false)
         {
             ConsolidateStacks(chestitems);
 
@@ -136,46 +138,49 @@ namespace InvisibleHand
 
         FIXME (maybe?): the "item-moved" sound plays even if the order doesn't change.
         */
-        public static void Sort(IList<Item> container, bool chest, bool reverse, int rangeStart, int rangeEnd)
+        public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
             Sort(container, chest, reverse, new Tuple<int,int>(rangeStart, rangeEnd));
         }
 
-        public static void Sort(IList<Item> container, bool chest, bool reverse, Tuple<int,int> range = null)
+        public static void Sort(Item[] container, bool chest, bool reverse, Tuple<int,int> range = null)
         {
             // if range param not specified, set it to whole container
-            if (range == null) range = new Tuple<int,int>(0, container.Length -1);
+            if (range == null)
+                range = new Tuple<int, int>(0, container.Length - 1);
 
             // get copies of the items and send them off to be sorted
             var sortedItemList = OrganizeItems(GetItemCopies(container, chest, range));
-            if (sortedItemList == null) return;
+            if (sortedItemList == null)
+                return;
 
-            if (reverse) sortedItemList.Reverse(); //reverse on user request
+            if (reverse)
+                sortedItemList.Reverse(); //reverse on user request
 
             // depending on user settings, decide if we copy items to end or beginning of container
-            var fillFromEnd = chest ? IHBase.ModOptions["RearSortChest"] : IHBase.ModOptions["RearSortPlayer"]; //boolean
+            var fillFromEnd = chest ? IHBase.ModOptions["SortToEndChest"] : IHBase.ModOptions["SortToEndPlayer"];
 
             // set up the functions that will be used in the iterators ahead
-            Func<int,int> getIndex, getIter;
-            Func<int,bool> getCond, getWhileCond;
+            Func<int, int> getIndex, getIter;
+            Func<int, bool> getCond; //, getWhileCond;
 
             if (fillFromEnd)	// use decrementing iterators
             {
                 getIndex = x => range.Item2 - x;
                 getIter = x => x-1;
                 getCond = x => x >= range.Item1;
-                getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
+                // getWhileCond = x => x>range.Item1 && container[x].favorited;
             }
             else 	// use incrementing iterators
             {
                 getIndex = y => range.Item1 + y;
                 getIter = y => y+1;
                 getCond = y => y <= range.Item2;
-                getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
+                // getWhileCond = y => y<range.Item2 && container[y].favorited;
             }
 
             int filled = 0; // num of slots filled (or locked) so far
-            if (!chest) // player inv with locking enabled
+            if (!chest) // player inventory
             {
                 // copy the sorted items back to the original container
                 // (overwriting the current, unsorted contents)
@@ -186,7 +191,7 @@ namespace InvisibleHand
                     // if the categorizer and slot-locker are functioning
                     // correctly, that _shouldn't_ be possible. Shouldn't.
                     // Probably.
-                    while (IHPlayer.SlotLocked(getIndex(filled)))
+                    while (container[getIndex(filled)].favorited)
                         filled++;
 
                     // now that we've found an unlocked slot, clone
@@ -198,14 +203,14 @@ namespace InvisibleHand
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
                 {
                     // find the first unlocked slot.
-                    if (IHPlayer.SlotLocked(i)) continue;
+                    if (container[i].favorited) continue;
 
                     container[i] = new Item();
                 }
             }
-            else // just run through 'em all
+            else // just throw 'em back in the box
             {
-                foreach ( var item in sortedItemList)
+                foreach (var item in sortedItemList)
                 {
                     container[getIndex(filled++)] = item.Clone();
                     Sound.ItemMoved.Play();
@@ -222,12 +227,12 @@ namespace InvisibleHand
         *  Adapted from "PutItem()" in ShockahBase.SBase
         *  @params container, rangeStart, rangeEnd
         */
-        public static void ConsolidateStacks(IList<Item> container, int rangeStart, int rangeEnd)
+        public static void ConsolidateStacks(Item[] container, int rangeStart, int rangeEnd)
         {
             ConsolidateStacks(container, new Tuple<int,int>(rangeStart, rangeEnd));
         }
 
-        public static void ConsolidateStacks(IList<Item> container, Tuple<int, int> range = null)
+        public static void ConsolidateStacks(Item[] container, Tuple<int, int> range = null)
         {
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 

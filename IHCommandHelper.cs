@@ -1,10 +1,7 @@
 using System;
-// using System.Linq;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
-// using Microsoft.Xna.Framework.Input;
-// using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {

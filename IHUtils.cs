@@ -2,12 +2,21 @@ using System;
 // using Microsoft.Xna.Framework;
 // using TAPI.UIKit;
 using Terraria;
+// using Terraria.UI;
+using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {
 
     public static class IHUtils
     {
+        private static readonly Player player;
+
+        static IHUtils()
+        {
+            player = IHPlayer.LocalPlayer;
+        }
+
         // !ref:Main:#22215.29##22643.29#
         // The methods here are pretty much just cleaned up and somewhat
         // refactored versions of the vanilla code (which did not wrap
@@ -27,7 +36,7 @@ namespace InvisibleHand
         //      DoQuickStack()                                  //
         //------------------------------------------------------//
 
-    #region depositall
+        #region depositall
         private const int R_START = 49;   //start from end of main inventory
         private const int R_END   = 10;     //don't include hotbar
 
@@ -37,9 +46,9 @@ namespace InvisibleHand
         */
         public static void DoDepositAll()
         {
-            DoDepositAll(IHPlayer.LocalPlayer);
+            DoDepositAll(player);
         }
-        public static void DoDepositAll(Player player)
+        public static void DoDepositAll(Player aplayer)
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
@@ -49,7 +58,8 @@ namespace InvisibleHand
             {
                 for (int i=R_START; i >= R_END; i--)
                 {
-                    if (IHPlayer.SlotLocked(i) ||  player.inventory[i].IsBlank()) continue;
+                    var item = player.inventory[i];
+                    if (item.favorited ||  item.IsBlank()) continue;
                     MoveItemToChest(i, sendNetMsg);
                 }
                 Recipe.FindRecipes(); // !ref:Main:#22640.36#
@@ -71,15 +81,15 @@ namespace InvisibleHand
         */
         public static void DoLootAll()
         {
-            DoLootAll(Main.localPlayer);
+            DoLootAll(player);
         }
-        public static void DoLootAll(Player player)
+        public static void DoLootAll(Player aplayer)
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
 
             var sendNetMsg = player.chest > -1;
-            var container = player.chestItems;
+            var container = Main.chest[player.chest].item;
 
             for (int i=0; i<Chest.maxItems; i++)
             {
@@ -101,14 +111,14 @@ namespace InvisibleHand
         */
         public static void DoQuickStack()
         {
-            DoQuickStack(Main.localPlayer);
+            DoQuickStack(player);
         }
-        public static void DoQuickStack(Player player)
+        public static void DoQuickStack(Player aplayer)
         {
             if (player.chest == -1) return;
 
             var inventory = player.inventory;
-            var container = player.chestItems;
+            var container = Main.chest[player.chest].item;
             bool sendMessage = player.chest > -1;
             var checkLocks  = IHPlayer.ActionLocked(TIH.QuickStack);  //boolean
 
@@ -119,7 +129,7 @@ namespace InvisibleHand
                 {                                                                               //for each item in inventory (including coins, ammo, hotbar),
                     for (int iP=0; iP<58; iP++)
                     {
-                        if (checkLocks && IHPlayer.SlotLocked(iP)) continue;                    // if we're checking locks ignore the locked ones
+                        if (inventory[iP].favorited) continue;                    // if we're checking locks ignore the locked ones
 
                         if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
@@ -143,7 +153,10 @@ namespace InvisibleHand
             }
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
         }
-    #endregion
+        #endregion
+
+
+        // FIXME: ITEMSLOT STUFF IS HAAAARRRD NOW!!! I'm not sure how to get the item in the slot...I'm not sure about anything related to this, anymore, to be honest...
 
         //------------------------------------------------------//
         //-----------CALLABLES FOR ITEM SLOT ACTIONS------------//
@@ -164,111 +177,113 @@ namespace InvisibleHand
         *   move item from player inventory slot to chest
         *   returns true if item moved/itemstack emptied
         */
-        public static bool ShiftToChest(ref ItemSlot slot)
-        {
-            bool sendMessage = Main.localPlayer.chest > -1;
-
-            var pItem = slot.MyItem;
-
-            int retIdx = -1;
-            if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
-            {
-                retIdx = MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
-                                            i => i<Chest.maxItems,
-                                            i => i+1
-                                        );
-            }
-
-            // if we didn't find an empty slot...
-            if (retIdx < 0)
-            {
-                //we can't stack it, so we already know there's no place for it.
-                if (pItem.maxStack == 1) return false;
-
-                retIdx = MoveItemP2C(ref pItem, Main.localPlayer.chestItems, sendMessage);
-
-                // still didn't find an empty slot...
-                if (retIdx < 0)
-                {
-                    // ...but, partial success (stack amt changed), though we
-                    // don't want to reset the item.
-                    if (retIdx == -1)
-                    {
-                        Sound.ItemMoved.Play();
-                        Recipe.FindRecipes();
-                    }
-                    return false;
-                }
-            }
-            //else, success!
-            Sound.ItemMoved.Play();
-            slot.MyItem = new Item();
-            // if (sendMessage) SendNetMessage(retIdx);
-            return true;
-        }
-
-        /// MoveChestSlotItem - moves item from chest/guide slot to player inventory
-        public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
-        {
-            //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
-            var cItem = slot.MyItem;
-
-            if (cItem.IsBlank()) return false;
-
-            if (cItem.Matches(ItemCat.COIN)) {
-                // don't bother with "shifting", just move it as usual
-                slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
-                return (slot.MyItem.IsBlank());
-            }
-
-            // reminder: ShiftToPlayer returns true if original item ends up empty
-            if (cItem.Matches(ItemCat.AMMO)) {
-                if (cItem.maxStack > 1
-                && cItem.stack == cItem.maxStack
-                && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) //ammo goes top-to-bottom
-                    return true;
-            }
-
-            // if it's a stackable item and the stack is *full*, just shift it.
-            else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
-                if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //try hotbar first, ascending order (vanilla parity)
-                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //then the other slots, descending
-            }
-
-            //if all of the above failed, then we have no empty slots.
-            // Let's save some work and go traditional:
-            slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
-            return (slot.MyItem.IsBlank());
-        }
-
-        /// attempts to move an item to an empty slot (returns success status)
-        private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
-        {
-            int iStart;
-            Func<int,bool> iCheck;
-            Func<int,int> iNext;
-
-            if (desc) {
-                iStart =  ixStop;
-                iCheck = i => i >= ixStart;
-                iNext = i => i-1;
-            }
-            else {
-                iStart = ixStart;
-                iCheck = i => i <=  ixStop;
-                iNext = i => i+1;
-            }
-
-            int retIdx = MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
-            if (retIdx >= 0)
-            {
-                Sound.ItemMoved.Play();
-                slot.MyItem = new Item();
-                // if (sendMessage) SendNetMessage(retIdx);
-                return true;
-            }
-            return false;
-        }
+        // public static bool ShiftToChest(ref ItemSlot slot)
+        // {
+        //     // var player = IHPlayer.LocalPlayer;
+        //     bool sendMessage = player.chest > -1;
+        //     var chestItems = Main.chest[player.chest].item;
+        //
+        //     var pItem = slot.MyItem;
+        //
+        //     int retIdx = -1;
+        //     if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
+        //     {
+        //         retIdx = MoveToFirstEmpty( pItem, chestItems, 0,
+        //                                     i => i<Chest.maxItems,
+        //                                     i => i+1
+        //                                 );
+        //     }
+        //
+        //     // if we didn't find an empty slot...
+        //     if (retIdx < 0)
+        //     {
+        //         //we can't stack it, so we already know there's no place for it.
+        //         if (pItem.maxStack == 1) return false;
+        //
+        //         retIdx = MoveItemP2C(ref pItem, chestItems, sendMessage);
+        //
+        //         // still didn't find an empty slot...
+        //         if (retIdx < 0)
+        //         {
+        //             // ...but, partial success (stack amt changed), though we
+        //             // don't want to reset the item.
+        //             if (retIdx == -1)
+        //             {
+        //                 Sound.ItemMoved.Play();
+        //                 Recipe.FindRecipes();
+        //             }
+        //             return false;
+        //         }
+        //     }
+        //     //else, success!
+        //     Sound.ItemMoved.Play();
+        //     slot.MyItem = new Item();
+        //     // if (sendMessage) SendNetMessage(retIdx);
+        //     return true;
+        // }
+        //
+        // /// MoveChestSlotItem - moves item from chest/guide slot to player inventory
+        // public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
+        // {
+        //     //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
+        //     var cItem = slot.MyItem;
+        //
+        //     if (cItem.IsBlank()) return false;
+        //
+        //     if (cItem.Matches(ItemCat.COIN)) {
+        //         // don't bother with "shifting", just move it as usual
+        //         slot.MyItem = player.GetItem(Main.myPlayer, slot.MyItem);
+        //         return (slot.MyItem.IsBlank());
+        //     }
+        //
+        //     // reminder: ShiftToPlayer returns true if original item ends up empty
+        //     if (cItem.Matches(ItemCat.AMMO)) {
+        //         if (cItem.maxStack > 1
+        //         && cItem.stack == cItem.maxStack
+        //         && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) //ammo goes top-to-bottom
+        //             return true;
+        //     }
+        //
+        //     // if it's a stackable item and the stack is *full*, just shift it.
+        //     else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
+        //         if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //try hotbar first, ascending order (vanilla parity)
+        //         ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //then the other slots, descending
+        //     }
+        //
+        //     //if all of the above failed, then we have no empty slots.
+        //     // Let's save some work and go traditional:
+        //     slot.MyItem = player.GetItem(Main.myPlayer, slot.MyItem);
+        //     return (slot.MyItem.IsBlank());
+        // }
+        //
+        // /// attempts to move an item to an empty slot (returns success status)
+        // private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
+        // {
+        //     int iStart;
+        //     Func<int,bool> iCheck;
+        //     Func<int,int> iNext;
+        //
+        //     if (desc) {
+        //         iStart =  ixStop;
+        //         iCheck = i => i >= ixStart;
+        //         iNext = i => i-1;
+        //     }
+        //     else {
+        //         iStart = ixStart;
+        //         iCheck = i => i <=  ixStop;
+        //         iNext = i => i+1;
+        //     }
+        //
+        //     int retIdx = MoveToFirstEmpty( slot.MyItem, player.inventory, iStart, iCheck, iNext );
+        //     if (retIdx >= 0)
+        //     {
+        //         Sound.ItemMoved.Play();
+        //         slot.MyItem = new Item();
+        //         // if (sendMessage) SendNetMessage(retIdx);
+        //         return true;
+        //     }
+        //     return false;
+        // }
 
     #region helperfunctions
 
@@ -297,8 +312,8 @@ namespace InvisibleHand
         public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
         {
             int retIdx = MoveItemP2C (
-            ref Main.localPlayer.inventory[iPlayer],    // item in inventory
-            Main.localPlayer.chestItems,                // destination container
+            ref player.inventory[iPlayer],    // item in inventory
+            Main.chest[player.chest].item,                // destination container
             sendMessage,                                // if true, sendMessage
             desc);                                      // check container indices descending?
 
@@ -307,7 +322,7 @@ namespace InvisibleHand
                 Sound.ItemMoved.Play();
                 if (retIdx > -1) // =full success!
                 {
-                    Main.localPlayer.inventory[iPlayer] = new Item();
+                    player.inventory[iPlayer] = new Item();
                     // if (sendMessage) SendNetMessage(retIdx);
                     return true;
                 }
@@ -472,19 +487,10 @@ namespace InvisibleHand
         {
             if (Main.netMode == 1)
             {
-                NetMessage.SendData(32, -1, -1, "", Main.localPlayer.chest, (float)index, 0, 0, 0);
+                NetMessage.SendData(32, -1, -1, "", player.chest, (float)index, 0, 0, 0);
             }
         }
 
-        public static Player getMyPlayer()
-        {
-            return Main.player[Main.myPlayer];
-        }
-
-        public static IHPlayer getMyModPlayer()
-        {
-
-        }
 
     #endregion
 

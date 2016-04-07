@@ -39,6 +39,17 @@ namespace InvisibleHand
             return sub;
         }
 
+        /// query the Main (current) keystate about the given key
+        public static bool Down(this Keys key)
+        {
+            return Main.keyState.IsKeyDown(key);
+        }
+        public static bool Up(this Keys key)
+        {
+            return Main.keyState.IsKeyUp(key);
+        }
+
+        /// query an arbitrary keystate about the given key
         public static bool Down(this Keys key, KeyboardState state)
         {
             return state.IsKeyDown(key);
@@ -48,10 +59,11 @@ namespace InvisibleHand
             return state.IsKeyUp(key);
         }
 
+
         /// returns true if the key is down now, but was up in the previous state
-        public static bool Pressed(this Keys key, KeyboardState current_state, KeyboardState previous_state)
+        public static bool Pressed(this Keys key, KeyboardState previous_state)
         {
-            return key.Up(previous_state) && key.Down(current_state);
+            return key.Up(previous_state) && key.Down();
         }
 
         #endregion
@@ -93,11 +105,14 @@ namespace InvisibleHand
             // return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
         }
 
+        // FIXME: glowstick and flaregun and...the whole thing, really
         public static bool IsTool(this Item item)
         {
             return item.createTile == TileID.Rope || item.createTile == TileID.Chain || item.name.EndsWith("Bucket") ||
-            item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() || ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
-            item.type == 1991 || item.type == 50 || item.type == 1326 || ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
+            item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() ||
+            // ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
+            item.type == 1991 || item.type == 50 || item.type == 1326 ||
+            // ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
             item.name.Contains("Paintbrush") || item.name.Contains("Paint Roller") || item.name.Contains("Paint Scraper") ||
             (item.type >= 1543 && item.type <= 1545);
             //bucket, bug net, magic mirror, rod of discord, spectre paint tools
@@ -182,14 +197,14 @@ namespace InvisibleHand
 
         /// returns the key-bind (as a string) for the button with the given
         /// action. return value will be something like "(X)"
-        public static string GetKeyTip(this TIH action)
-        {
-            string kbopt;
-            if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
-                return IHBase.ButtonKeyTips[kbopt];
-
-            return "";
-        }
+        // public static string GetKeyTip(this TIH action)
+        // {
+        //     string kbopt;
+        //     if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
+        //         return IHBase.ButtonKeyTips[kbopt];
+        //
+        //     return "";
+        // }
 
     #endregion
 

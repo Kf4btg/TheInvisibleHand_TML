@@ -1,8 +1,8 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System;
+// using System;
 // using TAPI;
-using Terraria.ID;
+// using Terraria.ID;
 
 namespace InvisibleHand
 {
@@ -74,7 +74,7 @@ namespace InvisibleHand
 
         public static void Initialize()
         {
-            
+
         }
 
     }
