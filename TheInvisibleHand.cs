@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
@@ -138,7 +139,6 @@ namespace InvisibleHand
                                 case "query-key":
                                     commandHelper.printHelp("query-key");
                                     break;
-
                             }
                             // Main.NewText("Usage: /ihconfig set-opt <option name> true|false|0|1");
                             // Main.NewText("  Example: /ihconfig set opt ReverseSortPlayer true");
@@ -162,18 +162,10 @@ namespace InvisibleHand
                                     string value = qcmd.Dequeue();
                                     if (bool.TryParse(value, out newval))
                                         this.UpdateOption(opt, newval);
-                                    else if (Int32.TryParse(value, out boolint))
-                                    {
-                                        if (boolint == 0)
-                                            this.UpdateOption(opt, false);
-                                        else if (boolint == 1)
-                                            this.UpdateOption(opt, true);
-                                        else
-                                        {
-                                            commandHelper.ErrorMsg($"could not parse value '{value}'", "ihconfig");
-                                            return;
-                                        }
-                                    }
+                                    else if (Int32.TryParse(value, out boolint) && (boolint == 0 || boolint == 1))
+                                        this.UpdateOption(opt, boolint == 1);
+                                    else
+                                        commandHelper.ErrorMsg($"could not parse value '{value}'", "ihconfig");
                                 }
                             }
                             else
@@ -182,9 +174,64 @@ namespace InvisibleHand
                         break;
                     case "sk":
                     case "set-key":
+                        if (qcmd.Count == 0)
+                            commandHelper.printHelp("set-key");
+                        else
+                        {
+                            string action = qcmd.Dequeue();
+                            if (ActionKeys.ContainsKey(action))
+                            {
+                                Keys newkey;
+                                string value = qcmd.Dequeue();
+                                if (Enum.TryParse<Keys>(value, out newkey))
+                                    this.UpdateOption(action, newkey);
+                                else
+                                    commandHelper.ErrorMsg($"could not parse value '{value}' as a known key", "ihconfig");
+                            }
+                            else
+                            {
+                                commandHelper.ErrorMsg($"invalid action name '{action}'", "ihconfig");
+                            }
+                        }
                         break;
                     case "q":
-                    case "query":
+                    case "query-opt":
+                        if (qcmd.Count == 0 || qcmd.Peek()=="all")
+                        {
+                            // print all available options and current values
+                            StringBuilder printopts = new StringBuilder("Options:");
+                            foreach (var kvp in ModOptions)
+                            {
+                                printopts.AppendFormat(" {0} [{1}],", kvp.Key, kvp.Value);
+                            }
+                            // print all but last comma
+                            Main.NewText(printopts.ToString(0, printopts.Length-1));
+                        }
+                        else
+                        {
+                            while (qcmd.Count > 0)
+                            {
+                                string opt = qcmd.Dequeue();
+                                bool current;
+                                if (ModOptions.TryGetValue(opt, out current))
+                                    Main.NewText($"Option {opt}: {current}");
+                                else
+                                    commandHelper.ErrorMsg("invalid option name '{opt}'", "ihconfig");
+                            }
+                        }
+                        break;
+                    case "qk":
+                    case "query-key":
+                        if (qcmd.Count == 0 || qcmd.Peek() == "all")
+                        {
+                            StringBuilder printkeys = new StringBuilder("KeyBinds:");
+                            foreach (var kvp in ActionKeys)
+                            {
+                                printkeys.AppendFormat(" {0} [{1}],", kvp.Key, kvp.Value);
+                            }
+                            // print all but last comma
+                            Main.NewText(printkeys.ToString(0, printkeys.Length-1));
+                        }
                         break;
                 }
 
@@ -193,7 +240,6 @@ namespace InvisibleHand
                     args = command_line_parts.slice(1);
                 else
                     args = new string[0];
-
             }
         }
 
@@ -224,26 +270,26 @@ namespace InvisibleHand
                 "Usage: /ihconfig set-opt <option> {false,true,0,1,default}",
                 "  Examples: /ihconfig set-opt ReverseSortPlayer true",
                 "            /ihconfig set-opt ReverseSortChest 0",
-                "Use \"/ihconfig query-opt\" for a list of all options."
+                "Use \"/ihconfig query-opt all\" for a list of all options."
             );
 
             commandHelper.setHelp("set-key",
                 "Usage: /ihconfig set-key <action> <key>",
                 "  Examples: /ihconfig set-key DepositAll X",
                 "            /ihconfig set-key Sort Tab",
-                "Use \"/ihconfig query-key\" for a list of all actions and current key-binds."
+                "Use \"/ihconfig query-key all\" for a list of all actions and current key-binds."
             );
 
             commandHelper.setHelp("query-opt",
-                "Usage: /ihconfig query-opt [option_name]...",
+                "Usage: /ihconfig query-opt [all] [<option_name>]...",
                 "With no arguments, prints a list of all option names.",
                 "With one or more option names, shows current state of those options.",
                 "  Example: /ihconfig query-opt SortToEndPlayer ReverseSortPlayer"
             );
 
             commandHelper.setHelp("query-key",
-                "Usage: /ihconfig query-key [action_name]...",
-                "With no arguments, prints a list of all action names.",
+                "Usage: /ihconfig query-key [all] [<action_name>]...",
+                "With no arguments (or 'all'), prints a list of all action names.",
                 "With one or more action names, shows currently bound key for those actions.",
                 "  Example: /ihconfig query-opt Sort LootAll"
             );
