@@ -5,85 +5,100 @@ using System.Collections.Generic;
 
 namespace InvisibleHand.Utils
 {
+    public enum OptionType
+    {
+        STRING,
+        BOOL,
+        INT,
+        FLOAT,
+        KEY
+    }
 
     public static class OptionManager
     {
         /// maps mod name to Mod
-        private static Dictionary<string, Mod> trackedMods;
+        // private static IDictionary<string, Mod> trackedMods;
         /// maps
 
-        /// maps modname to registered String options for that mod
-        private static Dictionary<string, Dictionary<string, StringOption>> StringOptions;
-        // private static Dictionary<string, StringOption> StringOptions;
-        // private static Dictionary<string, StringOption> StringOptions;
-        // private static Dictionary<string, StringOption> StringOptions;
-        // private static Dictionary<string, StringOption> StringOptions;
+        /// maps modname to registered options (of any ModOption type)
+        private static IDictionary<string, IDictionary<string, dynamic>> OptionsByMod = new Dictionary<string, IDictionary<string, dynamic>>();
 
-        /// used as an extension method on the mod class
-        public static void RegisterModOption<T>(this Mod mod, string option_name, T default_value)
-        {
-            if (!trackedMods.ContainsKey(mod.Name))
-                trackedMods.Add(mod.Name, mod);
-
-            // Type opt_type = option_type ?? default_value.GetType();
-
-            // switch (opt_type.Name)
-            // {
-            //     case "String":
-            //     case "StringOption":
-            //         AddOption(new StringOption(mod, (string)default_value));
-            //         break;
-            //     case "Boolean":
-            //     case "BoolOption":
-            //         AddOption(new BoolOption(mod, (bool)default_value));
-            //         break;
-            //     case "Int32":
-            //     case "IntOption":
-            //         AddOption(new IntOption(mod, (int)default_value));
-            //         break;
-            //     case "Keys":
-            //     case "KeyOption":
-            //         AddOption(new KeyOption(mod, (Keys)default_value));
-            //         break;
-            //     default:
-            //         // if option_type is a subclass of ModOption<>, then use that
-            //         if (opt_type.Equals(typeof(ModOption<>)) || opt_type.IsSubclassOf(typeof(ModOption<>)))
-            //             AddOption(new opt_type())
-            //
-            //         // create a generic type for the object
-            //         Type genericOptType = typeof(ModOption<>);
-            //         Type constructedOptType = genericOptType.MakeGenericType(new Type[] { opt_type });
-            //
-            //         AddOption(new ModOption<opt_type>);
-            //         break;
-            // }
-        }
-
-        public static void RegisterStringOption(this Mod mod, string option_name, string default_value)
-        {
-            if (StringOptions.ContainsKey(mod.Name))
-                StringOptions[mod.Name].Add(option_name, new StringOption(mod, option_name, default_value));
-        }
-
-        public static void RegisterBoolOption(this Mod mod, string option_name, bool default_value)
+        /// Called as extension method on the Mod class; the type of the option is inferred dynamically from the type of `default_value`. If this type is one of string, bool, int, float, or Keys, an appropriate subclass ModOption will be instantiated. Otherwise, a new generic ModOption type will be generated and used.
+        public static void RegisterOption(this Mod mod, string option_name, dynamic default_value)
         {
 
+            // if (!trackedMods.ContainsKey(mod.Name))
+            //     trackedMods.Add(mod.Name, mod);
+
+            // special cases
+            dynamic option;
+            if (default_value is string)
+                option = new StringOption(mod, option_name, default_value);
+            else if (default_value is bool)
+                option = new BoolOption(mod, option_name, default_value);
+            else if (default_value is int)
+                option = new IntOption(mod, option_name, default_value);
+            else if (default_value is float)
+                option = new FloatOption(mod, option_name, default_value);
+            else if (default_value is Keys)
+                option = new KeyOption(mod, option_name, default_value);
+            else
+            {
+                // create a ModOption type based on the default value
+                Type t = default_value.GetType();
+                Type constructedOptType = typeof(ModOption<>).MakeGenericType(new Type[] { t });
+
+                option = constructedOptType.GetConstructor(new Type[]{
+                    typeof(Mod),
+                    typeof(string),
+                    t}).Invoke(new object[]{mod, option_name, default_value});
+            }
+
+            _addOption(mod.Name, option);
         }
 
-        public static void RegisterIntOption(this Mod mod, string option_name, int default_value)
+        /// register a pre-constructed mod option
+        private static void _addOption<U, T>(string mod_name, U mod_option) where U : ModOption<T>
         {
+            if (!OptionsByMod.ContainsKey(mod_name))
+                OptionsByMod.Add(mod_name, new Dictionary<string, dynamic>());
 
+            try
+            {
+                OptionsByMod[mod_name].Add(mod_option.name, mod_option);
+            }
+            catch (ArgumentException)
+            {
+                // don't crash on duplicate keys; but do write an error to the log
+                ErrorLogger.Log($"An Option with the name {mod_option.name} is already registered for mod {mod_name}.");
+            }
         }
 
-        public static void RegisterKeyOption(this Mod mod, string option_name, Keys default_value)
+        /// register a pre-constructed mod option for this mod
+        public static void AddOption<U, T>(this Mod mod, U mod_option) where U : ModOption<T>
         {
-
+            _addOption<U, T>(mod.Name, mod_option);
         }
 
-        public static void AddOption<T>(ModOption<T> newopt)
+        /// request the option value of the type T for the option named `option_name` in this mod
+        /// E.g., if a bool option was registered with name "enableFeatureA", you could retrieve its
+        /// value with
+        ///     ```bool featA_enabled = mod.GetOptionValue<bool>("enableFeatureA");```
+        /// If either the mod or the option has not yet been registered with the OptionManager, an exception will be thrown.
+        public static T GetOptionValue<T>(this Mod mod, string option_name)
         {
-
+            return OptionsByMod[mod.Name][option_name].Value;
         }
+
+        public static void UpdateOption<T>(this Mod mod, string option_name, T new_value)
+        {
+            OptionsByMod[mod.Name][option_name].Value = new_value;
+        }
+
+        // public static void RegisterCallback(this Mod mod, string option_name, Action<string)
+        // {
+        //
+        // }
     }
 
     /// T is the type of the option's value, usually a simple type such as int, bool, string, etc.
@@ -186,6 +201,16 @@ namespace InvisibleHand.Utils
         public BoolOption(Mod mod, string name, bool value = false) : base(mod, name, value) { }
 
         public static implicit operator bool(BoolOption o)
+        {
+            return o.Value;
+        }
+    }
+
+    public class FloatOption : ModOption<float>
+    {
+        public FloatOption(Mod mod, string name, float value = default(float)) : base(mod, name, value) { }
+
+        public static implicit operator float(FloatOption o)
         {
             return o.Value;
         }
