@@ -17,8 +17,8 @@ namespace InvisibleHand
         /// original values to replace them with newer, better buttons.
         public static Dictionary<TIH, string> OriginalButtonLabels { get; private set; }
 
-        public static readonly Dictionary<string, BoolOption> ModOptions = new Dictionary<string, BoolOption>();
-        public static readonly Dictionary<string, KeyOption> ActionKeys = new Dictionary<string, KeyOption>();
+        public static readonly Dictionary<string, bool> ModOptions = new Dictionary<string, bool>();
+        public static readonly Dictionary<string, Keys> ActionKeys = new Dictionary<string, Keys>();
 
         public override string Name
         {
@@ -34,18 +34,29 @@ namespace InvisibleHand
                 // AutoloadSounds = true,
             };
 
-            // default options
-            ModOptions["UseReplacers"] = new BoolOption(this, true);
+            foreach (var kvp in Constants.DefaultOptionValues)
+            {
+                this.RegisterOption(kvp.Key, kvp.Value, onOptionChanged);
+                ModOptions[kvp.Key] = kvp.Value;
+            }
+            foreach (var kvp in Constants.DefaultKeys)
+            {
+                this.RegisterOption(kvp.Key, kvp.Value, onKeyBindChanged);
+                ActionKeys[kvp.Key]=kvp.Value;
+            }
 
-            // default hotkeys
-            ActionKeys["Sort"] = new KeyOption(this, Keys.R);
-            ActionKeys["Clean"] = new KeyOption(this, Keys.T);
-            
-            ActionKeys["DepositAll"] = new KeyOption(this, Keys.Z);
-            ActionKeys["LootAll"] = new KeyOption(this, Keys.X);
-            ActionKeys["QuickStack"] = new KeyOption(this, Keys.C);
-            ActionKeys["SmartDeposit"] = new KeyOption(this, Keys.V);
-            ActionKeys["SmartLoot"] = new KeyOption(this, Keys.B);
+            // default options
+            // ModOptions["UseReplacers"] = new BoolOption(this, true);
+            //
+            // // default hotkeys
+            // ActionKeys["Sort"] = new KeyOption(this, Keys.R);
+            // ActionKeys["Clean"] = new KeyOption(this, Keys.T);
+            //
+            // ActionKeys["DepositAll"] = new KeyOption(this, Keys.Z);
+            // ActionKeys["LootAll"] = new KeyOption(this, Keys.X);
+            // ActionKeys["QuickStack"] = new KeyOption(this, Keys.C);
+            // ActionKeys["SmartDeposit"] = new KeyOption(this, Keys.V);
+            // ActionKeys["SmartLoot"] = new KeyOption(this, Keys.B);
         }
 
         public override void Load()
@@ -58,14 +69,14 @@ namespace InvisibleHand
             }
         }
 
-        public void onOptionChanged(string name, bool value)
+        private static void onOptionChanged(string name, bool value)
         {
-
+            ModOptions[name] = value;
         }
 
-        public void onOptionChanged(string name, Keys value)
+        private static void onKeyBindChanged(string name, Keys value)
         {
-
+            ActionKeys[name] = value;
         }
     }
 }
