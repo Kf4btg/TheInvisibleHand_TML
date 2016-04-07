@@ -18,6 +18,7 @@ namespace InvisibleHand
             }
         }
 
+        // track Keyboard state (pressed keys)
         internal static KeyboardState prevState = Keyboard.GetState();
         internal static KeyboardState currState = Keyboard.GetState();
 
@@ -89,6 +90,7 @@ namespace InvisibleHand
 
             // TODO: refactor option-handling into separate lib, save the options there; query
             // that during load to retrieve options
+
             // Save modoptions
             writer.Write(IHBase.ModOptions.Count);
             foreach (var kvp in IHBase.ModOptions)
@@ -96,6 +98,7 @@ namespace InvisibleHand
               writer.Write(kvp.Key); // string optionname
               writer.Write((bool)kvp.Value);
             }
+            
             // save user-defined hotkeys
             writer.Write(IHBase.ActionKeys.Count);
             foreach (var kvp in IHBase.ActionKeys)
@@ -160,6 +163,7 @@ namespace InvisibleHand
                 ErrorLogger.Log("Read Error: "+e.ToString());
             }
 
+            // load locked Actions
             try
             {
                 int count = reader.ReadInt32();

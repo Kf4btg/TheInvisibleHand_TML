@@ -1,9 +1,11 @@
 using Microsoft.Xna.Framework.Input;
-// using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using System;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.ID;
+
+using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {
@@ -55,6 +57,14 @@ namespace InvisibleHand
         #endregion
 
         #region itemExensions
+
+
+        public static bool IsBlank(this Item item)
+        {
+
+            return item.type == 0 || item.stack == 0;
+        }
+
         public static ItemCat GetCategory(this Item item)
         {
             foreach (ItemCat catID in Constants.CheckOrder)

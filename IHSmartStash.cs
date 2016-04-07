@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Terraria;
+using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {
@@ -14,11 +15,14 @@ namespace InvisibleHand
         */
         public static void SmartDeposit()
         {
-            if (Main.localPlayer.chest == -1) return;
 
-            var pInventory = Main.localPlayer.inventory; //Item[]
-            var chestItems = Main.localPlayer.chestItems; //Item[]
-            var sendNetMsg = Main.localPlayer.chest >-1; //bool
+            var player = IHPlayer.LocalPlayer;
+
+            if (player.chest == -1) return;
+
+            var pInventory = player.inventory; //Item[]
+            var chestItems = Main.chest[player.chest].item; //Item[]
+            var sendNetMsg = player.chest > -1; //bool
 
             // define a query that creates category groups for the items in the chests,
             // then pulls out the category keys into a distinct list (List<ItemCat>)
@@ -30,26 +34,14 @@ namespace InvisibleHand
                         select catGroup.Key).Distinct() //no duplicates
                         .ToList(); //store the query results
 
-            // if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
-            // {
                 for (int i = 49; i >= 10; i--)  // reverse through player inv
                 {
-                    if (!pInventory[i].IsBlank() //&& !IHPlayer.SlotLocked(i)
+                    if (!pInventory[i].IsBlank()
                         && catList.Contains(pInventory[i].GetCategory()))
                     {
                         IHUtils.MoveItemToChest(i, sendNetMsg);
                     }
                 }
-            // }
-            // else //no locking
-            // {
-            //     for (int i = 49; i >= 10; i--)
-            //     {
-            //         // if chest contains a matching category
-            //         if (!pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()))
-            //             IHUtils.MoveItemToChest(i, sendNetMsg);
-            //     }
-            // }
             Recipe.FindRecipes();
         }
 
@@ -64,11 +56,13 @@ namespace InvisibleHand
         */
         public static void SmartLoot()
         {
-            if (Main.localPlayer.chest == -1) return;
+            var player = IHPlayer.LocalPlayer;
 
-            var pInventory = Main.localPlayer.inventory; //Item[]
-            var chestItems = Main.localPlayer.chestItems; //Item[]
-            var sendNetMsg = Main.localPlayer.chest >-1; //bool
+            if (player.chest == -1) return;
+
+            var pInventory = player.inventory; //Item[]
+            var chestItems = Main.chest[player.chest].item; //Item[]
+            var sendNetMsg = player.chest > -1; //bool
 
             int index;
             //for each item in inventory (including coins & hotbar)...
@@ -93,7 +87,7 @@ namespace InvisibleHand
                             // I *think* this ItemText.NewText command just makes the text pulse...
                             // I don't entirely grok how it works, but included for parity w/ vanilla
                             ItemText.NewText(chestItems[j], IHUtils.StackMergeD(ref chestItems[j], ref pInventory[index]));
-                            Main.localPlayer.DoCoins(index);
+                            player.DoCoins(index);
                             if (chestItems[j].stack<=0)
                             {
                                 chestItems[j] = new Item(); //reset this item if all stack transferred
