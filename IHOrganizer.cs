@@ -41,13 +41,13 @@ namespace InvisibleHand
        /// <summary>
        /// Construct a list containing cloned copies of items in the given container, skipping blank (and optionally locked) slots.
        /// </summary>
-       /// <param name="source_container">The IList<Item> array of the container</param>
+       /// <param name="source_container">The Item[] array of the container</param>
        /// <param name="source_is_chest">Is the source container a chest? </param>
        /// <param name="rangeStart">index in source to start looking for items </param>
        /// <param name="rangeEnd">index in source to stop looking for items </param>
        /// <returns> The new list of copied items, or null if no items were
        /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(IList<Item> source_container, bool source_is_chest, int rangeStart, int rangeEnd)
+        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
         {
             return GetItemCopies(source_container, source_is_chest, new Tuple<int, int>(rangeStart, rangeEnd));
         }
@@ -56,13 +56,13 @@ namespace InvisibleHand
         /// Construct a list containing cloned copies of items in the given
         /// container, skipping blank (and optionally locked) slots.
         /// </summary>
-        /// <param name="source_container">The IList<Item> array of the container</param>
+        /// <param name="source_container">The Item[] array of the container</param>
         /// <param name="source_is_chest">Is the source container a chest? </param>
         /// <param name="range">Starting and ending indices defining the subset of the
         /// source's slots to be searched for items.</param>
         /// <returns> The new list of copied items, or null if no items were
         /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(IList<Item> source_container, bool source_is_chest, Tuple<int,int> range = null)
+        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
         {
             if (range == null) range = new Tuple<int,int>(0, source_container.Length -1);
 

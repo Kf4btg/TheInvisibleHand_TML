@@ -19,6 +19,26 @@ namespace InvisibleHand
         // }
         #endregion
 
+        #region genericExtensions
+
+        /// <summary>
+        /// Get the array slice between the two indexes.
+        /// ... Inclusive for start index, exclusive for end index.</summary> 
+        public static T[] slice<T>(this T[] source, int start, int end = -1)
+        {
+            // Handle negative ends
+            if (end < 0)
+                end = source.Length + end;
+            int len = end - start;
+
+            T[] sub = new T[len];
+            Array.Copy(source, start, sub, 0, len);
+
+            return sub;
+        }
+
+        #endregion
+
         #region itemExensions
         public static ItemCat GetCategory(this Item item)
         {

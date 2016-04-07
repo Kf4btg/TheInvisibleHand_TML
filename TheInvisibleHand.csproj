@@ -33,8 +33,15 @@
     <Reference Include="Microsoft.Xna.Framework">
         <HintPath>..\..\ref\tModLoader Linux v0.8\ModCompile\Microsoft.Xna.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework.Game" />
-    <Reference Include="Microsoft.Xna.Framework.Graphics" />
+    <Reference Include="Microsoft.Xna.Framework.Game" >
+        <HintPath>..\..\ref\tModLoader Linux v0.8\ModCompile\Microsoft.Xna.Framework.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Graphics" >
+        <HintPath>..\..\ref\tModLoader Linux v0.8\ModCompile\Microsoft.Xna.Framework.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Xact" >
+        <HintPath>..\..\ref\tModLoader Linux v0.8\ModCompile\Microsoft.Xna.Framework.Xact.dll</HintPath>
+    </Reference>
     <Reference Include="Terraria">
       <HintPath>..\..\ref\tModLoader Linux v0.8\ModCompile\tModLoaderWindows.exe</HintPath>
     </Reference>
@@ -46,6 +53,7 @@
     <Compile Include="CategoryDef.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IHCommandHelper.cs" />
     <Compile Include="IHEvent.cs" />
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
