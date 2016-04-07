@@ -18,6 +18,9 @@ namespace InvisibleHand
             }
         }
 
+        internal static KeyboardState prevState = Keyboard.GetState();
+        internal static KeyboardState currState = Keyboard.GetState();
+
         public static IHPlayer GetLocalIHPlayer(Mod mod)
         {
             return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
@@ -124,33 +127,37 @@ namespace InvisibleHand
 
             try //mod options
             {
-              int count = reader.ReadInt32();
-              for (int i = 0; i < count; i++)
-              {
-                  string optionName = reader.ReadString();
-                  bool state = reader.ReadBoolean();
-                  IHBase.ModOptions[optionName] = new BoolOption(mod, state);
-              }
+                int count = reader.ReadInt32();
+                for (int i = 0; i < count; i++)
+                {
+                    string optionName = reader.ReadString();
+                    bool state = reader.ReadBoolean();
+                    mod.UpdateOption(optionName, state);
+                }
             }
             catch (Exception e)
             {
-              ErrorLogger.Log("Read Error: "+e.ToString());
+                ErrorLogger.Log("Read Error: "+e.ToString());
             }
 
             try //key options
             {
-              int count = reader.ReadInt32();
-              for (int i = 0; i < count; i++)
-              {
-                  string actionName = reader.ReadString();
-                  int keyval = reader.ReadInt32();
-                  if (Enum.IsDefined(typeof(Keys), keyval))
-                    IHBase.ActionKeys[actionName] = new KeyOption(mod, (Keys)keyval);
-              }
+                int count = reader.ReadInt32();
+                for (int i = 0; i < count; i++)
+                {
+                    string actionName = reader.ReadString();
+                    int keyval = reader.ReadInt32();
+                    if (Enum.IsDefined(typeof(Keys), keyval))
+                        mod.UpdateOption(actionName, (Keys)keyval);
+                    else
+                        ErrorLogger.Log($"Invalid value {keyval} for keybind {actionName} found in player save data");
+
+                    // IHBase.ActionKeys[actionName] = new KeyOption(mod, (Keys)keyval);
+                }
             }
             catch (Exception e)
             {
-              ErrorLogger.Log("Read Error: "+e.ToString());
+                ErrorLogger.Log("Read Error: "+e.ToString());
             }
 
             try
@@ -170,27 +177,32 @@ namespace InvisibleHand
             }
         }
 
+        public static bool KeyboardBusy() => Main.chatMode || Main.editSign || Main.editChest;
+        public static bool ShiftHeld() => Keys.LeftShift.Down(currState) || Keys.RightShift.Down(currState);
+
         /// During this phase we check if the player has pressed any hotkeys;
         /// if so, the corresponding action is called, with the chest-related
         /// actions wrapped in special net-update code to prevent syncing
         /// issues during multiplayer.
         public override void PreUpdate()
         {
+            currState = Keyboard.GetState();
+
             //activate only if:
                 // not typing
                 // inventory is open
                 // not shopping
                 // not talking to an npc
-            if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && player.talkNPC==-1)
+            if (!KeyboardBusy() && Main.playerInventory && Main.npcShop==0 && player.talkNPC==-1)
             {
                 // Sort inventory/chest
-                if (IHBase.ActionKeys["Sort"].Pressed())
+                if (IHBase.ActionKeys["Sort"].Pressed(currState, prevState))
                 {
-                    Sort(KState.Special.Shift.Down());
+                    Sort(ShiftHeld());
                 }
 
                 //Consolidate Stacks
-                else if (IHBase.ActionKeys["Clean"].Pressed())
+                else if (IHBase.ActionKeys["Clean"].Pressed(currState, prevState))
                 {
                     CleanStacks();
                 }
@@ -199,18 +211,20 @@ namespace InvisibleHand
                     if ( player.chest == -1 ) return; //no action w/o open container
 
                     // smartloot or quickstack
-                    if (IHBase.ActionKeys["QuickStack"].Pressed()) {
-                        QuickStack(KState.Special.Shift.Down());
+                    if (IHBase.ActionKeys["QuickStack"].Pressed(currState, prevState)) {
+                        QuickStack(ShiftHeld());
                     }
                     // smart-deposit or deposit-all
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed()) {
-                        DepositAll(KState.Special.Shift.Down());
+                    else if (IHBase.ActionKeys["DepositAll"].Pressed(currState, prevState)) {
+                        DepositAll(ShiftHeld());
                     }
                     // loot all
-                    else if (IHBase.ActionKeys["LootAll"].Pressed())
+                    else if (IHBase.ActionKeys["LootAll"].Pressed(currState, prevState))
                         DoChestUpdateAction( IHUtils.DoLootAll );
                 }
             }
+
+            prevState = currState;
         }
 
         /// <summary>
@@ -361,8 +375,8 @@ namespace InvisibleHand
         /// <returns>True if indicated action is set to respect locked slots.</returns>
         public static bool ActionLocked(Player player, TIH actionID)
         {
-            IHPlayer mp = player.GetSubClass<IHPlayer>();
-                return mp.LockedActions[actionID];
+            // IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
+            return player.GetModPlayer<IHPlayer>(Instance.mod).LockedActions[actionID];
         }
 
         public static bool ActionLocked(TIH actionID)
@@ -372,9 +386,9 @@ namespace InvisibleHand
 
         /// Set indicated action to respect/not-respect locked slots,
         /// depending on current status.
-        public static void ToggleActionLock(Player p, TIH actionID)
+        public static void ToggleActionLock(Player player, TIH actionID)
         {
-            IHPlayer mp = p.GetSubClass<IHPlayer>();
+            IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
             mp.LockedActions[actionID] = !mp.LockedActions[actionID];
         }
 

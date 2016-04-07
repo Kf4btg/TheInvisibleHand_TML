@@ -1,4 +1,4 @@
-// using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 // using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria.ModLoader;
@@ -23,7 +23,7 @@ namespace InvisibleHand
 
         /// <summary>
         /// Get the array slice between the two indexes.
-        /// ... Inclusive for start index, exclusive for end index.</summary> 
+        /// ... Inclusive for start index, exclusive for end index.</summary>
         public static T[] slice<T>(this T[] source, int start, int end = -1)
         {
             // Handle negative ends
@@ -35,6 +35,21 @@ namespace InvisibleHand
             Array.Copy(source, start, sub, 0, len);
 
             return sub;
+        }
+
+        public static bool Down(this Keys key, KeyboardState state)
+        {
+            return state.IsKeyDown(key);
+        }
+        public static bool Up(this Keys key, KeyboardState state)
+        {
+            return state.IsKeyUp(key);
+        }
+
+        /// returns true if the key is down now, but was up in the previous state
+        public static bool Pressed(this Keys key, KeyboardState current_state, KeyboardState previous_state)
+        {
+            return key.Up(previous_state) && key.Down(current_state);
         }
 
         #endregion
