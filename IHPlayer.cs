@@ -1,6 +1,7 @@
 using System;
+using System.Linq;
 using System.IO;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.UI;
@@ -236,12 +237,13 @@ namespace InvisibleHand
         /// Performs QuickStack or SmartLoot action if an appropriate container is open.
         /// </summary>
         /// <param name="smartLoot">Perform SmartLoot action instead </param>
-        public void QuickStack(bool smartLoot = false)
+        public void QuickStack(bool restock = false)
         {
             // if (player.chest == -1) return;
 
-            if (smartLoot)
-                DoChestUpdateAction(IHSmartStash.SmartLoot);
+            if (restock)
+                ChestUI.Restock();
+                // DoChestUpdateAction(IHSmartStash.SmartLoot);
             else
                 ChestUI.QuickStack();
                 // DoChestUpdateAction(IHUtils.DoQuickStack);
@@ -256,7 +258,8 @@ namespace InvisibleHand
             // if (player.chest == -1) return;
 
             if (smartDeposit)
-                DoChestUpdateAction(IHSmartStash.SmartDeposit);
+                this.SmartDeposit();
+                // DoChestUpdateAction(IHSmartStash.SmartDeposit);
             else
                 ChestUI.DepositAll();
             // DoChestUpdateAction(IHUtils.DoDepositAll);
@@ -267,5 +270,46 @@ namespace InvisibleHand
             // if (player.chest != -1)
             ChestUI.LootAll();
         }
+
+        /****************************************************
+        *   This will compare the categories of items in the player's
+            inventory to those of items in the open container and
+            deposit any items of matching categories.
+        */
+        public void SmartDeposit()
+        {
+            if (player.chest == -1) return;
+
+            // var pInventory = player.inventory; //Item[]
+            // var chestitems = this.chestItems; //Item[]
+            // var sendNetMsg = player.chest > -1; //bool
+
+            // define a query that creates category groups for the items in the chests,
+            // then pulls out the category keys into a distinct list (List<ItemCat>)
+            var catList =
+                    (from item in this.chestItems
+                        where !item.IsBlank()
+                        group item by item.GetCategory() into catGroup
+                        from cat in catGroup
+                        select catGroup.Key).Distinct() //no duplicates
+                        .ToList(); //store the query results
+
+            Item current;
+            for (int i = 49; i >= 10; i--)  // reverse through player inv
+            {
+                current = player.inventory[i];
+                if (!current.IsBlank() && !current.favorited
+                    && catList.Contains(current.GetCategory()))
+                {
+                    ChestUI.TryPlacingInChest(current, false);
+                    // IHUtils.MoveItem(ref pInventory[i], chestitems, 0, Chest.maxItems);
+                    // IHUtils.MoveItemToChest(i, sendNetMsg);
+                }
+            }
+            Recipe.FindRecipes();
+        }
+
+
+
     }
 }
