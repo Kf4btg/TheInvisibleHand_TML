@@ -12,8 +12,6 @@ namespace InvisibleHand
 {
     public class IHPlayer : ModPlayer
     {
-        private static IHPlayer Instance;
-
         // track Keyboard state (pressed keys)
         internal static KeyboardState prevState = Keyboard.GetState();
         // can just use Main.keyState for the current
@@ -23,10 +21,10 @@ namespace InvisibleHand
         public static IHPlayer GetLocalIHPlayer(Mod mod) => Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
         public Item[] chestItems => Main.chest[player.chest].item;
 
-        public override void Initialize()
-        {
-            Instance = this;
-        }
+        // public override void Initialize()
+        // {
+        //     Instance = this;
+        // }
 
         public override void SaveCustomData(BinaryWriter writer)
         {

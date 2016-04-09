@@ -4,6 +4,7 @@ using System;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.ID;
+using Terraria.UI;
 
 using InvisibleHand.Utils;
 
@@ -176,24 +177,26 @@ namespace InvisibleHand
         /// from Terraria's code for that action. </param>
         /// <returns>Corresponding label for the action or the empty string ""
         /// if one could not be found.</returns>
-        public static string DefaultLabelForAction(this TIH action, bool use_originals)
+        public static string DefaultLabelForAction(int actionID, bool use_originals)
         {
             if (use_originals)
             {
-                switch (action)
-                {
-                    case TIH.LootAll:
-                    case TIH.DepositAll:
-                    case TIH.QuickStack:
-                    case TIH.Rename:
-                    case TIH.SaveName:
-                    case TIH.CancelEdit:
-                        return IHBase.OriginalButtonLabels[action];
-                }
+                if (actionID < ChestUI.ButtonID.Count)
+                    return IHBase.OriginalButtonLabels[actionID];
+                // switch (actionID)
+                // {
+                //     case ActionID.:
+                //     case TIH.DepositAll:
+                //     case TIH.QuickStack:
+                //     case TIH.Rename:
+                //     case TIH.SaveName:
+                //     case TIH.CancelEdit:
+                //         return IHBase.OriginalButtonLabels[action];
+                // }
             }
 
             string label;
-            if (Constants.DefaultButtonLabels.TryGetValue(action, out label))
+            if (Constants.DefaultButtonLabels.TryGetValue(actionID, out label))
                 return label;
 
             return "";

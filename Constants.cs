@@ -46,6 +46,7 @@ namespace InvisibleHand
         public const int SmartDeposit = ChestUI.ButtonID.Count + 3;
 
         public const int ReverseSort = ChestUI.ButtonID.Count + 4;
+        public const int SaveChestName = ChestUI.ButtonID.Count + 5;
     }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
@@ -343,15 +344,15 @@ namespace InvisibleHand
 
         /// holds the index in Terraria.Lang.inter[] corresponding
         /// to the paired actions; used to get original button lobels.
-        public static readonly Dictionary<TIH, int> LangInterIndices;
+        public static readonly Dictionary<int, int> LangInterIndices;
 
-        public static readonly Dictionary<TIH, string> DefaultButtonLabels;
+        public static readonly Dictionary<int, string> DefaultButtonLabels;
         // public static readonly Dictionary<TIH, Action> DefaultClickActions;
 
         // public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
 
         /// maps actions to the modoption defining their keybind
-        public static readonly Dictionary<TIH, string> ButtonActionToKeyBindOption;
+        public static readonly Dictionary<int, string> ButtonActionToKeyBindOption;
 
         public static readonly Dictionary<string, bool> DefaultOptionValues;
 
@@ -387,34 +388,52 @@ namespace InvisibleHand
             TileGroupFurniture.UnionWith(TileID.Sets.RoomNeeds.CountsAsTable);
 
 
-            LangInterIndices = new Dictionary<TIH, int>
+            LangInterIndices = new Dictionary<int, int>
             {
-                {TIH.LootAll,    29},
-                {TIH.DepositAll, 30},
-                {TIH.QuickStack, 31},
-                {TIH.SaveName,   47},
-                {TIH.Rename,     61},
-                {TIH.CancelEdit, 63}
+                {ActionID.LootAll,    29},
+                {ActionID.DepositAll, 30},
+                {ActionID.QuickStack, 31},
+                {ActionID.SaveChestName,   47},
+                {ActionID.RenameChest,     61},
+                {ActionID.RenameChestCancel, 63}
+                // {TIH.LootAll,    29},
+                // {TIH.DepositAll, 30},
+                // {TIH.QuickStack, 31},
+                // {TIH.SaveName,   47},
+                // {TIH.Rename,     61},
+                // {TIH.CancelEdit, 63}
             };
 
 
-            DefaultButtonLabels = new Dictionary<TIH, string>
+            DefaultButtonLabels = new Dictionary<int, string>
             {
                 // Player Inventory
-                {TIH.None, ""},
-                {TIH.Sort,         "Sort"},
-                {TIH.ReverseSort,  "Sort (Reverse)"},
+                // {TIH.None, ""},
+                {ActionID.Sort,         "Sort"},
+                {ActionID.ReverseSort,  "Sort (Reverse)"},
+                // {TIH.None, ""},
+                // {TIH.Sort,         "Sort"},
+                // {TIH.ReverseSort,  "Sort (Reverse)"},
 
-                {TIH.CleanStacks,     "Clean Stacks"},
+                {ActionID.CleanStacks,     "Clean Stacks"},
+                // {TIH.CleanStacks,     "Clean Stacks"},
                 // Chests
-                {TIH.SmartLoot,    "Restock"},
-                {TIH.QuickStack,   "Quick Stack"},
-                {TIH.SmartDeposit, "Smart Deposit"},
-                {TIH.DepositAll,   "Deposit All"},
-                {TIH.LootAll,      "Loot All"},
-                {TIH.Rename,       "Rename"},
-                {TIH.SaveName,     "Save"},
-                {TIH.CancelEdit,   "Cancel"}
+                {ActionID.Restock,    "Restock"},
+                {ActionID.QuickStack,   "Quick Stack"},
+                {ActionID.SmartDeposit, "Smart Deposit"},
+                {ActionID.DepositAll,   "Deposit All"},
+                {ActionID.LootAll,      "Loot All"},
+                {ActionID.RenameChest,       "Rename"},
+                {ActionID.SaveChestName,     "Save"},
+                {ActionID.RenameChestCancel,   "Cancel"}
+                // {TIH.SmartLoot,    "Restock"},
+                // {TIH.QuickStack,   "Quick Stack"},
+                // {TIH.SmartDeposit, "Smart Deposit"},
+                // {TIH.DepositAll,   "Deposit All"},
+                // {TIH.LootAll,      "Loot All"},
+                // {TIH.Rename,       "Rename"},
+                // {TIH.SaveName,     "Save"},
+                // {TIH.CancelEdit,   "Cancel"}
             };
 
             // DefaultClickActions = new Dictionary<TIH, Action>
@@ -464,20 +483,32 @@ namespace InvisibleHand
             * Map action types to the string used for the corresponding
             * keybind in Modoptions.json
             */
-            ButtonActionToKeyBindOption = new Dictionary<TIH, string>()
+            ButtonActionToKeyBindOption = new Dictionary<int, string>()
             {
-                {TIH.CleanStacks,   "cleanStacks"},
+                {ActionID.CleanStacks,   "cleanStacks"},
 
-                {TIH.DepositAll,     "depositAll"},
-                {TIH.SmartDeposit,   "depositAll"},
+                {ActionID.DepositAll,     "depositAll"},
+                {ActionID.SmartDeposit,   "depositAll"},
 
-                {TIH.LootAll,    "lootAll"},
+                {ActionID.LootAll,    "lootAll"},
 
-                {TIH.QuickStack, "quickStack"},
-                {TIH.SmartLoot,  "quickStack"},
+                {ActionID.QuickStack, "quickStack"},
+                {ActionID.Restock,  "quickStack"},
 
-                {TIH.Sort,       "sort"},
-                {TIH.ReverseSort,"sort"},
+                {ActionID.Sort,       "sort"},
+                {ActionID.ReverseSort,"sort"},
+                // {TIH.CleanStacks,   "cleanStacks"},
+                //
+                // {TIH.DepositAll,     "depositAll"},
+                // {TIH.SmartDeposit,   "depositAll"},
+                //
+                // {TIH.LootAll,    "lootAll"},
+                //
+                // {TIH.QuickStack, "quickStack"},
+                // {TIH.SmartLoot,  "quickStack"},
+                //
+                // {TIH.Sort,       "sort"},
+                // {TIH.ReverseSort,"sort"},
                 // edit chest doesn't get a keyboard shortcut. So there.
             };
         }
