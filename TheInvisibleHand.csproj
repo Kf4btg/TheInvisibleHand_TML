@@ -57,7 +57,7 @@
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
     <Compile Include="IHUtils.cs" />
-    <Compile Include="Utils\IHCommandHelper.cs" />
+    <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
     <Compile Include="Items\CategoryEnum.cs" />
