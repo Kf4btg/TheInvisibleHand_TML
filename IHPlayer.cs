@@ -115,9 +115,7 @@ namespace InvisibleHand
         public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
 
         /// During this phase we check if the player has pressed any hotkeys;
-        /// if so, the corresponding action is called, with the chest-related
-        /// actions wrapped in special net-update code to prevent syncing
-        /// issues during multiplayer.
+        /// if so, the corresponding action is called
         public override void PreUpdate()
         {
 
@@ -138,9 +136,7 @@ namespace InvisibleHand
 
                 else if (player.chest != -1) //no action w/o open container
                 {
-                    // if (player.chest == -1) return;
-
-                    // smartloot or quickstack
+                    // restock or quickstack
                     if (IHBase.ActionKeys["QuickStack"].Pressed(prevState))
                     {
                         QuickStack(ShiftHeld());
@@ -234,19 +230,17 @@ namespace InvisibleHand
         }
 
         /// <summary>
-        /// Performs QuickStack or SmartLoot action if an appropriate container is open.
+        /// Performs QuickStack or Restock action if an appropriate container is open.
         /// </summary>
-        /// <param name="smartLoot">Perform SmartLoot action instead </param>
+        /// <param name="smartLoot">Perform Restock action instead </param>
         public void QuickStack(bool restock = false)
         {
             // if (player.chest == -1) return;
 
             if (restock)
                 ChestUI.Restock();
-                // DoChestUpdateAction(IHSmartStash.SmartLoot);
             else
                 ChestUI.QuickStack();
-                // DoChestUpdateAction(IHUtils.DoQuickStack);
         }
 
         /// <summary>
@@ -262,7 +256,6 @@ namespace InvisibleHand
                 // DoChestUpdateAction(IHSmartStash.SmartDeposit);
             else
                 ChestUI.DepositAll();
-            // DoChestUpdateAction(IHUtils.DoDepositAll);
         }
 
         public void LootAll()
@@ -279,10 +272,6 @@ namespace InvisibleHand
         public void SmartDeposit()
         {
             if (player.chest == -1) return;
-
-            // var pInventory = player.inventory; //Item[]
-            // var chestitems = this.chestItems; //Item[]
-            // var sendNetMsg = player.chest > -1; //bool
 
             // define a query that creates category groups for the items in the chests,
             // then pulls out the category keys into a distinct list (List<ItemCat>)
@@ -302,14 +291,9 @@ namespace InvisibleHand
                     && catList.Contains(current.GetCategory()))
                 {
                     ChestUI.TryPlacingInChest(current, false);
-                    // IHUtils.MoveItem(ref pInventory[i], chestitems, 0, Chest.maxItems);
-                    // IHUtils.MoveItemToChest(i, sendNetMsg);
                 }
             }
             Recipe.FindRecipes();
         }
-
-
-
     }
 }

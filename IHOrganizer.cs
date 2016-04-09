@@ -11,7 +11,7 @@ namespace InvisibleHand
     {
         /// this will sort the categorized items first by category, then by
         /// more specific traits. Sorting Rules defined in CategoryDef class.
-        public static List<Item> OrganizeItems(List<Item> source)
+        public static IList<Item> OrganizeItems(IList<Item> source)
         {
             if (source == null) return null;
 
@@ -44,13 +44,12 @@ namespace InvisibleHand
        /// </summary>
        /// <param name="source_container">The Item[] array of the container</param>
        /// <param name="source_is_chest">Is the source container a chest? </param>
-       /// <param name="rangeStart">index in source to start looking for items </param>
-       /// <param name="rangeEnd">index in source to stop looking for items </param>
+
        /// <returns> The new list of copied items, or null if no items were
        /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
+        public static IList<Item> GetItemCopies(Item[] source_container, bool source_is_chest)
         {
-            return GetItemCopies(source_container, source_is_chest, new Tuple<int, int>(rangeStart, rangeEnd));
+            return GetItemCopies(source_container, source_is_chest, 0, source_container.Length -1);
         }
 
         /// <summary>
@@ -59,13 +58,13 @@ namespace InvisibleHand
         /// </summary>
         /// <param name="source_container">The Item[] array of the container</param>
         /// <param name="source_is_chest">Is the source container a chest? </param>
-        /// <param name="range">Starting and ending indices defining the subset of the
-        /// source's slots to be searched for items.</param>
+        /// <param name="rangeStart">index in source to start looking for items </param>
+        /// <param name="rangeEnd">index in source to stop looking for items </param>
         /// <returns> The new list of copied items, or null if no items were
         /// applicable to be copied (NOT an empty list!).</returns>
-        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
+        // public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
+        public static IList<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
         {
-            if (range == null) range = new Tuple<int,int>(0, source_container.Length -1);
 
             // initialize the list that will hold the copied items
             var itemList = new List<Item>();
@@ -76,7 +75,7 @@ namespace InvisibleHand
             // will need a different list if locking is enabled
             if (!source_is_chest)
             {
-                for (int i=range.Item1; i<=range.Item2; i++)
+                for (int i=rangeStart; i<=rangeEnd; i++)
                 {
                     // "favorited" is now what was "locked"
                     if (source_container[i].favorited || source_container[i].IsBlank()) continue;
@@ -87,7 +86,7 @@ namespace InvisibleHand
             }
             else //only skip blank slots
             {
-                for (int i=range.Item1; i<=range.Item2; i++)
+                for (int i=rangeStart; i<=rangeEnd; i++)
                 {
                     if (!source_container[i].IsBlank())
                         itemList.Add(source_container[i].Clone());
@@ -138,19 +137,15 @@ namespace InvisibleHand
 
         FIXME (maybe?): the "item-moved" sound plays even if the order doesn't change.
         */
-        public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
+        public static void Sort(Item[] container, bool chest, bool reverse)
         {
-            Sort(container, chest, reverse, new Tuple<int,int>(rangeStart, rangeEnd));
+            Sort(container, chest, reverse, 0, container.Length - 1);
         }
 
-        public static void Sort(Item[] container, bool chest, bool reverse, Tuple<int,int> range = null)
+        public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
-            // if range param not specified, set it to whole container
-            if (range == null)
-                range = new Tuple<int, int>(0, container.Length - 1);
-
             // get copies of the items and send them off to be sorted
-            var sortedItemList = OrganizeItems(GetItemCopies(container, chest, range));
+            var sortedItemList = OrganizeItems(GetItemCopies(container, chest, rangeStart, rangeEnd));
             if (sortedItemList == null)
                 return;
 
@@ -166,17 +161,17 @@ namespace InvisibleHand
 
             if (fillFromEnd)	// use decrementing iterators
             {
-                getIndex = x => range.Item2 - x;
+                getIndex = x => rangeEnd - x;
                 getIter = x => x-1;
-                getCond = x => x >= range.Item1;
-                // getWhileCond = x => x>range.Item1 && container[x].favorited;
+                getCond = x => x >= rangeStart;
+                // getWhileCond = x => x>rangeStart && container[x].favorited;
             }
             else 	// use incrementing iterators
             {
-                getIndex = y => range.Item1 + y;
+                getIndex = y => rangeStart + y;
                 getIter = y => y+1;
-                getCond = y => y <= range.Item2;
-                // getWhileCond = y => y<range.Item2 && container[y].favorited;
+                getCond = y => y <= rangeEnd;
+                // getWhileCond = y => y<rangeEnd && container[y].favorited;
             }
 
             int filled = 0; // num of slots filled (or locked) so far
@@ -187,8 +182,8 @@ namespace InvisibleHand
                 foreach (var item in sortedItemList)
                 {
                     // find the first unlocked slot. this would throw an
-                    // exception if range.Item1+filled somehow went over 49, but
-                    // if the categorizer and slot-locker are functioning
+                    // exception if rangeStart+filled somehow went over 49, but
+                    // if the categorizer and favorting are functioning
                     // correctly, that _shouldn't_ be possible. Shouldn't.
                     // Probably.
                     while (container[getIndex(filled)].favorited)
@@ -224,19 +219,11 @@ namespace InvisibleHand
         } // sort()
 
         /*************************************************************************
-        *  Adapted from "PutItem()" in ShockahBase.SBase
         *  @params container, rangeStart, rangeEnd
         */
         public static void ConsolidateStacks(Item[] container, int rangeStart, int rangeEnd)
         {
-            ConsolidateStacks(container, new Tuple<int,int>(rangeStart, rangeEnd));
-        }
-
-        public static void ConsolidateStacks(Item[] container, Tuple<int, int> range = null)
-        {
-            if (range == null) range = new Tuple<int,int>(0, container.Length -1);
-
-            for (int i = range.Item2; i>=range.Item1; i--) //iterate in reverse
+            for (int i = rangeEnd; i>=rangeStart; i--) //iterate in reverse
             {
                 var item = container[i];
 
@@ -244,9 +231,14 @@ namespace InvisibleHand
                 if (!item.IsBlank() && item.stack < item.maxStack)
                 {
                     // search the remaining slots for other stacks of this item
-                    StackItems(ref item, container, range.Item1, i-1);
+                    StackItems(ref item, container, rangeStart, i-1);
                 }
             }
+        }
+
+        public static void ConsolidateStacks(Item[] container)
+        {
+            ConsolidateStacks(container, 0, container.Length - 1);
         }
 
         /// called by ConsolidateStacks, this takes a single item and searches a
@@ -257,7 +249,7 @@ namespace InvisibleHand
             {
                 var item2 = container[j];
                 // found another <full stack of a matching item
-                if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
+                if (item.CanStackWith(item2))
                 {
                     int diff = Math.Min(item2.maxStack - item2.stack, item.stack);
                     item2.stack += diff;
@@ -265,13 +257,13 @@ namespace InvisibleHand
 
                     Sound.ItemMoved.Play();
 
-                    if (item.IsBlank())
+                    if (item.stack == 0)
                     {
                         item = new Item();
-                        return;
-                    }//\item blank
-                }//\matching stack
-            }//\go through container range
+                        break;
+                    }
+                }
+            }
         }//\StackItems()
     }
 }
