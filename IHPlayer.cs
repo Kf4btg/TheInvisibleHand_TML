@@ -37,15 +37,15 @@ namespace InvisibleHand
                 //     if (Main.gameMenu == true)
                 // as this is set during the SaveAndQuit() method of the worldgen
                 // immediately before player save. So:
-                Lang.inter[lii[TIH.LootAll]] = IHBase.OriginalButtonLabels[TIH.LootAll];
-                Lang.inter[lii[TIH.DepositAll]] = IHBase.OriginalButtonLabels[TIH.DepositAll];
-                Lang.inter[lii[TIH.QuickStack]] = IHBase.OriginalButtonLabels[TIH.QuickStack];
+                Lang.inter[lii[ActionID.LootAll]] = IHBase.OriginalButtonLabels[ActionID.LootAll];
+                Lang.inter[lii[ActionID.DepositAll]] = IHBase.OriginalButtonLabels[ActionID.DepositAll];
+                Lang.inter[lii[ActionID.QuickStack]] = IHBase.OriginalButtonLabels[ActionID.QuickStack];
 
                 if (IHBase.ModOptions["UseReplacers"])
                 {
-                    Lang.inter[lii[TIH.Rename]] = IHBase.OriginalButtonLabels[TIH.Rename];
-                    Lang.inter[lii[TIH.SaveName]] = IHBase.OriginalButtonLabels[TIH.SaveName];
-                    Lang.inter[lii[TIH.CancelEdit]] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
+                    Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
+                    Lang.inter[lii[ActionID.SaveChestName]] = IHBase.OriginalButtonLabels[ActionID.SaveChestName];
+                    Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
                 }
                 // should take care of it and make sure the strings are set
                 // correctly if the mod is unloaded/the replacer-button option
