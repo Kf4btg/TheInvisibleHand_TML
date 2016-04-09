@@ -10,12 +10,12 @@ namespace InvisibleHand
 
     public static class IHUtils
     {
-        private static readonly Player player;
-
-        static IHUtils()
-        {
-            player = IHPlayer.LocalPlayer;
-        }
+        // private static readonly Player player;
+        //
+        // static IHUtils()
+        // {
+        //     player = IHPlayer.LocalPlayer;
+        // }
 
         // !ref:Main:#22215.29##22643.29#
         // The methods here are pretty much just cleaned up and somewhat
@@ -36,124 +36,124 @@ namespace InvisibleHand
         //      DoQuickStack()                                  //
         //------------------------------------------------------//
 
-        #region depositall
-        private const int R_START = 49;   //start from end of main inventory
-        private const int R_END   = 10;     //don't include hotbar
-
-        /********************************************************
-        *   DoDepositAll
-        // !ref:Main:#22314.0#
-        */
-        public static void DoDepositAll()
-        {
-            DoDepositAll(player);
-        }
-        public static void DoDepositAll(Player aplayer)
-        {
-            //this shouldn't happen if method is called correctly
-            if (player.chest == -1) return;
-            bool sendNetMsg = player.chest > -1;
-
-            if (IHPlayer.ActionLocked(TIH.DepositAll))
-            {
-                for (int i=R_START; i >= R_END; i--)
-                {
-                    var item = player.inventory[i];
-                    if (item.favorited ||  item.IsBlank()) continue;
-                    MoveItemToChest(i, sendNetMsg);
-                }
-                Recipe.FindRecipes(); // !ref:Main:#22640.36#
-                return;
-            }
-
-            for (int i=R_START; i >= R_END; i--)
-            {
-                if (!player.inventory[i].IsBlank()) MoveItemToChest(i, sendNetMsg);
-            }
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-
-        } //\DoDepositAll()
-    #endregion
-
-    #region lootall
-        /********************************************************
-        *   DoLootAll !ref:Main:#22272.00#
-        */
-        public static void DoLootAll()
-        {
-            DoLootAll(player);
-        }
-        public static void DoLootAll(Player aplayer)
-        {
-            //this shouldn't happen if method is called correctly
-            if (player.chest == -1) return;
-
-            var sendNetMsg = player.chest > -1;
-            var container = Main.chest[player.chest].item;
-
-            for (int i=0; i<Chest.maxItems; i++)
-            {
-                if (!container[i].IsBlank())
-                {
-                    container[i] = player.GetItem(player.whoAmI, container[i]);
-
-                    // if (sendNetMsg) SendNetMessage(i);
-                }
-            }
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        }
-    #endregion
-
-    #region quickstack
-        /********************************************************
-        *   DoQuickStack
-        *   !ref:Main:#22476.44##22637.44#
-        */
-        public static void DoQuickStack()
-        {
-            DoQuickStack(player);
-        }
-        public static void DoQuickStack(Player aplayer)
-        {
-            if (player.chest == -1) return;
-
-            var inventory = player.inventory;
-            var container = Main.chest[player.chest].item;
-            bool sendMessage = player.chest > -1;
-            var checkLocks  = IHPlayer.ActionLocked(TIH.QuickStack);  //boolean
-
-
-            for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
-            {                                                                                   //if chest item is not blank && not a full stack, then
-                if (!container[iC].IsBlank() && container[iC].stack < container[iC].maxStack)
-                {                                                                               //for each item in inventory (including coins, ammo, hotbar),
-                    for (int iP=0; iP<58; iP++)
-                    {
-                        if (inventory[iP].favorited) continue;                    // if we're checking locks ignore the locked ones
-
-                        if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
-                        {
-                            // RingBell();                                                       //...play "item-moved" sound and...
-                            Sound.ItemMoved.Play();
-                                                                                                // ...merge inv. item stack to chest item stack
-                            if (StackMerge(ref inventory[iP], container, iC))
-                            {                                                                   // do merge & check return (inv stack empty) status
-                                inventory[iP] = new Item();                                     // reset slot if all inv stack moved
-                            }
-                            else if (container[iC].IsBlank())
-                            {                                                                   // else, inv stack not empty after merge, but (because of DoCoins() call),
-                                                                                                // chest stack could be.
-                                container[iC] = inventory[iP].Clone();                          // move inv item to chest slot
-                                inventory[iP] = new Item();                                     // and reset inv slot
-                            }
-                            // if (sendMessage) SendNetMessage(iC);                             //send net message if regular chest
-                        }
-                    }
-                }
-            }
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        }
-        #endregion
+    //     #region depositall
+    //     private const int R_START = 49;   //start from end of main inventory
+    //     private const int R_END   = 10;     //don't include hotbar
+    //
+    //     /********************************************************
+    //     *   DoDepositAll
+    //     // !ref:Main:#22314.0#
+    //     */
+    //     public static void DoDepositAll()
+    //     {
+    //         DoDepositAll(player);
+    //     }
+    //     public static void DoDepositAll(Player aplayer)
+    //     {
+    //         //this shouldn't happen if method is called correctly
+    //         if (player.chest == -1) return;
+    //         bool sendNetMsg = player.chest > -1;
+    //
+    //         if (IHPlayer.ActionLocked(TIH.DepositAll))
+    //         {
+    //             for (int i=R_START; i >= R_END; i--)
+    //             {
+    //                 var item = player.inventory[i];
+    //                 if (item.favorited ||  item.IsBlank()) continue;
+    //                 MoveItemToChest(i, sendNetMsg);
+    //             }
+    //             Recipe.FindRecipes(); // !ref:Main:#22640.36#
+    //             return;
+    //         }
+    //
+    //         for (int i=R_START; i >= R_END; i--)
+    //         {
+    //             if (!player.inventory[i].IsBlank()) MoveItemToChest(i, sendNetMsg);
+    //         }
+    //         Recipe.FindRecipes(); // !ref:Main:#22640.36#
+    //
+    //     } //\DoDepositAll()
+    // #endregion
+    //
+    // #region lootall
+    //     /********************************************************
+    //     *   DoLootAll !ref:Main:#22272.00#
+    //     */
+    //     public static void DoLootAll()
+    //     {
+    //         DoLootAll(player);
+    //     }
+    //     public static void DoLootAll(Player aplayer)
+    //     {
+    //         //this shouldn't happen if method is called correctly
+    //         if (player.chest == -1) return;
+    //
+    //         var sendNetMsg = player.chest > -1;
+    //         var container = Main.chest[player.chest].item;
+    //
+    //         for (int i=0; i<Chest.maxItems; i++)
+    //         {
+    //             if (!container[i].IsBlank())
+    //             {
+    //                 container[i] = player.GetItem(player.whoAmI, container[i]);
+    //
+    //                 // if (sendNetMsg) SendNetMessage(i);
+    //             }
+    //         }
+    //         Recipe.FindRecipes(); // !ref:Main:#22640.36#
+    //     }
+    // #endregion
+    //
+    // #region quickstack
+    //     /********************************************************
+    //     *   DoQuickStack
+    //     *   !ref:Main:#22476.44##22637.44#
+    //     */
+    //     public static void DoQuickStack()
+    //     {
+    //         DoQuickStack(player);
+    //     }
+    //     public static void DoQuickStack(Player aplayer)
+    //     {
+    //         if (player.chest == -1) return;
+    //
+    //         var inventory = player.inventory;
+    //         var container = Main.chest[player.chest].item;
+    //         bool sendMessage = player.chest > -1;
+    //         var checkLocks  = IHPlayer.ActionLocked(TIH.QuickStack);  //boolean
+    //
+    //
+    //         for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
+    //         {                                                                                   //if chest item is not blank && not a full stack, then
+    //             if (!container[iC].IsBlank() && container[iC].stack < container[iC].maxStack)
+    //             {                                                                               //for each item in inventory (including coins, ammo, hotbar),
+    //                 for (int iP=0; iP<58; iP++)
+    //                 {
+    //                     if (inventory[iP].favorited) continue;                    // if we're checking locks ignore the locked ones
+    //
+    //                     if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
+    //                     {
+    //                         // RingBell();                                                       //...play "item-moved" sound and...
+    //                         Sound.ItemMoved.Play();
+    //                                                                                             // ...merge inv. item stack to chest item stack
+    //                         if (StackMerge(ref inventory[iP], container, iC))
+    //                         {                                                                   // do merge & check return (inv stack empty) status
+    //                             inventory[iP] = new Item();                                     // reset slot if all inv stack moved
+    //                         }
+    //                         else if (container[iC].IsBlank())
+    //                         {                                                                   // else, inv stack not empty after merge, but (because of DoCoins() call),
+    //                                                                                             // chest stack could be.
+    //                             container[iC] = inventory[iP].Clone();                          // move inv item to chest slot
+    //                             inventory[iP] = new Item();                                     // and reset inv slot
+    //                         }
+    //                         // if (sendMessage) SendNetMessage(iC);                             //send net message if regular chest
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         Recipe.FindRecipes(); // !ref:Main:#22640.36#
+    //     }
+    //     #endregion
 
 
         // FIXME: ITEMSLOT STUFF IS HAAAARRRD NOW!!! I'm not sure how to get the item in the slot...I'm not sure about anything related to this, anymore, to be honest...
@@ -309,26 +309,59 @@ namespace InvisibleHand
         *
         *    @return : True if item was (entirely) removed from inventory; otherwise false.
         */
-        public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
-        {
-            int retIdx = MoveItemP2C (
-            ref player.inventory[iPlayer],    // item in inventory
-            Main.chest[player.chest].item,                // destination container
-            sendMessage,                                // if true, sendMessage
-            desc);                                      // check container indices descending?
+        // public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
+        // {
+        //     int retIdx = MoveItemP2C (
+        //     ref player.inventory[iPlayer],    // item in inventory
+        //     Main.chest[player.chest].item,                // destination container
+        //     sendMessage,                                // if true, sendMessage
+        //     desc);                                      // check container indices descending?
+        //
+        //
+        //
+        //     if (retIdx > -2) // >=partial success
+        //     {
+        //         Sound.ItemMoved.Play();
+        //         if (retIdx > -1) // =full success!
+        //         {
+        //             player.inventory[iPlayer] = new Item();
+        //             // if (sendMessage) SendNetMessage(retIdx);
+        //             return true;
+        //         }
+        //     }
+        //     return false;
+        // }
 
-            if (retIdx > -2) // >=partial success
-            {
+        public static void MoveItem(ref Item item, Item[] target_container, int min_index, int max_index, bool desc = false)
+        {
+            // if the item is fully or partially moved, play the ItemMoved Sound
+            if (moveItem(ref item, target_container, min_index, max_index, desc))
                 Sound.ItemMoved.Play();
-                if (retIdx > -1) // =full success!
-                {
-                    player.inventory[iPlayer] = new Item();
-                    // if (sendMessage) SendNetMessage(retIdx);
-                    return true;
-                }
-            }
-            return false;
         }
+
+        private static bool moveItem(ref Item item, Item[] target_container, int min_index, int max_index, bool desc)
+        {
+            int moved_to_index;
+            int orig_stack_amt = item.stack; // save current stack amount
+
+            if ((item.maxStack > 1 &&
+                    TryMergeStackToContainer(item, target_container, min_index, max_index,
+                                             desc, out moved_to_index))
+                || MoveToFirstEmpty(item, target_container, min_index, max_index, desc, out moved_to_index))
+            {
+                // item fully moved
+                item = new Item(); // replace it
+                // return true;
+                // return moved_to_index;
+            }
+
+
+            // return orig_stack_amt == item.stack ? -2 : -1; //exit status
+            return orig_stack_amt != item.stack; //exit status
+        }
+
+
+
 
         /******************************************************
         *   MoveItem - moves a single item to a different container
@@ -343,34 +376,90 @@ namespace InvisibleHand
         *             -3 : @item was passed as blank
         */
         //for player->chest
-        public static int MoveItemP2C(ref Item item, Item[] container, bool sendMessage=true, bool desc = false)
+        // public static int MoveItemP2C(ref Item item, Item[] container, bool sendMessage=true, bool desc = false)
+        public static int MoveItemP2C(Item item, Item[] container, bool desc = false)
         {
-            if (item.stack<=0) return -3;
+            // we have checks beforehand to avoid this situation:
+            // if (item.stack<=0) return -3;
 
-            int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
+            // int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
 
-            if (desc) { iStart = Chest.maxItems - 1; iCheck = i => i >= 0; iNext  = i => i-1; }
-            else      { iStart = 0;      iCheck = i => i < Chest.maxItems; iNext  = i => i+1; }
+            // if (desc)
+            // {
+            //     iStart = Chest.maxItems - 1;
+            //     iCheck = i => i >= 0;
+            //     iNext = i => i - 1;
+            // }
+            // else {
+            //     iStart = 0;
+            //     iCheck = i => i < Chest.maxItems;
+            //     iNext = i => i + 1;
+            // }
 
-            int j=-1;
-            int stackB4 = item.stack; // save current stack amount
-            if (item.maxStack > 1) // search container for matching non-maxed stacks
-                j = TryStackMerge(ref item, container, sendMessage, iStart, iCheck, iNext);
+            int moved_to_index;
+            int orig_stack_amt = item.stack; // save current stack amount
 
-            if (j<0) //remaining stack or non-stackable
+            if ((item.maxStack > 1 &&
+                    TryMergeStackToContainer(item, container, 0, Chest.maxItems,
+                                             desc, out moved_to_index))
+                || MoveToFirstEmpty(item, container, 0, Chest.maxItems, desc, out moved_to_index))
             {
-                j = MoveToFirstEmpty(item, container, iStart, iCheck, iNext);
-
-                if (j<0) //no empty slots
-                    // compare stack amt. now to stack amt. before TryStackMerge, etc.
-                    return stackB4==item.stack ? -2 : -1; //exit status
+                return moved_to_index;
             }
-            return j;
+
+
+            return orig_stack_amt == item.stack ? -2 : -1; //exit status
+
+
+
+            // search container for matching non-maxed stacks
+            // if (desc)
+            //     for (int i = Chest.maxItems; i >= 0; i--)
+            //     {
+            //         // j = TryStackMerge(ref item, container, sendMessage, iStart, iCheck, iNext);
+            //         if (TryStackMerge(ref item, container, i))
+            //         {
+            //             moved_to_index = i;
+            //             break;
+            //         }
+            //     }
+            // else
+            //     for (int i = 0; i <= Chest.maxItems; i++)
+            //     {
+            //         if (TryStackMerge(ref item, container, i))
+            //         {
+            //             moved_to_index = i;
+            //             break;
+            //         }
+            //     }
+            //remaining stack or non-stackable
+            // if (moved_to_index < 0 && !MoveToFirstEmpty(item, container, 0, Chest.maxItems, desc, out moved_to_index)) // no empty slots
+            //     return orig_stack_amt == item.stack ? -2 : -1; //exit status
+
+            // {
+            //     // moved_to_index = MoveToFirstEmpty(item, container, iStart, iCheck, iNext);
+            //     if (!MoveToFirstEmpty(item, container, 0, Chest.maxItems, desc, out moved_to_index)) //no empty slots
+            //         return stackB4==item.stack ? -2 : -1; //exit status
+            //     // if (moved_to_index<0) //no empty slots
+            //     //     // compare stack amt. now to stack amt. before TryStackMerge, etc.
+            //     //     return stackB4==item.stack ? -2 : -1; //exit status
+            // }
+            // return moved_to_index;
         }
 
         /********************************************************
         *   Helper Helpers? - functions used in the above helper methods
         */
+
+        public static bool CopyIfEmpty(Item src_item, ref Item dest_item)
+        {
+            if (dest_item.IsBlank())
+            {
+                dest_item = src_item.Clone();
+                return true;
+            }
+            return false;
+        }
 
         // @return: >=0 (index) if move succeeded; -1 if failed
         /// <summary>
@@ -382,40 +471,96 @@ namespace InvisibleHand
         /// <param name="iCheck"></param>
         /// <param name="iNext"></param>
         /// <returns>bigger than -1 if move succeeded (index in destination to which item was moved); -1 if failed</returns>
-        public static int MoveToFirstEmpty(Item item, Item[] dest, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
+        // public static int MoveToFirstEmpty(Item item, Item[] dest, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
+        //
+
+        /// Attempts to move the item into an empty slot in the destination. Destination slots will be checked between min_index and max_index; which direction they are checked in depends on the value of `desc`. If an empty slot is found and the item is successfully copied, `dest_index` is set to the index of the found slot and the function returns true. If no empty slot is found, dest_index is set to -1 and the method returns false.
+        public static bool MoveToFirstEmpty(Item item, Item[] dest, int min_index, int max_index, bool desc, out int dest_index)
         {
-            for (int i=iStart; iCheck(i); i=iNext(i)) //!ref:Main:#22416.00#
-            {
-                if (dest[i].IsBlank())
+            dest_index = -1;
+            if (desc)
+                for (int i = max_index; i >= min_index; i--)
                 {
-                    dest[i] = item.Clone();
-                    return i; //return index of destination slot
+                    if (CopyIfEmpty(item, ref dest[i]))
+                    {
+                        dest_index = i;
+                        break;
+                    }
                 }
-            }
-            return -1;
+            else
+                for (int i = min_index; i <= max_index; i++)
+                {
+                    if (CopyIfEmpty(item, ref dest[i]))
+                    {
+                        dest_index = i;
+                        break;
+                    }
+                }
+            return dest_index >= 0;
         }
 
-        // @return: >=0 (index) if entire stack moved; -1 if failed to move or some remains
-        public static int TryStackMerge(ref Item item, Item[] dest, bool sendMessage, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
+        public static bool TryMergeStackToContainer(Item item, Item[] dest, int min_index, int max_index, bool desc, out int dest_index)
         {
-            //search inventory for matching non-maxed stacks
-            for (int i=iStart; iCheck(i); i=iNext(i))
-            {
-                var item2 = dest[i];
-                // found a non-empty slot containing a not-full stack of the same item type
-                if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
+            dest_index = -1;
+            if (desc)
+                for (int i = max_index; i >= min_index; i--)
                 {
-                    if (StackMerge(ref item, dest, i)) return i;  //if item's stack was reduced to 0
-                    if (dest[i].IsBlank())  //now check container slot to see if doCoins emptied it
+                    if (TryMergeStacks(item, dest, i))
                     {
-                        dest[i] = item.Clone(); // move inv item to chest slot
-                        return i;  // return index to indicate that item slot should be reset
+                        dest_index = i;
+                        break;
                     }
-                    // if (sendMessage) SendNetMessage(i);
                 }
-            } // if we manage to exit this loop, there is still some stack remaining:
-            return -1;
+            else
+                for (int i = min_index; i <= max_index; i++)
+                {
+                    if (TryMergeStacks(item, dest, i))
+                    {
+                        dest_index = i;
+                        break;
+                    }
+                }
+            return dest_index >= 0;
         }
+
+
+
+        // @return: >=0 (index) if entire stack moved; -1 if failed to move or some remains
+        // public static int TryStackMerge(ref Item item, Item[] dest, bool sendMessage, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
+        //
+
+        /// returns true if the entire stack of src_item is reduced to 0; otherwise returns false
+        public static bool TryMergeStacks(Item src_item, Item[] dest_container, int dest_index)
+        {
+            return src_item.CanStackWith(dest_container[dest_index]) && (StackMerge(src_item, dest_container, dest_index) || CopyIfEmpty(src_item, ref dest_container[dest_index]));
+        }
+
+
+        // public static bool TryStackMerge(ref Item src_item, Item[] dest_container, int dest_index)
+        // {
+            // var dest_item = dest_container[dest_index];
+
+            //search inventory for matching non-maxed stacks
+            // for (int i=iStart; iCheck(i); i=iNext(i))
+            // {
+            // found a non-empty slot containing a not-full stack of the same item type
+            // if (!dest_item.IsBlank() && dest_item.IsTheSameAs(src_item) && dest_item.stack < dest_item.maxStack)
+            //     {
+            //         if (StackMerge(src_item, dest_container, dest_index))
+            //             return true;  //if item's stack was reduced to 0
+            //
+            //         //now check container slot to see if doCoins emptied it
+            //         if (dest_container[dest_index].IsBlank())
+            //         {
+            //             // move inv item to chest slot
+            //             dest_container[dest_index] = src_item.Clone();
+            //             return true;
+            //         }
+            //         // if (sendMessage) SendNetMessage(i);
+            //     }
+            // // } // if we manage to exit this loop, there is still some stack remaining:
+            // return false;
+        // }
 
         /******************************************************
         // Moves as much of itemSrc.stack to itemDest.stack as possible.
@@ -423,7 +568,8 @@ namespace InvisibleHand
         // Does not check for item equality or existence of passed items;
         // that must be ensured by the calling method.
         */
-        public static bool StackMerge(ref Item itemSrc, ref Item itemDest)
+        // public static bool StackMerge(ref Item itemSrc, ref Item itemDest)
+        public static bool StackMerge(Item itemSrc, Item itemDest)
         {
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
             itemDest.stack += diff;
@@ -433,7 +579,8 @@ namespace InvisibleHand
         }
 
         // takes the entire destination container as a parameter so as to check coin stacks
-        public static bool StackMerge(ref Item itemSrc, Item[] dest, int dIndex )
+        // public static bool StackMerge(ref Item itemSrc, Item[] dest, int dIndex )
+        public static bool StackMerge(Item itemSrc, Item[] dest, int dIndex )
         {
             int diff = Math.Min(dest[dIndex].maxStack - dest[dIndex].stack, itemSrc.stack);
             dest[dIndex].stack += diff;
@@ -444,7 +591,8 @@ namespace InvisibleHand
         }
 
         // as the first StackMerge above, but returns the amount transferred
-        public static int StackMergeD(ref Item itemSrc, ref Item itemDest)
+        // public static int StackMergeD(ref Item itemSrc, ref Item itemDest)
+        public static int StackMergeD(Item itemSrc, ref Item itemDest)
         {
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
             itemDest.stack += diff;
@@ -487,7 +635,7 @@ namespace InvisibleHand
         {
             if (Main.netMode == 1)
             {
-                NetMessage.SendData(32, -1, -1, "", player.chest, (float)index, 0, 0, 0);
+                NetMessage.SendData(32, -1, -1, "", Main.player[Main.myPlayer].chest, (float)index, 0, 0, 0);
             }
         }
 

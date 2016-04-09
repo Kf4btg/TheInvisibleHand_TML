@@ -70,6 +70,10 @@ namespace InvisibleHand
 
         #region itemExensions
 
+        public static bool CanStackWith(this Item src_item, Item dest_item)
+        {
+            return !dest_item.IsBlank() && dest_item.IsTheSameAs(src_item) && dest_item.stack < dest_item.maxStack;
+        }
 
         public static bool IsBlank(this Item item)
         {

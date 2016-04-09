@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
+using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 
@@ -12,8 +13,10 @@ namespace InvisibleHand
     public class IHPlayer : ModPlayer
     {
         private static IHPlayer Instance;
-        public static Player LocalPlayer {
-            get {
+        public static Player LocalPlayer
+        {
+            get
+            {
                 return Main.player[Main.myPlayer];
             }
         }
@@ -28,7 +31,8 @@ namespace InvisibleHand
             return Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
         }
 
-        public Item[] chestItems {
+        public Item[] chestItems
+        {
             get { return Main.chest[player.chest].item; }
         }
 
@@ -38,7 +42,7 @@ namespace InvisibleHand
         /// Holds status of flag indicating whether a particular
         /// action will respect (i.e. ignore) locked slots.
         /// Some actions are unaffected by this flag.
-        private Dictionary<TIH,bool> LockedActions;
+        private Dictionary<TIH, bool> LockedActions;
 
         public override void Initialize()
         {
@@ -49,7 +53,7 @@ namespace InvisibleHand
 
             // init "locked" status of all available actions;
             // not all actions are affected by this flag
-            LockedActions = new Dictionary<TIH,bool>();
+            LockedActions = new Dictionary<TIH, bool>();
             foreach (TIH aID in Enum.GetValues(typeof(TIH)))
             {
                 LockedActions.Add(aID, false);
@@ -60,7 +64,7 @@ namespace InvisibleHand
         {
             if (Main.gameMenu)
             {
-              // TODO: find somewhere else to do this
+                // TODO: find somewhere else to do this
                 var lii = Constants.LangInterIndices;
                 // reset original chest-button strings if we're quitting to main
                 // menu, which should be indicated by checking:
@@ -96,16 +100,16 @@ namespace InvisibleHand
             writer.Write(IHBase.ModOptions.Count);
             foreach (var kvp in IHBase.ModOptions)
             {
-              writer.Write(kvp.Key); // string optionname
-              writer.Write((bool)kvp.Value);
+                writer.Write(kvp.Key); // string optionname
+                writer.Write((bool)kvp.Value);
             }
 
             // save user-defined hotkeys
             writer.Write(IHBase.ActionKeys.Count);
             foreach (var kvp in IHBase.ActionKeys)
             {
-              writer.Write(kvp.Key); // string action_name
-              writer.Write((int)kvp.Value); // int val of Keys enum value
+                writer.Write(kvp.Key); // string action_name
+                writer.Write((int)kvp.Value); // int val of Keys enum value
             }
 
             // save locked action types
@@ -141,7 +145,7 @@ namespace InvisibleHand
             }
             catch (Exception e)
             {
-                ErrorLogger.Log("Read Error: "+e.ToString());
+                ErrorLogger.Log("Read Error: " + e.ToString());
             }
 
             try //key options
@@ -161,7 +165,7 @@ namespace InvisibleHand
             }
             catch (Exception e)
             {
-                ErrorLogger.Log("Read Error: "+e.ToString());
+                ErrorLogger.Log("Read Error: " + e.ToString());
             }
 
             // load locked Actions
@@ -178,7 +182,7 @@ namespace InvisibleHand
             }
             catch (Exception e)
             {
-              ErrorLogger.Log("Read Error: "+e.ToString());
+                ErrorLogger.Log("Read Error: " + e.ToString());
             }
         }
 
@@ -193,11 +197,11 @@ namespace InvisibleHand
         {
 
             //activate only if:
-                // not typing
-                // inventory is open
-                // not shopping
-                // not talking to an npc
-            if (!KeyboardBusy() && Main.playerInventory && Main.npcShop==0 && player.talkNPC==-1)
+            // not typing
+            // inventory is open
+            // not shopping
+            // not talking to an npc
+            if (!KeyboardBusy() && Main.playerInventory && Main.npcShop == 0 && player.talkNPC == -1)
             {
                 // Sort inventory/chest
                 if (IHBase.ActionKeys["Sort"].Pressed(prevState))
@@ -206,28 +210,30 @@ namespace InvisibleHand
                 }
 
                 //Consolidate Stacks
-                else if (IHBase.ActionKeys["Clean"].Pressed( prevState))
+                else if (IHBase.ActionKeys["Clean"].Pressed(prevState))
                 {
                     CleanStacks();
                 }
                 else
                 {
-                    if ( player.chest == -1 ) return; //no action w/o open container
+                    if (player.chest == -1) return; //no action w/o open container
 
                     // smartloot or quickstack
-                    if (IHBase.ActionKeys["QuickStack"].Pressed(prevState)) {
+                    if (IHBase.ActionKeys["QuickStack"].Pressed(prevState))
+                    {
                         QuickStack(ShiftHeld());
                     }
                     // smart-deposit or deposit-all
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed(prevState)) {
+                    else if (IHBase.ActionKeys["DepositAll"].Pressed(prevState))
+                    {
                         DepositAll(ShiftHeld());
                     }
                     // loot all
                     else if (IHBase.ActionKeys["LootAll"].Pressed(prevState))
-                        DoChestUpdateAction( IHUtils.DoLootAll );
+                        ChestUI.LootAll();
+                    // DoChestUpdateAction(IHUtils.DoLootAll);
                 }
             }
-
             prevState = Main.keyState;
         }
 
@@ -282,16 +288,16 @@ namespace InvisibleHand
             // NOTE: this used to check player.chestItems==null, but I once got a
             // "object reference not set to instance of object" or whatever kind of error
             // with that check elsewhere in the code. This should be safer and have the exact same result.
-            if ( player.chest == -1 ) // no valid chest open, sort player inventory
+            if (player.chest == -1) // no valid chest open, sort player inventory
                 // shift-pressed XOR Reverse-sort-mod-option:
                 //   this will reverse the sort IFF exactly one of these two bools is true
                 IHOrganizer.SortPlayerInv(player,
                     reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
             else
                 // call sort on the Item[] array returned by chestItems
-                DoChestUpdateAction( () =>
-                    IHOrganizer.SortChest(chestItems,
-                    reverse ^ IHBase.ModOptions["ReverseSortChest"])
+                DoChestUpdateAction(() =>
+                   IHOrganizer.SortChest(chestItems,
+                   reverse ^ IHBase.ModOptions["ReverseSortChest"])
                 );
         }
 
@@ -299,7 +305,7 @@ namespace InvisibleHand
         public void CleanStacks()
         {
 
-            if ( player.chest == -1 )
+            if (player.chest == -1)
                 IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
             else
                 DoChestUpdateAction(
@@ -312,12 +318,13 @@ namespace InvisibleHand
         /// <param name="smartLoot">Perform SmartLoot action instead </param>
         public void QuickStack(bool smartLoot = false)
         {
-            if ( player.chest == -1 ) return;
+            if (player.chest == -1) return;
 
             if (smartLoot)
-                DoChestUpdateAction( IHSmartStash.SmartLoot );
+                DoChestUpdateAction(IHSmartStash.SmartLoot);
             else
-                DoChestUpdateAction( IHUtils.DoQuickStack );
+                ChestUI.QuickStack();
+                // DoChestUpdateAction(IHUtils.DoQuickStack);
         }
 
         /// <summary>
@@ -326,12 +333,20 @@ namespace InvisibleHand
         /// <param name="smartDeposit">Perform smartDeposit action instead </param>
         public void DepositAll(bool smartDeposit = false)
         {
-            if ( player.chest == -1 ) return;
+            if (player.chest == -1) return;
 
             if (smartDeposit)
-                DoChestUpdateAction( IHSmartStash.SmartDeposit );
+                DoChestUpdateAction(IHSmartStash.SmartDeposit);
             else
-                DoChestUpdateAction( IHUtils.DoDepositAll );
+                ChestUI.DepositAll();
+            // DoChestUpdateAction(IHUtils.DoDepositAll);
+        }
+
+        public void LootAll()
+        {
+            if (player.chest == -1) return;
+
+            ChestUI.LootAll();
         }
 
         /// Only valid for the 40 Player inventory slots below the hotbar.
@@ -370,36 +385,152 @@ namespace InvisibleHand
         //     Instance.lockedSlots[slotIndex - 10] = !Instance.lockedSlots[slotIndex - 10];
         // }
 
-        public bool SlotLocked(int slot)
-        {
-            return player.inventory[slot].favorited;
-        }
+        // public bool SlotLocked(int slot)
+        // {
+        //     return player.inventory[slot].favorited;
+        // }
+        //
+        //
+        // /// <returns>True if indicated action is set to respect locked slots.</returns>
+        // public static bool ActionLocked(Player player, TIH actionID)
+        // {
+        //     // IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
+        //     return player.GetModPlayer<IHPlayer>(Instance.mod).LockedActions[actionID];
+        // }
+        //
+        // public bool ActionLocked(TIH actionID)
+        // {
+        //     return this.LockedActions[actionID];
+        // }
+        //
+        // /// Set indicated action to respect/not-respect locked slots,
+        // /// depending on current status.
+        // public static void ToggleActionLock(Player player, TIH actionID)
+        // {
+        //     IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
+        //     mp.LockedActions[actionID] = !mp.LockedActions[actionID];
+        // }
+        //
+        // public static void ToggleActionLock(TIH actionID)
+        // {
+        //     Instance.LockedActions[actionID] = !Instance.LockedActions[actionID];
+        // }
+        //
+        // #region inventory actions
+        //
+        // //Moving these here from IHUtils; they're tied to the player, anyway, so they really should be here
+        //
+        // private const int R_START = 49;   //start from end of main inventory
+        // private const int R_END   = 10;     //don't include hotbar
+        //
+        // public void DoDepositAll()
+        // {
+        //     // if no chest open, just return;
+        //     // this shouldn't happen if method if everything is working correctly
+        //     if (player.chest == -1)
+        //         return;
+        //
+        //     Func<Item, bool> can_move;
+        //
+        //     if (ActionLocked(TIH.DepositAll))
+        //         // skip favorited items if the action is locked
+        //         can_move = item => !(item.IsBlank() || item.favorited);
+        //     else
+        //         can_move = item => !item.IsBlank();
+        //
+        //     for (int i = R_START; i >= R_END; i--)
+        //     {
+        //         if (can_move(player.inventory[i]))
+        //             IHUtils.MoveItem(ref player.inventory[i], chestItems, 0, Chest.maxItems);
+        //     }
+        //
+        //     // XXX: Is this necessary anymore?
+        //     Recipe.FindRecipes();
+        //
+        //     // skip favorited items if the action is locked
+        //     // if (ActionLocked(TIH.DepositAll))
+        //     // {
+        //     //     // iterate from end to beginning
+        //     //     for (int i = R_START; i >= R_END; i--)
+        //     //     {
+        //     //         // var item = player.inventory[i];
+        //     //         if (player.inventory[i].IsBlank() || player.inventory[i].favorited)
+        //     //             continue;
+        //     //
+        //     //         // IHUtils.MoveItemToChest(int iPlayer, bool sendMessage)
+        //     //         IHUtils.MoveItem(ref player.inventory[i], chestItems, 0, Chest.maxItems);
+        //     //     }
+        //     // }
+        //     // else
+        //     // {
+        //     // }
+        // }
+        //
+        // /// for simplicity, this just uses the vanilla player.GetItem()
+        // /// to do its work.
+        // public void DoLootAll()
+        // {
+        //     //this shouldn't happen if method is called correctly
+        //     if (player.chest == -1) return;
+        //
+        //     // var sendNetMsg = player.chest > -1;
+        //     var container = chestItems;
+        //
+        //     for (int i=0; i<Chest.maxItems; i++)
+        //     {
+        //         if (!container[i].IsBlank())
+        //         {
+        //             container[i] = player.GetItem(player.whoAmI, container[i]);
+        //
+        //             // if (sendNetMsg) SendNetMessage(i);
+        //         }
+        //     }
+        //     Recipe.FindRecipes(); // !ref:Main:#22640.36#
+        // }
+        //
+        // public void DoQuickStack(Player aplayer)
+        // {
+        //     if (player.chest == -1) return;
+        //
+        //     var inventory = player.inventory;
+        //     var container = chestItems;
+        //     // bool sendMessage = player.chest > -1;
+        //     var checkLocks  = ActionLocked(TIH.QuickStack);  //boolean
+        //
+        //
+        //     for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
+        //     {                                                                                   //if chest item is not blank && not a full stack, then
+        //         if (!container[iC].IsBlank() && container[iC].stack < container[iC].maxStack)
+        //         {                                                                               //for each item in inventory (including coins, ammo, hotbar),
+        //             for (int iP=0; iP<58; iP++)
+        //             {
+        //                 if (inventory[iP].favorited) continue;                    // if we're checking locks ignore the locked ones
+        //
+        //                 if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
+        //                 {
+        //                     Sound.ItemMoved.Play();
+        //                                                                                         // ...merge inv. item stack to chest item stack
+        //                     if (StackMerge(ref inventory[iP], container, iC))
+        //                     {                                                                   // do merge & check return (inv stack empty) status
+        //                         inventory[iP] = new Item();                                     // reset slot if all inv stack moved
+        //                     }
+        //                     else if (container[iC].IsBlank())
+        //                     {                                                                   // else, inv stack not empty after merge, but (because of DoCoins() call),
+        //                                                                                         // chest stack could be.
+        //                         container[iC] = inventory[iP].Clone();                          // move inv item to chest slot
+        //                         inventory[iP] = new Item();                                     // and reset inv slot
+        //                     }
+        //                     // if (sendMessage) SendNetMessage(iC);                             //send net message if regular chest
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     Recipe.FindRecipes(); // !ref:Main:#22640.36#
+        // }
+        //
+        //
+        // #endregion
 
-
-        /// <returns>True if indicated action is set to respect locked slots.</returns>
-        public static bool ActionLocked(Player player, TIH actionID)
-        {
-            // IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
-            return player.GetModPlayer<IHPlayer>(Instance.mod).LockedActions[actionID];
-        }
-
-        public static bool ActionLocked(TIH actionID)
-        {
-            return Instance.LockedActions[actionID];
-        }
-
-        /// Set indicated action to respect/not-respect locked slots,
-        /// depending on current status.
-        public static void ToggleActionLock(Player player, TIH actionID)
-        {
-            IHPlayer mp = player.GetModPlayer<IHPlayer>(Instance.mod);
-            mp.LockedActions[actionID] = !mp.LockedActions[actionID];
-        }
-
-        public static void ToggleActionLock(TIH actionID)
-        {
-            Instance.LockedActions[actionID] = !Instance.LockedActions[actionID];
-        }
 
     }
 }
