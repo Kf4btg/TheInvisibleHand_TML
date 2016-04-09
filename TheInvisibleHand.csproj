@@ -53,6 +53,7 @@
     <Compile Include="CategoryDef.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IHCommandHandler.cs" />
     <Compile Include="IHEvent.cs" />
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
