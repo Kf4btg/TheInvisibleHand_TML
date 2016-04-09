@@ -5,7 +5,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-
     public class IHCommandHelper
     {
         public readonly Mod modbase;
@@ -22,12 +21,15 @@ namespace InvisibleHand
             helpStrings[key] = new List<string>(help_lines);
         }
 
+        public void setHelp(string key, IList<string> help_lines)
+        {
+            helpStrings[key] = new List<string>(help_lines);
+        }
+
         public void printHelp(string key)
         {
             foreach (string line in helpStrings[key])
-            {
                 Main.NewText(line);
-            }
         }
 
         public void ErrorMsg(string msg, string source = "")
@@ -35,7 +37,5 @@ namespace InvisibleHand
             if (source==String.Empty) source = modbase.Name;
             Main.NewText($"[{source}] Error: {msg}");
         }
-
-
     }
 }

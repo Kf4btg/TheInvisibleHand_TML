@@ -7,29 +7,29 @@ using Terraria.UI;
 namespace InvisibleHand
 {
     /// All the actions that the mod can perform
-    public enum TIH
-    {
-        None,
-
-        Sort,
-        ReverseSort,
-
-        QuickStack,
-        DepositAll,
-        LootAll,
-
-        CleanStacks,
-
-        SmartDeposit,
-        SmartLoot,
-
-        // simply for replacing the button with a visually-consistent
-        // tiled-graphic version when someone chooses non-text
-        // replacements
-        Rename,
-        SaveName,
-        CancelEdit
-    }
+    // public enum TIH
+    // {
+    //     None,
+    //
+    //     Sort,
+    //     ReverseSort,
+    //
+    //     QuickStack,
+    //     DepositAll,
+    //     LootAll,
+    //
+    //     CleanStacks,
+    //
+    //     SmartDeposit,
+    //     SmartLoot,
+    //
+    //     // simply for replacing the button with a visually-consistent
+    //     // tiled-graphic version when someone chooses non-text
+    //     // replacements
+    //     Rename,
+    //     SaveName,
+    //     CancelEdit
+    // }
 
     public class ActionID
     {
@@ -358,6 +358,9 @@ namespace InvisibleHand
 
         public static readonly Dictionary<string, Keys> DefaultKeys;
 
+        /// help strings for the chat commands
+        public static readonly Dictionary<string, IList<string>> CommandHelpStrings;
+
 
         static Constants()
         {
@@ -511,7 +514,51 @@ namespace InvisibleHand
                 // {TIH.ReverseSort,"sort"},
                 // edit chest doesn't get a keyboard shortcut. So there.
             };
+
+            CommandHelpStrings = new Dictionary<string, IList<string>>(){
+                {"ihconfig", new string[4]
+                    {
+                        "Usage: /ihconfig <subcommand> <arguments>",
+                        "Valid subcommands are \"h[elp]\", \"set-opt\", \"set-key\", \"query-opt\",  and \"query-key\".",
+                        "These have aliases of 'h', 'so', 'sk', 'qo', and 'qk', respectively",
+                        "Use \"/ihconfig help <subcommand>\" for more information."
+                    }
+                },
+                {"help", new string[5]
+                    {"Usage: /ihconfig set-opt <option_name> {true|1,false|0,default}",
+                    "/ihconfig set-key <action_name> <key>",
+                    "/ihconfig query-opt [option_name]...",
+                    "/ihconfig query-key [action_name]...",
+                    "Use \"/ihconfig help <subcommand>\" for more information"}
+                },
+                {"set-opt", new string[4]
+                    {"Usage: /ihconfig set-opt <option> {false,true,0,1,default}",
+                    "  Examples: /ihconfig set-opt ReverseSortPlayer true",
+                    "            /ihconfig set-opt ReverseSortChest 0",
+                    "Use \"/ihconfig query-opt all\" for a list of all options."}
+                },
+                {"set-key", new string[4]
+                    {"Usage: /ihconfig set-key <action> <key>",
+                    "  Examples: /ihconfig set-key DepositAll X",
+                    "            /ihconfig set-key Sort Tab",
+                    "Use \"/ihconfig query-key all\" for a list of all actions and current key-binds."}
+                },
+                {"query-opt", new string[4]
+                    {"Usage: /ihconfig query-opt [all] [<option_name>]...",
+                    "With no arguments, prints a list of all option names.",
+                    "With one or more option names, shows current state of those options.",
+                    "  Example: /ihconfig query-opt SortToEndPlayer ReverseSortPlayer"}
+                },
+                {"query-key", new string[4]
+                    {"Usage: /ihconfig query-key [all] [<action_name>]...",
+                    "With no arguments (or 'all'), prints a list of all action names.",
+                    "With one or more action names, shows currently bound key for those actions.",
+                    "  Example: /ihconfig query-opt Sort LootAll"}
+                }
+            };
         }
+
+
 
         // a hack; don't know if it's necessary
         // public static void None() { }
