@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using Terraria.ModLoader;
 using Terraria;
 
-namespace InvisibleHand
+namespace InvisibleHand.Utils
 {
-    public class IHCommandHelper
+    public class CommandHelper
     {
         public readonly Mod modbase;
 
         private IDictionary<string, IList<string>> helpStrings = new Dictionary<string, IList<string>>();
 
-        public IHCommandHelper(Mod modbase)
+        public CommandHelper(Mod modbase)
         {
             this.modbase = modbase;
         }
