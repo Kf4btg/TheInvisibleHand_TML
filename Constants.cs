@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 // using System;
 using Terraria.ID;
+using Terraria.UI;
 
 namespace InvisibleHand
 {
@@ -28,6 +29,23 @@ namespace InvisibleHand
         Rename,
         SaveName,
         CancelEdit
+    }
+
+    public class ActionID
+    {
+        public const int LootAll = ChestUI.ButtonID.LootAll;
+        public const int DepositAll = ChestUI.ButtonID.DepositAll;
+        public const int QuickStack = ChestUI.ButtonID.QuickStack;
+        public const int Restock = ChestUI.ButtonID.Restock;
+        public const int RenameChest = ChestUI.ButtonID.RenameChest;
+        public const int RenameChestCancel = ChestUI.ButtonID.RenameChestCancel;
+        // public const int Count = ChestUI.ButtonID.Count;
+
+        public const int Sort = ChestUI.ButtonID.Count + 1;
+        public const int CleanStacks = ChestUI.ButtonID.Count + 2;
+        public const int SmartDeposit = ChestUI.ButtonID.Count + 3;
+
+        public const int ReverseSort = ChestUI.ButtonID.Count + 4;
     }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
