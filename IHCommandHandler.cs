@@ -78,7 +78,7 @@ namespace InvisibleHand
                                     helper.printHelp("set");
                                     break;
 
-                                case "qo":
+                                case "q":
                                 case "query":
                                     helper.printHelp("query");
                                     break;
