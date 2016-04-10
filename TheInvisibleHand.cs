@@ -15,7 +15,7 @@ namespace InvisibleHand
         /// holds the game's original strings for loot-all, dep-all, quick-stack, etc;
         /// we're going to be removing these later on, but will use their
         /// original values to replace them with newer, better buttons.
-        public static Dictionary<int, string> OriginalButtonLabels { get; private set; }
+        // public static Dictionary<int, string> OriginalButtonLabels { get; private set; }
 
         public static readonly Dictionary<string, bool> ModOptions = new Dictionary<string, bool>();
         // public static readonly Dictionary<string, Keys> ActionKeys = new Dictionary<string, Keys>();
