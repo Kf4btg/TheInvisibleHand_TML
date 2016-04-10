@@ -1,9 +1,9 @@
 author = wuli1986
-version = 2.0.0.1alpha
+version = 2.0.0.1
 displayName = The Invisible Hand
 homepage = http://forums.terraria.org/index.php?threads/the-invisible-hand-inventory-management-for-the-organizationally-challenged.7547/
 hideCode = false
 hideResources = false
 includeSource = true
 buildIgnore = *.csproj, *.user, *.userprefs, obj\*, bin\*, .vs\*, .git\*
-includePDB = true
+noCompile = true

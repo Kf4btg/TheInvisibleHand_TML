@@ -5,13 +5,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheInvisibleHand", "TheInvi
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		MonoDebug|Any CPU = MonoDebug|Any CPU
+		WindowsDebug|Any CPU = WindowsDebug|Any CPU
+		MonoRelease|Any CPU = MonoRelease|Any CPU
+		WindowsRelease|Any CPU = WindowsRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.MonoDebug|Any CPU.ActiveCfg = MonoDebug|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.WindowsDebug|Any CPU.ActiveCfg = WindowsDebug|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.MonoDebug|Any CPU.Build.0 = MonoDebug|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.WindowsDebug|Any CPU.Build.0 = WindowsDebug|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.MonoRelease|Any CPU.ActiveCfg = MonoRelease|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.WindowsRelease|Any CPU.ActiveCfg = WindowsRelease|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.MonoRelease|Any CPU.Build.0 = MonoRelease|Any CPU
+		{09B5ADE1-7180-4747-B59E-055F373EC5B0}.WindowsRelease|Any CPU.Build.0 = WindowsRelease|Any CPU
 	EndGlobalSection
 EndGlobal
