@@ -317,7 +317,7 @@ namespace InvisibleHand
 
             DefaultOptionValues = new Dictionary<string, bool>
             {
-                {"UseReplacers", true},
+                // {"UseReplacers", true},
                 {"SortToEndPlayer", false},
                 {"SortToEndChest", false},
                 {"ReverseSortPlayer", false},
