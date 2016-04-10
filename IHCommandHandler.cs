@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Input;
 using Terraria;
 using InvisibleHand.Utils;
 
@@ -74,34 +73,22 @@ namespace InvisibleHand
                         {
                             switch (qcmd.Dequeue())
                             {
-                                case "so":
-                                case "set-opt":
-                                    helper.printHelp("set-opt");
-                                    break;
-
-                                case "sk":
-                                case "set-key":
-                                    helper.printHelp("set-key");
+                                case "s":
+                                case "set":
+                                    helper.printHelp("set");
                                     break;
 
                                 case "qo":
-                                case "query-opt":
-                                    helper.printHelp("query-opt");
-                                    break;
-
-                                case "qk":
-                                case "query-key":
-                                    helper.printHelp("query-key");
+                                case "query":
+                                    helper.printHelp("query");
                                     break;
                             }
-                            // Main.NewText("Usage: /ihconfig set-opt <option name> true|false|0|1");
-                            // Main.NewText("  Example: /ihconfig set opt ReverseSortPlayer true");
                         }
                         break;
-                    case "so":
-                    case "set-opt":
+                    case "s":
+                    case "set":
                         if (qcmd.Count == 0)
-                            helper.printHelp("set-opt");
+                            helper.printHelp("set");
                         else
                         {
                             string opt = qcmd.Dequeue();
@@ -126,30 +113,9 @@ namespace InvisibleHand
                                 helper.ErrorMsg($"invalid option name '{opt}'", "ihconfig");
                         }
                         break;
-                    case "sk":
-                    case "set-key":
-                        if (qcmd.Count == 0)
-                            helper.printHelp("set-key");
-                        else
-                        {
-                            string action = qcmd.Dequeue();
-                            if (IHBase.ActionKeys.ContainsKey(action))
-                            {
-                                Keys newkey;
-                                string value = qcmd.Dequeue();
-                                if (Enum.TryParse<Keys>(value, out newkey))
-                                    modbase.UpdateOption(action, newkey);
-                                else
-                                    helper.ErrorMsg($"could not parse value '{value}' as a known key", "ihconfig");
-                            }
-                            else
-                            {
-                                helper.ErrorMsg($"invalid action name '{action}'", "ihconfig");
-                            }
-                        }
-                        break;
+
                     case "q":
-                    case "query-opt":
+                    case "query":
                         if (qcmd.Count == 0 || qcmd.Peek()=="all")
                         {
                             // print all available options and current values
@@ -174,24 +140,8 @@ namespace InvisibleHand
                             }
                         }
                         break;
-                    case "qk":
-                    case "query-key":
-                        if (qcmd.Count == 0 || qcmd.Peek() == "all")
-                        {
-                            StringBuilder printkeys = new StringBuilder("KeyBinds:");
-                            foreach (var kvp in IHBase.ActionKeys)
-                            {
-                                printkeys.AppendFormat(" {0} [{1}],", kvp.Key, kvp.Value);
-                            }
-                            // print all but last comma
-                            Main.NewText(printkeys.ToString(0, printkeys.Length-1));
-                        }
-                        break;
                 }
-
             }
         }
-
-
     }
 }

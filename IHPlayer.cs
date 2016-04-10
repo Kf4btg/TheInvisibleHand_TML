@@ -5,7 +5,7 @@ using System.IO;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.UI;
-using Microsoft.Xna.Framework.Input;
+// using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 
 namespace InvisibleHand
@@ -13,7 +13,7 @@ namespace InvisibleHand
     public class IHPlayer : ModPlayer
     {
         // track Keyboard state (pressed keys)
-        internal static KeyboardState prevState = Keyboard.GetState();
+        // internal static KeyboardState prevState = Keyboard.GetState();
         // can just use Main.keyState for the current
         // internal static KeyboardState currState = Keyboard.GetState();
 
@@ -21,36 +21,36 @@ namespace InvisibleHand
         public static IHPlayer GetLocalIHPlayer(Mod mod) => Main.player[Main.myPlayer].GetModPlayer<IHPlayer>(mod);
         public Item[] chestItems => Main.chest[player.chest].item;
 
-        // public override void Initialize()
-        // {
-        //     Instance = this;
-        // }
+        public override void Initialize()
+        {
+            ((IHBase)mod).localplayer = this;
+        }
 
         public override void SaveCustomData(BinaryWriter writer)
         {
-            if (Main.gameMenu)
-            {
-                // TODO: find somewhere else to do this
-                var lii = Constants.LangInterIndices;
-                // reset original chest-button strings if we're quitting to main
-                // menu, which should be indicated by checking:
-                //     if (Main.gameMenu == true)
-                // as this is set during the SaveAndQuit() method of the worldgen
-                // immediately before player save. So:
-                Lang.inter[lii[ActionID.LootAll]] = IHBase.OriginalButtonLabels[ActionID.LootAll];
-                Lang.inter[lii[ActionID.DepositAll]] = IHBase.OriginalButtonLabels[ActionID.DepositAll];
-                Lang.inter[lii[ActionID.QuickStack]] = IHBase.OriginalButtonLabels[ActionID.QuickStack];
-
-                if (IHBase.ModOptions["UseReplacers"])
-                {
-                    Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
-                    Lang.inter[lii[ActionID.SaveChestName]] = IHBase.OriginalButtonLabels[ActionID.SaveChestName];
-                    Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
-                }
-                // should take care of it and make sure the strings are set
-                // correctly if the mod is unloaded/the replacer-button option
-                // is disabled.
-            }
+            // if (Main.gameMenu)
+            // {
+            //     // TODO: find somewhere else to do this
+            //     var lii = Constants.LangInterIndices;
+            //     // reset original chest-button strings if we're quitting to main
+            //     // menu, which should be indicated by checking:
+            //     //     if (Main.gameMenu == true)
+            //     // as this is set during the SaveAndQuit() method of the worldgen
+            //     // immediately before player save. So:
+            //     Lang.inter[lii[ActionID.LootAll]] = IHBase.OriginalButtonLabels[ActionID.LootAll];
+            //     Lang.inter[lii[ActionID.DepositAll]] = IHBase.OriginalButtonLabels[ActionID.DepositAll];
+            //     Lang.inter[lii[ActionID.QuickStack]] = IHBase.OriginalButtonLabels[ActionID.QuickStack];
+            //
+            //     if (IHBase.ModOptions["UseReplacers"])
+            //     {
+            //         Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
+            //         Lang.inter[lii[ActionID.SaveChestName]] = IHBase.OriginalButtonLabels[ActionID.SaveChestName];
+            //         Lang.inter[lii[ActionID.RenameChestCancel]] = IHBase.OriginalButtonLabels[ActionID.RenameChestCancel];
+            //     }
+            //     // should take care of it and make sure the strings are set
+            //     // correctly if the mod is unloaded/the replacer-button option
+            //     // is disabled.
+            // }
 
             // TODO: refactor option-handling into separate lib, save the options there; query
             // that during load to retrieve options
@@ -61,14 +61,6 @@ namespace InvisibleHand
             {
                 writer.Write(kvp.Key); // string optionname
                 writer.Write((bool)kvp.Value);
-            }
-
-            // save user-defined hotkeys
-            writer.Write(IHBase.ActionKeys.Count);
-            foreach (var kvp in IHBase.ActionKeys)
-            {
-                writer.Write(kvp.Key); // string action_name
-                writer.Write((int)kvp.Value); // int val of Keys enum value
             }
         }
 
@@ -89,69 +81,51 @@ namespace InvisibleHand
             {
                 ErrorLogger.Log("Read Error: " + e.ToString());
             }
-
-            try //key options
-            {
-                int count = reader.ReadInt32();
-                for (int i = 0; i < count; i++)
-                {
-                    string actionName = reader.ReadString();
-                    int keyval = reader.ReadInt32();
-                    if (Enum.IsDefined(typeof(Keys), keyval))
-                        mod.UpdateOption(actionName, (Keys)keyval);
-                    else
-                        ErrorLogger.Log($"Invalid value {keyval} for keybind {actionName} found in player save data");
-                }
-            }
-            catch (Exception e)
-            {
-                ErrorLogger.Log("Read Error: " + e.ToString());
-            }
         }
 
-        public static bool KeyboardBusy() => Main.chatMode || Main.editSign || Main.editChest;
-        public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
+        // public static bool KeyboardBusy() => Main.chatMode || Main.editSign || Main.editChest;
+        // public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
 
         /// During this phase we check if the player has pressed any hotkeys;
         /// if so, the corresponding action is called
-        public override void PreUpdate()
-        {
-
-            //activate only if:
-            // not typing
-            // inventory is open
-            // not shopping
-            // not talking to an npc
-            if (!KeyboardBusy() && Main.playerInventory && Main.npcShop == 0 && player.talkNPC == -1)
-            {
-                // Sort inventory/chest
-                if (IHBase.ActionKeys["Sort"].Pressed(prevState))
-                    Sort(ShiftHeld());
-
-                //Consolidate Stacks
-                else if (IHBase.ActionKeys["Clean"].Pressed(prevState))
-                    CleanStacks();
-
-                else if (player.chest != -1) //no action w/o open container
-                {
-                    // restock or quickstack
-                    if (IHBase.ActionKeys["QuickStack"].Pressed(prevState))
-                    {
-                        QuickStack(ShiftHeld());
-                    }
-                    // smart-deposit or deposit-all
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed(prevState))
-                    {
-                        DepositAll(ShiftHeld());
-                    }
-                    // loot all
-                    else if (IHBase.ActionKeys["LootAll"].Pressed(prevState))
-                        LootAll();
-                    // DoChestUpdateAction(IHUtils.DoLootAll);
-                }
-            }
-            prevState = Main.keyState;
-        }
+        // public override void PreUpdate()
+        // {
+        //
+        //     //activate only if:
+        //     // not typing
+        //     // inventory is open
+        //     // not shopping
+        //     // not talking to an npc
+        //     if (!KeyboardBusy() && Main.playerInventory && Main.npcShop == 0 && player.talkNPC == -1)
+        //     {
+        //         // Sort inventory/chest
+        //         if (IHBase.ActionKeys["Sort"].Pressed(prevState))
+        //             Sort(ShiftHeld());
+        //
+        //         //Consolidate Stacks
+        //         else if (IHBase.ActionKeys["Clean"].Pressed(prevState))
+        //             CleanStacks();
+        //
+        //         else if (player.chest != -1) //no action w/o open container
+        //         {
+        //             // restock or quickstack
+        //             if (IHBase.ActionKeys["QuickStack"].Pressed(prevState))
+        //             {
+        //                 QuickStack(ShiftHeld());
+        //             }
+        //             // smart-deposit or deposit-all
+        //             else if (IHBase.ActionKeys["DepositAll"].Pressed(prevState))
+        //             {
+        //                 DepositAll(ShiftHeld());
+        //             }
+        //             // loot all
+        //             else if (IHBase.ActionKeys["LootAll"].Pressed(prevState))
+        //                 LootAll();
+        //             // DoChestUpdateAction(IHUtils.DoLootAll);
+        //         }
+        //     }
+        //     prevState = Main.keyState;
+        // }
 
         /// <summary>
         /// Takes an Action and will perform it wrapped in some net update code if we are a client. Otherwise it just does whatever it is.
@@ -160,6 +134,7 @@ namespace InvisibleHand
         // public static void DoChestUpdateAction(Action action)
         public void DoChestUpdateAction(Action action)
         {
+            /// TODO: see if we can get rid of this. Only sort and clean use it anymore.
 
             var chestContents = chestItems; // cache this
             // var player = Main.localPlayer;
@@ -174,7 +149,6 @@ namespace InvisibleHand
                 {
                     oldItems[i] = chestContents[i].Clone();
                 }
-
                 // perform the requested action
                 action();
 
@@ -183,12 +157,9 @@ namespace InvisibleHand
                 // if they do not match.
                 for (int i = 0; i < oldItems.Length; i++)
                 {
-                    // var oldItem = oldItems[i];
-                    // var newItem = chestContents[i];
-
                     if (oldItems[i].IsNotTheSameAs(chestContents[i]) || oldItems[i].stack != chestContents[i].stack)
                     {
-                        IHUtils.SendNetMessage(i);
+                        NetMessage.SendData(32, -1, -1, "", player.chest, (float)i, 0, 0, 0);
                     }
                 }
             }
@@ -251,7 +222,6 @@ namespace InvisibleHand
 
             if (smartDeposit)
                 this.SmartDeposit();
-                // DoChestUpdateAction(IHSmartStash.SmartDeposit);
             else
                 ChestUI.DepositAll();
         }

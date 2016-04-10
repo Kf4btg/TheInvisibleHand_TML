@@ -4,7 +4,6 @@ using System;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.ID;
-using Terraria.UI;
 
 using InvisibleHand.Utils;
 
@@ -51,21 +50,21 @@ namespace InvisibleHand
         }
 
         /// query an arbitrary keystate about the given key
-        public static bool Down(this Keys key, KeyboardState state)
-        {
-            return state.IsKeyDown(key);
-        }
-        public static bool Up(this Keys key, KeyboardState state)
-        {
-            return state.IsKeyUp(key);
-        }
-
-
-        /// returns true if the key is down now, but was up in the previous state
-        public static bool Pressed(this Keys key, KeyboardState previous_state)
-        {
-            return key.Up(previous_state) && key.Down();
-        }
+        // public static bool Down(this Keys key, KeyboardState state)
+        // {
+        //     return state.IsKeyDown(key);
+        // }
+        // public static bool Up(this Keys key, KeyboardState state)
+        // {
+        //     return state.IsKeyUp(key);
+        // }
+        //
+        //
+        // /// returns true if the key is down now, but was up in the previous state
+        // public static bool Pressed(this Keys key, KeyboardState previous_state)
+        // {
+        //     return key.Up(previous_state) && key.Down();
+        // }
 
         #endregion
 
@@ -169,38 +168,7 @@ namespace InvisibleHand
 
     #region TIH action exts
 
-        /// <summary>
-        /// DefaultLabelForAction
-        /// </summary>
-        /// <param name="action"> </param>
-        /// <param name="use_originals">If true, will return the value pulled
-        /// from Terraria's code for that action. </param>
-        /// <returns>Corresponding label for the action or the empty string ""
-        /// if one could not be found.</returns>
-        public static string DefaultLabelForAction(int actionID, bool use_originals)
-        {
-            if (use_originals)
-            {
-                if (actionID < ChestUI.ButtonID.Count)
-                    return IHBase.OriginalButtonLabels[actionID];
-                // switch (actionID)
-                // {
-                //     case ActionID.:
-                //     case TIH.DepositAll:
-                //     case TIH.QuickStack:
-                //     case TIH.Rename:
-                //     case TIH.SaveName:
-                //     case TIH.CancelEdit:
-                //         return IHBase.OriginalButtonLabels[action];
-                // }
-            }
 
-            string label;
-            if (Constants.DefaultButtonLabels.TryGetValue(actionID, out label))
-                return label;
-
-            return "";
-        }
 
         /// returns the key-bind (as a string) for the button with the given
         /// action. return value will be something like "(X)"

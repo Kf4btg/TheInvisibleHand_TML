@@ -1,19 +1,9 @@
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 
 namespace InvisibleHand.Utils
 {
-    public enum OptionType
-    {
-        STRING,
-        BOOL,
-        INT,
-        FLOAT,
-        KEY
-    }
-
     public static class OptionManager
     {
         /// maps mod name to Mod
@@ -97,18 +87,18 @@ namespace InvisibleHand.Utils
         }
 
         // Keys
-        public static KeyOption RegisterOption(this Mod mod, string option_name, Keys default_value)
-        {
-            var option = new KeyOption(mod, option_name, default_value);
-            _addOption(mod.Name, option);
-            return option;
-        }
-        public static KeyOption RegisterOption(this Mod mod, string option_name, Keys default_value, Action<string, Keys> callback, bool notify = true)
-        {
-            var option = RegisterOption(mod, option_name, default_value);
-            option.RegisterCallback(callback, notify);
-            return option;
-        }
+        // public static KeyOption RegisterOption(this Mod mod, string option_name, Keys default_value)
+        // {
+        //     var option = new KeyOption(mod, option_name, default_value);
+        //     _addOption(mod.Name, option);
+        //     return option;
+        // }
+        // public static KeyOption RegisterOption(this Mod mod, string option_name, Keys default_value, Action<string, Keys> callback, bool notify = true)
+        // {
+        //     var option = RegisterOption(mod, option_name, default_value);
+        //     option.RegisterCallback(callback, notify);
+        //     return option;
+        // }
 
         /// register a pre-constructed  mod option
         private static ModOption<T> _addOption<T>(string mod_name, ModOption<T> mod_option)
@@ -295,19 +285,19 @@ namespace InvisibleHand.Utils
         }
     }
 
-    public class KeyOption : ModOption<Keys>
-    {
-        public KeyOption(Mod mod, string name, Keys? value = Keys.None) : base(mod, name, (Keys)value) {}
-
-        public static implicit operator Keys(KeyOption o)
-        {
-            return o.Value;
-        }
-
-        /// return the integer value of the Keys enum member; intended for use in serialization.
-        public static explicit operator int(KeyOption o)
-        {
-            return (int)o.Value;
-        }
-    }
+    // public class KeyOption : ModOption<Keys>
+    // {
+    //     public KeyOption(Mod mod, string name, Keys? value = Keys.None) : base(mod, name, (Keys)value) {}
+    //
+    //     public static implicit operator Keys(KeyOption o)
+    //     {
+    //         return o.Value;
+    //     }
+    //
+    //     /// return the integer value of the Keys enum member; intended for use in serialization.
+    //     public static explicit operator int(KeyOption o)
+    //     {
+    //         return (int)o.Value;
+    //     }
+    // }
 }
