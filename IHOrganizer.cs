@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using System.Linq.Dynamic;
+// using System.Linq.Dynamic;
 using Terraria;
 using InvisibleHand.Utils;
 
@@ -28,15 +28,27 @@ namespace InvisibleHand
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
             foreach (var category in byCategory)
             {
-                // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
-                // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
-                var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
+                // until we replace Dynamic Linq, just sort the categorized items by name
 
-                // execute the query and put the result in a list to return
-                foreach (var s_item in result)
-                    sortedList.Add(s_item);
+                var result =
+                    from item in category
+                    orderby item.name
+                    select item;
+
+                sortedList.AddRange(result);
+
+                // var result = category.AsQueryable().OrderBy(Func<Item, TKey> keySelector, IComparer<TKey> comparer)
+
+                //     // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
+                //     // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
+                //     var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
+                //
+                //     // execute the query and put the result in a list to return
+                //     foreach (var s_item in result)
+                //         sortedList.Add(s_item);
             }
             return sortedList;
+
         }
 
        /// <summary>
