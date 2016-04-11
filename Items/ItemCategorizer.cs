@@ -1,5 +1,5 @@
 // using Microsoft.Xna.Framework;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 // using System;
 // using TAPI;
 using Terraria;
@@ -16,7 +16,7 @@ namespace InvisibleHand.Items
         {
             // var cinfo = getCategoryInfo(item);
 
-            categorize(item, getCategoryInfo(item));
+            classify(item, getCategoryInfo(item));
 
             // if (item.placeStyle > 0)
             // {
@@ -36,48 +36,58 @@ namespace InvisibleHand.Items
             // }
         }
 
-        private void categorize(Item item, CategoryInfo cinfo)
+        private void classify(Item item, CategoryInfo cinfo)
         {
             var clist = cinfo.categories;
+            // var traits = cinfo.traits;
+
+            // some generic traits
+            if (item.channel) cinfo.addTrait(Trait.auto);
+            if (item.consumable) cinfo.addTrait(Trait.CONSUME);
+
             if (item.placeStyle > 0)
             {
                 // placeable items, eg furniture, banners, paintings, etc. May also include some accessories
-                clist.Add("placeable");
+                // clist.Add("placeable");
+                cinfo.addTrait(Trait.placeable);
             }
 
             else if (item.melee)
             {
-                cinfo.weapon |= WeaponType.Melee;
+                cinfo.addWeaponTrait(Trait.MELEE);
 
-                clist.Add("weapon");
-                clist.Add("melee");
+                // cinfo.weapon |= WeaponTypes.Melee;
+
+                // clist.Add("weapon");
+                // clist.Add("melee");
 
                 // bitmask for determining tooltype
                 // pick, axe, hammer, channel (automatic, ie drill, chainsaw, etc.)
 
-                ToolType tooltype = ToolType.None;
+                // ToolTypes tooltype = ToolTypes.None;
 
-                if (item.pick > 0)   tooltype |= ToolType.Pick;
-                if (item.axe > 0)    tooltype |= ToolType.Axe;
-                if (item.hammer > 0) tooltype |= ToolType.Hammer;
+                if (item.pick > 0) cinfo.addToolTrait(Trait.PICK);
 
-                if (!tooltype.Equals(ToolType.None))
-                {
-                    clist.Add("tool");
+                if (item.axe > 0) cinfo.addToolTrait(Trait.AXE);
 
-                    if (item.channel) tooltype |= ToolType.Auto;
+                if (item.hammer > 0) cinfo.addToolTrait(Trait.HAMMER);
 
-                    // set the value on the info object
-                    cinfo.tool = tooltype;
-                }
             }
             else if (item.ranged) // could also include ammo!
             {
+                if (item.ammo > 0)
+                {
+                    if (!item.notAmmo)
+                        cinfo.addTrait(Trait.AMMO);
+                }
+                else
+                    cinfo.addWeaponTrait(Trait.RANGED);
 
             }
             else if (item.magic)
             {
-                cinfo.weapon |= WeaponType.Magic;
+                cinfo.addWeaponTrait(Trait.MAGIC);
+                // cinfo.weapon |= WeaponType.Magic;
 
                 // further categorization is likely to rely on examination of the projectile for the item
                 //
@@ -85,19 +95,12 @@ namespace InvisibleHand.Items
             }
             else if (item.thrown)
             {
-                cinfo.weapon |= WeaponType.Thrown;
+                cinfo.addWeaponTrait(Trait.THROWN);
                 // things like the bone glove will be non-consumable,
                 // as well as probably some modded items
-                if (item.consumable) clist.Add("consumable");
+                // if (item.consumable) clist.Add("consumable");
 
             }
-
-
-        }
-
-        private void getToolType(Item item, ref CategoryInfo cinfo)
-        {
-
         }
     }
 

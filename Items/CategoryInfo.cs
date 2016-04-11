@@ -17,11 +17,28 @@ namespace InvisibleHand.Items
         //
         // TODO: create enums or use ints for the categories
         public List<string> categories = new List<string>();
+        public HashSet<Trait> traits = new HashSet<Trait>();
 
         // some frequently needed properties
-        public ToolType tool = ToolType.None;
-        public WeaponType weapon = WeaponType.None;
+        // public ToolType tool = ToolType.None;
+        // public WeaponType weapon = WeaponType.None;
 
 
+
+        public void addTrait(Trait t)
+        {
+            traits.Add(t);
+        }
+
+        public void addWeaponTrait(Trait t)
+        {
+            addTrait(t);
+            addTrait(Trait.weapon);
+        }
+        public void addToolTrait(Trait t)
+        {
+            addTrait(t);
+            addTrait(Trait.tool);
+        }
     }
 }

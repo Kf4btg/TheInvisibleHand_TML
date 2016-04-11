@@ -1,5 +1,5 @@
 // using Microsoft.Xna.Framework;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 // using TAPI;
 // using Terraria.ID;
@@ -7,11 +7,11 @@ using System;
 namespace InvisibleHand.Items
 {
     [Flags]
-    public enum ItemType
+    public enum ItemTypes
     {
         None = 0x0,
-        Weapon = 0x1,
-        Tool = 0x2,
+        Tool = 0x1,
+        Weapon = 0x2,
         Armor = 0x4,
         Accessory = 0x8,
         Consumable = 0x10,
@@ -20,7 +20,7 @@ namespace InvisibleHand.Items
 
 
     [Flags]
-    public enum ToolType
+    public enum ToolSpecialties
     {
         None = 0,
         Pick = 1,
@@ -42,7 +42,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum WeaponType
+    public enum WeaponSpecialties
     {
         None = 0,
 
@@ -54,7 +54,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum MeleeType
+    public enum MeleeSpecialties
     {
         None = 0,
 
@@ -93,7 +93,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum RangedType
+    public enum RangedSpecialties
     {
         None = 0,
 
@@ -113,7 +113,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum MagicType
+    public enum MagicSpecialties
     {
         None = 0,
         Direct = 0x1,
@@ -124,7 +124,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum SummonType
+    public enum SummonSpecialties
     {
         None = 0,
         Minion = 0x1,
@@ -132,7 +132,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum ThrownType
+    public enum ThrownSpecialties
     {
         None = 0,
         Basic = 0x1,
@@ -140,7 +140,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum OtherWeaponType
+    public enum OtherWeaponSpecialties
     {
         None = 0,
 
@@ -149,8 +149,12 @@ namespace InvisibleHand.Items
     }
 
 
-    public enum ItemCategory
+    public enum Trait
     {
+        placeable,
+        auto,
+        weapon,
+        tool,
         //WEAPONS
             //MELEE
                 //TOOLS,
@@ -208,10 +212,10 @@ namespace InvisibleHand.Items
         OTHER
     }
 
-    public enum ValuedAttributes
+    public enum ValuedAttribute
     {
         //generic
-        VALUE,
+        value,
         useTime,
         rare,
         maxStack,
@@ -296,6 +300,7 @@ namespace InvisibleHand.Items
 
     }
 
+    [Flags]
     public enum BooleanAttributes
     {
         consumable,
@@ -335,9 +340,40 @@ namespace InvisibleHand.Items
 
 
         // i THINK channel is used for things that either a) seem like they would take mana but don't, or b) maintain an 'active' state without requiring any resources or effort from the player (e.g. the drill/chainsaw VRRRRR noise, or the endlessly-flying yoyos)
-        channel,
+        channel
 
 
+    }
+
+    public static class ItemSpecialty
+    {
+        public static readonly Dictionary<ItemTypes, int> Specialties;
+
+        static ItemSpecialty()
+        {
+            foreach (ItemTypes itype in Enum.GetValues(typeof(ItemTypes)))
+            {
+
+            }
+        }
+
+        private static IList<int> get_specs(ItemTypes type)
+        {
+            switch (type)
+            {
+                case ItemTypes.Armor:
+                case ItemTypes.Accessory:
+                case ItemTypes.Consumable:
+                case ItemTypes.Material:
+                case ItemTypes.Tool:
+                case ItemTypes.Weapon:
+
+                    break;
+
+            }
+
+            return new int[0];
+        }
     }
 
 }
