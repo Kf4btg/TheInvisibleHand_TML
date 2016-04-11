@@ -111,6 +111,7 @@ namespace InvisibleHand.Items
 
     }
 
+
     // public class ItemCategory
     // {
     //

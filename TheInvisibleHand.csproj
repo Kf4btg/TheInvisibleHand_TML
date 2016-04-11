@@ -109,6 +109,7 @@
     <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
+    <Compile Include="Utils\IDecision.cs" />
     <Compile Include="Items\CategoryEnum.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
