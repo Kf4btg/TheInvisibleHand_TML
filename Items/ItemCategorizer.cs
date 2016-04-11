@@ -1,6 +1,6 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-// using System;
+using System;
 // using TAPI;
 using Terraria;
 // using Terraria.ID;
@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
-    public class ItemTweaker : GlobalItem
+    public class CategorizedItem : GlobalItem
     {
         public CategoryInfo getCategoryInfo(Item item) => (CategoryInfo)item.GetModInfo(mod, "CategoryInfo");
 
@@ -43,7 +43,7 @@ namespace InvisibleHand.Items
 
             // some generic traits
             if (item.channel) cinfo.addTrait(Trait.auto);
-            if (item.consumable) cinfo.addTrait(Trait.CONSUME);
+            if (item.consumable) cinfo.addTrait(Trait.consumable);
 
             if (item.placeStyle > 0)
             {
@@ -54,7 +54,7 @@ namespace InvisibleHand.Items
 
             else if (item.melee)
             {
-                cinfo.addWeaponTrait(Trait.MELEE);
+                cinfo.addWeaponTrait(Trait.melee);
 
                 // cinfo.weapon |= WeaponTypes.Melee;
 
@@ -66,11 +66,11 @@ namespace InvisibleHand.Items
 
                 // ToolTypes tooltype = ToolTypes.None;
 
-                if (item.pick > 0) cinfo.addToolTrait(Trait.PICK);
+                if (item.pick > 0) cinfo.addToolTrait(Trait.pick);
 
-                if (item.axe > 0) cinfo.addToolTrait(Trait.AXE);
+                if (item.axe > 0) cinfo.addToolTrait(Trait.axe);
 
-                if (item.hammer > 0) cinfo.addToolTrait(Trait.HAMMER);
+                if (item.hammer > 0) cinfo.addToolTrait(Trait.hammer);
 
             }
             else if (item.ranged) // could also include ammo!
@@ -78,15 +78,15 @@ namespace InvisibleHand.Items
                 if (item.ammo > 0)
                 {
                     if (!item.notAmmo)
-                        cinfo.addTrait(Trait.AMMO);
+                        cinfo.addTrait(Trait.ammo);
                 }
                 else
-                    cinfo.addWeaponTrait(Trait.RANGED);
+                    cinfo.addWeaponTrait(Trait.ranged);
 
             }
             else if (item.magic)
             {
-                cinfo.addWeaponTrait(Trait.MAGIC);
+                cinfo.addWeaponTrait(Trait.magic);
                 // cinfo.weapon |= WeaponType.Magic;
 
                 // further categorization is likely to rely on examination of the projectile for the item
@@ -95,13 +95,20 @@ namespace InvisibleHand.Items
             }
             else if (item.thrown)
             {
-                cinfo.addWeaponTrait(Trait.THROWN);
+                cinfo.addWeaponTrait(Trait.thrown);
                 // things like the bone glove will be non-consumable,
                 // as well as probably some modded items
                 // if (item.consumable) clist.Add("consumable");
 
             }
         }
+
+
+        public static IDictionary<Trait, Func<Item, bool>> MatchingRules = new Dictionary<Trait, Func<Item, bool>>()
+        {
+            { Trait.weapon, item => false}
+        };
+
     }
 
     // public class ItemCategory

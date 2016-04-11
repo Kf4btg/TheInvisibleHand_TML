@@ -1,7 +1,7 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System;
-// using TAPI;
+using Terraria;
 // using Terraria.ID;
 
 namespace InvisibleHand.Items
@@ -155,62 +155,63 @@ namespace InvisibleHand.Items
         auto,
         weapon,
         tool,
-        //WEAPONS
-            //MELEE
-                //TOOLS,
-                PICK,
-                AXE,
-                HAMMER,
-            MELEE,
-            BOOMERANG,
-            // THROWN
-            THROWN,
+        //weapons
+            //melee
+                //tools,
+                pick,
+                axe,
+                hammer,
+            melee,
+            boomerang,
+            // thrown
+            thrown,
 
-            // RANGED
-        RANGED,
+            // ranged
+        ranged,
 
-        // MAGIC
-        MAGIC,
+        // magic
+        magic,
 
-            //SUMMON
-            SUMMON,
+            //summon
+            summon,
 
-        COIN,
-        TOOL,
-        MECH,
-        BOMB,
-        AMMO,
-        PET,
-        HEAD,
-        BODY,
-        LEGS,
-        ACCESSORY,
-        VANITY,
-        POTION,
-        CONSUME,
-        BAIT,
-        DYE,
-        PAINT,
-        ORE,
-        BAR,
-        GEM,
-        SEED,
-        LIGHT,
-        CRAFT,
-        FURNITURE,
-        STATUE,
-        WALLDECO,
-        BANNER,
-        CLUTTER,
-        WOOD,
-        BLOCK,
-        BRICK,
-        TILE,
-        WALL,
-        MISC_MAT,
-        SPECIAL,    // Boss summoning items, heart containers, mana crystals
-        OTHER
+        coin,
+        mech,
+        bomb,
+        ammo,
+        pet,
+        head,
+        body,
+        legs,
+        accessory,
+        vanity,
+        potion,
+        consumable,
+        bait,
+        dye,
+        paint,
+        ore,
+        bar,
+        gem,
+        seed,
+        light,
+        craft,
+        furniture,
+        statue,
+        walldeco,
+        banner,
+        clutter,
+        wood,
+        block,
+        brick,
+        tile,
+        wall,
+        misc_mat,
+        special,    // boss summoning items, heart containers, mana crystals
+        other
     }
+
+
 
     public enum ValuedAttribute
     {
@@ -341,8 +342,6 @@ namespace InvisibleHand.Items
 
         // i THINK channel is used for things that either a) seem like they would take mana but don't, or b) maintain an 'active' state without requiring any resources or effort from the player (e.g. the drill/chainsaw VRRRRR noise, or the endlessly-flying yoyos)
         channel
-
-
     }
 
     public static class ItemSpecialty
