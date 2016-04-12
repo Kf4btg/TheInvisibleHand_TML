@@ -157,6 +157,18 @@ namespace InvisibleHand.Items
         Other = 3
     }
 
+    public enum EquipType
+    {
+        HeadSlot,
+        BodySlot,
+        LegSlot,
+        Accessory,
+        Hook,
+        Mount,
+        LightPet,
+        VanityPet
+    }
+
 
     public enum Trait
     {

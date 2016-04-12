@@ -12,7 +12,7 @@ namespace InvisibleHand.Items
     public static class Rules
     {
         /// Every method/property in Rules.Binary is a simple yes/no (boolean) query
-        static class Binary
+        internal static class Binary
         {
             // this three are a bit redundant...
             public static bool questItem(Item item) => item.questItem;
@@ -28,6 +28,12 @@ namespace InvisibleHand.Items
             public static bool isFishingPole(Item item) => item.fishingPole > 0;
             public static bool isBait(Item item) => item.bait > 0;
 
+            public static bool isHook(Item item) => Main.projHook[item.shoot];
+            public static bool isMount(Item item) => item.mountType != -1;
+            public static bool isLightPet(Item item) => item.buffType > 0 && (Main.lightPet[item.buffType]);
+
+            public static bool isVanityPet(Item item) => item.buffType > 0 && (Main.vanityPet[item.buffType]);
+
             public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || Main.projHook[item.shoot] || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
 
             public static bool isWand(Item item) => item.tileWand > 0;
@@ -37,7 +43,7 @@ namespace InvisibleHand.Items
             public static bool isHammer(Item item) => item.hammer > 0;
 
             public static bool increasedReach(Item item) => item.tileBoost > 0;
-            public static bool decreasedReach(Item item) => item.tileBoost <= 0;
+            public static bool decreasedReach(Item item) => item.tileBoost < 0;
 
             public static bool healsLife(Item item) => item.healLife > 0;
             public static bool healsMana(Item item) => item.healMana > 0;
@@ -68,7 +74,7 @@ namespace InvisibleHand.Items
             public static bool grantsBuff(Item item) => item.buffTime > 0;
 
             // maybe?
-            // public static bool potion(Item item) => grantsBuff(item) && !isFood(item);
+            public static bool isPotion(Item item) => grantsBuff(item) && !isFood(item);
 
             public static bool falling(Item item) => TileID.Sets.Falling[item.createTile];
 
@@ -78,48 +84,65 @@ namespace InvisibleHand.Items
         }
 
         /// these rules are dependent on Binary.CanBePlaced()
-        static class TileIDGroups
+        internal static class TileIDGroups
         {
-            public static bool Torch(Item item) => item.createTile == TileID.Torches;
+
+            #region roomneeds doors
     		public static bool Door(Item item) => item.createTile == TileID.ClosedDoor;
+            public static bool Platform(Item item) => item.createTile == TileID.Platforms;
+            #endregion roomneeds doors
 
-            // includes cups and mugs
-            public static bool Bottle(Item item) => item.createTile == TileID.Bottles;
-    		public static bool Table(Item item) => item.createTile == TileID.Tables;
-    		public static bool Chair(Item item) => item.createTile == TileID.Chairs;
+            #region roomneeds chairs
+            public static bool Chair(Item item) => item.createTile == TileID.Chairs;
+            public static bool Bed(Item item) => item.createTile == TileID.Beds;
+            /// also sofas
+            public static bool Bench(Item item) => item.createTile == TileID.Benches;
+            #endregion roomneeds chairs
 
-            // only the lead anvil?
-            public static bool Anvil(Item item) => item.createTile == TileID.Anvils;
-
+            #region roomneeds tables
     		public static bool WorkBench(Item item) => item.createTile == TileID.WorkBenches;
-    		public static bool Platform(Item item) => item.createTile == TileID.Platforms;
+            public static bool Table(Item item) => item.createTile == TileID.Tables;
+            public static bool Piano(Item item) => item.createTile == TileID.Pianos;
+            public static bool Dresser(Item item) => item.createTile == TileID.Dressers;
+            public static bool Bookcase(Item item) => item.createTile == TileID.Bookcases;
+
+            #endregion roomneeds tables
+
+            /// wait, is this a table or a chair?
+    		public static bool Bathtub(Item item) => item.createTile == TileID.Bathtubs;
+            /// and what about this?
+            public static bool Sink(Item item) => item.createTile == TileID.Sinks;
+
+
+            #region lighting
+            public static bool Candle(Item item) => item.createTile == TileID.Candles;
+            public static bool Chandelier(Item item) => item.createTile == TileID.Chandeliers;
+            public static bool HangingLantern(Item item) => item.createTile == TileID.HangingLanterns;
+    		public static bool Lamp(Item item) => item.createTile == TileID.Lamps;
+            public static bool Candelabra(Item item) => item.createTile == TileID.Candelabras;
+            public static bool Torch(Item item) => item.createTile == TileID.Torches;
+
+            #endregion lighting
+
 
             // chests, barrels, and trash can
             public static bool Container(Item item) => item.createTile == TileID.Containers;
-    		public static bool Candle(Item item) => item.createTile == TileID.Candles;
-    		public static bool Chandelier(Item item) => item.createTile == TileID.Chandeliers;
-    		public static bool HangingLantern(Item item) => item.createTile == TileID.HangingLanterns;
-    		public static bool Bed(Item item) => item.createTile == TileID.Beds;
 
             /// these are the seeds for the herbs
             public static bool ImmatureHerb(Item item) => item.createTile == TileID.ImmatureHerbs;
     		public static bool Tombstone(Item item) => item.createTile == TileID.Tombstones;
-    		public static bool Piano(Item item) => item.createTile == TileID.Pianos;
-    		public static bool Dresser(Item item) => item.createTile == TileID.Dressers;
-
-            /// also sofas
-            public static bool Bench(Item item) => item.createTile == TileID.Benches;
-    		public static bool Bathtub(Item item) => item.createTile == TileID.Bathtubs;
 
             /// important (and there's a lot of these...)
             public static bool Banner(Item item) => item.createTile == TileID.Banners;
-    		public static bool Lamp(Item item) => item.createTile == TileID.Lamps;
+
+            // includes cups and mugs
+            public static bool Bottle(Item item) => item.createTile == TileID.Bottles;
+            // only the lead anvil?
+            public static bool Anvil(Item item) => item.createTile == TileID.Anvils;
 
             // only the cauldron?
             public static bool CookingPot(Item item) => item.createTile == TileID.CookingPots;
 
-    		public static bool Candelabra(Item item) => item.createTile == TileID.Candelabras;
-    		public static bool Bookcase(Item item) => item.createTile == TileID.Bookcases;
 
             /// three of them!
             public static bool Bowl(Item item) => item.createTile == TileID.Bowls;
@@ -139,7 +162,6 @@ namespace InvisibleHand.Items
 
             // red and green
             public static bool HolidayLight(Item item) => item.createTile == TileID.HolidayLights;
-    		public static bool Sink(Item item) => item.createTile == TileID.Sinks;
     		public static bool Gem(Item item) => item.createTile == TileID.ExposedGems;
     		public static bool WaterFountain(Item item) => item.createTile == TileID.WaterFountain;
 
@@ -180,15 +202,25 @@ namespace InvisibleHand.Items
             public static bool LunarMonolith(Item item) => item.createTile == TileID.LunarMonolith;
         }
 
-        static class Groupings
+        internal static class Groupings
         {
             public static bool isFurniture(Item item) => TileSets.Furniture.Contains(item.createTile);
+
+            public static bool housingDoor(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsDoor.Contains(item.createTile);
+            public static bool housingTable(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsTable.Contains(item.createTile);
+            public static bool housingChair(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsChair.Contains(item.createTile);
+            public static bool housingTorch(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsTorch.Contains(item.createTile);
+
             public static bool isOre(Item item) => TileID.Sets.Ore[item.createTile];
             public static bool isIce(Item item) => TileID.Sets.Ices[item.createTile];
         }
 
         /// narrows down a generic grouping (e.g. 'Weapon') to a more specific classifier (e.g. 'Melee')
-        static class Types
+        internal static class Types
         {
             /// The item should have been passed through Binary.isWeapon() before getting here,
             /// the result of this may not have much real meaning.

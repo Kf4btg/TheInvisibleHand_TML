@@ -22,30 +22,44 @@ namespace InvisibleHand.Items
 
         /// until we nail down exactly what traits we want to use, we'll
         /// just reference them by name. Later on we'll define enums
-        public HashSet<string> S_traits = new HashSet<string>();
+        private HashSet<string> S_traits;
+
+        public HashSet<string> Traits
+        {
+            get
+            {
+                if (S_traits==null)
+                    S_traits = new HashSet<String>();
+                return S_traits;
+            }
+            set
+            {
+                if (S_traits==null) S_traits = value;
+            }
+        }
 
 
-        public void addTrait(Trait t)
+        public void AddTrait(Trait t)
         {
             traits.Add(t);
         }
-        public void addTraits(params Trait[] ts)
+        public void AddTraits(params Trait[] ts)
         {
             traits.UnionWith(ts);
         }
 
-        public bool addTrait(string trait_name)
+        public bool AddTrait(string trait_name)
         {
-            return S_traits.Add(trait_name);
+            return Traits.Add(trait_name);
             // Trait t;
             // if (Enum.TryParse(trait_name, out t))
             // traits.Add(t);
         }
 
-        public void addTraits(string[] trait_names)
+        public void AddTraits(string[] trait_names)
         {
 
-            S_traits.UnionWith(trait_names);
+            Traits.UnionWith(trait_names);
 
             // foreach (var tn in trait_names)
             // {
@@ -55,15 +69,15 @@ namespace InvisibleHand.Items
             // }
         }
 
-        public void addWeaponTrait(Trait t)
-        {
-            addTrait(t);
-            addTrait(Trait.weapon);
-        }
-        public void addToolTrait(Trait t)
-        {
-            addTrait(t);
-            addTrait(Trait.tool);
-        }
+        // public void addWeaponTrait(Trait t)
+        // {
+        //     AddTrait(t);
+        //     AddTrait(Trait.weapon);
+        // }
+        // public void addToolTrait(Trait t)
+        // {
+        //     AddTrait(t);
+        //     AddTrait(Trait.tool);
+        // }
     }
 }
