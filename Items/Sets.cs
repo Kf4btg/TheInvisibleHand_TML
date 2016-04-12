@@ -5,23 +5,45 @@ using System.Collections.Generic;
 namespace InvisibleHand.Items
 {
 
-    public class ItemSet
+    public class Set
     {
         public string name { get; private set; }
 
-        public readonly IEnumerable<int> ids;
+        public readonly ICollection<int> IDs;
 
-        public ItemSet(string name, int[] ids)
+        public Set(string name, int[] ids)
         {
             this.name = name;
-            this.ids = new HashSet<int>(ids);
+            this.IDs = new HashSet<int>(ids);
+        }
+
+        /// Create the set from a union of int lists
+        public Set(string name, params int[][] ids)
+        {
+            this.name = name;
+            var idset = new HashSet<int>();
+            foreach (var idlist in ids)
+            {
+                idset.UnionWith(idlist);
+            }
+            this.IDs = idset;
+        }
+
+        public void Extend(int[] ids)
+        {
+            ((HashSet<int>)this.IDs).UnionWith(ids);
+        }
+
+        public bool Contains(int id)
+        {
+            return this.IDs.Contains(id);
         }
 
     }
 
-    public static class Sets
+    public static class ItemSets
     {
-        public static ItemSet Bait = new ItemSet ("Bait", new int[] {
+        public static Set Bait = new Set ("Bait", new int[] {
             ItemID.Firefly,
             ItemID.MonarchButterfly,
             ItemID.PurpleEmperorButterfly,
@@ -53,7 +75,7 @@ namespace InvisibleHand.Items
             ItemID.Sluggy,
             ItemID.Buggy,
         });
-        public static ItemSet Boss = new ItemSet ("Boss/Event Summons", new int[] {
+        public static Set Boss = new Set ("Boss/Event Summons", new int[] {
             ItemID.Abeemination,
             ItemID.BloodySpine,
             ItemID.CelestialSigil,
@@ -72,7 +94,7 @@ namespace InvisibleHand.Items
             ItemID.SuspiciousLookingEye,
             ItemID.WormFood,
         });
-        public static ItemSet Wiring = new ItemSet ("Wiring", new int[] {
+        public static Set Wiring = new Set ("Wiring", new int[] {
             ItemID.Actuator,
             ItemID.ActiveStoneBlock,
             ItemID.InactiveStoneBlock,
@@ -94,7 +116,7 @@ namespace InvisibleHand.Items
             ItemID.BlueWrench,
             ItemID.GreenWrench,
         });
-        public static ItemSet Expert = new ItemSet ("Expert Items", new int[] {
+        public static Set Expert = new Set ("Expert Items", new int[] {
             ItemID.GravityGlobe,
             ItemID.RoyalGel,
             ItemID.EoCShield,
@@ -126,7 +148,7 @@ namespace InvisibleHand.Items
             ItemID.MechanicalBatteryPiece,
             ItemID.ShrimpyTruffle,
         });
-        public static ItemSet Quest = new ItemSet ("Quest Items", new int[] {
+        public static Set Quest = new Set ("Quest Items", new int[] {
             ItemID.Batfish,
             ItemID.BublebeeTuna,
             ItemID.Catfish,
@@ -168,7 +190,7 @@ namespace InvisibleHand.Items
             ItemID.TropicalBarracuda,
         });
 
-        public static ItemSet Legwear = new ItemSet ("Leg Apparel", new int[] {
+        public static Set Legwear = new Set ("Leg Apparel", new int[] {
             ItemID.CopperGreaves,
             ItemID.IronGreaves,
             ItemID.SilverGreaves,
@@ -280,7 +302,7 @@ namespace InvisibleHand.Items
             ItemID.SkiphsPants,
             ItemID.LokisPants,
         });
-        public static ItemSet Chestgear = new ItemSet ("Chest Apparel", new int[] {
+        public static Set Chestgear = new Set ("Chest Apparel", new int[] {
             ItemID.CopperChainmail,
             ItemID.IronChainmail,
             ItemID.SilverChainmail,
@@ -417,7 +439,7 @@ namespace InvisibleHand.Items
             ItemID.SkiphsShirt,
             ItemID.LokisShirt,
         });
-        public static ItemSet Headgear = new ItemSet ("Head Apparel", new int[] {
+        public static Set Headgear = new Set ("Head Apparel", new int[] {
             ItemID.Goggles,
             ItemID.MiningHelmet,
             ItemID.CopperHelmet,
@@ -611,7 +633,7 @@ namespace InvisibleHand.Items
             ItemID.SkiphsHelm,
             ItemID.LokisHelm,
         });
-        public static ItemSet Accessory = new ItemSet ("Accessories", new int[] {
+        public static Set Accessory = new Set ("Accessories", new int[] {
             ItemID.CopperWatch,
             ItemID.SilverWatch,
             ItemID.GoldWatch,
@@ -891,7 +913,7 @@ namespace InvisibleHand.Items
             ItemID.SkiphsWings,
             ItemID.LokisWings,
         });
-        public static ItemSet ThrownMisc = new ItemSet ("Thrown Misc", new int[] {
+        public static Set ThrownMisc = new Set ("Thrown Misc", new int[] {
             ItemID.Bomb,
             ItemID.BouncyBomb,
             ItemID.Dynamite,
@@ -899,7 +921,7 @@ namespace InvisibleHand.Items
             ItemID.StickyGlowstick,
             ItemID.BouncyGlowstick,
         });
-        public static ItemSet Platforms = new ItemSet ("Platforms", new int[] {
+        public static Set Platforms = new Set ("Platforms", new int[] {
             ItemID.WoodPlatform,
             ItemID.EbonwoodPlatform,
             ItemID.RichMahoganyPlatform,
@@ -927,7 +949,7 @@ namespace InvisibleHand.Items
             ItemID.MarblePlatform,
             ItemID.GranitePlatform,
         });
-        public static ItemSet Blocks = new ItemSet ("Blocks", new int[] {
+        public static Set Blocks = new Set ("Blocks", new int[] {
             ItemID.DirtBlock,
             ItemID.StoneBlock,
             ItemID.Wood,
@@ -1057,7 +1079,7 @@ namespace InvisibleHand.Items
             ItemID.LunarBlockNebula,
             ItemID.LunarBlockStardust,
         });
-        public static ItemSet MiscFurniture = new ItemSet ("Misc Furniture", new int[] {
+        public static Set MiscFurniture = new Set ("Misc Furniture", new int[] {
             ItemID.WoodenTable,
             ItemID.EbonwoodTable,
             ItemID.RichMahoganyTable,
@@ -1324,7 +1346,7 @@ namespace InvisibleHand.Items
             ItemID.GoldenToilet,
             ItemID.TrashCan,
         });
-        public static ItemSet Banners = new ItemSet ("Banners", new int[] {
+        public static Set Banners = new Set ("Banners", new int[] {
             ItemID.RedBanner,
             ItemID.GreenBanner,
             ItemID.BlueBanner,
@@ -1593,7 +1615,7 @@ namespace InvisibleHand.Items
             ItemID.SandSlimeBanner,
             ItemID.SeaSnailBanner,
         });
-        public static ItemSet LightSources = new ItemSet ("Light Sources", new int[] {
+        public static Set LightSources = new Set ("Light Sources", new int[] {
             ItemID.LampPost,
             ItemID.DiablostLamp,
             ItemID.CactusLamp,
@@ -1773,7 +1795,7 @@ namespace InvisibleHand.Items
             ItemID.MarbleLantern,
             ItemID.GraniteLantern,
         });
-        public static ItemSet Fences = new ItemSet ("Fences", new int[] {
+        public static Set Fences = new Set ("Fences", new int[] {
             ItemID.WoodenFence,
             ItemID.LeadFence,
             ItemID.EbonwoodFence,
@@ -1784,7 +1806,7 @@ namespace InvisibleHand.Items
             ItemID.BorealWoodFence,
             ItemID.PalmWoodFence,
         });
-        public static ItemSet Walls = new ItemSet ("Walls", new int[] {
+        public static Set Walls = new Set ("Walls", new int[] {
             ItemID.StoneWall,
             ItemID.DirtWall,
             ItemID.WoodWall,
@@ -1892,7 +1914,7 @@ namespace InvisibleHand.Items
             ItemID.LunarBrickWall,
             ItemID.LivingLeafWall,
         });
-        public static ItemSet Wallpapers = new ItemSet ("Wallpapers", new int[] {
+        public static Set Wallpapers = new Set ("Wallpapers", new int[] {
             ItemID.ChristmasTreeWallpaper,
             ItemID.OrnamentWallpaper,
             ItemID.CandyCaneWallpaper,
@@ -1914,13 +1936,13 @@ namespace InvisibleHand.Items
             ItemID.CopperPipeWallpaper,
             ItemID.DuckyWallpaper,
         });
-        public static ItemSet LunarFragments = new ItemSet ("Lunar Fragments", new int[] {
+        public static Set LunarFragments = new Set ("Lunar Fragments", new int[] {
             ItemID.FragmentVortex,
             ItemID.FragmentNebula,
             ItemID.FragmentSolar,
             ItemID.FragmentStardust,
         });
-        public static ItemSet Statues = new ItemSet ("Statues", new int[] {
+        public static Set Statues = new Set ("Statues", new int[] {
             ItemID.AngelStatue,
             ItemID.ArmorStatue,
             ItemID.StarStatue,
@@ -2006,7 +2028,7 @@ namespace InvisibleHand.Items
             ItemID.AlphabetStatueZ,
         });
 
-        public static ItemSet Axes = new ItemSet ("Axes", new int[] {
+        public static Set Axes = new Set ("Axes", new int[] {
             ItemID.IronAxe,
             ItemID.WarAxeoftheNight,
             ItemID.MeteorHamaxe,
@@ -2047,7 +2069,7 @@ namespace InvisibleHand.Items
             ItemID.LunarHamaxeNebula,
             ItemID.LunarHamaxeStardust,
         });
-        public static ItemSet Drills = new ItemSet ("Drills", new int[] {
+        public static Set Drills = new Set ("Drills", new int[] {
             ItemID.CobaltDrill,
             ItemID.MythrilDrill,
             ItemID.AdamantiteDrill,
@@ -2057,7 +2079,7 @@ namespace InvisibleHand.Items
             ItemID.ChlorophyteDrill,
             ItemID.LaserDrill,
         });
-        public static ItemSet Pickaxes = new ItemSet ("Pickaxes", new int[] {
+        public static Set Pickaxes = new Set ("Pickaxes", new int[] {
             ItemID.IronPickaxe,
             ItemID.NightmarePickaxe,
             ItemID.MoltenPickaxe,
@@ -2086,7 +2108,7 @@ namespace InvisibleHand.Items
             ItemID.SilverPickaxe,
             ItemID.GoldPickaxe,
         });
-        public static ItemSet ThrownWeapons = new ItemSet ("Thrown Weapons", new int[] {
+        public static Set ThrownWeapons = new Set ("Thrown Weapons", new int[] {
             ItemID.Shuriken,
             ItemID.Bone,
             ItemID.SpikyBall,
@@ -2107,7 +2129,7 @@ namespace InvisibleHand.Items
             ItemID.BoneDagger,
             ItemID.PartyGirlGrenade,
         });
-        public static ItemSet SummonWeapons = new ItemSet ("Summon Weapons", new int[] {
+        public static Set SummonWeapons = new Set ("Summon Weapons", new int[] {
             ItemID.PygmyStaff,
             ItemID.SlimeStaff,
             ItemID.StaffoftheFrostHydra,
@@ -2126,7 +2148,7 @@ namespace InvisibleHand.Items
             ItemID.MoonlordTurretStaff,
             ItemID.RainbowCrystalStaff,
         });
-        public static ItemSet RangedWeapons = new ItemSet ("Ranged Weapons", new int[] {
+        public static Set RangedWeapons = new Set ("Ranged Weapons", new int[] {
             ItemID.WoodenBow,
             ItemID.DemonBow,
             ItemID.FlintlockPistol,
@@ -2208,7 +2230,7 @@ namespace InvisibleHand.Items
             ItemID.Phantasm,
             ItemID.FireworksLauncher,
         });
-        public static ItemSet MagicWeapons = new ItemSet ("Magic Weapons", new int[] {
+        public static Set MagicWeapons = new Set ("Magic Weapons", new int[] {
             ItemID.Vilethorn,
             ItemID.FlowerofFire,
             ItemID.MagicMissile,
@@ -2272,7 +2294,7 @@ namespace InvisibleHand.Items
             ItemID.NebulaBlaze,
             ItemID.LunarFlareBook,
         });
-        public static ItemSet Yoyos = new ItemSet ("Yoyos", new int[] {
+        public static Set Yoyos = new Set ("Yoyos", new int[] {
             ItemID.Terrarian,
             ItemID.Rally,
             ItemID.CorruptYoyo,
@@ -2294,7 +2316,7 @@ namespace InvisibleHand.Items
             ItemID.Terrarian,
             ItemID.TheEyeOfCthulhu,
         });
-        public static ItemSet MeleeWeapons = new ItemSet ("Melee Weapons", new int[] {
+        public static Set MeleeWeapons = new Set ("Melee Weapons", new int[] {
             ItemID.YellowPhasesaber,
             ItemID.WhitePhasesaber,
             ItemID.PurplePhasesaber,
@@ -2430,11 +2452,11 @@ namespace InvisibleHand.Items
             ItemID.GoldBroadsword,
             ItemID.DayBreak,
         });
-        public static ItemSet Tools = new ItemSet ("Tools", new int[] {
+        public static Set Tools = new Set ("Tools", new int[] {
             ItemID.MagicMirror,
             ItemID.IceMirror,
         });
-        public static ItemSet Hammers = new ItemSet ("Hammers", new int[] {
+        public static Set Hammers = new Set ("Hammers", new int[] {
             ItemID.IronHammer,
             ItemID.TheBreaker,
             ItemID.WoodenHammer,
@@ -2466,7 +2488,7 @@ namespace InvisibleHand.Items
             ItemID.LunarHamaxeNebula,
             ItemID.LunarHamaxeStardust,
         });
-        public static ItemSet FishingRods = new ItemSet ("Fishing Rods", new int[] {
+        public static Set FishingRods = new Set ("Fishing Rods", new int[] {
             ItemID.WoodFishingPole,
             ItemID.ReinforcedFishingPole,
             ItemID.FiberglassFishingPole,
@@ -2477,7 +2499,7 @@ namespace InvisibleHand.Items
             ItemID.Fleshcatcher,
             ItemID.HotlineFishingHook,
         });
-        public static ItemSet Ammo = new ItemSet ("Ammo", new int[] {
+        public static Set Ammo = new Set ("Ammo", new int[] {
             ItemID.WoodenArrow,
             ItemID.FlamingArrow,
             ItemID.UnholyArrow,
@@ -2524,7 +2546,7 @@ namespace InvisibleHand.Items
             ItemID.MoonlordBullet,
             ItemID.MoonlordArrow,
         });
-        public static ItemSet Torches = new ItemSet ("Torches", new int[] {
+        public static Set Torches = new Set ("Torches", new int[] {
             ItemID.Torch,
             ItemID.TikiTorch,
             ItemID.BlueTorch,
@@ -2543,7 +2565,7 @@ namespace InvisibleHand.Items
             ItemID.RainbowTorch,
             ItemID.PinkTorch,
         });
-        public static ItemSet MusicBoxes = new ItemSet ("Music Boxes", new int[] {
+        public static Set MusicBoxes = new Set ("Music Boxes", new int[] {
             ItemID.MusicBoxOverworldDay,
             ItemID.MusicBoxEerie,
             ItemID.MusicBoxNight,
@@ -2584,7 +2606,7 @@ namespace InvisibleHand.Items
             ItemID.MusicBoxTowers,
             ItemID.MusicBoxGoblins,
         });
-        public static ItemSet Trophies = new ItemSet ("Trophies", new int[] {
+        public static Set Trophies = new Set ("Trophies", new int[] {
             ItemID.EyeofCthulhuTrophy,
             ItemID.EaterofWorldsTrophy,
             ItemID.BrainofCthulhuTrophy,
@@ -2613,7 +2635,7 @@ namespace InvisibleHand.Items
             ItemID.FlyingDutchmanTrophy,
             ItemID.MoonLordTrophy,
         });
-        public static ItemSet Dyes = new ItemSet ("Dyes", new int[] {
+        public static Set Dyes = new Set ("Dyes", new int[] {
             ItemID.RedDye,
             ItemID.OrangeDye,
             ItemID.YellowDye,
@@ -2742,7 +2764,7 @@ namespace InvisibleHand.Items
             ItemID.LokisDye,
             ItemID.ShadowflameHadesDye,
         });
-        public static ItemSet Seeds = new ItemSet ("Seeds", new int[] {
+        public static Set Seeds = new Set ("Seeds", new int[] {
             ItemID.CorruptSeeds,
             ItemID.GrassSeeds,
             ItemID.MushroomGrassSeeds,
@@ -2759,7 +2781,7 @@ namespace InvisibleHand.Items
             ItemID.CrimsonSeeds,
             ItemID.ShiverthornSeeds,
         });
-        public static ItemSet Potions = new ItemSet ("Potions", new int[] {
+        public static Set Potions = new Set ("Potions", new int[] {
             ItemID.LesserHealingPotion,
             ItemID.LesserManaPotion,
             ItemID.HealingPotion,
@@ -2813,7 +2835,7 @@ namespace InvisibleHand.Items
             ItemID.WormholePotion,
             ItemID.SuperHealingPotion,
         });
-        public static ItemSet Ores = new ItemSet ("Ores", new int[] {
+        public static Set Ores = new Set ("Ores", new int[] {
             ItemID.IronOre,
             ItemID.CopperOre,
             ItemID.GoldOre,
@@ -2835,7 +2857,7 @@ namespace InvisibleHand.Items
             ItemID.TitaniumOre,
             ItemID.LunarOre,
         });
-        public static ItemSet Bars = new ItemSet ("Bars", new int[] {
+        public static Set Bars = new Set ("Bars", new int[] {
             ItemID.GoldBar,
             ItemID.CopperBar,
             ItemID.SilverBar,
@@ -2860,7 +2882,7 @@ namespace InvisibleHand.Items
             ItemID.SpectreBar,
             ItemID.LunarBar,
         });
-        public static ItemSet Souls = new ItemSet ("Souls", new int[] {
+        public static Set Souls = new Set ("Souls", new int[] {
             ItemID.SoulofLight,
             ItemID.SoulofNight,
             ItemID.SoulofFright,
@@ -2868,7 +2890,12 @@ namespace InvisibleHand.Items
             ItemID.SoulofSight,
             ItemID.SoulofFlight,
         });
+    }
 
+    public static class TileSets
+    {
+        public static Set Furniture = new Set("Furniture", TileID.Sets.RoomNeeds.CountsAsDoor,
+        TileID.Sets.RoomNeeds.CountsAsChair, TileID.Sets.RoomNeeds.CountsAsTable, TileID.Sets.RoomNeeds.CountsAsTorch);
 
     }
 
