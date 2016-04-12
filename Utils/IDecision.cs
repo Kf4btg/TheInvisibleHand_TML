@@ -1,17 +1,48 @@
 using System;
+using System.Collections.Generic;
 
 namespace InvisibleHand.Utils
 {
-    /// represents the root of a decision tree that evaluates
-    /// objects of type T; Evaluate(T) will use the test function to determine which of
-    /// OnYes.Evaluate(T) or OnNo.Evaluate(T) to call to continue the decision process
+
     public interface IDecision<T>
     {
-        IDecision<T> OnYes { get; }
-        IDecision<T> OnNo { get; }
+        IList<IDecision<T>> Branches { get; }
 
-        Func<T, bool> Test { get; }
+        Func<T, int> NextBranch { get; }
 
-        bool Evaluate(T subject);
+        IDecision<T> Evaluate(T t);
+    }
+
+    public class BinaryDecision<T> : IDecision<T>
+    {
+        public IDecision<T> OnYes { get; set; }
+        public IDecision<T> OnNo { get; set; }
+        public Func<T, bool> Test { get; set; }
+
+        public IList<IDecision<T>> Branches { get; private set; }
+
+        public Func<T, int> NextBranch { get; private set; }
+
+        public BinaryDecision()
+        {
+            Branches = new List<IDecision<T>> { OnNo , OnYes };
+            this.NextBranch = (t) => this.Test(t) ? 1 : 0;
+        }
+
+        public virtual IDecision<T> Evaluate(T t)
+        {
+            return this.Branches[this.NextBranch(t)];
+        }
+    }
+
+    public class Decision<T> : IDecision<T>
+    {
+        public IList<IDecision<T>> Branches { get; set; }
+        public Func<T, int> NextBranch { get; set; }
+
+        public virtual IDecision<T> Evaluate(T t)
+        {
+            return this.Branches[this.NextBranch(t)];
+        }
     }
 }
