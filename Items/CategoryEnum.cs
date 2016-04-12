@@ -1,13 +1,13 @@
 // using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using System;
-using Terraria;
+// using Terraria;
 // using Terraria.ID;
 
 namespace InvisibleHand.Items
 {
     [Flags]
-    public enum ItemTypes
+    public enum ItemFamilies
     {
         None = 0x0,
         Tool = 0x1,
@@ -20,7 +20,7 @@ namespace InvisibleHand.Items
 
 
     [Flags]
-    public enum ToolSpecialties
+    public enum ToolTypes
     {
         None = 0,
         Pick = 1,
@@ -42,7 +42,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum WeaponSpecialties
+    public enum WeaponType
     {
         None = 0,
 
@@ -51,6 +51,7 @@ namespace InvisibleHand.Items
         Thrown = 0x4,
         Magic = 0x8,
         Summon = 0x10,
+        Other = 0x20
     }
 
     [Flags]
@@ -146,6 +147,14 @@ namespace InvisibleHand.Items
 
         Explosive = 0x1,
         Placeable = 0x2,
+    }
+
+    public enum WallDecoType
+    {
+        Painting = 0,
+        Trophy = 1,
+        Rack = 2,
+        Other = 3
     }
 
 
@@ -342,37 +351,6 @@ namespace InvisibleHand.Items
 
         // i THINK channel is used for things that either a) seem like they would take mana but don't, or b) maintain an 'active' state without requiring any resources or effort from the player (e.g. the drill/chainsaw VRRRRR noise, or the endlessly-flying yoyos)
         channel
-    }
-
-    public static class ItemSpecialty
-    {
-        public static readonly Dictionary<ItemTypes, int> Specialties;
-
-        static ItemSpecialty()
-        {
-            foreach (ItemTypes itype in Enum.GetValues(typeof(ItemTypes)))
-            {
-
-            }
-        }
-
-        private static IList<int> get_specs(ItemTypes type)
-        {
-            switch (type)
-            {
-                case ItemTypes.Armor:
-                case ItemTypes.Accessory:
-                case ItemTypes.Consumable:
-                case ItemTypes.Material:
-                case ItemTypes.Tool:
-                case ItemTypes.Weapon:
-
-                    break;
-
-            }
-
-            return new int[0];
-        }
     }
 
 }
