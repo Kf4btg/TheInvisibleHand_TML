@@ -91,6 +91,13 @@ namespace InvisibleHand.Items
         /// for the multi-tag operations, this can be checked to see if the operation was successful for that given scenario.
         public bool LastResult { get; private set; }
 
+        private IDictionary<string, Func<Item, bool>> conditionTable;
+
+        public ItemWithInfo()
+        {
+            this.conditionTable = Rules.ConditionTable;
+        }
+
         public bool TryAddTrait(Func<Item, bool> check, string trait)
         {
             if (check(item))
@@ -118,7 +125,7 @@ namespace InvisibleHand.Items
 
         /// tag this instance with the given trait;
         /// return the modified instance
-        public ItemWithInfo Tag(string trait)
+        public ItemWithInfo AddTag(string trait)
         {
             info.AddTrait(trait);
 
@@ -131,63 +138,65 @@ namespace InvisibleHand.Items
         /// tag this instance with the given trait;
         /// IFF condition is true; return the instance,
         /// modified or not.
-        public ItemWithInfo Tag(bool condition, string trait)
+        public ItemWithInfo Tag(string trait)
         {
             LastResult = false; // reset
-            return condition ? this.Tag(trait) : this;
+            return conditionTable[trait](item) ? this.AddTag(trait) : this;
         }
 
         /// tag this instance with the given trait;
         /// IFF check() evaluates true; return the instance,
         /// modified or not.
-        public ItemWithInfo Tag(Func<Item, bool> check, string trait)
-        {
-            return this.Tag(check(item), trait);
-        }
+        // public ItemWithInfo Tag(Func<Item, bool> check, string trait)
+        // {
+        //     return this.Tag(check(item), trait);
+        // }
 
         /// tag this instance with given trait_if_true;
         /// if condition is true; otherwise, tag this
         /// instance with trait_if_false
-        public ItemWithInfo Tag(bool condition, string trait_if_true, string trait_if_false)
-        {
-            return condition ? this.Tag(trait_if_true) : this.Tag(trait_if_false);
-        }
+        // public ItemWithInfo Tag(bool condition, string trait_if_true, string trait_if_false)
+        // public ItemWithInfo Tag(string trait_if_true, string trait_if_false)
+        // {
+            // return condition ? this.AddTag(trait_if_true) : this.AddTag(trait_if_false);
+        // }
 
         /// tag this instance with given trait_if_true;
         /// if check() evaluates true; otherwise, tag this
         /// instance with trait_if_false
-        public ItemWithInfo Tag(Func<Item, bool> check, string trait_if_true, string trait_if_false)
-        {
-            return this.Tag(check(item), trait_if_true, trait_if_false);
-        }
+        // public ItemWithInfo Tag(Func<Item, bool> check, string trait_if_true, string trait_if_false)
+        // {
+        //     return this.Tag(check(item), trait_if_true, trait_if_false);
+        // }
 
-        public ItemWithInfo TagFirst(params Tuple<bool, string>[] bool_trait_pairs)
+        public ItemWithInfo TagFirst(params string[] traits)
         {
-            foreach (var pair in bool_trait_pairs)
+            foreach (var trait in traits)
             {
-                if (this.TryTag(pair.Item1, pair.Item2))
+                if (this.Tag(trait).LastResult)
                     break;
             }
             return this;
         }
 
         /// goes through the list of pairs in the params list, attempting to tag each given trait; when one tag is successful, the function returns without checking the remaining. Should be used for mutually-exclusive traits.
-        public ItemWithInfo TagFirst(params Tuple<Func<Item, bool>, string>[] bool_trait_pairs)
-        {
-            foreach (var pair in bool_trait_pairs)
-            {
-                if (this.Tag(pair.Item1, pair.Item2).LastResult)
-                    break;
-            }
-            return this;
-        }
+        // public ItemWithInfo TagFirst(params Tuple<Func<Item, bool>, string>[] bool_trait_pairs)
+        // {
+        //     foreach (var pair in bool_trait_pairs)
+        //     {
+        //         if (this.Tag(pair.Item1, pair.Item2).LastResult)
+        //             break;
+        //     }
+        //     return this;
+        // }
 
         /// attempts to tag each of the traits given in the params list, not caring whether each tag operation is successful or not. Can be used to try tagging related but not mutually-exclusive traits.
-        public ItemWithInfo TagAny(params Tuple<Func<Item, bool>, string>[] check_trait_pairs)
+        // public ItemWithInfo TagAny(params Tuple<Func<Item, bool>, string>[] check_trait_pairs)
+        public ItemWithInfo TagAny(params string[] traits)
         {
             bool res = false;
-            foreach (var pair in check_trait_pairs)
-                res |= this.Tag(pair.Item1, pair.Item2).LastResult;
+            foreach (var trait in traits)
+                res |= this.Tag(trait).LastResult;
 
             // we want to know if any of the operations succeeded, not just
             // the most recent one, so we catch any True value in res
@@ -197,20 +206,25 @@ namespace InvisibleHand.Items
 
         #region bool returns
 
-        public bool TryTag(bool condition, string trait)
+        public bool TryTag(string trait)
         {
-            if (condition)
-            {
-                info.AddTrait(trait);
-                return true;
-            }
-            return false;
+            return this.Tag(trait).LastResult;
         }
 
-        public bool TryTag(Func<Item, bool> check, string trait)
-        {
-            return TryTag(check(item), trait);
-        }
+        // public bool TryTag(bool condition, string trait)
+        // {
+        //     if (condition)
+        //     {
+        //         AddTrait(trait);
+        //         return true;
+        //     }
+        //     return false;
+        // }
+        //
+        // public bool TryTag(Func<Item, bool> check, string trait)
+        // {
+        //     return TryTag(check(item), trait);
+        // }
 
         #endregion bool returns
 

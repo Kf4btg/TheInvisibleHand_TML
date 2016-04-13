@@ -16,18 +16,18 @@ namespace InvisibleHand.Items
         internal static class Binary
         {
             // this three are a bit redundant...
-            public static bool questItem(Item item) => item.questItem;
-            public static bool isMaterial(Item item) => item.material;
-            public static bool expert(Item item) => item.expert;
+            // public static bool questItem(Item item) => item.questItem;
+            // public static bool isMaterial(Item item) => item.material;
+            // public static bool expert(Item item) => item.expert;
             // could add item.vanity here
 
             public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
 
-            public static bool givesDefense(Item item) => item.defense > 0;
+            // public static bool givesDefense(Item item) => item.defense > 0;
 
 
-            public static bool isFishingPole(Item item) => item.fishingPole > 0;
-            public static bool isBait(Item item) => item.bait > 0;
+            // public static bool isFishingPole(Item item) => item.fishingPole > 0;
+            // public static bool isBait(Item item) => item.bait > 0;
 
             public static bool isHook(Item item) => Main.projHook[item.shoot];
             public static bool isMount(Item item) => item.mountType != -1;
@@ -37,19 +37,19 @@ namespace InvisibleHand.Items
 
             public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || Main.projHook[item.shoot] || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
 
-            public static bool isWand(Item item) => item.tileWand > 0;
+            // public static bool isWand(Item item) => item.tileWand > 0;
 
-            public static bool isPick(Item item) => item.pick > 0;
-            public static bool isAxe(Item item) => item.axe > 0;
-            public static bool isHammer(Item item) => item.hammer > 0;
+            // public static bool isPick(Item item) => item.pick > 0;
+            // public static bool isAxe(Item item) => item.axe > 0;
+            // public static bool isHammer(Item item) => item.hammer > 0;
 
-            public static bool increasedReach(Item item) => item.tileBoost > 0;
-            public static bool decreasedReach(Item item) => item.tileBoost < 0;
+            // public static bool increasedReach(Item item) => item.tileBoost > 0;
+            // public static bool decreasedReach(Item item) => item.tileBoost < 0;
 
-            public static bool healsLife(Item item) => item.healLife > 0;
-            public static bool healsMana(Item item) => item.healMana > 0;
+            // public static bool healsLife(Item item) => item.healLife > 0;
+            // public static bool healsMana(Item item) => item.healMana > 0;
 
-            public static bool costsMana(Item item) => item.mana > 0;
+            // public static bool costsMana(Item item) => item.mana > 0;
 
             /// NOTE: not everything that has a "placeStyle" has a "createTile" (the noteable
             /// exceptions are the butterflies, which have a "createNPC" instead), and
@@ -237,15 +237,15 @@ namespace InvisibleHand.Items
         {
             /// The item should have been passed through Binary.isWeapon() before getting here,
             /// the result of this may not have much real meaning.
-            public static WeaponType Weapon(Item item)
-            {
-                return item.melee   ? WeaponType.Melee  :
-                        item.ranged ? WeaponType.Ranged :
-                        item.magic  ? WeaponType.Magic  :
-                        item.thrown ? WeaponType.Thrown :
-                        item.summon ? WeaponType.Summon :
-                        WeaponType.Other;
-            }
+            // public static WeaponType Weapon(Item item)
+            // {
+            //     return item.melee   ? WeaponType.Melee  :
+            //             item.ranged ? WeaponType.Ranged :
+            //             item.magic  ? WeaponType.Magic  :
+            //             item.thrown ? WeaponType.Thrown :
+            //             item.summon ? WeaponType.Summon :
+            //             WeaponType.Other;
+            // }
 
             /// call with an Item instance and the name of a
             /// property such as "faceSlot", "wingsSlot", etc.
@@ -254,17 +254,17 @@ namespace InvisibleHand.Items
                 return (int)(typeof(Item).GetField(slot_type, BindingFlags.Public | BindingFlags.Instance).GetValue(item)) > 0;
             }
 
-            public static string AccessoryType(Item item)
-            {
-
-                return item.faceSlot > 0 ? "headSlot" :
-                item.neckSlot > 0 ? "neckSlot" :
-                item.backSlot > 0 ? "backSlot" :
-                item.wingSlot > 0 ? "wingSlot" :
-                item.shoeSlot > 0 ? "shoeSlot" :
-                item.handOnSlot > 0 ? "handOnSlot" :
-                    item.neckSlot > 0 ? "neckSlot" : "otherAccy";
-            }
+            // public static string AccessoryType(Item item)
+            // {
+            //
+            //     return item.faceSlot > 0 ? "headSlot" :
+            //     item.neckSlot > 0 ? "neckSlot" :
+            //     item.backSlot > 0 ? "backSlot" :
+            //     item.wingSlot > 0 ? "wingSlot" :
+            //     item.shoeSlot > 0 ? "shoeSlot" :
+            //     item.handOnSlot > 0 ? "handOnSlot" :
+            //         item.neckSlot > 0 ? "neckSlot" : "otherAccy";
+            // }
 
             public static WallDecoType WallDeco(Item item)
             {
@@ -294,6 +294,7 @@ namespace InvisibleHand.Items
             {"questItem", (i) => i.questItem},
             {"expert", (i) => i.expert},
             {"material", (i) => i.material},
+            {"bait", (i) => i.bait > 0},
 
             {"melee", (i) => i.melee},
             {"ranged", (i) => i.ranged},
@@ -301,6 +302,21 @@ namespace InvisibleHand.Items
             {"summon", (i) => i.summon},
             {"thrown", (i) => i.thrown},
 
+            {"defense", (i) => i.defense > 0},
+            {"reachBoost", (i) => i.tileBoost > 0},
+            {"reachPenalty", (i) => i.tileBoost < 0},
+
+            {"healsLife", (i) => i.healLife > 0},
+            {"healsMana", (i) => i.healMana > 0},
+
+            {"costsMana", (i) => i.mana > 0},
+
+            {"pick", (i) => i.pick > 0},
+            {"axe", (i) => i.axe > 0},
+            {"hammer", (i) => i.hammer > 0},
+
+            {"wand", (i) => i.tileWand > 0},
+            {"fishingPole", (i) => i.fishingPole > 0},
 
             {"accessory", (i) => i.accessory},
             {"vanity", (i) => i.vanity},
@@ -321,7 +337,6 @@ namespace InvisibleHand.Items
             {"equipable", Binary.isEquipable},
             {"weapon", Binary.isWeapon},
 
-            {"bait", Binary.isBait},
 
             {"consumable", Binary.isConsumable},
             {"buff", Binary.timedBuff}, // only for consumables
@@ -330,9 +345,6 @@ namespace InvisibleHand.Items
 
             {"ammo", Binary.isAmmo},
 
-            {"defense", Binary.givesDefense},
-            {"reachBoost", Binary.increasedReach},
-            {"reachPenalty", Binary.decreasedReach},
 
 
             {"lightPet", Binary.isLightPet},
@@ -340,11 +352,6 @@ namespace InvisibleHand.Items
             {"grapplingHook", Binary.isHook},
             {"mount", Binary.isMount},
 
-            {"pick", Binary.isPick},
-            {"axe", Binary.isAxe},
-            {"hammer", Binary.isHammer},
-            {"wand", Binary.isWand},
-            {"fishingPole", Binary.isFishingPole},
 
 
             {"housingFurniture", Groupings.Furniture},
