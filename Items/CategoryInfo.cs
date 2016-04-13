@@ -88,8 +88,11 @@ namespace InvisibleHand.Items
         public Item item;
         public CategoryInfo info;
 
-        /// for the multi-tag operations, this can be checked to see if the operation was successful for that given scenario.
-        public bool LastResult { get; private set; }
+
+        // for the multi-tag operations, this can be checked to see if the operation was successful for that given scenario.
+        /// Holds whether the most recent tagging attempt was successful
+        /// (i.e. the trait's condition was satisfied)
+        public bool Success { get; private set; }
 
         private IDictionary<string, Func<Item, bool>> conditionTable;
 
@@ -131,16 +134,16 @@ namespace InvisibleHand.Items
 
             // if we've gotten here, then the condition check (if any)
             // was successful, so we set LastResult=true
-            LastResult = true;
+            Success = true;
             return this;
         }
 
-        /// tag this instance with the given trait;
-        /// IFF condition is true; return the instance,
-        /// modified or not.
+        /// tag this instance with the given trait iff the condition
+        /// for the trait (as found in the Condition Table) is true;
+        ///return the instance, whether modified or not.
         public ItemWithInfo Tag(string trait)
         {
-            LastResult = false; // reset
+            Success = false; // reset
             return conditionTable[trait](item) ? this.AddTag(trait) : this;
         }
 
@@ -151,6 +154,16 @@ namespace InvisibleHand.Items
         // {
         //     return this.Tag(check(item), trait);
         // }
+
+        /// tag this instance with the given trait
+        /// IFF condition is true; return the instance,
+        /// modified or not.
+        public ItemWithInfo TagIf(bool condition, string trait)
+        {
+            Success = false;
+            return condition ? this.AddTag(trait) : this;
+        }
+
 
         /// tag this instance with given trait_if_true;
         /// if condition is true; otherwise, tag this
@@ -173,7 +186,7 @@ namespace InvisibleHand.Items
         {
             foreach (var trait in traits)
             {
-                if (this.Tag(trait).LastResult)
+                if (this.Tag(trait).Success)
                     break;
             }
             return this;
@@ -196,11 +209,11 @@ namespace InvisibleHand.Items
         {
             bool res = false;
             foreach (var trait in traits)
-                res |= this.Tag(trait).LastResult;
+                res |= this.Tag(trait).Success;
 
             // we want to know if any of the operations succeeded, not just
             // the most recent one, so we catch any True value in res
-            LastResult = res;
+            Success = res;
             return this;
         }
 
@@ -208,7 +221,7 @@ namespace InvisibleHand.Items
 
         public bool TryTag(string trait)
         {
-            return this.Tag(trait).LastResult;
+            return this.Tag(trait).Success;
         }
 
         // public bool TryTag(bool condition, string trait)

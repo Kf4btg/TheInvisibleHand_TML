@@ -78,13 +78,17 @@ namespace InvisibleHand.Items
             {
                 foreach (var tileID in r.requiredTile)
                 {
+                    // the requiredTile array is initialized from 0 on up;
+                    // if we found -1 (the default value for the array entries),
+                    // then there are no more required tiles for this recipe;
+                    // since most recipes just have 0-1 (rarely even 2)
+                    // required tiles, this could save us a good bit of time as the
+                    // length of the required tile array is 15
                     if (tileID == -1) break;
                     CraftingStations.Add(tileID);
                 }
             }
-
             CraftingStations.Trim();
-
         }
 
     }

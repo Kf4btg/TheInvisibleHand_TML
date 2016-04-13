@@ -49,6 +49,7 @@ namespace InvisibleHand.Items
                 .Tag("expert")
                 .Tag("material")
                 .Tag("bait")
+                .Tag("mech")
                 .Tag("defense");
 
             if (!item.TryTag("reachBoost"))
@@ -63,16 +64,21 @@ namespace InvisibleHand.Items
                     "magic",
                     "summon",
                     "thrown"
-                    ).LastResult)
+                    ).Success)
                     item.AddTag("otherWeapon");
             }
 
             // equipables
             if (item.TryTag("equipable"))
             {
-                item.Tag("vanity");
 
-                if (item.TryTag("accessory"))
+                bool vanity = item.TryTag("vanity");
+
+                if (item.TagFirst("headSlot", "bodySlot", "legSlot").Success)
+                {
+                    item.TagIf(!vanity, "armor");
+                }
+                else if (item.TryTag("accessory"))
                 {
                     item.Tag("musicbox")
                         .TagFirst(
@@ -89,35 +95,30 @@ namespace InvisibleHand.Items
                             "frontSlot"
                         );
 
-                    if (!item.LastResult)
+                    if (!item.Success)
                         ErrorLogger.Log($"Unknown accessory type for item '{_item.name}', type {_item.type}");
                 }
                 else
+                {
                     item.TagFirst(
                         "lightPet",
                         "vanityPet",
                         "grapplingHook",
                         "mount"
                     );
+                }
 
             }
-            else if (item.TagAny(
-                "pick",
-                "axe",
-                "hammer"
-                ).LastResult ||
-                item.TagFirst("wand","fishingPole")
-                    .LastResult)
-            {
-                // FIXME: also add wrenches & stuff to this category
-                item.AddTag("tool");
-                tool = true;
-
-            }
+            else
+                item.TagIf(item.TagAny("pick", "axe", "hammer").Success
+                        || item.TagFirst("wand", "fishingPole", "wrench").Success,
+                    "tool");
 
             placeable = !(weapon || tool) && item.TryTag("placeable");
             if (placeable)
             {
+                item.Tag("craftingStation");
+
                 if (item.TryTag("housingFurniture"))
                 {
                     if (item.TryTag("housingDoor"))
@@ -173,13 +174,20 @@ namespace InvisibleHand.Items
                 }
                 else
                 {
-                    item.Tag("ore")
-                        .Tag("gem");
+                    item.TagFirst("container", "statue", "sink", "clock", "alphabetStatue", "tombstone",
+                                    "crate", "planter", "cannon", "campfire", "fountain", "bottle", "bowl",
+                                    "beachstuff", "cookingPot", "anvil", "track", "trap", "timer", "pressurePlate",
+                                    "firework", "dyePlant", "seed", "ore", "bar", "gem",
+                                    "monolith");
+
+                    // item.Tag("ore")
+                        // .Tag("gem");
                 }
             }
             else if (item.TryTag("ammo"))
             {
-
+                item.TagFirst("arrow", "bullet", "rocket", "dart", "sandAmmo", "solution")
+                    .TagIf(!_item.consumable, "endless"); // endless quiver, musket pouch, etc
             }
             else if (item.TryTag("consumable"))
             {
