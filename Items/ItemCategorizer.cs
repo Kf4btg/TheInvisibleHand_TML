@@ -14,7 +14,6 @@ namespace InvisibleHand.Items
     using static Rules.Binary;
     using static Rules.TileIDGroups;
     using static Rules.Groupings;
-    using rtypes = Rules.Types;
 
     public class CategorizedItem : GlobalItem
     {
@@ -65,58 +64,17 @@ namespace InvisibleHand.Items
             if (!item.TryTag(increasedReach, "reachBoost"))
                 item.Tag(decreasedReach, "reachPenalty");
 
-            // item.TryAddTrait(isBait, "bait");
             weapon = item.TryTag(isWeapon, "weapon");
             if (weapon)
             {
                 if (!item.TagFirst(
-                    tup(_item.melee, "melee"),
+                    tup(_item.melee,  "melee"),
                     tup(_item.ranged, "ranged"),
-                    tup(_item.magic, "magic"),
+                    tup(_item.magic,  "magic"),
                     tup(_item.summon, "summon"),
                     tup(_item.thrown, "thrown")
                     ).LastResult)
                     item.Tag("otherWeapon");
-
-                // foreach (var weapcheck in new[]
-                // {
-                //     new {check=_item.melee, trait="melee"},
-                //     new {check=_item.ranged, trait="ranged"},
-                //     new {check=_item.magic, trait="magic"},
-                //     new {check=_item.summon, trait="summon"},
-                //     new {check=_item.thrown, trait="thrown"},
-                // })
-                //     if (item.TryTag(weapcheck.check, weapcheck.trait))
-                //         break;
-
-                // switch(Rules.Types.Weapon(_item))
-                // {
-                //     case WeaponType.Melee:
-                //         item.AddTrait("melee");
-                //         // further categorization here
-                //         break;
-                //     case WeaponType.Ranged:
-                //         item.AddTrait("ranged");
-                //         // further categorization here
-                //         break;
-                //     case WeaponType.Magic:
-                //         item.AddTrait("magic");
-                //         // further categorization here
-                //         break;
-                //     case WeaponType.Thrown:
-                //         item.AddTrait("thrown");
-                //         // further categorization here
-                //         break;
-                //     case WeaponType.Summon:
-                //         item.AddTrait("summon");
-                //         // further categorization here
-                //         break;
-                //     case WeaponType.Other:
-                //         // i think this is things that just do "damage",
-                //         // like the flare gun?
-                //     default:
-                //         break;
-                // }
             }
 
             // equipables
@@ -137,114 +95,102 @@ namespace InvisibleHand.Items
                             ftup(i => i.handOffSlot > 0, "handOffSlot"),
                             ftup(i => i.shieldSlot > 0, "shieldSlot"),
                             ftup(i => i.waistSlot > 0, "waistSlot"),
-                            ftup(i => i.balloonSlot > 0, "balloonSlot"),
+                            ftup(i => i.balloonSlot > 0, "balloon"),
                             ftup(i => i.frontSlot > 0, "frontSlot")
                         );
 
                     if (!item.LastResult)
                         ErrorLogger.Log($"Unknown accessory type for item '{_item.name}', type {_item.type}");
-
-                    // var slots = new[] { _item.faceSlot, _item.neckSlot, _item.backSlot, _item.wingSlot, _item.shoeSlot, _item.handOnSlot, _item.handOffSlot, _item.shieldSlot, _item.waistSlot, _item.balloonSlot, _item.frontSlot, };
-
-                    // foreach (var slot in new[]{
-                    //     "faceSlot", "neckSlot",
-                    //     "wingSlot", "shoeSlot",
-                    //     "handOnSlot", "handOffSlot",
-                    //     "shieldSlot", "waistSlot",
-                    //     "balloonSlot", "frontSlot"
-                    //     }) {
-                    //     if (item.TryTag(rtypes.AccySlot(_item, slot), slot)) break;
-                    // }
-
-
-
                 }
                 else
-                    foreach (var equipcheck in new Dictionary<string, Func<Item, bool>>
-                    {
-                        // {"accessory", (i) => i.accessory},
-                        {"lightPet", isLightPet},
-                        {"vanityPet", isVanityPet},
-                        {"grapplingHook", isHook},
-                        {"mount", isMount},
-                    })
-                        if (item.TryTag(equipcheck.Value, equipcheck.Key))
-                            break;
+                    item.TagFirst(
+                        ftup(isLightPet, "lightPet"),
+                        ftup(isVanityPet, "vanityPet"),
+                        ftup(isHook, "grapplingHook"),
+                        ftup(isMount, "mount")
+                    );
 
-                // if (item.TryTag(_item.accessory, "accessory"))
-                // {
-                //     // get accessory type/slot
-                // }
-                // else if (item.TryTag(isLightPet, "lightPet") ||
-                //     item.TryTag(isVanityPet, "vanityPet") ||
-                //     item.TryTag(isMount, "mount"))
-                // {
-                //     // something about pets?
-                // }
-                // else if (item.TryTag(isHook, "grapplingHook"))
-                // {
-                //
-                // }
-                // else
-                // {
-                //     item.Tag(MusicBox, "musicbox");
-                // }
-
-
-
-                // get equip type
-                //
-                // get armor type/slot
-                //
             }
-            else
+            else if (item.TagAny(
+                ftup(isPick, "pick"),
+                ftup(isAxe, "axe"),
+                ftup(isHammer, "hammer")
+                ).LastResult ||
+                item.TagFirst(
+                    ftup(isWand, "wand"),
+                    ftup(isFishingPole, "fishingPole"))
+                    .LastResult)
             {
-                tool |= item.TryAddTrait(isPick, "pick");
-                tool |= item.TryAddTrait(isAxe, "axe");
-                tool |= item.TryAddTrait(isHammer, "hammer");
+                // FIXME: also add wrenches & stuff to this category
+                item.Tag("tool");
+                tool = true;
 
-                if (!tool) tool |= item.TryAddTrait(isWand, "wand");
-                if (!tool) tool |= item.TryAddTrait(isFishingPole, "fishingPole");
-
-                if (tool)
-                    item.AddTrait("tool");
             }
 
-            if (!(weapon || tool) && item.TryAddTrait(CanBePlaced, "placeable"))
+            placeable = !(weapon || tool) && item.TryTag(CanBePlaced, "placeable");
+            if (placeable)
             {
-                placeable = true;
-
-                if (item.TryAddTrait(isFurniture, "housingFurniture"))
+                if (item.TryTag(Furniture, "housingFurniture"))
                 {
-                    if (item.TryAddTrait(housingDoor, "housingDoor"))
+                    if (item.TryTag(housingDoor, "housingDoor"))
                     {//break down
-                        item.TryAddTrait(Door, "door");
+                        item.Tag(Door, "door");
+                        // TODO: platforms, tall gate,
+                        // TrapdoorClosed
                     }
-                    else if (item.TryAddTrait(housingTable, "housingTable"))
+                    else if (item.TryTag(housingTable, "housingTable"))
                     {
-                        if (item.TryAddTrait(Table, "table")
-                        ||item.TryAddTrait(WorkBench, "workbench")
-                        || item.TryAddTrait(Dresser, "dresser")
-                        ||item.TryAddTrait(Piano, "piano")
-                        ||item.TryAddTrait(Bookcase, "bookcase"))
-                        {}
+                        item.TagFirst(
+                            ftup(Table, "table"),
+                            ftup(WorkBench, "workbench"),
+                            ftup(Dresser, "dresser"),
+                            ftup(Piano, "piano"),
+                            ftup(Bookcase, "bookcase"),
+                            ftup(Bathtub, "bathtub")
+                            // TODO: bewitching table, alchemy table, tinkerer's bench
+                        );
+
                     }
                     else if (item.TryAddTrait(housingChair, "housingChair"))
                     {
-                        if (item.TryAddTrait(Chair, "chair")
-                        ||item.TryAddTrait(Bed, "bed")
-                        ||item.TryAddTrait(Bench, "bench")
-                        )
-                        {}
+                        item.TagFirst(
+                            ftup(Chair, "chair"),
+                            ftup(Bed, "bed"),
+                            ftup(Bench, "bench")
+                            // TODO: thrones
+                        );
                     }
                     else if (item.TryAddTrait(housingTorch, "lighting"))
-                    {}
+                    {
+                        item.TagFirst(
+                            ftup(Torch, "torch"),
+                            ftup(Candle, "candle"),
+                            ftup(Chandelier, "chandelier"),
+                            ftup(HangingLantern, "hangingLantern"),
+                            ftup(Lamp, "lamp"),
+                            ftup(HolidayLight, "holidayLight"),
+                            ftup(Candelabra, "candelabra")
+                            // TODO: TileID.WaterCandle,
+        					// TileID.ChineseLanterns,
+                            // TileID.Jackolanterns,
+        					// TileID.SkullLanterns,
+        					// TileID.PlatinumCandelabra,
+        					// TileID.PlatinumCandle,
+        					// TileID.FireflyinaBottle,
+        					// TileID.LightningBuginaBottle,
+        					// TileID.BlueJellyfishBowl,
+        					// TileID.GreenJellyfishBowl,
+        					// TileID.PinkJellyfishBowl,
+        					// TileID.PeaceCandle,
+        					// TileID.Fireplace
+                        );
+                    }
                 }
-                else if (item.TryAddTrait(isOre, "ore"))
+                else
                 {
+                    item.Tag(Ore, "ore")
+                        .Tag(Gem, "gem");
                 }
-
-
             }
             else if (item.TryAddTrait(isAmmo, "ammo"))
             {

@@ -1,5 +1,5 @@
-// using System.Collections.Generic;
-// using System;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Reflection;
 using Terraria;
@@ -106,13 +106,11 @@ namespace InvisibleHand.Items
             public static bool Piano(Item item) => item.createTile == TileID.Pianos;
             public static bool Dresser(Item item) => item.createTile == TileID.Dressers;
             public static bool Bookcase(Item item) => item.createTile == TileID.Bookcases;
+            // ... why is the bathtub a table? (I think I know why...)
+            public static bool Bathtub(Item item) => item.createTile == TileID.Bathtubs;
 
             #endregion roomneeds tables
 
-            /// wait, is this a table or a chair?
-    		public static bool Bathtub(Item item) => item.createTile == TileID.Bathtubs;
-            /// and what about this?
-            public static bool Sink(Item item) => item.createTile == TileID.Sinks;
 
 
             #region lighting
@@ -122,9 +120,11 @@ namespace InvisibleHand.Items
     		public static bool Lamp(Item item) => item.createTile == TileID.Lamps;
             public static bool Candelabra(Item item) => item.createTile == TileID.Candelabras;
             public static bool Torch(Item item) => item.createTile == TileID.Torches;
+            public static bool HolidayLight(Item item) => item.createTile == TileID.HolidayLights;
 
             #endregion lighting
 
+            public static bool Sink(Item item) => item.createTile == TileID.Sinks;
 
             // chests, barrels, and trash can
             public static bool Container(Item item) => item.createTile == TileID.Containers;
@@ -162,7 +162,6 @@ namespace InvisibleHand.Items
             public static bool Timer(Item item) => item.createTile == TileID.Timers;
 
             // red and green
-            public static bool HolidayLight(Item item) => item.createTile == TileID.HolidayLights;
     		public static bool Gem(Item item) => item.createTile == TileID.ExposedGems;
     		public static bool WaterFountain(Item item) => item.createTile == TileID.WaterFountain;
 
@@ -205,7 +204,7 @@ namespace InvisibleHand.Items
 
         internal static class Groupings
         {
-            public static bool isFurniture(Item item) => TileSets.Furniture.Contains(item.createTile);
+            public static bool Furniture(Item item) => TileSets.Furniture.Contains(item.createTile);
 
             public static bool housingDoor(Item item) =>
                     TileID.Sets.RoomNeeds.CountsAsDoor.Contains(item.createTile);
@@ -216,8 +215,21 @@ namespace InvisibleHand.Items
             public static bool housingTorch(Item item) =>
                     TileID.Sets.RoomNeeds.CountsAsTorch.Contains(item.createTile);
 
-            public static bool isOre(Item item) => TileID.Sets.Ore[item.createTile];
-            public static bool isIce(Item item) => TileID.Sets.Ices[item.createTile];
+            public static bool Ore(Item item) => TileID.Sets.Ore[item.createTile];
+            public static bool Ice(Item item) => TileID.Sets.Ices[item.createTile];
+
+            public static bool HallowBlock(Item item) => TileID.Sets.Hallow[item.createTile];
+            public static bool CrimsonBlock(Item item) => TileID.Sets.Crimson[item.createTile];
+            public static bool CorruptionBlock(Item item) => TileID.Sets.Corrupt[item.createTile];
+
+            public static bool Sand(Item item) => TileID.Sets.Conversion.Sand[item.createTile];
+            public static bool HardenedSand (Item item) => TileID.Sets.Conversion.HardenedSand[item.createTile];
+            public static bool Sandstone(Item item) => TileID.Sets.Conversion.Sandstone[item.createTile];
+
+            public static bool Stone(Item item) => TileID.Sets.Conversion.Stone[item.createTile];
+
+            public static bool CanPlaceOnWall(Item item) => TileID.Sets.FramesOnKillWall[item.createTile];
+
         }
 
         /// narrows down a generic grouping (e.g. 'Weapon') to a more specific classifier (e.g. 'Melee')
@@ -276,5 +288,97 @@ namespace InvisibleHand.Items
                 return WallDecoType.Other;
             }
         }
+
+        public static readonly IDictionary<string, Func<Item, bool>> ConditionTable = new Dictionary<string, Func<Item, bool>>
+        {
+            {"questItem", (i) => i.questItem},
+            {"expert", (i) => i.expert},
+            {"material", (i) => i.material},
+
+            {"melee", (i) => i.melee},
+            {"ranged", (i) => i.ranged},
+            {"magic", (i) => i.magic},
+            {"summon", (i) => i.summon},
+            {"thrown", (i) => i.thrown},
+
+
+            {"accessory", (i) => i.accessory},
+            {"vanity", (i) => i.vanity},
+
+            // accy slots
+            {"faceSlot", (i) => i.faceSlot > 0},
+            {"neckSlot", (i) => i.neckSlot > 0},
+            {"backSlot", (i) => i.backSlot > 0},
+            {"wingSlot", (i) => i.wingSlot > 0},
+            {"handOnSlot", (i) => i.handOnSlot > 0},
+            {"handOffSlot", (i) => i.handOffSlot > 0},
+            {"shieldSlot", (i) => i.shieldSlot > 0},
+            {"waistSlot", (i) => i.waistSlot > 0},
+            {"balloonSlot", (i) => i.balloonSlot > 0},
+            {"frontSlot", (i) => i.frontSlot > 0},
+
+            {"placeable", Binary.CanBePlaced},
+            {"equipable", Binary.isEquipable},
+            {"weapon", Binary.isWeapon},
+
+            {"bait", Binary.isBait},
+
+            {"consumable", Binary.isConsumable},
+            {"buff", Binary.timedBuff}, // only for consumables
+            {"food", Binary.isFood},
+            {"potion", Binary.isPotion}, // dependent on consumable & !isFood
+
+            {"ammo", Binary.isAmmo},
+
+            {"defense", Binary.givesDefense},
+            {"reachBoost", Binary.increasedReach},
+            {"reachPenalty", Binary.decreasedReach},
+
+
+            {"lightPet", Binary.isLightPet},
+            {"vanityPet", Binary.isVanityPet},
+            {"grapplingHook", Binary.isHook},
+            {"mount", Binary.isMount},
+
+            {"pick", Binary.isPick},
+            {"axe", Binary.isAxe},
+            {"hammer", Binary.isHammer},
+            {"wand", Binary.isWand},
+            {"fishingPole", Binary.isFishingPole},
+
+
+            {"housingFurniture", Groupings.Furniture},
+
+            {"housingDoor", Groupings.housingDoor},
+            {"Door", TileIDGroups.Door},
+
+            {"lighting", Groupings.housingTorch},
+            {"torch", TileIDGroups.Torch},
+            {"candle", TileIDGroups.Candle},
+            {"chandelier", TileIDGroups.Chandelier},
+            {"hangingLantern", TileIDGroups.HangingLantern},
+            {"lamp", TileIDGroups.Lamp},
+            {"holidayLight", TileIDGroups.HolidayLight},
+            {"candelabra", TileIDGroups.Candelabra},
+
+            {"housingChair", Groupings.housingChair},
+            {"chair", TileIDGroups.Chair},
+            {"bed", TileIDGroups.Bed},
+            {"bench", TileIDGroups.Bench},
+
+            {"housingTable", Groupings.housingTable},
+            {"table", TileIDGroups.Table},
+            {"workbench", TileIDGroups.WorkBench},
+            {"dresser", TileIDGroups.Dresser},
+            {"piano", TileIDGroups.Piano},
+            {"bookcase", TileIDGroups.Bookcase},
+            {"bathtub", TileIDGroups.Bathtub},
+
+
+            {"ore", Groupings.Ore},
+
+            {"gem", TileIDGroups.Gem},
+            {"musicbox", TileIDGroups.MusicBox},
+    };
     }
 }
