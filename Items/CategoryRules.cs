@@ -1,6 +1,7 @@
 // using System.Collections.Generic;
 // using System;
 using System.Linq;
+using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using System.Text.RegularExpressions;
@@ -20,10 +21,10 @@ namespace InvisibleHand.Items
             public static bool expert(Item item) => item.expert;
             // could add item.vanity here
 
-            public static bool isWeapon(Item item)
-            {
-                return (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
-            }
+            public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
+
+            public static bool givesDefense(Item item) => item.defense > 0;
+
 
             public static bool isFishingPole(Item item) => item.fishingPole > 0;
             public static bool isBait(Item item) => item.bait > 0;
@@ -66,15 +67,15 @@ namespace InvisibleHand.Items
             //      item.consumable
             public static bool CanBePlaced(Item item) => (item.createTile > -1 || item.createWall > 0) && (item.type != 213 && item.tileWand < 1);
 
-            public static bool isAmmo(Item item) => !CanBePlaced(item) && item.ammo > 0 && !item.notAmmo;
-            public static bool isConsumable(Item item) => !isAmmo(item) && !CanBePlaced(item) && item.consumable;
+            public static bool isAmmo(Item item) => /*!CanBePlaced(item) &&*/ item.ammo > 0 && !item.notAmmo;
+            public static bool isConsumable(Item item) => /*!isAmmo(item) && !CanBePlaced(item) && */ item.consumable;
 
             public static bool isFood(Item item) => item.buffType == 26;
 
-            public static bool grantsBuff(Item item) => item.buffTime > 0;
+            public static bool timedBuff(Item item) => item.buffTime > 0;
 
             // maybe?
-            public static bool isPotion(Item item) => grantsBuff(item) && !isFood(item);
+            public static bool isPotion(Item item) => timedBuff(item) && !isFood(item);
 
             public static bool falling(Item item) => TileID.Sets.Falling[item.createTile];
 
@@ -232,6 +233,25 @@ namespace InvisibleHand.Items
                         item.thrown ? WeaponType.Thrown :
                         item.summon ? WeaponType.Summon :
                         WeaponType.Other;
+            }
+
+            /// call with an Item instance and the name of a
+            /// property such as "faceSlot", "wingsSlot", etc.
+            public static bool AccySlot(Item item, string slot_type)
+            {
+                return (int)(typeof(Item).GetField(slot_type, BindingFlags.Public | BindingFlags.Instance).GetValue(item)) > 0;
+            }
+
+            public static string AccessoryType(Item item)
+            {
+
+                return item.faceSlot > 0 ? "headSlot" :
+                item.neckSlot > 0 ? "neckSlot" :
+                item.backSlot > 0 ? "backSlot" :
+                item.wingSlot > 0 ? "wingSlot" :
+                item.shoeSlot > 0 ? "shoeSlot" :
+                item.handOnSlot > 0 ? "handOnSlot" :
+                    item.neckSlot > 0 ? "neckSlot" : "otherAccy";
             }
 
             public static WallDecoType WallDeco(Item item)

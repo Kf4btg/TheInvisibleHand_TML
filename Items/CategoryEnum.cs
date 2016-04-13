@@ -249,13 +249,14 @@ namespace InvisibleHand.Items
         tileWand, // tile created by wands like the living wood wand or bone wand
         paint,
 
-        headSlot,
-        bodySlot,
-        legSlot,
-        faceSlot,
-        neckSlot,
-        backSlot,
-        wingslot,
+        headSlot, // armor
+        bodySlot, // armor
+        legSlot,  // armor
+
+        faceSlot, // accys
+        neckSlot, //  |
+        backSlot, //  V
+        wingSlot,
         shoeSlot,
         handOnSlot,
         handOffSlot,
