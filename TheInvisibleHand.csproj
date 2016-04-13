@@ -113,6 +113,7 @@
     <Compile Include="Items\CategoryEnum.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
     <Compile Include="Items\CategoryRules.cs" />
+    <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
     <Compile Include="Items\Sets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

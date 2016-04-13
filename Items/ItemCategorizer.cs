@@ -1,6 +1,6 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System;
+// using System;
 // using System.Linq;
 using Terraria;
 // using Terraria.ID;
@@ -9,36 +9,19 @@ using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
-    public class CategorizedItem : GlobalItem
+    public static class ItemCategorizer
     {
-        private static IDictionary<int, HashSet<string>> item_cache = new Dictionary<int, HashSet<string>>();
+        // private static IDictionary<int, HashSet<string>> item_cache = new Dictionary<int, HashSet<string>>();
 
-        public CategoryInfo getCategoryInfo(Item item) => (CategoryInfo)item.GetModInfo(mod, "CategoryInfo");
-
-        public override void SetDefaults(Item item)
+        public static ISet<string> Classify(Item item)
         {
-            var cinfo = getCategoryInfo(item);
+            var iwi = new ItemWithInfo(item);
+            classify(iwi);
 
-            /// check to see if we've seen this type of item before
-            if (item_cache.ContainsKey(item.type))
-            {
-                cinfo.Traits = item_cache[item.type];
-            }
-            else
-            {
-                var iwi = new ItemWithInfo
-                {
-                    item = item,
-                    info = getCategoryInfo(item)
-                };
-
-                classify(iwi);
-                // classify(item, getCategoryInfo(item));
-            }
+            return iwi.TraitList;
         }
 
-        // private void classify(Item item, CategoryInfo cinfo)
-        private void classify(ItemWithInfo item)
+        private static void classify(ItemWithInfo item)
         {
             var _item = item.item;
             bool weapon, tool, placeable;
