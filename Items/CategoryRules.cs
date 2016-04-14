@@ -12,26 +12,21 @@ namespace InvisibleHand.Items
 {
     public static class Rules
     {
+
+        /// prevents attempting to index Main.projectile w/ -1
+        public static bool TestProjectileAI(int projid, int otherid)
+        {
+            return projid > 0 && Main.projectile[projid].aiStyle == otherid;
+        }
+
         /// Every method/property in Rules.Binary is a simple yes/no (boolean) query
         internal static class Binary
         {
-            // this three are a bit redundant...
-            // public static bool questItem(Item item) => item.questItem;
-            // public static bool isMaterial(Item item) => item.material;
-            // public static bool expert(Item item) => item.expert;
-            // could add item.vanity here
-
             public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
             public static bool isArmor(Item item) => item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0; // && !item.vanity
 
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;
-
-            // public static bool givesDefense(Item item) => item.defense > 0;
-
-
-            // public static bool isFishingPole(Item item) => item.fishingPole > 0;
-            // public static bool isBait(Item item) => item.bait > 0;
 
             public static bool isHook(Item item) => Main.projHook[item.shoot];
             public static bool isMount(Item item) => item.mountType != -1;
@@ -40,20 +35,6 @@ namespace InvisibleHand.Items
             public static bool isVanityPet(Item item) => item.buffType > 0 && (Main.vanityPet[item.buffType]);
 
             public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || Main.projHook[item.shoot] || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
-
-            // public static bool isWand(Item item) => item.tileWand > 0;
-
-            // public static bool isPick(Item item) => item.pick > 0;
-            // public static bool isAxe(Item item) => item.axe > 0;
-            // public static bool isHammer(Item item) => item.hammer > 0;
-
-            // public static bool increasedReach(Item item) => item.tileBoost > 0;
-            // public static bool decreasedReach(Item item) => item.tileBoost < 0;
-
-            // public static bool healsLife(Item item) => item.healLife > 0;
-            // public static bool healsMana(Item item) => item.healMana > 0;
-
-            // public static bool costsMana(Item item) => item.mana > 0;
 
             /// NOTE: not everything that has a "placeStyle" has a "createTile" (the noteable
             /// exceptions are the butterflies, which have a "createNPC" instead), and
@@ -74,14 +55,16 @@ namespace InvisibleHand.Items
             public static bool isAmmo(Item item) => /*!CanBePlaced(item) &&*/ item.ammo > 0 && !item.notAmmo;
             public static bool isConsumable(Item item) => /*!isAmmo(item) && !CanBePlaced(item) && */ item.consumable;
 
-            public static bool isFood(Item item) => item.buffType == BuffID.WellFed;
+            public static bool isFood(Item item)    => item.buffType == BuffID.WellFed;
 
             public static bool timedBuff(Item item) => item.buffTime > 0;
 
             // maybe?
-            public static bool isPotion(Item item) => timedBuff(item) && !isFood(item);
+            public static bool isPotion(Item item)  => timedBuff(item) && !isFood(item);
 
-            public static bool falling(Item item) => TileID.Sets.Falling[item.createTile];
+            public static bool falling(Item item)   => TileID.Sets.Falling[item.createTile];
+
+            public static bool Explosive(Item item) => TestProjectileAI(item.shoot, 16);
 
 
 
@@ -93,38 +76,38 @@ namespace InvisibleHand.Items
         {
 
             #region roomneeds doors
-    		public static bool Door(Item item) => item.createTile == TileID.ClosedDoor;
+    		public static bool Door(Item item)     => item.createTile == TileID.ClosedDoor;
             public static bool Platform(Item item) => item.createTile == TileID.Platforms;
             #endregion roomneeds doors
 
             #region roomneeds chairs
             public static bool Chair(Item item) => item.createTile == TileID.Chairs;
-            public static bool Bed(Item item) => item.createTile == TileID.Beds;
+            public static bool Bed(Item item)   => item.createTile == TileID.Beds;
             /// also sofas
             public static bool Bench(Item item) => item.createTile == TileID.Benches;
             #endregion roomneeds chairs
 
             #region roomneeds tables
     		public static bool WorkBench(Item item) => item.createTile == TileID.WorkBenches;
-            public static bool Table(Item item) => item.createTile == TileID.Tables;
-            public static bool Piano(Item item) => item.createTile == TileID.Pianos;
-            public static bool Dresser(Item item) => item.createTile == TileID.Dressers;
-            public static bool Bookcase(Item item) => item.createTile == TileID.Bookcases;
+            public static bool Table(Item item)     => item.createTile == TileID.Tables;
+            public static bool Piano(Item item)     => item.createTile == TileID.Pianos;
+            public static bool Dresser(Item item)   => item.createTile == TileID.Dressers;
+            public static bool Bookcase(Item item)  => item.createTile == TileID.Bookcases;
             // ... why is the bathtub a table? (I think I know why...)
-            public static bool Bathtub(Item item) => item.createTile == TileID.Bathtubs;
+            public static bool Bathtub(Item item)   => item.createTile == TileID.Bathtubs;
 
             #endregion roomneeds tables
 
 
 
             #region lighting
-            public static bool Candle(Item item) => item.createTile == TileID.Candles;
-            public static bool Chandelier(Item item) => item.createTile == TileID.Chandeliers;
+            public static bool Candle(Item item)         => item.createTile == TileID.Candles;
+            public static bool Chandelier(Item item)     => item.createTile == TileID.Chandeliers;
             public static bool HangingLantern(Item item) => item.createTile == TileID.HangingLanterns;
-    		public static bool Lamp(Item item) => item.createTile == TileID.Lamps;
-            public static bool Candelabra(Item item) => item.createTile == TileID.Candelabras;
-            public static bool Torch(Item item) => item.createTile == TileID.Torches;
-            public static bool HolidayLight(Item item) => item.createTile == TileID.HolidayLights;
+    		public static bool Lamp(Item item)           => item.createTile == TileID.Lamps;
+            public static bool Candelabra(Item item)     => item.createTile == TileID.Candelabras;
+            public static bool Torch(Item item)          => item.createTile == TileID.Torches;
+            public static bool HolidayLight(Item item)   => item.createTile == TileID.HolidayLights;
 
             #endregion lighting
 
@@ -133,8 +116,7 @@ namespace InvisibleHand.Items
             // chests, barrels, and trash can
             public static bool Container(Item item) => item.createTile == TileID.Containers;
 
-            /// these are the seeds for the herbs
-            public static bool ImmatureHerb(Item item) => item.createTile == TileID.ImmatureHerbs;
+
     		public static bool Tombstone(Item item) => item.createTile == TileID.Tombstones;
 
             /// important (and there's a lot of these...)
@@ -160,7 +142,6 @@ namespace InvisibleHand.Items
             /// only the lihzard traps (not the regular dart trap)
             public static bool Trap(Item item) => item.createTile == TileID.Traps;
     		public static bool MusicBox(Item item) => item.createTile == TileID.MusicBoxes;
-    		public static bool Explosive(Item item) => item.createTile == TileID.Explosives;
 
             /// only 3 & 5
             public static bool Timer(Item item) => item.createTile == TileID.Timers;
@@ -176,9 +157,11 @@ namespace InvisibleHand.Items
             /// green, blue, & yellow rockets
             public static bool Firework(Item item) => item.createTile == TileID.Firework;
 
-            /// NOTE: Strange Plants also have a 'rarity' of -11
-            public static bool DyePlant(Item item) => item.createTile == TileID.DyePlants;
-            public static bool MetalBar(Item item) => item.createTile == TileID.MetalBars;
+            /// NOTE: Strange Plants have a special Set in ItemID.Sets
+            public static bool DyePlant(Item item)     => item.createTile == TileID.DyePlants;
+            /// these are the seeds for the herbs
+            public static bool ImmatureHerb(Item item) => item.createTile == TileID.ImmatureHerbs;
+            public static bool MetalBar(Item item)     => item.createTile == TileID.MetalBars;
 
 
 
@@ -189,10 +172,9 @@ namespace InvisibleHand.Items
 
             /// ABC, 123
             public static bool AlphabetStatue(Item item) => item.createTile == TileID.AlphabetStatues;
-    		public static bool FishingCrate(Item item) => item.createTile == TileID.FishingCrate;
-    		public static bool PlanterBox(Item item) => item.createTile == TileID.PlanterBox;
-            /// all 3 of them
-            public static bool LunarMonolith(Item item) => item.createTile == TileID.LunarMonolith;
+    		public static bool FishingCrate(Item item)   => item.createTile == TileID.FishingCrate;
+    		public static bool PlanterBox(Item item)     => item.createTile == TileID.PlanterBox;
+            public static bool LunarMonolith(Item item)  => item.createTile == TileID.LunarMonolith;
         }
 
         internal static class Groupings
@@ -234,7 +216,7 @@ namespace InvisibleHand.Items
             /// they all seem to end in "Rack"; Some other decorative wall hangings (like
             /// Ship's wheel, Compass Rose, etc.), will likely be difficult to distinguish
             /// from paintings, though.
-            public static bool WallDeco(Item item) => new int[]{ TileID.Painting3X3, TileID.Painting4X3, TileID.Painting6X4, TileID.Painting2X3, TileID.Painting3X2 }.Contains(item.createTile);
+            public static bool WallDeco(Item item) => new int[] { TileID.Painting3X3, TileID.Painting4X3, TileID.Painting6X4, TileID.Painting2X3, TileID.Painting3X2 }.Contains(item.createTile);
             // public static bool Painting3X3(Item item) => item.createTile == TileID.Painting3X3;
             // public static bool Painting4X3(Item item) => item.createTile == TileID.Painting4X3;
             // public static bool Painting6X4(Item item) => item.createTile == TileID.Painting6X4;
@@ -244,7 +226,74 @@ namespace InvisibleHand.Items
             public static bool NebulaPickup(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
 
             public static bool GoesInExtractinator(Item item) => ItemID.Sets.NebulaPickup[item.type];
+        }
 
+        internal static class Dye
+        {
+            private const short base_dye_start = 1007; // ItemID.RedDye
+            private const short base_dye_end = 1018; // ItemID.PinkDye
+
+            private const short black_dye_start = base_dye_start + 12;
+            private const short black_dye_end = base_dye_end + 12;
+
+            private const short bright_dye_start = base_dye_start + 31;
+            private const short bright_dye_end = base_dye_end + 31;
+
+            private const short silver_dye_start = base_dye_start + 44;
+            private const short silver_dye_end = base_dye_end + 44;
+
+            private static readonly int[] other_base_dyes = new int[3] { ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye };
+            private static readonly int[] other_black_dyes = new int[2] { ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye };
+            private static readonly int[] other_bright_dyes = new int[2] { ItemID.BrownDye + 2, ItemID.BrightSilverDye };
+            private static readonly int[] other_silver_dyes = new int[2] { ItemID.BrownDye + 3, ItemID.SilverAndBlackDye };
+
+
+            public static bool BasicDyes(Item item) => (item.type >= base_dye_start && item.type <= base_dye_end) || other_base_dyes.Contains(item.type);
+
+            /// the "... and Black" dyes
+            public static bool BlackDyes(Item item) => (item.type >= black_dye_start && item.type <= black_dye_end) || other_black_dyes.Contains(item.type);
+
+            public static bool BrightDyes(Item item) => (item.type >= bright_dye_start && item.type <= bright_dye_end) || other_bright_dyes.Contains(item.type);
+
+            /// the "... and Silver" dyes
+            public static bool SilverDyes(Item item) => (item.type >= silver_dye_start && item.type <= silver_dye_end) || other_silver_dyes.Contains(item.type);
+
+            /// including intense versions
+            public static bool FlameDyes(Item item) => (item.type >= 1031 && item.type <= 1036) || (item.type >= 1063 && item.type <= 1065) || (item.type >= 3550 && item.type <= 3552);
+
+            /// gradient and rainbow dyes
+            public static bool GradientDyes(Item item) => (item.type >= 1066 && item.type <= 1070);
+
+
+            private static readonly Tuple<int, int>[] strange_dye_ranges = new[]
+            {
+                Tuple.Create(2869, 2873),
+                Tuple.Create(2883, 2885),
+                Tuple.Create(3024, 3028),
+                Tuple.Create(3038, 3042),
+                Tuple.Create(3533, 3535),
+                Tuple.Create(3553, 3556),
+                Tuple.Create(3560, 3562),
+                Tuple.Create(3597, 3600)
+            };
+
+            private static readonly int[] more_strange_dyes = new int[4] { 2878, 2879, 3190, 3530 };
+
+            public static bool StrangeDyes(Item item)
+            {
+                var itemid = item.type;
+
+                if (more_strange_dyes.Contains(itemid)) return true;
+
+                foreach (var range in strange_dye_ranges)
+                {
+                    if (itemid >= range.Item1 && itemid <= range.Item2)
+                        return true;
+                }
+                return false;
+            }
+
+            public static bool LunarDyes(Item item) => (item.type >= 3526 && item.type <= 3529);
         }
 
         /// narrows down a generic grouping (e.g. 'Weapon') to a more specific classifier (e.g. 'Melee')
@@ -305,170 +354,124 @@ namespace InvisibleHand.Items
             }
         }
 
+        internal static class Weapons
+        {
+            internal static class Melee
+            {
+                // broadswords and most tools
+                public static bool Swing(Item item) => item.useStyle == 1 && !item.noMelee;
+                // shortswords
+                public static bool Jab(Item item) => item.useStyle == 3;
+                // spear, flail, yoyo, mech tools
+                public static bool Directional(Item item) => item.useStyle == 5;
+
+                // boomerangs, daybreak, flying knife...
+                public static bool Thrown(Item item) => item.useStyle == 1 && item.noMelee;
+
+                // picks, hammers, axes
+                public static bool isTool(Item item) => item.pick > 0 || item.axe > 0 || item.hammer > 0;
+                // drills, jackhammers, chainsaws
+                // OR: => Main.projectile[item.shoot].aiStyle==20;
+                public static bool mechTool(Item item) => isTool(item) && item.channel;
+
+                /// alias for 'Jab'
+                public static bool ShortSword(Item item) => Jab(item);
+
+                /// Dependent on 'Thrown' (well. maybe not really)
+                public static bool Boomerang(Item item) => TestProjectileAI(item.shoot, 3);
+
+
+                //***
+                //Dependent on Swing()==true
+                //***
+                /// also includes some things like Purple Clubberfish, slap hand, etc., that aren't
+                /// technically swords, but are swung overhead & there's really no way to tell them apart...
+                // the !noUseGraphic check is for excluding things like chain guillotines, flairon;
+                public static bool BroadSword(Item item) => /*Swing(item) &&*/ !(isTool(item) || item.noUseGraphic);
+
+
+                //***
+                //Dependent on Directional()==true
+                //***
+
+                // spears are kind of a "if it doesn't fit anything else" category...but this seems to single them out nicely.
+                // This also includes Scourge of the Corruptor, which is kinda iffy, but close enough
+                // public static bool Spear(Item item) =>/* Directional(item) &&*/ (item.noMelee && item.noUseGraphic && !item.channel);
+                //
+                // Actually, I think using the aiStyle of the item.shoot projectile is better.
+                // NOTE: spears and mech tools also have a projectiles w/ tileCollide==False
+                public static bool Spear(Item item) => TestProjectileAI(item.shoot, 19);
+
+                // all (vanilla) flails (other than Flairon, which is just...weird) use animations 40 or 45
+                // NOTE: also, flails have a projectile id (item.shoot) of 15;
+                // public static bool Flail(Item item) => /*Directional(item) && */ (item.useAnimation == 40 || item.useAnimation == 45);
+                public static bool Flail(Item item) => TestProjectileAI(item.shoot, 15);
+
+                // Yoyos; the 'usetime' check is necessary to distinguish from the Arkhalis
+                // public static bool Yoyo(Item item) => /*Directional(item) &&*/ (item.channel && item.useAnimation == 25 && item.useTime == 25);
+                public static bool Yoyo(Item item) => TestProjectileAI(item.shoot, 99);
+            }
+
+
+            internal static class Ranged
+            {
+                public static bool ArrowConsuming(Item item)  => item.useAmmo == 1;
+                public static bool BulletConsuming(Item item) => item.useAmmo == 14;
+                public static bool RocketConsuming(Item item) => item.useAmmo == 771;
+                public static bool DartConsuming(Item item)   => item.useAmmo == 51;
+                public static bool GelConsuming(Item item)    => item.useAmmo == 23;
+
+                public static bool NoAmmo(Item item) => item.useAmmo < 1;
+
+                /// this isn't entirely accurate...some of the highlevel bows also have auto-reuse set True;
+                /// it's probably the best we can do, though.
+                public static bool Repeater(Item item) => ArrowConsuming(item) && item.autoReuse;
+                public static bool AutomaticGun(Item item) => BulletConsuming(item) && item.autoReuse;
+
+            }
+
+            internal static class Magic
+            {
+                public static bool Homing(Item item) => ProjectileID.Sets.Homing[item.shoot];
+
+                public static bool Area(Item item)
+                {
+                    if (item.shoot < 1) return false;
+                    var projectile = Main.projectile[item.shoot];
+                    return projectile.maxPenetrate < 0 && !projectile.tileCollide;
+                }
+
+                // e.g. magic missile
+                public static bool Controllable(Item item) => TestProjectileAI(item.shoot, 9);
+                // e.g. water bolt
+                public static bool Bouncing(Item item)
+                {
+                    if (item.shoot < 1) return false;
+                    var projectile = Main.projectile[item.shoot];
+                    return projectile.aiStyle == 8 || projectile.aiStyle == 14;
+                }
+
+                // e.g. aqua scepter
+                public static bool Stream(Item item) => TestProjectileAI(item.shoot, 12);
+                // e.g. a lot of things; anything that passes through at least one enemy
+                public static bool Piercing(Item item) => Main.projectile[item.shoot].maxPenetrate > 1;
+
+                // i.e. straight(ish) line that passes through blocks
+                public static bool VilethornAI(Item item) => TestProjectileAI(item.shoot, 4);
+            }
+
+            internal static class Summon
+            {
+                public static bool Minion(Item item) => Main.projectile[item.shoot].minion;
+
+                // there's nothing like a 'sentry' field, but that's all that's left after taking
+                // out the 'minion' weapons, so...
+                public static bool Sentry(Item item) => !Minion(item);
+            }
+
+        }
         // Ideas for dealing with mod items:
         //  1) Use Recipe.ItemMatches() for added materials
-
-        // public static readonly IDictionary<string, Func<Item, bool>> ConditionTable = new Dictionary<string, Func<Item, bool>>
-        // {
-        //     {"questItem", (i) => i.questItem},
-        //     {"expert", (i) => i.expert},
-        //     {"material", (i) => i.material},
-        //     {"mech", (i) => i.mech},
-        //
-        //     {"bait", (i) => i.bait > 0},
-        //
-        //     {"melee", (i) => i.melee},
-        //     {"ranged", (i) => i.ranged},
-        //     {"magic", (i) => i.magic},
-        //     {"summon", (i) => i.summon},
-        //     {"thrown", (i) => i.thrown},
-        //
-        //     {"defense", (i) => i.defense > 0},
-        //     {"reachBoost", (i) => i.tileBoost > 0},
-        //     {"reachPenalty", (i) => i.tileBoost < 0},
-        //
-        //     {"healsLife", (i) => i.healLife > 0},
-        //     {"healsMana", (i) => i.healMana > 0},
-        //
-        //     {"costsMana", (i) => i.mana > 0},
-        //
-        //     {"pick", (i) => i.pick > 0},
-        //     {"axe", (i) => i.axe > 0},
-        //     {"hammer", (i) => i.hammer > 0},
-        //
-        //     {"wand", (i) => i.tileWand > 0},
-        //     {"fishingPole", (i) => i.fishingPole > 0},
-        //     {"wrench", Binary.isWrench},
-        //
-        //     {"accessory", (i) => i.accessory},
-        //     {"vanity", (i) => i.vanity},
-        //
-        //     // armor slots
-        //     {"headSlot", (i) => i.headSlot > 0},
-        //     {"bodySlot", (i) => i.bodySlot > 0},
-        //     {"legSlot", (i) => i.legSlot > 0},
-        //
-        //
-        //     // accy slots
-        //     {"faceSlot", (i) => i.faceSlot > 0},
-        //     {"neckSlot", (i) => i.neckSlot > 0},
-        //     {"backSlot", (i) => i.backSlot > 0},
-        //     {"wings", (i) => i.wingSlot > 0},
-        //     {"handOnSlot", (i) => i.handOnSlot > 0},
-        //     {"handOffSlot", (i) => i.handOffSlot > 0},
-        //     {"shieldSlot", (i) => i.shieldSlot > 0},
-        //     {"waistSlot", (i) => i.waistSlot > 0},
-        //     {"balloon", (i) => i.balloonSlot > 0},
-        //     {"frontSlot", (i) => i.frontSlot > 0},
-        //
-        //     {"placeable", Binary.CanBePlaced},
-        //     {"equipable", Binary.isEquipable},
-        //     {"weapon", Binary.isWeapon},
-        //     {"armor", Binary.isArmor},
-        //
-        //
-        //     {"consumable", Binary.isConsumable},
-        //     {"buff", Binary.timedBuff}, // only for consumables
-        //     {"food", Binary.isFood},
-        //     {"potion", Binary.isPotion}, // dependent on consumable & !isFood
-        //
-        //
-        //     {"lightPet", Binary.isLightPet},
-        //     {"vanityPet", Binary.isVanityPet},
-        //     {"grapplingHook", Binary.isHook},
-        //     {"mount", Binary.isMount},
-        //
-        //
-        //
-        //     {"craftingStation", (i) => TileSets.CraftingStations.Contains(i.createTile)},
-        //
-        //     {"housingFurniture", Groupings.Furniture},
-        //
-        //     {"housingDoor", Groupings.housingDoor},
-        //     {"Door", ByTileID.Door},
-        //
-        //     {"lighting", Groupings.housingTorch},
-        //     {"torch", ByTileID.Torch},
-        //     {"candle", ByTileID.Candle},
-        //     {"chandelier", ByTileID.Chandelier},
-        //     {"hangingLantern", ByTileID.HangingLantern},
-        //     {"lamp", ByTileID.Lamp},
-        //     {"holidayLight", ByTileID.HolidayLight},
-        //     {"candelabra", ByTileID.Candelabra},
-        //
-        //     {"housingChair", Groupings.housingChair},
-        //     {"chair", ByTileID.Chair},
-        //     {"bed", ByTileID.Bed},
-        //     {"bench", ByTileID.Bench},
-        //
-        //     {"housingTable", Groupings.housingTable},
-        //     {"table", ByTileID.Table},
-        //     {"workbench", ByTileID.WorkBench},
-        //     {"dresser", ByTileID.Dresser},
-        //     {"piano", ByTileID.Piano},
-        //     {"bookcase", ByTileID.Bookcase},
-        //     {"bathtub", ByTileID.Bathtub},
-        //
-        //     // other furniture-like items
-        //     {"container", ByTileID.Container},
-        //     {"sink", ByTileID.Sink},
-        //     {"clock", ByTileID.GrandfatherClock},
-        //     {"statue", ByTileID.Statue},
-        //     {"alphabetStatue", ByTileID.AlphabetStatue},
-        //     {"planter", ByTileID.PlanterBox},
-        //     {"crate", ByTileID.FishingCrate},
-        //     {"monolith", ByTileID.LunarMonolith},
-        //
-        //     {"cannon", ByTileID.Cannon},
-        //     {"campfire", ByTileID.Campfire},
-        //     {"fountain", ByTileID.WaterFountain},
-        //     {"tombstone", ByTileID.Tombstone},
-        //
-        //     // house clutter
-        //     {"bottle", ByTileID.Bottle},
-        //     {"bowl", ByTileID.Bowl},
-        //     {"beachstuff", ByTileID.BeachPile},
-        //
-        //     // mech
-        //     {"track", ByTileID.MinecartTrack},
-        //     {"trap", ByTileID.Trap},
-        //     {"timer", ByTileID.Timer},
-        //     {"pressurePlate", ByTileID.PressurePlate},
-        //
-        //
-        //
-        //     {"cookingPot", ByTileID.CookingPot},
-        //     {"anvil", ByTileID.Anvil}, // just the low-level ones (iron & lead)
-        //
-        //
-        //     {"wallDeco", Groupings.WallDeco},
-        //     {"trophy", (i) => Types.WallDeco(i) == WallDecoType.Trophy},
-        //     {"painting", (i) => Types.WallDeco(i) == WallDecoType.Painting},
-        //     {"rack", (i) => Types.WallDeco(i) == WallDecoType.Rack},
-        //
-        //
-        //     {"firework", ByTileID.Firework},
-        //     {"dyePlant", ByTileID.DyePlant},
-        //     {"seed", ByTileID.ImmatureHerb},
-        //
-        //     {"ore", Groupings.Ore},
-        //     {"bar", ByTileID.MetalBar},
-        //
-        //
-        //     {"gem", ByTileID.Gem},
-        //     {"musicbox", ByTileID.MusicBox},
-        //
-        //     {"ammo", Binary.isAmmo},
-        //     {"arrow", (i) => i.ammo == 1},
-        //     {"bullet", (i) => i.ammo == 14},
-        //     {"rocket", (i) => i.ammo == 771},
-        //     {"dart", (i) => i.ammo == 51},
-        //
-        //     // {"gel", (i) => i.ammo == 23},
-        //     {"sandAmmo", (i) => i.ammo == 42},
-        //     {"coinAmmo", (i) => i.ammo == 71},
-        //     {"solution", (i) => i.ammo == 780},
-        // };
 
         public static readonly IDictionary<Trait, Func<Item, bool>> TConditionTable = new Dictionary<Trait, Func<Item, bool>>
         {
@@ -480,20 +483,49 @@ namespace InvisibleHand.Items
             {Trait.bait, (i) => i.bait > 0},
 
             {Trait.melee, (i) => i.melee},
+            {Trait.melee_style_swing, Weapons.Melee.Swing},
+            {Trait.melee_style_jab, Weapons.Melee.Jab},
+            {Trait.melee_style_directional, Weapons.Melee.Directional},
+            {Trait.melee_style_thrown, Weapons.Melee.Thrown},
+            {Trait.broadsword, Weapons.Melee.BroadSword},
+            {Trait.shortsword, Weapons.Melee.Jab},
+            {Trait.boomerang, Weapons.Melee.Boomerang},
+            {Trait.spear, Weapons.Melee.Spear},
+            {Trait.yoyo, Weapons.Melee.Yoyo},
+            {Trait.flail, Weapons.Melee.Flail},
+
             {Trait.ranged, (i) => i.ranged},
+            {Trait.bullet_consuming, Weapons.Ranged.BulletConsuming},
+            {Trait.arrow_consuming, Weapons.Ranged.ArrowConsuming},
+            {Trait.rocket_consuming, Weapons.Ranged.RocketConsuming},
+            {Trait.dart_consuming, Weapons.Ranged.DartConsuming},
+            {Trait.gel_consuming, Weapons.Ranged.GelConsuming},
+            {Trait.repeater, Weapons.Ranged.Repeater},
+            {Trait.automatic_gun, Weapons.Ranged.AutomaticGun},
+
             {Trait.magic, (i) => i.magic},
+            {Trait.area, Weapons.Magic.Area},
+            {Trait.homing, Weapons.Magic.Homing},
+            {Trait.bouncing, Weapons.Magic.Bouncing},
+            {Trait.controlled, Weapons.Magic.Controllable},
+            {Trait.stream, Weapons.Magic.Stream},
+
             {Trait.summon, (i) => i.summon},
+            {Trait.minion, Weapons.Summon.Minion},
+            {Trait.sentry, Weapons.Summon.Sentry},
+
             {Trait.thrown, (i) => i.thrown},
 
             {Trait.has_projectile, (i) => i.shoot > 0},
-
 
             {Trait.defense, (i) => i.defense > 0},
             {Trait.reach_boost, (i) => i.tileBoost > 0},
             {Trait.reach_penalty, (i) => i.tileBoost < 0},
 
             {Trait.heal_life, (i) => i.healLife > 0},
+            {Trait.regen_life, (i) => i.lifeRegen > 0},
             {Trait.heal_mana, (i) => i.healMana > 0},
+            {Trait.boost_mana, (i) => i.manaIncrease > 0},
 
             {Trait.use_mana, (i) => i.mana > 0},
 
@@ -537,12 +569,26 @@ namespace InvisibleHand.Items
             {Trait.food, Binary.isFood},
             {Trait.potion, Binary.isPotion}, // dependent on consumable & !isFood
 
+            {Trait.dye, (i) => i.dye > 0},
+            {Trait.dye_basic, Dye.BasicDyes},
+            {Trait.dye_black, Dye.BlackDyes},
+            {Trait.dye_bright, Dye.BrightDyes},
+            {Trait.dye_silver, Dye.SilverDyes},
+            {Trait.dye_flame, Dye.FlameDyes},
+            {Trait.dye_gradient, Dye.GradientDyes},
+            {Trait.dye_strange, Dye.StrangeDyes},
+            {Trait.dye_lunar, Dye.LunarDyes},
+
+            {Trait.hair_dye, (i) => i.hairDye != 0},
+            {Trait.paint, (i) => i.paint > 0},
 
             {Trait.pet_light, Binary.isLightPet},
             {Trait.pet_vanity, Binary.isVanityPet},
             {Trait.grapple, Binary.isHook},
             {Trait.mount, Binary.isMount},
 
+
+            {Trait.wall, (i) => i.createWall > 0},
             {Trait.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
 
             {Trait.housing_furniture, Groupings.Furniture},
@@ -598,11 +644,8 @@ namespace InvisibleHand.Items
             {Trait.timer, ByTileID.Timer},
             {Trait.pressure_plate, ByTileID.PressurePlate},
 
-
-
             {Trait.cooking_pot, ByTileID.CookingPot},
             {Trait.anvil, ByTileID.Anvil}, // just the low-level ones (iron & lead)
-
 
             {Trait.wall_deco, Groupings.WallDeco},
             {Trait.trophy, (i) => Types.WallDeco(i) == WallDecoType.Trophy},
@@ -616,7 +659,7 @@ namespace InvisibleHand.Items
 
             {Trait.ore, Groupings.Ore},
             {Trait.bar, ByTileID.MetalBar},
-
+            {Trait.soul, Groupings.Soul},
 
             {Trait.gem, ByTileID.Gem},
             {Trait.musicbox, ByTileID.MusicBox},
@@ -629,8 +672,11 @@ namespace InvisibleHand.Items
 
             // {Trait.gel, (i) => i.ammo == 23},
             {Trait.ammo_sand, (i) => i.ammo == 42},
-            {Trait.ammo_coin, (i) => i.ammo == 71},
+            {Trait.coin, (i) => i.ammo == 71},
             {Trait.ammo_solution, (i) => i.ammo == 780},
+
+            {Trait.endless, (i) => i.ammo > 0 && !i.consumable},
+            {Trait.explosive, Binary.Explosive}
         };
     }
 }

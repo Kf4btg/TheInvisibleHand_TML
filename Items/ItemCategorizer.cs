@@ -33,7 +33,13 @@ namespace InvisibleHand.Items
                 .Tag(Trait.material)
                 .Tag(Trait.bait)
                 .Tag(Trait.mech)
-                .Tag(Trait.defense);
+                .Tag(Trait.explosive)
+                .Tag(Trait.defense)
+                .Tag(Trait.heal_life)
+                .Tag(Trait.heal_mana)
+                .Tag(Trait.regen_life)
+                .Tag(Trait.boost_mana)
+                .Tag(Trait.use_mana);
 
             if (!item.TryTag(Trait.reach_boost))
                 item.Tag(Trait.reach_penalty);
@@ -50,15 +56,7 @@ namespace InvisibleHand.Items
                     Trait.thrown
                     ).Success)
                 {
-                    switch(item.LastTag)
-                    {
-                        case Trait.melee:
-                        case Trait.ranged:
-                        case Trait.magic:
-                        case Trait.summon:
-                        case Trait.thrown:
-                            break;
-                    }
+                    classifyWeapon(item, item.LastTag);
                 }
                 else
                     item.AddTag(Trait.weapon_other);
@@ -168,14 +166,29 @@ namespace InvisibleHand.Items
                         );
                     }
                 }
+                else if (item.TryTag(Trait.wall_deco))
+                {
+                    switch (Rules.Types.WallDeco(_item))
+                    {
+                        case WallDecoType.Painting:
+                            item.AddTag(Trait.painting);
+                            break;
+                        case WallDecoType.Trophy:
+                            item.AddTag(Trait.trophy);
+                            break;
+                        case WallDecoType.Rack:
+                            item.AddTag(Trait.rack);
+                            break;
+                    }
+                }
                 else
                 {
-                    item.TagFirst(  Trait.container, Trait.statue, Trait.sink,
+                    item.TagFirst(  Trait.wall, Trait.container, Trait.statue, Trait.sink,
                                     Trait.clock, Trait.statue_alphabet, Trait.tombstone,
                                     Trait.crate, Trait.planter, Trait.cannon,
                                     Trait.campfire, Trait.fountain, Trait.bottle,
                                     Trait.bowl, Trait.beachstuff, Trait.cooking_pot,
-                                    Trait.anvil, Trait.track, Trait.trap, Trait.timer,
+                                    Trait.anvil, Trait.track, Trait.coin, Trait.trap, Trait.timer,
                                     Trait.pressure_plate, Trait.firework, Trait.plant_dye,
                                     Trait.plant_seed, Trait.ore, Trait.bar, Trait.gem,
                                     Trait.monolith);
@@ -193,10 +206,54 @@ namespace InvisibleHand.Items
             {
                 item.Tag(Trait.buff)
                     .TagFirst(Trait.food, Trait.potion);
-                                    // or possibly flask...
+                // or possibly flask...
+            }
+            else if (item.TryTag(Trait.dye))
+            {
+                item.TagFirst(Trait.dye_basic, Trait.dye_basic, Trait.dye_flame, Trait.dye_gradient,
+                                Trait.dye_strange, Trait.dye_bright, Trait.dye_silver, Trait.dye_lunar);
+            }
+            else
+            {
+                item.TagFirst(Trait.soul, Trait.paint, Trait.hair_dye, Trait.banner);
             }
 
         }
 
+        private static void classifyWeapon(ItemWithInfo item, Trait weaponType)
+        {
+            var _item = item.item;
+            switch (weaponType)
+            {
+                case Trait.melee:
+                    // item.Tag(has_projectile);
+                    if (item.TryTag(Trait.melee_style_directional))
+                        item.TagFirst(Trait.spear, Trait.flail, Trait.yoyo);
+                    else if (item.TryTag(Trait.melee_style_swing))
+                        item.Tag(Trait.broadsword);
+                    else if (item.TryTag(Trait.melee_style_thrown))
+                        item.Tag(Trait.boomerang);
+                    else
+                        item.TagIf(item.TryTag(Trait.melee_style_jab), Trait.shortsword);
+                    break;
+                case Trait.ranged:
+                    if (item.TryTag(Trait.arrow_consuming))
+                        item.Tag(Trait.repeater);
+                    else if (item.TryTag(Trait.bullet_consuming))
+                        item.Tag(Trait.automatic_gun);
+                    else
+                        item.TagFirst(Trait.rocket_consuming, Trait.dart_consuming, Trait.gel_consuming, Trait.no_ammo);
+                    break;
+                case Trait.magic:
+                    item.TagFirst(Trait.area, Trait.homing, Trait.controlled, Trait.bouncing, Trait.stream);
+                    break;
+                case Trait.summon:
+                    item.TagIf(!item.TryTag(Trait.minion), Trait.sentry);
+                    break;
+                case Trait.thrown:
+                default:
+                    break;
+            }
+        }
     }
 }

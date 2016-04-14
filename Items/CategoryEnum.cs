@@ -321,12 +321,17 @@ namespace InvisibleHand.Items
         material,
         mech,
         bait,
+        explosive,
 
         auto,
         channeled,
 
         weapon,
             melee,
+                melee_style_swing,
+                melee_style_jab,
+                melee_style_directional,
+                melee_style_thrown,
                 shortsword,
                 broadsword,
                 boomerang,
@@ -338,19 +343,23 @@ namespace InvisibleHand.Items
                 bullet_consuming,
                 arrow_consuming,
                 rocket_consuming,
+                dart_consuming,
+                gel_consuming,
                 no_ammo,
 
                 gun,
+                automatic_gun,
                 bow,
                 repeater,
                 launcher,
 
             magic,
-                direct,
+                //~ direct,
                 area,
                 homing,
                 bouncing,
                 controlled,
+                stream,
             summon,
                 minion,
                 sentry,
@@ -362,7 +371,9 @@ namespace InvisibleHand.Items
         reach_penalty,
 
         heal_life,
+        regen_life,
         heal_mana,
+        boost_mana,
 
         use_mana,
 
@@ -498,9 +509,15 @@ namespace InvisibleHand.Items
 
         coin,
         bomb,
+        
         dye,
         dye_basic,
-        dye_combined,
+        dye_black,
+        dye_bright,
+        dye_silver,
+        dye_flame,
+        dye_gradient,
+        //~ dye_combined,
         dye_strange,
         dye_lunar,
 
@@ -516,6 +533,7 @@ namespace InvisibleHand.Items
         tile,
         wall,
         special,    // boss summoning items, heart containers, mana crystals
+        soul,
         other
     }
 
