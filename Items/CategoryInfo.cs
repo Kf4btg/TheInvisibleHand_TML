@@ -1,5 +1,6 @@
 // using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Collections;
 using System;
 // using System.Dynamic;
 using Terraria;
@@ -17,10 +18,6 @@ namespace InvisibleHand.Items
         // public List<string> categories = new List<string>();
         private ISet<Trait> traits;
 
-        /// until we nail down exactly what traits we want to use, we'll
-        /// just reference them by name. Later on we'll define enums
-        private ISet<string> S_traits;
-
         public ISet<Trait> Traits
         {
             get
@@ -32,6 +29,8 @@ namespace InvisibleHand.Items
                 if (traits==null) traits = value;
             }
         }
+
+        public BitArray TraitArray = new BitArray((int)Trait.COUNT, false);
 
 
         public void AddTrait(Trait t)

@@ -509,7 +509,7 @@ namespace InvisibleHand.Items
 
         coin,
         bomb,
-        
+
         dye,
         dye_basic,
         dye_black,
@@ -534,7 +534,8 @@ namespace InvisibleHand.Items
         wall,
         special,    // boss summoning items, heart containers, mana crystals
         soul,
-        other
+        other,
+        COUNT
     }
 
 
