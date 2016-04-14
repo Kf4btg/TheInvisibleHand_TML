@@ -170,67 +170,7 @@ namespace InvisibleHand.Items
     }
 
 
-    public enum Trait
-    {
-        placeable,
-        auto,
-        weapon,
-        tool,
-        //weapons
-            //melee
-                //tools,
-                pick,
-                axe,
-                hammer,
-            melee,
-            boomerang,
-            // thrown
-            thrown,
 
-            // ranged
-        ranged,
-
-        // magic
-        magic,
-
-            //summon
-            summon,
-
-        coin,
-        mech,
-        bomb,
-        ammo,
-        pet,
-        head,
-        body,
-        legs,
-        accessory,
-        vanity,
-        potion,
-        consumable,
-        bait,
-        dye,
-        paint,
-        ore,
-        bar,
-        gem,
-        seed,
-        light,
-        craft,
-        furniture,
-        statue,
-        walldeco,
-        banner,
-        clutter,
-        wood,
-        block,
-        brick,
-        tile,
-        wall,
-        misc_mat,
-        special,    // boss summoning items, heart containers, mana crystals
-        other
-    }
 
 
 
@@ -365,5 +305,216 @@ namespace InvisibleHand.Items
         // i THINK channel is used for things that either a) seem like they would take mana but don't, or b) maintain an 'active' state without requiring any resources or effort from the player (e.g. the drill/chainsaw VRRRRR noise, or the endlessly-flying yoyos)
         channel
     }
+
+
+    /// There's too many possible traits (& trait combinations) to use
+    /// a [Flags] enum for them (at least, not without making some compromises
+    /// and sacrificing expandability), but we CAN use a BitArray to represent
+    /// an item's flagged traits in much the same manner. To make things clearer
+    /// when referencing a position within the bitarray, it will still behoove
+    /// us to define a typical consecutive enum for indexing rather than using
+    /// bare ints.
+    public enum Trait
+    {
+        questItem,
+        expert,
+        material,
+        mech,
+        bait,
+
+        auto,
+        channeled,
+
+        weapon,
+            melee,
+                shortsword,
+                broadsword,
+                boomerang,
+                spear,
+                flail,
+                yoyo,
+                has_projectile,
+            ranged,
+                bullet_consuming,
+                arrow_consuming,
+                rocket_consuming,
+                no_ammo,
+
+                gun,
+                bow,
+                repeater,
+                launcher,
+
+            magic,
+                direct,
+                area,
+                homing,
+                bouncing,
+                controlled,
+            summon,
+                minion,
+                sentry,
+            thrown,
+
+        defense,
+        reachBoost,
+        reachPenalty,
+
+        healsLife,
+        healsMana,
+
+        costsMana,
+
+        tool,
+        pick,
+        axe,
+        hammer,
+
+        wand,
+        fishingPole,
+        wrench,
+
+        accessory,
+        vanity,
+
+         // armor slots
+        headSlot,
+        bodySlot,
+        legSlot,
+
+         // accy by slot
+        slot_face,
+        slot_neck,
+        slot_back,
+        wings,
+        slot_handon,
+        slot_handoff,
+        slot_shield,
+        slot_waist,
+        balloon,
+        slot_front,
+
+        placeable,
+        equipable,
+        armor,
+
+        consumable,
+        buff,
+        food,
+        potion,
+
+        pet_light,
+        pet_vanity,
+        grapple,
+            grapple_single,
+            grapple_multi,
+        mount,
+        mount_cart,
+
+        crafting_station,
+
+        housing_furniture,
+            housing_door,
+                door,
+
+            housing_light,
+                torch,
+                candle,
+                chandelier,
+                hangingLantern,
+                lamp,
+                holidayLight,
+                candelabra,
+
+            housing_chair,
+                chair,
+                bed,
+                bench,
+
+            housing_table,
+                table,
+                workbench,
+                dresser,
+                piano,
+                bookcase,
+                bathtub,
+
+         // other furniture
+        container,
+        sink,
+        clock,
+        statue,
+        statue_alphabet,
+        planter,
+        crate,
+        monolith,
+
+        cannon,
+        campfire,
+        fountain,
+        tombstone,
+
+         // house clutter
+        bottle,
+        bowl,
+        beachstuff,
+
+         // mech
+        track,
+        trap,
+        timer,
+        pressure_plate,
+
+        cookingPot,
+        anvil,
+
+        wall_deco,
+        trophy,
+        painting,
+        rack,
+
+        firework,
+        plant_dye,
+        plant_seed,
+        plant_herb,
+
+        ore,
+        bar,
+        gem,
+        musicbox,
+
+        ammo,
+        arrow,
+        bullet,
+        rocket,
+        dart,
+        // gel,
+        ammo_sand,
+        ammo_coin,
+        ammo_solution,
+
+        coin,
+        bomb,
+        dye,
+        dye_basic,
+        dye_combined,
+        dye_strange,
+        dye_lunar,
+
+        hair_dye,
+        paint,
+        craft,
+        // furniture,
+        banner,
+        clutter,
+        wood,
+        block,
+        brick,
+        tile,
+        wall,
+        special,    // boss summoning items, heart containers, mana crystals
+        other
+    }
+
 
 }

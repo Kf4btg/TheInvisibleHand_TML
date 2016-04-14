@@ -223,6 +223,11 @@ namespace InvisibleHand.Items
 
             public static bool CanPlaceOnWall(Item item) => TileID.Sets.FramesOnKillWall[item.createTile];
 
+            public static bool StrangePlant(Item item) => ItemID.Sets.ExoticPlantsForDyeTrade[item.type];
+
+            /// Yoraizor's stuff is also in this item set, but will likely get caught by an 'isAccessory'
+            /// check or something before it gets here.
+            public static bool Soul(Item item) => ItemID.Sets.AnimatesAsSoul[item.type];
             /// Seems the Trophies fall in these categories, too. All the vanilla ones, at
             /// least, also end in "Trophy", so that could be a way to distinguish them;
             /// AND the decorative racks (blacksmith, helmet, spear, etc.), are here too;
@@ -235,6 +240,10 @@ namespace InvisibleHand.Items
             // public static bool Painting6X4(Item item) => item.createTile == TileID.Painting6X4;
             // public static bool Painting2X3(Item item) => item.createTile == TileID.Painting2X3;
             // public static bool Painting3X2(Item item) => item.createTile == TileID.Painting3X2;
+
+            public static bool NebulaPickup(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
+
+            public static bool GoesInExtractinator(Item item) => ItemID.Sets.NebulaPickup[item.type];
 
         }
 
