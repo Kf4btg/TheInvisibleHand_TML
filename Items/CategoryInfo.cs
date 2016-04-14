@@ -15,54 +15,54 @@ namespace InvisibleHand.Items
         //
         // TODO: create enums or use ints for the categories
         // public List<string> categories = new List<string>();
-        public ISet<Trait> traits = new HashSet<Trait>();
+        private ISet<Trait> traits;
 
         /// until we nail down exactly what traits we want to use, we'll
         /// just reference them by name. Later on we'll define enums
         private ISet<string> S_traits;
 
-        public ISet<string> Traits
+        public ISet<Trait> Traits
         {
             get
             {
-                return S_traits ?? new HashSet<String>();
+                return traits ?? new HashSet<Trait>();
             }
             set
             {
-                if (S_traits==null) S_traits = value;
+                if (traits==null) traits = value;
             }
         }
 
 
         public void AddTrait(Trait t)
         {
-            traits.Add(t);
+            Traits.Add(t);
         }
         public void AddTraits(params Trait[] ts)
         {
-            traits.UnionWith(ts);
+            Traits.UnionWith(ts);
         }
 
-        public bool AddTrait(string trait_name)
-        {
-            return Traits.Add(trait_name);
-            // Trait t;
-            // if (Enum.TryParse(trait_name, out t))
-            // traits.Add(t);
-        }
-
-        public void AddTraits(string[] trait_names)
-        {
-
-            Traits.UnionWith(trait_names);
-
-            // foreach (var tn in trait_names)
-            // {
-            //     Trait t;
-            //     if (Enum.TryParse(tn, out t))
-            //         traits.Add(t);
-            // }
-        }
+        // public bool AddTrait(string trait_name)
+        // {
+        //     return Traits.Add(trait_name);
+        //     // Trait t;
+        //     // if (Enum.TryParse(trait_name, out t))
+        //     // traits.Add(t);
+        // }
+        //
+        // public void AddTraits(string[] trait_names)
+        // {
+        //
+        //     Traits.UnionWith(trait_names);
+        //
+        //     // foreach (var tn in trait_names)
+        //     // {
+        //     //     Trait t;
+        //     //     if (Enum.TryParse(tn, out t))
+        //     //         traits.Add(t);
+        //     // }
+        // }
 
     }
 
@@ -78,15 +78,18 @@ namespace InvisibleHand.Items
         /// (i.e. the trait's condition was satisfied)
         public bool Success { get; private set; }
 
-        public ISet<string> TraitList { get; private set; }
+        /// holds the trait that was most recently tagged
+        public Trait LastTag { get; private set; }
 
-        private IDictionary<string, Func<Item, bool>> conditionTable;
+        public ISet<Trait> TraitList { get; private set; }
+
+        private IDictionary<Trait, Func<Item, bool>> conditionTable;
 
         public ItemWithInfo(Item item)
         {
             this.item = item;
-            this.conditionTable = Rules.ConditionTable;
-            this.TraitList = new HashSet<string>();
+            this.conditionTable = Rules.TConditionTable;
+            this.TraitList = new HashSet<Trait>();
         }
 
         // public bool TryAddTrait(Func<Item, bool> check, string trait)
@@ -116,7 +119,7 @@ namespace InvisibleHand.Items
 
         /// tag this instance with the given trait;
         /// return the modified instance
-        public ItemWithInfo AddTag(string trait)
+        public ItemWithInfo AddTag(Trait trait)
         {
             TraitList.Add(trait);
 
@@ -129,7 +132,7 @@ namespace InvisibleHand.Items
         /// tag this instance with the given trait iff the condition
         /// for the trait (as found in the Condition Table) is true;
         ///return the instance, whether modified or not.
-        public ItemWithInfo Tag(string trait)
+        public ItemWithInfo Tag(Trait trait)
         {
             Success = false; // reset
             return conditionTable[trait](item) ? this.AddTag(trait) : this;
@@ -138,7 +141,7 @@ namespace InvisibleHand.Items
         /// tag this instance with the given trait
         /// IFF condition is true; return the instance,
         /// modified or not.
-        public ItemWithInfo TagIf(bool condition, string trait)
+        public ItemWithInfo TagIf(bool condition, Trait trait)
         {
             Success = false;
             return condition ? this.AddTag(trait) : this;
@@ -146,7 +149,7 @@ namespace InvisibleHand.Items
 
         /// goes through the list of traits in the params list, attempting to tag each one; when a tag is successful,
         /// return without checking the remaining. Should be used for mutually-exclusive traits.
-        public ItemWithInfo TagFirst(params string[] traits)
+        public ItemWithInfo TagFirst(params Trait[] traits)
         {
             foreach (var trait in traits)
             {
@@ -159,7 +162,7 @@ namespace InvisibleHand.Items
         /// attempts to tag each of the traits given in the params list
         /// without regard to the success of each tag operation.
         /// Can be used to try tagging related but not mutually-exclusive traits.
-        public ItemWithInfo TagAny(params string[] traits)
+        public ItemWithInfo TagAny(params Trait[] traits)
         {
             bool res = false;
             foreach (var trait in traits)
@@ -173,7 +176,7 @@ namespace InvisibleHand.Items
 
         #region bool returns
 
-        public bool TryTag(string trait)
+        public bool TryTag(Trait trait)
         {
             return this.Tag(trait).Success;
         }

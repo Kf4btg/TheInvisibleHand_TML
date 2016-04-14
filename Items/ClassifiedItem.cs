@@ -10,7 +10,7 @@ namespace InvisibleHand.Items
 {
     public class ClassifiedItem : GlobalItem
     {
-        private static IDictionary<int, ISet<string>> item_cache = new Dictionary<int, ISet<string>>();
+        private static IDictionary<int, ISet<Trait>> item_cache = new Dictionary<int, ISet<Trait>>();
 
         public CategoryInfo getCategoryInfo(Item item) => (CategoryInfo)item.GetModInfo(mod, "CategoryInfo");
 

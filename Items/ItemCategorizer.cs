@@ -13,7 +13,7 @@ namespace InvisibleHand.Items
     {
         // private static IDictionary<int, HashSet<string>> item_cache = new Dictionary<int, HashSet<string>>();
 
-        public static ISet<string> Classify(Item item)
+        public static ISet<Trait> Classify(Item item)
         {
             var iwi = new ItemWithInfo(item);
             classify(iwi);
@@ -28,54 +28,67 @@ namespace InvisibleHand.Items
             weapon = tool = placeable = false;
 
             // some generic traits to begin with
-            item.Tag("questItem")
-                .Tag("expert")
-                .Tag("material")
-                .Tag("bait")
-                .Tag("mech")
-                .Tag("defense");
+            item.Tag(Trait.quest_item)
+                .Tag(Trait.expert)
+                .Tag(Trait.material)
+                .Tag(Trait.bait)
+                .Tag(Trait.mech)
+                .Tag(Trait.defense);
 
-            if (!item.TryTag("reachBoost"))
-                item.Tag("reachPenalty");
+            if (!item.TryTag(Trait.reach_boost))
+                item.Tag(Trait.reach_penalty);
 
-            weapon = item.TryTag("weapon");
+            weapon = item.TryTag(Trait.weapon);
             if (weapon)
             {
-                if (!item.TagFirst(
-                    "melee",
-                    "ranged",
-                    "magic",
-                    "summon",
-                    "thrown"
+                item.Tag(Trait.has_projectile);
+                if (item.TagFirst(
+                    Trait.melee,
+                    Trait.ranged,
+                    Trait.magic,
+                    Trait.summon,
+                    Trait.thrown
                     ).Success)
-                    item.AddTag("otherWeapon");
+                {
+                    switch(item.LastTag)
+                    {
+                        case Trait.melee:
+                        case Trait.ranged:
+                        case Trait.magic:
+                        case Trait.summon:
+                        case Trait.thrown:
+                            break;
+                    }
+                }
+                else
+                    item.AddTag(Trait.weapon_other);
             }
 
             // equipables
-            if (item.TryTag("equipable"))
+            if (item.TryTag(Trait.equipable))
             {
 
-                bool vanity = item.TryTag("vanity");
+                bool vanity = item.TryTag(Trait.vanity);
 
-                if (item.TagFirst("headSlot", "bodySlot", "legSlot").Success)
+                if (item.TagFirst(Trait.slot_head, Trait.slot_body, Trait.slot_leg).Success)
                 {
-                    item.TagIf(!vanity, "armor");
+                    item.TagIf(!vanity, Trait.armor);
                 }
-                else if (item.TryTag("accessory"))
+                else if (item.TryTag(Trait.accessory))
                 {
-                    item.Tag("musicbox")
+                    item.Tag(Trait.musicbox)
                         .TagFirst(
-                            "faceSlot",
-                            "neckSlot",
-                            "backSlot",
-                            "wings",
-                            "shoeSlot",
-                            "handOnSlot",
-                            "handOffSlot",
-                            "shieldSlot",
-                            "waistSlot",
-                            "balloon",
-                            "frontSlot"
+                            Trait.slot_face,
+                            Trait.slot_neck,
+                            Trait.slot_back,
+                            Trait.wings,
+                            Trait.slot_shoe,
+                            Trait.slot_handon,
+                            Trait.slot_handoff,
+                            Trait.slot_shield,
+                            Trait.slot_waist,
+                            Trait.balloon,
+                            Trait.slot_front
                         );
 
                     if (!item.Success)
@@ -84,61 +97,61 @@ namespace InvisibleHand.Items
                 else
                 {
                     item.TagFirst(
-                        "lightPet",
-                        "vanityPet",
-                        "grapplingHook",
-                        "mount"
+                        Trait.pet_light,
+                        Trait.pet_vanity,
+                        Trait.grapple,
+                        Trait.mount
                     );
                 }
 
             }
             else
-                item.TagIf(item.TagAny("pick", "axe", "hammer").Success
-                        || item.TagFirst("wand", "fishingPole", "wrench").Success,
-                    "tool");
+                item.TagIf(item.TagAny(Trait.pick, Trait.axe, Trait.hammer).Success
+                        || item.TagFirst(Trait.wand, Trait.fishing_pole, Trait.wrench).Success,
+                    Trait.tool);
 
-            placeable = !(weapon || tool) && item.TryTag("placeable");
+            placeable = !(weapon || tool) && item.TryTag(Trait.placeable);
             if (placeable)
             {
-                item.Tag("craftingStation");
+                item.Tag(Trait.crafting_station);
 
-                if (item.TryTag("housingFurniture"))
+                if (item.TryTag(Trait.housing_furniture))
                 {
-                    if (item.TryTag("housingDoor"))
+                    if (item.TryTag(Trait.housing_door))
                     {//break down
-                        item.Tag("door");
+                        item.Tag(Trait.door);
                         // TODO: platforms, tall gate,
                         // TrapdoorClosed
                     }
-                    else if (item.TryTag("housingTable"))
+                    else if (item.TryTag(Trait.housing_table))
                     {
                         item.TagFirst(
-                            "table",
-                            "workbench",
-                            "dresser",
-                            "piano",
-                            "bookcase",
-                            "bathtub"
+                            Trait.table,
+                            Trait.workbench,
+                            Trait.dresser,
+                            Trait.piano,
+                            Trait.bookcase,
+                            Trait.bathtub
                             // TODO: bewitching table, alchemy table, tinkerer's bench
                         );
 
                     }
-                    else if (item.TryTag("housingChair"))
+                    else if (item.TryTag(Trait.housing_chair))
                     {
-                        item.TagFirst( "chair", "bed", "bench"
+                        item.TagFirst( Trait.chair, Trait.bed, Trait.bench
                             // TODO: thrones
                         );
                     }
-                    else if (item.TryTag("lighting"))
+                    else if (item.TryTag(Trait.housing_light))
                     {
                         item.TagFirst(
-                            "torch",
-                            "candle",
-                            "chandelier",
-                            "hangingLantern",
-                            "lamp",
-                            "holidayLight",
-                            "candelabra"
+                            Trait.torch,
+                            Trait.candle,
+                            Trait.chandelier,
+                            Trait.hanging_lantern,
+                            Trait.lamp,
+                            Trait.holiday_light,
+                            Trait.candelabra
                             // TODO: TileID.WaterCandle,
         					// TileID.ChineseLanterns,
                             // TileID.Jackolanterns,
@@ -157,25 +170,29 @@ namespace InvisibleHand.Items
                 }
                 else
                 {
-                    item.TagFirst("container", "statue", "sink", "clock", "alphabetStatue", "tombstone",
-                                    "crate", "planter", "cannon", "campfire", "fountain", "bottle", "bowl",
-                                    "beachstuff", "cookingPot", "anvil", "track", "trap", "timer", "pressurePlate",
-                                    "firework", "dyePlant", "seed", "ore", "bar", "gem",
-                                    "monolith");
+                    item.TagFirst(  Trait.container, Trait.statue, Trait.sink,
+                                    Trait.clock, Trait.statue_alphabet, Trait.tombstone,
+                                    Trait.crate, Trait.planter, Trait.cannon,
+                                    Trait.campfire, Trait.fountain, Trait.bottle,
+                                    Trait.bowl, Trait.beachstuff, Trait.cooking_pot,
+                                    Trait.anvil, Trait.track, Trait.trap, Trait.timer,
+                                    Trait.pressure_plate, Trait.firework, Trait.plant_dye,
+                                    Trait.plant_seed, Trait.ore, Trait.bar, Trait.gem,
+                                    Trait.monolith);
 
-                    // item.Tag("ore")
-                        // .Tag("gem");
+                    // item.Tag(Trait.ore)
+                        // .Tag(Trait.gem);
                 }
             }
-            else if (item.TryTag("ammo"))
+            else if (item.TryTag(Trait.ammo))
             {
-                item.TagFirst("arrow", "bullet", "rocket", "dart", "sandAmmo", "solution")
-                    .TagIf(!_item.consumable, "endless"); // endless quiver, musket pouch, etc
+                item.TagFirst(Trait.arrow, Trait.bullet, Trait.rocket, Trait.dart, Trait.ammo_sand, Trait.ammo_solution)
+                    .TagIf(!_item.consumable, Trait.endless); // endless quiver, musket pouch, etc
             }
-            else if (item.TryTag("consumable"))
+            else if (item.TryTag(Trait.consumable))
             {
-                item.Tag("buff")
-                    .TagFirst("food", "potion");
+                item.Tag(Trait.buff)
+                    .TagFirst(Trait.food, Trait.potion);
                                     // or possibly flask...
             }
 

@@ -308,169 +308,329 @@ namespace InvisibleHand.Items
         // Ideas for dealing with mod items:
         //  1) Use Recipe.ItemMatches() for added materials
 
-        public static readonly IDictionary<string, Func<Item, bool>> ConditionTable = new Dictionary<string, Func<Item, bool>>
+        // public static readonly IDictionary<string, Func<Item, bool>> ConditionTable = new Dictionary<string, Func<Item, bool>>
+        // {
+        //     {"questItem", (i) => i.questItem},
+        //     {"expert", (i) => i.expert},
+        //     {"material", (i) => i.material},
+        //     {"mech", (i) => i.mech},
+        //
+        //     {"bait", (i) => i.bait > 0},
+        //
+        //     {"melee", (i) => i.melee},
+        //     {"ranged", (i) => i.ranged},
+        //     {"magic", (i) => i.magic},
+        //     {"summon", (i) => i.summon},
+        //     {"thrown", (i) => i.thrown},
+        //
+        //     {"defense", (i) => i.defense > 0},
+        //     {"reachBoost", (i) => i.tileBoost > 0},
+        //     {"reachPenalty", (i) => i.tileBoost < 0},
+        //
+        //     {"healsLife", (i) => i.healLife > 0},
+        //     {"healsMana", (i) => i.healMana > 0},
+        //
+        //     {"costsMana", (i) => i.mana > 0},
+        //
+        //     {"pick", (i) => i.pick > 0},
+        //     {"axe", (i) => i.axe > 0},
+        //     {"hammer", (i) => i.hammer > 0},
+        //
+        //     {"wand", (i) => i.tileWand > 0},
+        //     {"fishingPole", (i) => i.fishingPole > 0},
+        //     {"wrench", Binary.isWrench},
+        //
+        //     {"accessory", (i) => i.accessory},
+        //     {"vanity", (i) => i.vanity},
+        //
+        //     // armor slots
+        //     {"headSlot", (i) => i.headSlot > 0},
+        //     {"bodySlot", (i) => i.bodySlot > 0},
+        //     {"legSlot", (i) => i.legSlot > 0},
+        //
+        //
+        //     // accy slots
+        //     {"faceSlot", (i) => i.faceSlot > 0},
+        //     {"neckSlot", (i) => i.neckSlot > 0},
+        //     {"backSlot", (i) => i.backSlot > 0},
+        //     {"wings", (i) => i.wingSlot > 0},
+        //     {"handOnSlot", (i) => i.handOnSlot > 0},
+        //     {"handOffSlot", (i) => i.handOffSlot > 0},
+        //     {"shieldSlot", (i) => i.shieldSlot > 0},
+        //     {"waistSlot", (i) => i.waistSlot > 0},
+        //     {"balloon", (i) => i.balloonSlot > 0},
+        //     {"frontSlot", (i) => i.frontSlot > 0},
+        //
+        //     {"placeable", Binary.CanBePlaced},
+        //     {"equipable", Binary.isEquipable},
+        //     {"weapon", Binary.isWeapon},
+        //     {"armor", Binary.isArmor},
+        //
+        //
+        //     {"consumable", Binary.isConsumable},
+        //     {"buff", Binary.timedBuff}, // only for consumables
+        //     {"food", Binary.isFood},
+        //     {"potion", Binary.isPotion}, // dependent on consumable & !isFood
+        //
+        //
+        //     {"lightPet", Binary.isLightPet},
+        //     {"vanityPet", Binary.isVanityPet},
+        //     {"grapplingHook", Binary.isHook},
+        //     {"mount", Binary.isMount},
+        //
+        //
+        //
+        //     {"craftingStation", (i) => TileSets.CraftingStations.Contains(i.createTile)},
+        //
+        //     {"housingFurniture", Groupings.Furniture},
+        //
+        //     {"housingDoor", Groupings.housingDoor},
+        //     {"Door", ByTileID.Door},
+        //
+        //     {"lighting", Groupings.housingTorch},
+        //     {"torch", ByTileID.Torch},
+        //     {"candle", ByTileID.Candle},
+        //     {"chandelier", ByTileID.Chandelier},
+        //     {"hangingLantern", ByTileID.HangingLantern},
+        //     {"lamp", ByTileID.Lamp},
+        //     {"holidayLight", ByTileID.HolidayLight},
+        //     {"candelabra", ByTileID.Candelabra},
+        //
+        //     {"housingChair", Groupings.housingChair},
+        //     {"chair", ByTileID.Chair},
+        //     {"bed", ByTileID.Bed},
+        //     {"bench", ByTileID.Bench},
+        //
+        //     {"housingTable", Groupings.housingTable},
+        //     {"table", ByTileID.Table},
+        //     {"workbench", ByTileID.WorkBench},
+        //     {"dresser", ByTileID.Dresser},
+        //     {"piano", ByTileID.Piano},
+        //     {"bookcase", ByTileID.Bookcase},
+        //     {"bathtub", ByTileID.Bathtub},
+        //
+        //     // other furniture-like items
+        //     {"container", ByTileID.Container},
+        //     {"sink", ByTileID.Sink},
+        //     {"clock", ByTileID.GrandfatherClock},
+        //     {"statue", ByTileID.Statue},
+        //     {"alphabetStatue", ByTileID.AlphabetStatue},
+        //     {"planter", ByTileID.PlanterBox},
+        //     {"crate", ByTileID.FishingCrate},
+        //     {"monolith", ByTileID.LunarMonolith},
+        //
+        //     {"cannon", ByTileID.Cannon},
+        //     {"campfire", ByTileID.Campfire},
+        //     {"fountain", ByTileID.WaterFountain},
+        //     {"tombstone", ByTileID.Tombstone},
+        //
+        //     // house clutter
+        //     {"bottle", ByTileID.Bottle},
+        //     {"bowl", ByTileID.Bowl},
+        //     {"beachstuff", ByTileID.BeachPile},
+        //
+        //     // mech
+        //     {"track", ByTileID.MinecartTrack},
+        //     {"trap", ByTileID.Trap},
+        //     {"timer", ByTileID.Timer},
+        //     {"pressurePlate", ByTileID.PressurePlate},
+        //
+        //
+        //
+        //     {"cookingPot", ByTileID.CookingPot},
+        //     {"anvil", ByTileID.Anvil}, // just the low-level ones (iron & lead)
+        //
+        //
+        //     {"wallDeco", Groupings.WallDeco},
+        //     {"trophy", (i) => Types.WallDeco(i) == WallDecoType.Trophy},
+        //     {"painting", (i) => Types.WallDeco(i) == WallDecoType.Painting},
+        //     {"rack", (i) => Types.WallDeco(i) == WallDecoType.Rack},
+        //
+        //
+        //     {"firework", ByTileID.Firework},
+        //     {"dyePlant", ByTileID.DyePlant},
+        //     {"seed", ByTileID.ImmatureHerb},
+        //
+        //     {"ore", Groupings.Ore},
+        //     {"bar", ByTileID.MetalBar},
+        //
+        //
+        //     {"gem", ByTileID.Gem},
+        //     {"musicbox", ByTileID.MusicBox},
+        //
+        //     {"ammo", Binary.isAmmo},
+        //     {"arrow", (i) => i.ammo == 1},
+        //     {"bullet", (i) => i.ammo == 14},
+        //     {"rocket", (i) => i.ammo == 771},
+        //     {"dart", (i) => i.ammo == 51},
+        //
+        //     // {"gel", (i) => i.ammo == 23},
+        //     {"sandAmmo", (i) => i.ammo == 42},
+        //     {"coinAmmo", (i) => i.ammo == 71},
+        //     {"solution", (i) => i.ammo == 780},
+        // };
+
+        public static readonly IDictionary<Trait, Func<Item, bool>> TConditionTable = new Dictionary<Trait, Func<Item, bool>>
         {
-            {"questItem", (i) => i.questItem},
-            {"expert", (i) => i.expert},
-            {"material", (i) => i.material},
-            {"mech", (i) => i.mech},
+            {Trait.quest_item, (i) => i.questItem},
+            {Trait.expert, (i) => i.expert},
+            {Trait.material, (i) => i.material},
+            {Trait.mech, (i) => i.mech},
 
-            {"bait", (i) => i.bait > 0},
+            {Trait.bait, (i) => i.bait > 0},
 
-            {"melee", (i) => i.melee},
-            {"ranged", (i) => i.ranged},
-            {"magic", (i) => i.magic},
-            {"summon", (i) => i.summon},
-            {"thrown", (i) => i.thrown},
+            {Trait.melee, (i) => i.melee},
+            {Trait.ranged, (i) => i.ranged},
+            {Trait.magic, (i) => i.magic},
+            {Trait.summon, (i) => i.summon},
+            {Trait.thrown, (i) => i.thrown},
 
-            {"defense", (i) => i.defense > 0},
-            {"reachBoost", (i) => i.tileBoost > 0},
-            {"reachPenalty", (i) => i.tileBoost < 0},
+            {Trait.has_projectile, (i) => i.shoot > 0},
 
-            {"healsLife", (i) => i.healLife > 0},
-            {"healsMana", (i) => i.healMana > 0},
 
-            {"costsMana", (i) => i.mana > 0},
+            {Trait.defense, (i) => i.defense > 0},
+            {Trait.reach_boost, (i) => i.tileBoost > 0},
+            {Trait.reach_penalty, (i) => i.tileBoost < 0},
 
-            {"pick", (i) => i.pick > 0},
-            {"axe", (i) => i.axe > 0},
-            {"hammer", (i) => i.hammer > 0},
+            {Trait.heal_life, (i) => i.healLife > 0},
+            {Trait.heal_mana, (i) => i.healMana > 0},
 
-            {"wand", (i) => i.tileWand > 0},
-            {"fishingPole", (i) => i.fishingPole > 0},
-            {"wrench", Binary.isWrench},
+            {Trait.use_mana, (i) => i.mana > 0},
 
-            {"accessory", (i) => i.accessory},
-            {"vanity", (i) => i.vanity},
+            {Trait.pick, (i) => i.pick > 0},
+            {Trait.axe, (i) => i.axe > 0},
+            {Trait.hammer, (i) => i.hammer > 0},
+
+            {Trait.wand, (i) => i.tileWand > 0},
+            {Trait.fishing_pole, (i) => i.fishingPole > 0},
+            {Trait.wrench, Binary.isWrench},
+
+            {Trait.accessory, (i) => i.accessory},
+            {Trait.vanity, (i) => i.vanity},
 
             // armor slots
-            {"headSlot", (i) => i.headSlot > 0},
-            {"bodySlot", (i) => i.bodySlot > 0},
-            {"legSlot", (i) => i.legSlot > 0},
+            {Trait.slot_head, (i) => i.headSlot > 0},
+            {Trait.slot_body, (i) => i.bodySlot > 0},
+            {Trait.slot_leg, (i) => i.legSlot > 0},
 
 
             // accy slots
-            {"faceSlot", (i) => i.faceSlot > 0},
-            {"neckSlot", (i) => i.neckSlot > 0},
-            {"backSlot", (i) => i.backSlot > 0},
-            {"wings", (i) => i.wingSlot > 0},
-            {"handOnSlot", (i) => i.handOnSlot > 0},
-            {"handOffSlot", (i) => i.handOffSlot > 0},
-            {"shieldSlot", (i) => i.shieldSlot > 0},
-            {"waistSlot", (i) => i.waistSlot > 0},
-            {"balloon", (i) => i.balloonSlot > 0},
-            {"frontSlot", (i) => i.frontSlot > 0},
+            {Trait.slot_face, (i) => i.faceSlot > 0},
+            {Trait.slot_neck, (i) => i.neckSlot > 0},
+            {Trait.slot_back, (i) => i.backSlot > 0},
+            {Trait.wings, (i) => i.wingSlot > 0},
+            {Trait.slot_handon, (i) => i.handOnSlot > 0},
+            {Trait.slot_handoff, (i) => i.handOffSlot > 0},
+            {Trait.slot_shield, (i) => i.shieldSlot > 0},
+            {Trait.slot_waist, (i) => i.waistSlot > 0},
+            {Trait.balloon, (i) => i.balloonSlot > 0},
+            {Trait.slot_front, (i) => i.frontSlot > 0},
 
-            {"placeable", Binary.CanBePlaced},
-            {"equipable", Binary.isEquipable},
-            {"weapon", Binary.isWeapon},
-            {"armor", Binary.isArmor},
-
-
-            {"consumable", Binary.isConsumable},
-            {"buff", Binary.timedBuff}, // only for consumables
-            {"food", Binary.isFood},
-            {"potion", Binary.isPotion}, // dependent on consumable & !isFood
+            {Trait.placeable, Binary.CanBePlaced},
+            {Trait.equipable, Binary.isEquipable},
+            {Trait.weapon, Binary.isWeapon},
+            {Trait.armor, Binary.isArmor},
 
 
-            {"lightPet", Binary.isLightPet},
-            {"vanityPet", Binary.isVanityPet},
-            {"grapplingHook", Binary.isHook},
-            {"mount", Binary.isMount},
+            {Trait.consumable, Binary.isConsumable},
+            {Trait.buff, Binary.timedBuff}, // only for consumables
+            {Trait.food, Binary.isFood},
+            {Trait.potion, Binary.isPotion}, // dependent on consumable & !isFood
 
 
+            {Trait.pet_light, Binary.isLightPet},
+            {Trait.pet_vanity, Binary.isVanityPet},
+            {Trait.grapple, Binary.isHook},
+            {Trait.mount, Binary.isMount},
 
-            {"craftingStation", (i) => TileSets.CraftingStations.Contains(i.createTile)},
+            {Trait.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
 
-            {"housingFurniture", Groupings.Furniture},
+            {Trait.housing_furniture, Groupings.Furniture},
 
-            {"housingDoor", Groupings.housingDoor},
-            {"Door", ByTileID.Door},
+            {Trait.housing_door, Groupings.housingDoor},
+            {Trait.door, ByTileID.Door},
 
-            {"lighting", Groupings.housingTorch},
-            {"torch", ByTileID.Torch},
-            {"candle", ByTileID.Candle},
-            {"chandelier", ByTileID.Chandelier},
-            {"hangingLantern", ByTileID.HangingLantern},
-            {"lamp", ByTileID.Lamp},
-            {"holidayLight", ByTileID.HolidayLight},
-            {"candelabra", ByTileID.Candelabra},
+            {Trait.housing_light, Groupings.housingTorch},
+            {Trait.torch, ByTileID.Torch},
+            {Trait.candle, ByTileID.Candle},
+            {Trait.chandelier, ByTileID.Chandelier},
+            {Trait.hanging_lantern, ByTileID.HangingLantern},
+            {Trait.lamp, ByTileID.Lamp},
+            {Trait.holiday_light, ByTileID.HolidayLight},
+            {Trait.candelabra, ByTileID.Candelabra},
 
-            {"housingChair", Groupings.housingChair},
-            {"chair", ByTileID.Chair},
-            {"bed", ByTileID.Bed},
-            {"bench", ByTileID.Bench},
+            {Trait.housing_chair, Groupings.housingChair},
+            {Trait.chair, ByTileID.Chair},
+            {Trait.bed, ByTileID.Bed},
+            {Trait.bench, ByTileID.Bench},
 
-            {"housingTable", Groupings.housingTable},
-            {"table", ByTileID.Table},
-            {"workbench", ByTileID.WorkBench},
-            {"dresser", ByTileID.Dresser},
-            {"piano", ByTileID.Piano},
-            {"bookcase", ByTileID.Bookcase},
-            {"bathtub", ByTileID.Bathtub},
+            {Trait.housing_table, Groupings.housingTable},
+            {Trait.table, ByTileID.Table},
+            {Trait.workbench, ByTileID.WorkBench},
+            {Trait.dresser, ByTileID.Dresser},
+            {Trait.piano, ByTileID.Piano},
+            {Trait.bookcase, ByTileID.Bookcase},
+            {Trait.bathtub, ByTileID.Bathtub},
 
             // other furniture-like items
-            {"container", ByTileID.Container},
-            {"sink", ByTileID.Sink},
-            {"clock", ByTileID.GrandfatherClock},
-            {"statue", ByTileID.Statue},
-            {"alphabetStatue", ByTileID.AlphabetStatue},
-            {"planter", ByTileID.PlanterBox},
-            {"crate", ByTileID.FishingCrate},
-            {"monolith", ByTileID.LunarMonolith},
+            {Trait.container, ByTileID.Container},
+            {Trait.sink, ByTileID.Sink},
+            {Trait.clock, ByTileID.GrandfatherClock},
+            {Trait.statue, ByTileID.Statue},
+            {Trait.statue_alphabet, ByTileID.AlphabetStatue},
+            {Trait.planter, ByTileID.PlanterBox},
+            {Trait.crate, ByTileID.FishingCrate},
+            {Trait.monolith, ByTileID.LunarMonolith},
 
-            {"cannon", ByTileID.Cannon},
-            {"campfire", ByTileID.Campfire},
-            {"fountain", ByTileID.WaterFountain},
-            {"tombstone", ByTileID.Tombstone},
+            {Trait.cannon, ByTileID.Cannon},
+            {Trait.campfire, ByTileID.Campfire},
+            {Trait.fountain, ByTileID.WaterFountain},
+            {Trait.tombstone, ByTileID.Tombstone},
 
             // house clutter
-            {"bottle", ByTileID.Bottle},
-            {"bowl", ByTileID.Bowl},
-            {"beachstuff", ByTileID.BeachPile},
+            {Trait.bottle, ByTileID.Bottle},
+            {Trait.bowl, ByTileID.Bowl},
+            {Trait.beachstuff, ByTileID.BeachPile},
 
             // mech
-            {"track", ByTileID.MinecartTrack},
-            {"trap", ByTileID.Trap},
-            {"timer", ByTileID.Timer},
-            {"pressurePlate", ByTileID.PressurePlate},
+            {Trait.track, ByTileID.MinecartTrack},
+            {Trait.trap, ByTileID.Trap},
+            {Trait.timer, ByTileID.Timer},
+            {Trait.pressure_plate, ByTileID.PressurePlate},
 
 
 
-            {"cookingPot", ByTileID.CookingPot},
-            {"anvil", ByTileID.Anvil}, // just the low-level ones (iron & lead)
+            {Trait.cooking_pot, ByTileID.CookingPot},
+            {Trait.anvil, ByTileID.Anvil}, // just the low-level ones (iron & lead)
 
 
-            {"wallDeco", Groupings.WallDeco},
-            {"trophy", (i) => Types.WallDeco(i) == WallDecoType.Trophy},
-            {"painting", (i) => Types.WallDeco(i) == WallDecoType.Painting},
-            {"rack", (i) => Types.WallDeco(i) == WallDecoType.Rack},
+            {Trait.wall_deco, Groupings.WallDeco},
+            {Trait.trophy, (i) => Types.WallDeco(i) == WallDecoType.Trophy},
+            {Trait.painting, (i) => Types.WallDeco(i) == WallDecoType.Painting},
+            {Trait.rack, (i) => Types.WallDeco(i) == WallDecoType.Rack},
 
 
-            {"firework", ByTileID.Firework},
-            {"dyePlant", ByTileID.DyePlant},
-            {"seed", ByTileID.ImmatureHerb},
+            {Trait.firework, ByTileID.Firework},
+            {Trait.plant_dye, ByTileID.DyePlant},
+            {Trait.plant_seed, ByTileID.ImmatureHerb},
 
-            {"ore", Groupings.Ore},
-            {"bar", ByTileID.MetalBar},
-
-
-            {"gem", ByTileID.Gem},
-            {"musicbox", ByTileID.MusicBox},
-
-            {"ammo", Binary.isAmmo},
-            {"arrow", (i) => i.ammo == 1},
-            {"bullet", (i) => i.ammo == 14},
-            {"rocket", (i) => i.ammo == 771},
-            {"dart", (i) => i.ammo == 51},
-
-            // {"gel", (i) => i.ammo == 23},
-            {"sandAmmo", (i) => i.ammo == 42},
-            {"coinAmmo", (i) => i.ammo == 71},
-            {"solution", (i) => i.ammo == 780},
+            {Trait.ore, Groupings.Ore},
+            {Trait.bar, ByTileID.MetalBar},
 
 
+            {Trait.gem, ByTileID.Gem},
+            {Trait.musicbox, ByTileID.MusicBox},
 
-    };
+            {Trait.ammo, Binary.isAmmo},
+            {Trait.arrow, (i) => i.ammo == 1},
+            {Trait.bullet, (i) => i.ammo == 14},
+            {Trait.rocket, (i) => i.ammo == 771},
+            {Trait.dart, (i) => i.ammo == 51},
+
+            // {Trait.gel, (i) => i.ammo == 23},
+            {Trait.ammo_sand, (i) => i.ammo == 42},
+            {Trait.ammo_coin, (i) => i.ammo == 71},
+            {Trait.ammo_solution, (i) => i.ammo == 780},
+        };
     }
 }

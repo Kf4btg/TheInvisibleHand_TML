@@ -316,7 +316,7 @@ namespace InvisibleHand.Items
     /// bare ints.
     public enum Trait
     {
-        questItem,
+        quest_item,
         expert,
         material,
         mech,
@@ -355,15 +355,16 @@ namespace InvisibleHand.Items
                 minion,
                 sentry,
             thrown,
+            weapon_other,
 
         defense,
-        reachBoost,
-        reachPenalty,
+        reach_boost,
+        reach_penalty,
 
-        healsLife,
-        healsMana,
+        heal_life,
+        heal_mana,
 
-        costsMana,
+        use_mana,
 
         tool,
         pick,
@@ -371,22 +372,23 @@ namespace InvisibleHand.Items
         hammer,
 
         wand,
-        fishingPole,
+        fishing_pole,
         wrench,
 
         accessory,
         vanity,
 
          // armor slots
-        headSlot,
-        bodySlot,
-        legSlot,
+        slot_head,
+        slot_body,
+        slot_leg,
 
          // accy by slot
         slot_face,
         slot_neck,
         slot_back,
         wings,
+        slot_shoe,
         slot_handon,
         slot_handoff,
         slot_shield,
@@ -421,9 +423,9 @@ namespace InvisibleHand.Items
                 torch,
                 candle,
                 chandelier,
-                hangingLantern,
+                hanging_lantern,
                 lamp,
-                holidayLight,
+                holiday_light,
                 candelabra,
 
             housing_chair,
@@ -465,7 +467,7 @@ namespace InvisibleHand.Items
         timer,
         pressure_plate,
 
-        cookingPot,
+        cooking_pot,
         anvil,
 
         wall_deco,
@@ -492,6 +494,7 @@ namespace InvisibleHand.Items
         ammo_sand,
         ammo_coin,
         ammo_solution,
+        endless,
 
         coin,
         bomb,
