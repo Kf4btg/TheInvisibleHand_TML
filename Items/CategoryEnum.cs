@@ -541,267 +541,254 @@ namespace InvisibleHand.Items
     internal static class ItemFlags
     {
 
+        public static class general
+        {
+            public const int none          = 0;
+            public const int expert        = 1;
+            public const int quest_item    = 1 << 1;
+            public const int material      = 1 << 2;
+            public const int mech          = 1 << 3;
+            public const int bait          = 1 << 4;
+            public const int explosive     = 1 << 5;
+            public const int auto          = 1 << 6;
+            public const int channeled     = 1 << 7;
+            public const int weapon        = 1 << 8;
+            public const int equipable     = 1 << 9;
+            public const int vanity        = 1 << 10;
+            public const int defense       = 1 << 11;
+            public const int reach_boost   = 1 << 12;
+            public const int reach_penalty = 1 << 13;
+            public const int heal_life     = 1 << 14;
+            public const int regen_life    = 1 << 15;
+            public const int heal_mana     = 1 << 16;
+            public const int boost_mana    = 1 << 17;
+            public const int use_mana      = 1 << 18;
+            public const int tool          = 1 << 19;
+            public const int placeable     = 1 << 20;
+            public const int consumable    = 1 << 21;
+            public const int dye           = 1 << 22;
+        }
 
-    [Flags]
-    public enum general
-    {
-        none                    = 0,
-        expert                  = 1,
-        quest_item              = 1 << 1,
-        material                = 1 << 2,
-        mech                    = 1 << 3,
-        bait                    = 1 << 4,
-        explosive               = 1 << 5,
-        auto                    = 1 << 6,
-        channeled               = 1 << 7,
-        weapon                  = 1 << 8,
-        equipable               = 1 << 9,
-        vanity                  = 1 << 10,
-        defense                 = 1 << 11,
-        reach_boost             = 1 << 12,
-        reach_penalty           = 1 << 13,
-        heal_life               = 1 << 14,
-        regen_life              = 1 << 15,
-        heal_mana               = 1 << 16,
-        boost_mana              = 1 << 17,
-        use_mana                = 1 << 18,
-        tool                    = 1 << 19,
-        placeable               = 1 << 20,
-        consumable              = 1 << 21,
-        dye                     = 1 << 22,
-    }
+        public static class placeable
+        {
+            public const int none          = 0;
+            public const int furniture     = 1;
+            public const int seed          = 1 << 1;
+            public const int block         = 1 << 2;
+            public const int brick         = 1 << 3;
+            public const int ore           = 1 << 4;
+            public const int bar           = 1 << 5;
+            public const int wood          = 1 << 6;
+            public const int wall          = 1 << 7;
+            public const int wall_deco     = 1 << 8;
+            public const int dye_plant     = 1 << 9;
+            public const int strange_plant = 1 << 10;
+            public const int gem           = 1 << 11;
+        }
 
-    [Flags]
-    public enum placeable
-    {
-        none      = 0,
-        furniture = 1,
-        seed      = 1 << 1,
-        block     = 1 << 2,
-        brick     = 1 << 3,
-        ore       = 1 << 4,
-        bar       = 1 << 5,
-        wood      = 1 << 6,
-        wall      = 1 << 7,
-        wall_deco = 1 << 8,
-        dye_plant = 1 << 9,
-        strange_plant = 1 << 10,
-        gem = 1 << 11,
-    }
+        public static class ammo
+        {
+            public const int none     = 0;
+            public const int arrow    = 1;
+            public const int bullet   = 1 << 1;
+            public const int rocket   = 1 << 2;
+            public const int dart     = 1 << 3;
+            public const int sand     = 1 << 4;
+            public const int coin     = 1 << 5;
+            public const int solution = 1 << 6;
 
-    [Flags]
-    public enum ammo
-    {
-        none     = 0,
-        arrow    = 1,
-        bullet   = 1 << 1,
-        rocket   = 1 << 2,
-        dart     = 1 << 3,
-        sand     = 1 << 4,
-        coin     = 1 << 5,
-        solution = 1 << 6,
+            public const int endless  = 1 << 7;
 
-        endless  = 1 << 7,
+            public const int bomb     = 1 << 8;
+            // gel,
+        }
 
-        bomb     = 1 << 8,
-        // gel,
-    }
+        public static class dye
+        {
+            public const int none     = 0;
+            public const int basic    = 1;
+            public const int black    = 1 << 1;
+            public const int bright   = 1 << 2;
+            public const int silver   = 1 << 3;
+            public const int flame    = 1 << 4;
+            public const int gradient = 1 << 5;
+            public const int strange  = 1 << 6;
+            public const int lunar    = 1 << 7;
+        }
 
-    [Flags]
-    public enum dye
-    {
-        none         = 0,
-        basic    = 1,
-        black    = 1 << 1,
-        bright   = 1 << 2,
-        silver   = 1 << 3,
-        flame    = 1 << 4,
-        gradient = 1 << 5,
-        strange  = 1 << 6,
-        lunar    = 1 << 7,
-    }
+        public static class equip
+        {
+            public const int none           = 0;
+            public const int armor          = 1;
+            public const int accessory      = 1 << 2;
+            public const int vanity         = 1 << 3;
+            public const int pet            = 1 << 4;
+            public const int mount          = 1 << 5;
+            public const int grapple        = 1 << 6;
 
-    [Flags]
-    public enum equip
-    {
-        none           = 0,
-        armor          = 1,
-        accessory      = 1 << 2,
-        vanity         = 1 << 3,
-        pet            = 1 << 4,
-        mount          = 1 << 5,
-        grapple        = 1 << 6,
+            // armor slots
+            public const int slot_head      = 1 << 7;
+            public const int slot_body      = 1 << 8;
+            public const int slot_leg       = 1 << 9;
 
-        // armor slots
-        slot_head      = 1 << 7,
-        slot_body      = 1 << 8,
-        slot_leg       = 1 << 9,
+            // accy by slot
 
-        // accy by slot
+            public const int slot_face      = 1 << 10;
+            public const int slot_neck      = 1 << 11;
+            public const int slot_back      = 1 << 12;
+            public const int wings          = 1 << 13;
+            public const int slot_shoe      = 1 << 14;
+            public const int slot_handon    = 1 << 15;
+            public const int slot_handoff   = 1 << 16;
+            public const int slot_shield    = 1 << 17;
+            public const int slot_waist     = 1 << 18;
+            public const int balloon        = 1 << 19;
+            public const int slot_front     = 1 << 20;
 
-        slot_face      = 1 << 10,
-        slot_neck      = 1 << 11,
-        slot_back      = 1 << 12,
-        wings          = 1 << 13,
-        slot_shoe      = 1 << 14,
-        slot_handon    = 1 << 15,
-        slot_handoff   = 1 << 16,
-        slot_shield    = 1 << 17,
-        slot_waist     = 1 << 18,
-        balloon        = 1 << 19,
-        slot_front     = 1 << 20,
+            public const int pet_light      = 1 << 21;
+            public const int pet_vanity     = 1 << 22;
+            public const int grapple_single = 1 << 23;
+            public const int grapple_multi  = 1 << 24;
+            public const int mount_cart     = 1 << 1;
+        }
 
-        pet_light      = 1 << 21,
-        pet_vanity     = 1 << 22,
-        grapple_single = 1 << 23,
-        grapple_multi  = 1 << 24,
-        mount_cart     = 1 << 1,
-    }
+        public static class weapon
+        {
+            public const long none           = 0;
+            public const long automatic      = 1;
+            public const long has_projectile = 1 << 12;
 
-    [Flags]
-    public enum weapon : ulong
-    {
-        none = 0,
-        automatic = 1,
+            public const long melee = 1 << 1;
 
-        melee                 = 1 << 1,
-            style_swing       = 1 << 2,
-            style_jab         = 1 << 3,
-            style_directional = 1 << 4,
-            style_thrown      = 1 << 5,
-            broadsword        = 1 << 7,
-            boomerang         = 1 << 8,
-            spear             = 1 << 9,
-            flail             = 1 << 10,
-            yoyo              = 1 << 11,
-            has_projectile    = 1 << 12,
+                public const long style_swing       = 1 << 2;
+                public const long style_jab         = 1 << 3;
+                public const long style_directional = 1 << 4;
+                public const long style_thrown      = 1 << 5;
+                public const long broadsword        = 1 << 7;
+                public const long boomerang         = 1 << 8;
+                public const long spear             = 1 << 9;
+                public const long flail             = 1 << 10;
+                public const long yoyo              = 1 << 11;
 
-            shortsword = melee | style_jab,
+                public const long shortsword = melee | style_jab;
 
-        ranged               = 1 << 13,
-            bullet_consuming = 1 << 14,
-            arrow_consuming  = 1 << 15,
-            rocket_consuming = 1 << 16,
-            dart_consuming   = 1 << 18,
-            gel_consuming    = 1 << 19,
-            no_ammo          = 1 << 20,
+            public const long ranged               = 1 << 13;
+                public const long bullet_consuming = 1 << 14;
+                public const long arrow_consuming  = 1 << 15;
+                public const long rocket_consuming = 1 << 16;
+                public const long dart_consuming   = 1 << 18;
+                public const long gel_consuming    = 1 << 19;
+                public const long no_ammo          = 1 << 20;
 
-            gun           = ranged | bullet_consuming,
-            automatic_gun = gun | automatic,
-            bow           = ranged | arrow_consuming,
-            repeater      = bow | automatic,
-            launcher      = ranged | rocket_consuming,
+                public const long gun           = ranged | bullet_consuming;
+                public const long automatic_gun = gun | automatic;
+                public const long bow           = ranged | arrow_consuming;
+                public const long repeater      = bow | automatic;
+                public const long launcher      = ranged | rocket_consuming;
 
-        magic          = 1 << 26,
-            area       = 1 << 27,
-            homing     = 1 << 28,
-            bouncing   = 1 << 29,
-            controlled = 1 << 30,
-            stream     = 1ul << 31,
-            piercing   = 1 << 23,
+            public const long magic          = 1 << 26;
+                public const long area       = 1 << 27;
+                public const long homing     = 1 << 28;
+                public const long bouncing   = 1 << 29;
+                public const long controlled = 1 << 30;
+                public const long stream     = 1L << 31;
+                public const long piercing   = 1 << 23;
 
-        summon         = 1ul << 32,
-            minion     = 1 << 24,
-            sentry     = 1 << 22,
+            public const long summon         = 1L << 32;
+                public const long minion     = 1 << 24;
+                public const long sentry     = 1 << 22;
 
-        throwing       = 1 << 21,
-        weapon_other   = 1 << 25,
-    }
+            public const long throwing       = 1 << 21;
+            public const long weapon_other   = 1 << 25;
+        }
 
-    [Flags]
-    public enum tool
-    {
-        none         = 0,
-        pick         = 1,
-        axe          = 1 << 1,
-        hammer       = 1 << 2,
-        fishing_pole = 1 << 3,
-        wrench       = 1 << 4,
-        wand         = 1 << 5,
-        recall       = 1 << 6,
-        other        = 1 << 7,
-    }
+        public static class tool
+        {
+            public const int none         = 0;
+            public const int pick         = 1;
+            public const int axe          = 1 << 1;
+            public const int hammer       = 1 << 2;
+            public const int fishing_pole = 1 << 3;
+            public const int wrench       = 1 << 4;
+            public const int wand         = 1 << 5;
+            public const int recall       = 1 << 6;
+            public const int other        = 1 << 7;
+        }
 
-    [Flags]
-    public enum consumable
-    {
-        none   = 0,
-        buff   = 1,
-        food   = 1 << 1,
-        potion = 1 << 2,
-        heal   = 1 << 3,
-        regen  = 1 << 4,
-        life   = 1 << 5,
-        mana   = 1 << 6,
-    }
+        public static class consumable
+        {
+            public const int none   = 0;
+            public const int buff   = 1;
+            public const int food   = 1 << 1;
+            public const int potion = 1 << 2;
+            public const int heal   = 1 << 3;
+            public const int regen  = 1 << 4;
+            public const int life   = 1 << 5;
+            public const int mana   = 1 << 6;
+        }
 
-    [Flags]
-    public enum housing
-    {
-        none = 0,
-        door = 1,
-        light = 1 << 1,
-        chair = 1 << 2,
-        table = 1 << 3,
-    }
+        public static class housing
+        {
+            public const int none  = 0;
+            public const int door  = 1;
+            public const int light = 1 << 1;
+            public const int chair = 1 << 2;
+            public const int table = 1 << 3;
+        }
 
-    [Flags]
-    public enum furniture : ulong
-    {
-        none                      = 0,
-        valid_housing            = 1,
-        clutter                  = 1 << 1,
-        crafting_station         = 1 << 2,
-        container                = 1 << 3,
-        useable                  = 1 << 4,
-        decorative               = 1 << 5,
+        public static class furniture
+        {
+            public const long none             = 0;
+            public const long valid_housing    = 1;
+            public const long clutter          = 1 << 1;
+            public const long crafting_station = 1 << 2;
+            public const long container        = 1 << 3;
+            public const long useable          = 1 << 4;
+            public const long decorative       = 1 << 5;
 
-        // housing_furniture,
+            // housing_furniture,
             // housing_door,
-                door             = 1 << 6,
-
+            public const long door             = 1 << 6;
 
             // housing_light,
-                torch            = 1 << 7,
-                candle           = 1 << 8,
-                chandelier       = 1 << 9,
-                hanging_lantern  = 1 << 10,
-                lamp             = 1 << 11,
-                holiday_light    = 1 << 12,
-                candelabra       = 1 << 13,
+            public const long torch            = 1 << 7;
+            public const long candle           = 1 << 8;
+            public const long chandelier       = 1 << 9;
+            public const long hanging_lantern  = 1 << 10;
+            public const long lamp             = 1 << 11;
+            public const long holiday_light    = 1 << 12;
+            public const long candelabra       = 1 << 13;
 
             // housing_chair,
-                chair            = 1 << 15,
-                bed              = 1 << 16,
-                bench            = 1 << 17,
+            public const long chair = 1 << 15;
+            public const long bed   = 1 << 16;
+            public const long bench = 1 << 17;
 
             // housing_table,
-                table            = 1 << 18,
-                workbench        = 1 << 19,
-                dresser          = 1 << 20,
-                piano            = 1 << 21,
-                bookcase         = 1 << 22,
-                bathtub          = 1 << 23,
+            public const long table     = 1 << 18;
+            public const long workbench = 1 << 19;
+            public const long dresser   = 1 << 20;
+            public const long piano     = 1 << 21;
+            public const long bookcase  = 1 << 22;
+            public const long bathtub   = 1 << 23;
 
-        // other
-        sink                     = 1 << 24,
-        clock                    = 1 << 25,
-        bottle                   = 1 << 26,
-        bowl                     = 1 << 27,
-        beachstuff               = 1 << 28,
-        tombstone                = 1 << 29,
-        campfire                 = 1 << 30,
-        statue                   = 1ul << 31,
-        statue_alphabet          = 1ul << 32,
-        crate                    = 1ul << 33,
-        monolith                 = 1ul << 34,
-        cooking_pot              = 1ul << 35,
-        anvil                    = 1ul << 36,
-        cannon                   = 1ul << 37,
-        fountain                 = 1ul << 38,
-        planter                  = 1 << 14,
+            // other
+            public const long sink            = 1 << 24;
+            public const long clock           = 1 << 25;
+            public const long bottle          = 1 << 26;
+            public const long bowl            = 1 << 27;
+            public const long beachstuff      = 1 << 28;
+            public const long tombstone       = 1 << 29;
+            public const long campfire        = 1 << 30;
+            public const long statue          = 1L << 31;
+            public const long statue_alphabet = 1L << 32;
+            public const long crate           = 1L << 33;
+            public const long monolith        = 1L << 34;
+            public const long cooking_pot     = 1L << 35;
+            public const long anvil           = 1L << 36;
+            public const long cannon          = 1L << 37;
+            public const long fountain        = 1L << 38;
+            public const long planter         = 1 << 14;
+        }
     }
-}
-
-
 }

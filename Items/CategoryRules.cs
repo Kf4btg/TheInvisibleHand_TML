@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using System.Dynamic;
 using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -459,11 +458,9 @@ namespace InvisibleHand.Items
         internal static bool REPLACE_ME(Item item) => true;
 
         /// C# just doesn't understand ducks...
-        public static readonly dynamic ConditionMatrix = new ExpandoObject();
-
         internal static class Conditions
         {
-            public static readonly Dictionary<general, Func<Item, bool>> General = new Dictionary<general, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> General = new Dictionary<int, Func<Item, bool>>()
             {
                 {general.quest_item, (i)    => i.questItem},
                 {general.expert, (i)        => i.expert},
@@ -485,7 +482,7 @@ namespace InvisibleHand.Items
                 {general.consumable, Binary.isConsumable},
                 {general.weapon, Binary.isWeapon},
             };
-            public static readonly Dictionary<placeable, Func<Item, bool>> Placeable = new Dictionary<placeable, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Placeable = new Dictionary<int, Func<Item, bool>>()
             {
                 // {placeable.furniture, REPLACE_ME},
                 {placeable.seed, ByTileID.ImmatureHerb},
@@ -500,7 +497,7 @@ namespace InvisibleHand.Items
                 {placeable.wall_deco, Groupings.WallDeco},
                 {placeable.gem, ByTileID.Gem},
             };
-            public static readonly Dictionary<ammo, Func<Item, bool>> Ammo = new Dictionary<ammo, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Ammo = new Dictionary<int, Func<Item, bool>>()
             {
                 {ammo.arrow, (i)  => i.ammo == 1},
                 {ammo.bullet, (i)  => i.ammo == 14},
@@ -512,7 +509,7 @@ namespace InvisibleHand.Items
                 {ammo.endless, (i) => i.ammo > 0 && !i.consumable},
                 // {ammo.bomb, REPLACE_ME}
             };
-            public static readonly Dictionary<dye, Func<Item, bool>> Dye = new Dictionary<dye, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Dye = new Dictionary<int, Func<Item, bool>>()
             {
                 {dye.basic, Dyes.BasicDyes},
                 {dye.black, Dyes.BlackDyes},
@@ -523,7 +520,7 @@ namespace InvisibleHand.Items
                 {dye.strange, Dyes.StrangeDyes},
                 {dye.lunar, Dyes.LunarDyes},
             };
-            public static readonly Dictionary<equip, Func<Item, bool>> Equip = new Dictionary<equip, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Equip = new Dictionary<int, Func<Item, bool>>()
             {
                 // {equip.armor, REPLACE_ME},
                 {equip.accessory, (i) => i.accessory},
@@ -551,7 +548,7 @@ namespace InvisibleHand.Items
                 // {equip.grapple_multi, REPLACE_ME},
                 // {equip.mount_cart, REPLACE_ME},
             };
-            public static readonly Dictionary<weapon, Func<Item, bool>> Weapon = new Dictionary<weapon, Func<Item, bool>>()
+            public static readonly Dictionary<long, Func<Item, bool>> Weapon = new Dictionary<long, Func<Item, bool>>()
             {
                 {weapon.automatic, (i) => i.autoReuse},
                 {weapon.melee, (i) => i.melee},
@@ -591,7 +588,7 @@ namespace InvisibleHand.Items
                 {weapon.throwing, (i) => i.thrown},
                 // {weapon.weapon_other, REPLACE_ME},
             };
-            public static readonly Dictionary<tool, Func<Item, bool>> Tool = new Dictionary<tool, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Tool = new Dictionary<int, Func<Item, bool>>()
             {
                 {tool.pick, (i)         => i.pick > 0},
                 {tool.axe, (i)          => i.axe > 0},
@@ -602,7 +599,7 @@ namespace InvisibleHand.Items
                 // {tool.recall, REPLACE_ME},
                 // {tool.other, REPLACE_ME},
             };
-            public static readonly Dictionary<consumable, Func<Item, bool>> Consumable = new Dictionary<consumable, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Consumable = new Dictionary<int, Func<Item, bool>>()
             {
                 {consumable.buff, Binary.timedBuff},
                 {consumable.food, Binary.isFood},
@@ -612,14 +609,14 @@ namespace InvisibleHand.Items
                 // {consumable.life, REPLACE_ME},
                 // {consumable.mana, REPLACE_ME},
             };
-            public static readonly Dictionary<housing, Func<Item, bool>> Housing = new Dictionary<housing, Func<Item, bool>>()
+            public static readonly Dictionary<int, Func<Item, bool>> Housing = new Dictionary<int, Func<Item, bool>>()
             {
                 {housing.door, Groupings.housingDoor},
                 {housing.light, Groupings.housingTorch},
                 {housing.chair, Groupings.housingChair},
                 {housing.table, Groupings.housingTable},
             };
-            public static readonly Dictionary<furniture, Func<Item, bool>> Furniture = new Dictionary<furniture, Func<Item, bool>>()
+            public static readonly Dictionary<long, Func<Item, bool>> Furniture = new Dictionary<long, Func<Item, bool>>()
             {
                 {furniture.valid_housing, Groupings.Furniture},
                 // {furniture.clutter, REPLACE_ME},
@@ -661,6 +658,46 @@ namespace InvisibleHand.Items
                 {furniture.planter, ByTileID.PlanterBox},
                 {furniture.fountain, ByTileID.WaterFountain},
             };
+
+            public static bool Check(string table, Item item, int flag)
+            {
+                switch (table)
+                {
+                    case "general":
+                        return General[flag](item);
+                    case "placeable":
+                        return Placeable[flag](item);
+                    case "housing":
+                        return Housing[flag](item);
+                    case "tool":
+                        return Tool[flag](item);
+                    case "ammo":
+                        return Ammo[flag](item);
+                    case "equip":
+                        return Equip[flag](item);
+                    case "consumable":
+                        return Consumable[flag](item);
+                    case "dye":
+                        return Dye[flag](item);
+                    case "furniture":
+                        return Furniture[flag](item);
+                    case "weapon":
+                        return Weapon[flag](item);
+                }
+                return false;
+            }
+
+            public static bool Check(string table, Item item, long flag)
+            {
+                switch (table)
+                {
+                    case "furniture":
+                        return Furniture[flag](item);
+                    case "weapon":
+                        return Weapon[flag](item);
+                }
+                return false;
+            }
         }
 
         public static readonly IDictionary<Trait, Func<Item, bool>> TConditionTable = new Dictionary<Trait, Func<Item, bool>>
