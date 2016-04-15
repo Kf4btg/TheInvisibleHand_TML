@@ -112,6 +112,7 @@
     <Compile Include="Utils\IDecision.cs" />
     <Compile Include="Items\ItemFlags.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
+    <Compile Include="Items\CategoryMatcher.cs" />
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />

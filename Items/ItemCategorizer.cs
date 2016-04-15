@@ -13,16 +13,6 @@ namespace InvisibleHand.Items
 
     public static class ItemCategorizer
     {
-        // private static IDictionary<int, HashSet<string>> item_cache = new Dictionary<int, HashSet<string>>();
-
-        // public static ISet<Trait> Classify(Item item)
-        // {
-        //     var iwi = new ItemWithInfo(item);
-        //     classify(iwi);
-        //
-        //     return iwi.TraitList;
-        // }
-
         public static void ClassifyItem(Item item, CategoryInfo info)
         {
             classifyitem(new ItemWithInfo(item, info));
