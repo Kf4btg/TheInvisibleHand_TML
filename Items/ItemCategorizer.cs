@@ -171,7 +171,7 @@ namespace InvisibleHand.Items
                 }
                 else if (item.TryFlag(Type.Placeable, placeable.wall_deco))
                 {
-                    switch (Rules.Types.WallDeco(_item))
+                    switch (ClassificationRules.Types.WallDeco(_item))
                     {
                         // TODO: these flag values should probably be somewhere else,
                         // like maybe the furniture enum, or even a new enum for decorations
@@ -228,9 +228,9 @@ namespace InvisibleHand.Items
 
         }
 
-        private static void classify(ItemWithInfo item)
-        {
-            var _item = item.item;
+        // private static void classify(ItemWithInfo item)
+        // {
+        //     var _item = item.item;
             // bool _weapon, tool, placeable;
             // weapon = tool = placeable = false;
 
@@ -425,7 +425,7 @@ namespace InvisibleHand.Items
             //     item.TagFirst(Trait.soul, Trait.paint, Trait.hair_dye, Trait.banner);
             // }
 
-        }
+        // }
 
         private static void classifyWeapon(ItemWithInfo item, long weaponType)
         {
@@ -435,27 +435,46 @@ namespace InvisibleHand.Items
                 case weapon.melee:
                     // item.Tag(has_projectile);
                     if (item.TryFlag(Type.Weapon, weapon.style_directional))
-                        item.FlagFirst(Type.Weapon, weapon.flail, weapon.yoyo);
+                        item.FlagFirst(Type.Weapon,
+                                        weapon.flail,
+                                        weapon.yoyo);
                     else if (item.TryFlag(Type.Weapon, weapon.style_swing))
-                        item.Flag(Type.Weapon, weapon.broadsword);
+                        item.Flag(Type.Weapon,
+                                    weapon.broadsword);
                     else if (item.TryFlag(Type.Weapon, weapon.style_thrown))
-                        item.Flag(Type.Weapon, weapon.boomerang);
+                        item.Flag(Type.Weapon,
+                                    weapon.boomerang);
                     else
-                        item.FlagIf(item.TryFlag(Type.Weapon, weapon.style_jab), Type.Weapon, weapon.shortsword);
+                        item.FlagIf(item.TryFlag(Type.Weapon, weapon.style_jab),
+                                    Type.Weapon, weapon.shortsword);
                     break;
+
                 case weapon.ranged:
                     if (item.TryFlag(Type.Weapon, weapon.arrow_consuming))
-                        item.Flag(Type.Weapon, weapon.repeater);
+                        item.Flag(Type.Weapon,
+                                    weapon.repeater);
                     else if (item.TryFlag(Type.Weapon, weapon.bullet_consuming))
-                        item.Flag(Type.Weapon, weapon.automatic_gun);
+                        item.Flag(Type.Weapon,
+                                    weapon.automatic_gun);
                     else
-                        item.FlagFirst(Type.Weapon, weapon.rocket_consuming, weapon.dart_consuming, weapon.gel_consuming, weapon.no_ammo);
+                        item.FlagFirst(Type.Weapon,
+                                        weapon.rocket_consuming,
+                                        weapon.dart_consuming,
+                                        weapon.gel_consuming,
+                                        weapon.no_ammo);
                     break;
+
                 case weapon.magic:
-                    item.FlagFirst(Type.Weapon, weapon.area, weapon.homing, weapon.controlled, weapon.bouncing, weapon.stream);
+                    item.FlagFirst(Type.Weapon,
+                                    weapon.area,
+                                    weapon.homing,
+                                    weapon.controlled,
+                                    weapon.bouncing,
+                                    weapon.stream);
                     break;
                 case weapon.summon:
-                    item.FlagIf(!item.TryFlag(Type.Weapon, weapon.minion), Type.Weapon, weapon.sentry);
+                    item.FlagIf(!item.TryFlag(Type.Weapon, weapon.minion),
+                                Type.Weapon, weapon.sentry);
                     break;
                 case weapon.throwing:
                 default:

@@ -110,9 +110,9 @@
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
     <Compile Include="Utils\IDecision.cs" />
-    <Compile Include="Items\CategoryEnum.cs" />
+    <Compile Include="Items\ItemFlags.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
-    <Compile Include="Items\CategoryRules.cs" />
+    <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
     <Compile Include="Items\Sets.cs" />

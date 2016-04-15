@@ -81,14 +81,14 @@ namespace InvisibleHand.Items
 
         public static class mech
         {
-            public const int none = 0;
-            public const int trap = 1;
-            public const int timer = 1 << 1;
-            public const int Switch = 1 << 2;
-            public const int lever = 1 << 3;
+            public const int none           = 0;
+            public const int trap           = 1;
+            public const int timer          = 1 << 1;
+            public const int Switch         = 1 << 2;
+            public const int lever          = 1 << 3;
             public const int pressure_plate = 1 << 4;
-            public const int track = 1 << 5;
-            public const int firework = 1 << 6;
+            public const int track          = 1 << 5;
+            public const int firework       = 1 << 6;
 
             // TODO: wire? teleporter?
 

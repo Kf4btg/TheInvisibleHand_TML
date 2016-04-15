@@ -12,7 +12,7 @@ namespace InvisibleHand.Items
 {
     using static ItemFlags;
 
-    public static class Rules
+    public static class ClassificationRules
     {
 
         /// prevents attempting to index Main.projectile w/ -1
