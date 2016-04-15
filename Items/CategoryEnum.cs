@@ -538,5 +538,258 @@ namespace InvisibleHand.Items
         COUNT
     }
 
+    [Flags]
+    public enum generalTraits
+    {
+        none                    = 0,
+        expert                  = 1,
+        material                = 1 << 2,
+        mech                    = 1 << 3,
+        bait                    = 1 << 4,
+        explosive               = 1 << 5,
+        auto                    = 1 << 6,
+        channeled               = 1 << 7,
+        weapon                  = 1 << 8,
+        equipable               = 1 << 9,
+        vanity                  = 1 << 10,
+        defense                 = 1 << 11,
+        reach_boost             = 1 << 12,
+        reach_penalty           = 1 << 13,
+        heal_life               = 1 << 14,
+        regen_life              = 1 << 15,
+        heal_mana               = 1 << 16,
+        boost_mana              = 1 << 17,
+        use_mana                = 1 << 18,
+        tool                    = 1 << 19,
+        placeable               = 1 << 20,
+        consumable              = 1 << 21,
+        quest_item              = 1 << 1,
+    }
+
+    [Flags]
+    public enum placeabletype
+    {
+        none     = 0,
+        furniture = 1,
+        seed = 1 << 1,
+        block = 1 << 2,
+        brick = 1 << 3,
+        ore = 1 << 4,
+        bar = 1 << 5,
+        wood = 1 << 6,
+        wall = 1 << 7,
+        wall_deco = 1 << 8,
+    }
+
+    [Flags]
+    public enum ammotype
+    {
+        none     = 0,
+        arrow    = 1,
+        bullet   = 1 << 1,
+        rocket   = 1 << 2,
+        dart     = 1 << 3,
+        sand     = 1 << 4,
+        coin     = 1 << 5,
+        solution = 1 << 6,
+
+        endless  = 1 << 7,
+
+        bomb     = 1 << 8,
+        // gel,
+    }
+
+    [Flags]
+    public enum dyetype
+    {
+        none         = 0,
+        dye_basic    = 1,
+        dye_black    = 1 << 1,
+        dye_bright   = 1 << 2,
+        dye_silver   = 1 << 3,
+        dye_flame    = 1 << 4,
+        dye_gradient = 1 << 5,
+        dye_strange  = 1 << 6,
+        dye_lunar    = 1 << 7,
+    }
+
+    [Flags]
+    public enum equiptype
+    {
+        none           = 0,
+        armor          = 1,
+        accessory      = 1 << 2,
+        vanity         = 1 << 3,
+        pet            = 1 << 4,
+        mount          = 1 << 5,
+        grapple        = 1 << 6,
+
+        // armor slots
+        slot_head      = 1 << 7,
+        slot_body      = 1 << 8,
+        slot_leg       = 1 << 9,
+
+        // accy by slot
+
+        slot_face      = 1 << 10,
+        slot_neck      = 1 << 11,
+        slot_back      = 1 << 12,
+        wings          = 1 << 13,
+        slot_shoe      = 1 << 14,
+        slot_handon    = 1 << 15,
+        slot_handoff   = 1 << 16,
+        slot_shield    = 1 << 17,
+        slot_waist     = 1 << 18,
+        balloon        = 1 << 19,
+        slot_front     = 1 << 20,
+
+        pet_light      = 1 << 21,
+        pet_vanity     = 1 << 22,
+        grapple_single = 1 << 23,
+        grapple_multi  = 1 << 24,
+        mount_cart     = 1 << 1,
+    }
+
+    [Flags]
+    public enum weaponflags
+    {
+        none = 0,
+        automatic = 1,
+
+        melee                 = 1 << 1,
+            style_swing       = 1 << 2,
+            style_jab         = 1 << 3,
+            style_directional = 1 << 4,
+            style_thrown      = 1 << 5,
+            broadsword        = 1 << 7,
+            boomerang         = 1 << 8,
+            spear             = 1 << 9,
+            flail             = 1 << 10,
+            yoyo              = 1 << 11,
+            has_projectile    = 1 << 12,
+
+            shortsword = melee | style_jab,
+
+        ranged               = 1 << 13,
+            bullet_consuming = 1 << 14,
+            arrow_consuming  = 1 << 15,
+            rocket_consuming = 1 << 16,
+            dart_consuming   = 1 << 18,
+            gel_consuming    = 1 << 19,
+            no_ammo          = 1 << 20,
+
+            gun           = ranged | bullet_consuming,
+            automatic_gun = gun | automatic,
+            bow           = ranged | arrow_consuming,
+            repeater      = bow | automatic,
+            launcher      = ranged | rocket_consuming,
+
+        magic          = 1 << 26,
+            area       = 1 << 27,
+            homing     = 1 << 28,
+            bouncing   = 1 << 29,
+            controlled = 1 << 30,
+            stream     = 1 << 31,
+            piercing   = 1 << 23,
+
+        summon         = 1 << 32,
+            minion     = 1 << 24,
+            sentry     = 1 << 22,
+
+        throwing       = 1 << 21,
+        weapon_other   = 1 << 25,
+    }
+
+    [Flags]
+    public enum toolflags
+    {
+        none         = 0,
+        pick         = 1,
+        axe          = 1 << 1,
+        hammer       = 1 << 2,
+        fishing_pole = 1 << 3,
+        wrench       = 1 << 4,
+        wand         = 1 << 5,
+        recall       = 1 << 6,
+        other        = 1 << 7,
+    }
+
+    [Flags]
+    public enum consumabletype
+    {
+        none   = 0,
+        buff   = 1,
+        food   = 1 << 1,
+        potion = 1 << 2,
+        heal   = 1 << 3,
+        regen  = 1 << 4,
+        life   = 1 << 5,
+        mana   = 1 << 6,
+    }
+
+    public enum housing
+    {
+        door,
+        light,
+        chair,
+        table,
+    }
+
+    [Flags]
+    public enum furniture
+    {
+        none                      = 0,
+        valid_housing,            = 1,
+        clutter,                  = 1 << 1,
+        crafting_station,         = 1 << 2,
+        container,                = 1 << 3,
+        useable,                  = 1 << 4,
+        decorative,               = 1 << 5,
+
+        // housing_furniture,
+            // housing_door,
+                door,             = 1 << 6,
+
+
+            // housing_light,
+                torch,            = 1 << 7,
+                candle,           = 1 << 8,
+                chandelier,       = 1 << 9,
+                hanging_lantern,  = 1 << 10,
+                lamp,             = 1 << 11,
+                holiday_light,    = 1 << 12,
+                candelabra,       = 1 << 13,
+
+            // housing_chair,
+                chair,            = 1 << 15,
+                bed,              = 1 << 16,
+                bench,            = 1 << 17,
+
+            // housing_table,
+                table,            = 1 << 18,
+                workbench,        = 1 << 19,
+                dresser,          = 1 << 20,
+                piano,            = 1 << 21,
+                bookcase,         = 1 << 22,
+                bathtub,          = 1 << 23,
+
+        // other
+        sink,                     = 1 << 24,
+        clock,                    = 1 << 25,
+        bottle,                   = 1 << 26,
+        bowl,                     = 1 << 27,
+        beachstuff,               = 1 << 28,
+        tombstone,                = 1 << 29,
+        campfire,                 = 1 << 30,
+        statue,                   = 1 << 31,
+        statue_alphabet,          = 1 << 32,
+        crate,                    = 1 << 33,
+        monolith,                 = 1 << 34,
+        cooking_pot,              = 1 << 35,
+        anvil,                    = 1 << 36,
+        cannon,                   = 1 << 37,
+        planter,                  = 1 << 14,
+    }
+
 
 }

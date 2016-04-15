@@ -165,7 +165,7 @@ namespace InvisibleHand.Items
 
 
 
-    		public static bool MinecartTrack(Item item) => item.createTile == TileID.MinecartTrack;
+    		// public static bool MinecartTrack(Item item) => item.createTile == TileID.MinecartTrack;
 
             /// "Starfish"
             public static bool BeachPile(Item item) => item.createTile == TileID.BeachPiles;
@@ -639,7 +639,8 @@ namespace InvisibleHand.Items
             {Trait.beachstuff, ByTileID.BeachPile},
 
             // mech
-            {Trait.track, ByTileID.MinecartTrack},
+            // {Trait.track, ByTileID.MinecartTrack},
+            {Trait.track, (i) => i.cartTrack},
             {Trait.trap, ByTileID.Trap},
             {Trait.timer, ByTileID.Timer},
             {Trait.pressure_plate, ByTileID.PressurePlate},
