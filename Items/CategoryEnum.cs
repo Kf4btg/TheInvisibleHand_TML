@@ -19,7 +19,8 @@ namespace InvisibleHand.Items
             Tool,
             Consumable,
             Housing,
-            Furniture
+            Furniture,
+            Mech
         }
 
         public static class general
@@ -48,7 +49,11 @@ namespace InvisibleHand.Items
             public const int placeable     = 1 << 20;
             public const int consumable    = 1 << 21;
             public const int dye           = 1 << 22;
-            public const int ammo           = 1 << 23;
+            public const int ammo          = 1 << 23;
+            public const int soul          = 1 << 24;
+            public const int coin          = 1 << 25;
+            public const int paint         = 1 << 26;
+            public const int hair_dye      = 1 << 27;
         }
 
         public static class placeable
@@ -70,6 +75,24 @@ namespace InvisibleHand.Items
             public const int painting      = 1 << 13;
             public const int rack          = 1 << 14;
             public const int trophy        = 1 << 15;
+            public const int banner        = 1 << 16;
+            public const int wallpaper     = 1 << 17;
+        }
+
+        public static class mech
+        {
+            public const int none = 0;
+            public const int trap = 1;
+            public const int timer = 1 << 1;
+            public const int Switch = 1 << 2;
+            public const int lever = 1 << 3;
+            public const int pressure_plate = 1 << 4;
+            public const int track = 1 << 5;
+            public const int firework = 1 << 6;
+
+            // TODO: wire? teleporter?
+
+            // public const int wire = 1 << 5;
         }
 
         public static class ammo

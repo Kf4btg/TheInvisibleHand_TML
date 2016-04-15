@@ -194,14 +194,10 @@ namespace InvisibleHand.Items
                                         furniture.campfire, furniture.fountain, furniture.bottle,
                                         furniture.bowl, furniture.beachstuff, furniture.cooking_pot,
                                         furniture.anvil, furniture.monolith)
-                        .FlagFirst(Type.Placeable, placeable.wall, placeable.dye_plant, placeable.strange_plant,
+                        .FlagFirst(Type.Placeable, placeable.wall, placeable.dye_plant,
+                                        placeable.strange_plant, placeable.banner,
                                         placeable.seed, placeable.ore, placeable.bar, placeable.gem);
 
-                    //FIXME: properly categorize and add checks for these:
-                    // .FlagFirst(Type._, _.track, _.coin, _.trap, _.timer,
-                    // _.pressure_plate, _.firework, );
-                    // item.Tag(Trait.ore)
-                    // .Tag(Trait.gem);
                 }
             }
             else if (item.TryFlag(Type.General, general.ammo))
@@ -220,11 +216,15 @@ namespace InvisibleHand.Items
                 item.FlagFirst(Type.Dye, dye.basic, dye.black, dye.flame, dye.gradient,
                                 dye.strange, dye.bright, dye.silver, dye.lunar);
             }
-            // else
-            // {
-            //     // FIXME: include these:
-            //     // item.FlagFirst(Trait.soul, Trait.paint, Trait.hair_dye, Trait.banner);
-            // }
+            else
+            {
+                item.FlagFirst(Type.General, general.coin, general.soul, general.paint, general.hair_dye);
+            }
+
+            if ((item.info.Flags.general & general.mech) != 0)
+            {
+                item.FlagFirst(Type.Mech, mech.trap, mech.pressure_plate, mech.timer, mech.firework, mech.track);
+            }
 
         }
 

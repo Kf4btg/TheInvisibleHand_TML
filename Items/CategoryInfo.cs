@@ -24,6 +24,7 @@ namespace InvisibleHand.Items
         public int equip;
         public int dye;
         public int consumable;
+        public int mech;
 
     }
 
@@ -182,6 +183,9 @@ namespace InvisibleHand.Items
                     break;
                 case ItemFlags.Type.Dye:
                     info.Flags.dye |= flag;
+                    break;
+                case ItemFlags.Type.Mech:
+                    info.Flags.mech |= flag;
                     break;
                 case ItemFlags.Type.Furniture:
                     info.Flags.furniture |= (long)flag;

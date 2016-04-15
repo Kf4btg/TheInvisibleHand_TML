@@ -483,6 +483,10 @@ namespace InvisibleHand.Items
                 {general.consumable, Binary.isConsumable},
                 {general.weapon, Binary.isWeapon},
                 {general.ammo, Binary.isAmmo},
+                {general.soul, Groupings.Soul},
+                {general.hair_dye, (i) => i.hairDye > 0},
+                {general.coin, (i) => i.ammo == 71},
+                {general.paint, (i) => i.paint > 0},
             };
             public static readonly Dictionary<int, Func<Item, bool>>
             Placeable = new Dictionary<int, Func<Item, bool>>()
@@ -500,6 +504,7 @@ namespace InvisibleHand.Items
                 {placeable.wall_deco, Groupings.WallDeco},
                 {placeable.gem, ByTileID.Gem},
                 {placeable.musicbox, ByTileID.MusicBox},
+                {placeable.banner, ByTileID.Banner},
             };
             public static readonly Dictionary<int, Func<Item, bool>>
             Ammo = new Dictionary<int, Func<Item, bool>>()
@@ -671,6 +676,18 @@ namespace InvisibleHand.Items
                 {furniture.fountain, ByTileID.WaterFountain},
             };
 
+            public static readonly Dictionary<int, Func<Item, bool>>
+            Mech = new Dictionary<int, Func<Item, bool>>()
+            {
+                {mech.timer, ByTileID.Timer},
+                // {mech.Switch, ByTileID.L},
+                {mech.trap, ByTileID.Trap},
+                {mech.track, (i) => i.cartTrack},
+                {mech.firework, ByTileID.Firework},
+                // {mech.lever, REPLACE_ME},
+                {mech.pressure_plate, ByTileID.PressurePlate},
+            };
+
             public static bool Check(ItemFlags.Type table, Item item, int flag)
             {
                 switch (table)
@@ -698,6 +715,9 @@ namespace InvisibleHand.Items
 
                     case ItemFlags.Type.Dye:
                         return Dye[flag](item);
+
+                    case ItemFlags.Type.Mech:
+                        return Mech[flag](item);
 
                     case ItemFlags.Type.Furniture:
                         return Furniture[flag](item);
