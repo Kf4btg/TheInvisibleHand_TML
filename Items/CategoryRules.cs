@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Dynamic;
 using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -10,6 +11,8 @@ using System.Text.RegularExpressions;
 
 namespace InvisibleHand.Items
 {
+    using static ItemFlags;
+
     public static class Rules
     {
 
@@ -23,13 +26,13 @@ namespace InvisibleHand.Items
         internal static class Binary
         {
             public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
-            public static bool isArmor(Item item) => item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0; // && !item.vanity
+            public static bool isArmor(Item item)  => item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0; // && !item.vanity
 
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;
 
-            public static bool isHook(Item item) => Main.projHook[item.shoot];
-            public static bool isMount(Item item) => item.mountType != -1;
+            public static bool isHook(Item item)     => Main.projHook[item.shoot];
+            public static bool isMount(Item item)    => item.mountType != -1;
             public static bool isLightPet(Item item) => item.buffType > 0 && (Main.lightPet[item.buffType]);
 
             public static bool isVanityPet(Item item) => item.buffType > 0 && (Main.vanityPet[item.buffType]);
@@ -66,8 +69,6 @@ namespace InvisibleHand.Items
 
             public static bool Explosive(Item item) => TestProjectileAI(item.shoot, 16);
 
-
-
             public static bool oneDropYoyo(Item item) => new[] { 3315, 3316, 3317, 3262, 3282, 3283, 3284, 3285, 3286, 3389 }.Contains(item.type);
         }
 
@@ -95,10 +96,7 @@ namespace InvisibleHand.Items
             public static bool Bookcase(Item item)  => item.createTile == TileID.Bookcases;
             // ... why is the bathtub a table? (I think I know why...)
             public static bool Bathtub(Item item)   => item.createTile == TileID.Bathtubs;
-
             #endregion roomneeds tables
-
-
 
             #region lighting
             public static bool Candle(Item item)         => item.createTile == TileID.Candles;
@@ -107,52 +105,36 @@ namespace InvisibleHand.Items
     		public static bool Lamp(Item item)           => item.createTile == TileID.Lamps;
             public static bool Candelabra(Item item)     => item.createTile == TileID.Candelabras;
             public static bool Torch(Item item)          => item.createTile == TileID.Torches;
+            // red and green
             public static bool HolidayLight(Item item)   => item.createTile == TileID.HolidayLights;
-
             #endregion lighting
 
+            public static bool Anvil(Item item) => item.createTile == TileID.Anvils;
+            public static bool CookingPot(Item item) => item.createTile == TileID.CookingPots;
             public static bool Sink(Item item) => item.createTile == TileID.Sinks;
+            public static bool GrandfatherClock(Item item) => item.createTile == TileID.GrandfatherClocks;
+            public static bool Cannon(Item item)   => item.createTile == TileID.Cannon;
+            public static bool Campfire(Item item) => item.createTile == TileID.Campfire;
 
             // chests, barrels, and trash can
             public static bool Container(Item item) => item.createTile == TileID.Containers;
-
-
-    		public static bool Tombstone(Item item) => item.createTile == TileID.Tombstones;
 
             /// important (and there's a lot of these...)
             public static bool Banner(Item item) => item.createTile == TileID.Banners;
 
             // includes cups and mugs
             public static bool Bottle(Item item) => item.createTile == TileID.Bottles;
-            // only the lead anvil?
-            public static bool Anvil(Item item) => item.createTile == TileID.Anvils;
-
-            // only the cauldron?
-            public static bool CookingPot(Item item) => item.createTile == TileID.CookingPots;
-
-
             /// three of them!
             public static bool Bowl(Item item) => item.createTile == TileID.Bowls;
-    		public static bool GrandfatherClock(Item item) => item.createTile == TileID.GrandfatherClocks;
+            /// "Starfish"
+            public static bool BeachPile(Item item) => item.createTile == TileID.BeachPiles;
 
-            /// also includes vases
-            public static bool Statue(Item item) => item.createTile == TileID.Statues;
+            // mech stuff
+            public static bool Trap(Item item)          => item.createTile == TileID.Traps;
     		public static bool PressurePlate(Item item) => item.createTile == TileID.PressurePlates;
+            public static bool Timer(Item item)         => item.createTile == TileID.Timers;
 
-            /// only the lihzard traps (not the regular dart trap)
-            public static bool Trap(Item item) => item.createTile == TileID.Traps;
-    		public static bool MusicBox(Item item) => item.createTile == TileID.MusicBoxes;
-
-            /// only 3 & 5
-            public static bool Timer(Item item) => item.createTile == TileID.Timers;
-
-            // red and green
-    		public static bool Gem(Item item) => item.createTile == TileID.ExposedGems;
-    		public static bool WaterFountain(Item item) => item.createTile == TileID.WaterFountain;
-
-            // confetti and bunny, but not the...cannon.
-            public static bool Cannon(Item item) => item.createTile == TileID.Cannon;
-    		public static bool Campfire(Item item) => item.createTile == TileID.Campfire;
+            public static bool MusicBox(Item item) => item.createTile == TileID.MusicBoxes;
 
             /// green, blue, & yellow rockets
             public static bool Firework(Item item) => item.createTile == TileID.Firework;
@@ -163,13 +145,13 @@ namespace InvisibleHand.Items
             public static bool ImmatureHerb(Item item) => item.createTile == TileID.ImmatureHerbs;
             public static bool MetalBar(Item item)     => item.createTile == TileID.MetalBars;
 
-
-
     		// public static bool MinecartTrack(Item item) => item.createTile == TileID.MinecartTrack;
 
-            /// "Starfish"
-            public static bool BeachPile(Item item) => item.createTile == TileID.BeachPiles;
-
+            /// also includes vases
+            public static bool Statue(Item item)        => item.createTile == TileID.Statues;
+            public static bool Tombstone(Item item)     => item.createTile == TileID.Tombstones;
+            public static bool Gem(Item item)           => item.createTile == TileID.ExposedGems;
+            public static bool WaterFountain(Item item) => item.createTile == TileID.WaterFountain;
             /// ABC, 123
             public static bool AlphabetStatue(Item item) => item.createTile == TileID.AlphabetStatues;
     		public static bool FishingCrate(Item item)   => item.createTile == TileID.FishingCrate;
@@ -193,13 +175,13 @@ namespace InvisibleHand.Items
             public static bool Ore(Item item) => TileID.Sets.Ore[item.createTile];
             public static bool Ice(Item item) => TileID.Sets.Ices[item.createTile];
 
-            public static bool HallowBlock(Item item) => TileID.Sets.Hallow[item.createTile];
-            public static bool CrimsonBlock(Item item) => TileID.Sets.Crimson[item.createTile];
+            public static bool HallowBlock(Item item)     => TileID.Sets.Hallow[item.createTile];
+            public static bool CrimsonBlock(Item item)    => TileID.Sets.Crimson[item.createTile];
             public static bool CorruptionBlock(Item item) => TileID.Sets.Corrupt[item.createTile];
 
-            public static bool Sand(Item item) => TileID.Sets.Conversion.Sand[item.createTile];
+            public static bool Sand(Item item)          => TileID.Sets.Conversion.Sand[item.createTile];
             public static bool HardenedSand (Item item) => TileID.Sets.Conversion.HardenedSand[item.createTile];
-            public static bool Sandstone(Item item) => TileID.Sets.Conversion.Sandstone[item.createTile];
+            public static bool Sandstone(Item item)     => TileID.Sets.Conversion.Sandstone[item.createTile];
 
             public static bool Stone(Item item) => TileID.Sets.Conversion.Stone[item.createTile];
 
@@ -231,16 +213,16 @@ namespace InvisibleHand.Items
         internal static class Dye
         {
             private const short base_dye_start = 1007; // ItemID.RedDye
-            private const short base_dye_end = 1018; // ItemID.PinkDye
+            private const short base_dye_end   = 1018; // ItemID.PinkDye
 
             private const short black_dye_start = base_dye_start + 12;
-            private const short black_dye_end = base_dye_end + 12;
+            private const short black_dye_end   = base_dye_end + 12;
 
             private const short bright_dye_start = base_dye_start + 31;
-            private const short bright_dye_end = base_dye_end + 31;
+            private const short bright_dye_end   = base_dye_end + 31;
 
             private const short silver_dye_start = base_dye_start + 44;
-            private const short silver_dye_end = base_dye_end + 44;
+            private const short silver_dye_end   = base_dye_end + 44;
 
             private static readonly int[] other_base_dyes = new int[3] { ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye };
             private static readonly int[] other_black_dyes = new int[2] { ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye };
@@ -472,15 +454,223 @@ namespace InvisibleHand.Items
         }
         // Ideas for dealing with mod items:
         //  1) Use Recipe.ItemMatches() for added materials
+        //
+
+        public static bool REPLACE_ME(Item item) => true;
+
+        /// C# just doesn't understand ducks...
+        public static readonly dynamic ConditionMatrix = new ExpandoObject();
+
+        static Rules()
+        {
+            ConditionMatrix.General = new Dictionary<general, Func<Item, bool>>()
+            {
+                {general.quest_item, (i)    => i.questItem},
+                {general.expert, (i)        => i.expert},
+                {general.material, (i)      => i.material},
+                {general.mech, (i)          => i.mech},
+                {general.channeled, (i)     => i.channel},
+                {general.bait, (i)          => i.bait > 0},
+                {general.reach_boost, (i)   => i.tileBoost > 0},
+                {general.reach_penalty, (i) => i.tileBoost < 0},
+                {general.heal_life, (i)     => i.healLife > 0},
+                {general.regen_life, (i)    => i.lifeRegen > 0},
+                {general.heal_mana, (i)     => i.healMana > 0},
+                {general.boost_mana, (i)    => i.manaIncrease > 0},
+                {general.use_mana, (i)      => i.mana > 0},
+                {general.vanity, (i)        => i.vanity},
+                {general.dye, (i)           => i.dye > 0},
+                {general.equipable, Binary.isEquipable},
+                {general.placeable, Binary.CanBePlaced},
+                {general.consumable, Binary.isConsumable},
+                {general.weapon, Binary.isWeapon},
+            };
+            ConditionMatrix.Placeable = new Dictionary<placeable, Func<Item, bool>>()
+            {
+                // {placeable.furniture, REPLACE_ME},
+                {placeable.seed, ByTileID.ImmatureHerb},
+                {placeable.dye_plant, ByTileID.DyePlant},
+                {placeable.strange_plant, Groupings.StrangePlant},
+                // {placeable.block, REPLACE_ME},
+                // {placeable.brick, REPLACE_ME},
+                {placeable.ore, Groupings.Ore},
+                {placeable.bar, ByTileID.MetalBar},
+                // {placeable.wood, REPLACE_ME},
+                {placeable.wall, (i) => i.createWall > 0},
+                {placeable.wall_deco, Groupings.WallDeco},
+                {placeable.gem, ByTileID.Gem},
+            };
+            ConditionMatrix.Ammo = new Dictionary<ammo, Func<Item, bool>>()
+            {
+                {ammo.arrow, (i)  => i.ammo == 1},
+                {ammo.bullet, (i)  => i.ammo == 14},
+                {ammo.rocket, (i)  => i.ammo == 771},
+                {ammo.dart, (i)  => i.ammo == 51},
+                {ammo.sand, (i)  => i.ammo == 42},
+                {ammo.coin, (i)  => i.ammo == 71},
+                {ammo.solution, (i)  => i.ammo == 780},
+                {ammo.endless, (i) => i.ammo > 0 && !i.consumable},
+                // {ammo.bomb, REPLACE_ME}
+            };
+            ConditionMatrix.Dye = new Dictionary<dye, Func<Item, bool>>()
+            {
+                {dye.basic, Dye.BasicDyes},
+                {dye.black, Dye.BlackDyes},
+                {dye.bright, Dye.BrightDyes},
+                {dye.silver, Dye.SilverDyes},
+                {dye.flame, Dye.FlameDyes},
+                {dye.gradient, Dye.GradientDyes},
+                {dye.strange, Dye.StrangeDyes},
+                {dye.lunar, Dye.LunarDyes},
+            };
+            ConditionMatrix.Equip = new Dictionary<equip, Func<Item, bool>>()
+            {
+                // {equip.armor, REPLACE_ME},
+                {equip.accessory, (i) => i.accessory},
+                // {equip.pet, REPLACE_ME},
+                {equip.vanity, (i)    => i.vanity},
+                {equip.mount, Binary.isMount},
+                {equip.grapple, Binary.isHook},
+                {equip.slot_head, (i) => i.headSlot > 0},
+                {equip.slot_body, (i) => i.bodySlot > 0},
+                {equip.slot_leg, (i)  => i.legSlot > 0},
+                {equip.slot_face,    (i) => i.faceSlot > 0},
+                {equip.slot_neck,    (i) => i.neckSlot > 0},
+                {equip.slot_back,    (i) => i.backSlot > 0},
+                {equip.wings,        (i) => i.wingSlot > 0},
+                {equip.slot_shoe,    (i) => i.shoeSlot > 0},
+                {equip.slot_handon,  (i) => i.handOnSlot > 0},
+                {equip.slot_handoff, (i) => i.handOffSlot > 0},
+                {equip.slot_shield,  (i) => i.shieldSlot > 0},
+                {equip.slot_waist,   (i) => i.waistSlot > 0},
+                {equip.balloon,      (i) => i.balloonSlot > 0},
+                {equip.slot_front,   (i) => i.frontSlot > 0},
+                {equip.pet_light, Binary.isLightPet},
+                {equip.pet_vanity, Binary.isVanityPet},
+                // {equip.grapple_single, REPLACE_ME},
+                // {equip.grapple_multi, REPLACE_ME},
+                // {equip.mount_cart, REPLACE_ME},
+            };
+            ConditionMatrix.Weapon = new Dictionary<weapon, Func<Item, bool>>()
+            {
+                {weapon.automatic, (i) => i.autoReuse},
+                {weapon.melee, (i) => i.melee},
+                {weapon.style_swing, Weapons.Melee.Swing},
+                {weapon.style_jab, Weapons.Melee.Jab},
+                {weapon.style_directional, Weapons.Melee.Directional},
+                {weapon.style_thrown, Weapons.Melee.Thrown},
+                {weapon.broadsword, Weapons.Melee.BroadSword},
+                {weapon.boomerang, Weapons.Melee.Boomerang},
+                {weapon.spear, Weapons.Melee.Spear},
+                {weapon.flail, Weapons.Melee.Flail},
+                {weapon.yoyo, Weapons.Melee.Yoyo},
+                {weapon.has_projectile, (i) => i.shoot > 0},
+                // {weapon.shortsword, REPLACE_ME},
+                {weapon.ranged, (i) => i.ranged},
+                {weapon.bullet_consuming, Weapons.Ranged.BulletConsuming},
+                {weapon.arrow_consuming, Weapons.Ranged.ArrowConsuming},
+                {weapon.rocket_consuming, Weapons.Ranged.RocketConsuming},
+                {weapon.dart_consuming, Weapons.Ranged.DartConsuming},
+                {weapon.gel_consuming, Weapons.Ranged.GelConsuming},
+                {weapon.no_ammo, (i) => i.useAmmo < 0},
+                // {weapon.gun, REPLACE_ME},
+                // {weapon.automatic_gun, REPLACE_ME},
+                // {weapon.bow, REPLACE_ME},
+                // {weapon.repeater, REPLACE_ME},
+                // {weapon.launcher, REPLACE_ME},
+                {weapon.magic, (i) => i.magic},
+                {weapon.area, Weapons.Magic.Area},
+                {weapon.homing, Weapons.Magic.Homing},
+                {weapon.bouncing, Weapons.Magic.Bouncing},
+                {weapon.controlled,Weapons.Magic.Controllable},
+                {weapon.stream, Weapons.Magic.Stream},
+                {weapon.piercing, Weapons.Magic.Piercing},
+                {weapon.summon, (i) => i.summon},
+                {weapon.minion, Weapons.Summon.Minion},
+                {weapon.sentry, Weapons.Summon.Sentry},
+                {weapon.throwing, (i) => i.thrown},
+                // {weapon.weapon_other, REPLACE_ME},
+            };
+            ConditionMatrix.Tool = new Dictionary<tool, Func<Item, bool>>()
+            {
+                {tool.pick, (i)         => i.pick > 0},
+                {tool.axe, (i)          => i.axe > 0},
+                {tool.hammer, (i)       => i.hammer > 0},
+                {tool.fishing_pole, (i) => i.fishingPole > 0},
+                {tool.wand, (i)         => i.tileWand > 0},
+                {tool.wrench, Binary.isWrench},
+                // {tool.recall, REPLACE_ME},
+                // {tool.other, REPLACE_ME},
+            };
+            ConditionMatrix.Consumable = new Dictionary<consumable, Func<Item, bool>>()
+            {
+                {consumable.buff, Binary.timedBuff},
+                {consumable.food, Binary.isFood},
+                {consumable.potion, Binary.isPotion},
+                // {consumable.heal, REPLACE_ME},
+                // {consumable.regen, REPLACE_ME},
+                // {consumable.life, REPLACE_ME},
+                // {consumable.mana, REPLACE_ME},
+            };
+            ConditionMatrix.Housing = new Dictionary<housing, Func<Item, bool>>()
+            {
+                {housing.door, Groupings.housingDoor},
+                {housing.light, Groupings.housingTorch},
+                {housing.chair, Groupings.housingChair},
+                {housing.table, Groupings.housingTable},
+            };
+            ConditionMatrix.Furniture = new Dictionary<furniture, Func<Item, bool>>()
+            {
+                {furniture.valid_housing, Groupings.Furniture},
+                // {furniture.clutter, REPLACE_ME},
+                {furniture.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
+                {furniture.container, ByTileID.Container},
+                // {furniture.useable, REPLACE_ME},
+                // {furniture.decorative, REPLACE_ME},
+                {furniture.door, ByTileID.Door},
+                {furniture.torch, ByTileID.Torch},
+                {furniture.candle, ByTileID.Candle},
+                {furniture.chandelier, ByTileID.Chandelier},
+                {furniture.hanging_lantern, ByTileID.HangingLantern},
+                {furniture.lamp, ByTileID.Lamp},
+                {furniture.holiday_light, ByTileID.HolidayLight},
+                {furniture.candelabra, ByTileID.Candelabra},
+                {furniture.chair, ByTileID.Chair},
+                {furniture.bed, ByTileID.Bed},
+                {furniture.bench, ByTileID.Bench},
+                {furniture.table, ByTileID.Table},
+                {furniture.workbench, ByTileID.WorkBench},
+                {furniture.dresser, ByTileID.Dresser},
+                {furniture.piano, ByTileID.Piano},
+                {furniture.bookcase, ByTileID.Bookcase},
+                {furniture.bathtub, ByTileID.Bathtub},
+                {furniture.sink, ByTileID.Sink},
+                {furniture.clock, ByTileID.GrandfatherClock},
+                {furniture.bottle, ByTileID.Bottle},
+                {furniture.bowl, ByTileID.Bowl},
+                {furniture.beachstuff, ByTileID.BeachPile},
+                {furniture.tombstone, ByTileID.Tombstone},
+                {furniture.campfire, ByTileID.Campfire},
+                {furniture.statue, ByTileID.Statue},
+                {furniture.statue_alphabet, ByTileID.AlphabetStatue},
+                {furniture.crate, ByTileID.FishingCrate},
+                {furniture.monolith, ByTileID.LunarMonolith},
+                {furniture.cooking_pot, ByTileID.CookingPot},
+                {furniture.anvil, ByTileID.Anvil},
+                {furniture.cannon, ByTileID.Cannon},
+                {furniture.planter, ByTileID.PlanterBox},
+                {furniture.fountain, ByTileID.WaterFountain},
+            };
+        }
 
         public static readonly IDictionary<Trait, Func<Item, bool>> TConditionTable = new Dictionary<Trait, Func<Item, bool>>
         {
             {Trait.quest_item, (i) => i.questItem},
-            {Trait.expert, (i) => i.expert},
-            {Trait.material, (i) => i.material},
-            {Trait.mech, (i) => i.mech},
+            {Trait.expert, (i)     => i.expert},
+            {Trait.material, (i)   => i.material},
+            {Trait.mech, (i)       => i.mech},
 
-            {Trait.bait, (i) => i.bait > 0},
+            {Trait.bait, (i)       => i.bait > 0},
 
             {Trait.melee, (i) => i.melee},
             {Trait.melee_style_swing, Weapons.Melee.Swing},
@@ -518,19 +708,19 @@ namespace InvisibleHand.Items
 
             {Trait.has_projectile, (i) => i.shoot > 0},
 
-            {Trait.defense, (i) => i.defense > 0},
-            {Trait.reach_boost, (i) => i.tileBoost > 0},
+            {Trait.defense, (i)       => i.defense > 0},
+            {Trait.reach_boost, (i)   => i.tileBoost > 0},
             {Trait.reach_penalty, (i) => i.tileBoost < 0},
 
-            {Trait.heal_life, (i) => i.healLife > 0},
+            {Trait.heal_life, (i)  => i.healLife > 0},
             {Trait.regen_life, (i) => i.lifeRegen > 0},
-            {Trait.heal_mana, (i) => i.healMana > 0},
+            {Trait.heal_mana, (i)  => i.healMana > 0},
             {Trait.boost_mana, (i) => i.manaIncrease > 0},
 
             {Trait.use_mana, (i) => i.mana > 0},
 
-            {Trait.pick, (i) => i.pick > 0},
-            {Trait.axe, (i) => i.axe > 0},
+            {Trait.pick, (i)   => i.pick > 0},
+            {Trait.axe, (i)    => i.axe > 0},
             {Trait.hammer, (i) => i.hammer > 0},
 
             {Trait.wand, (i) => i.tileWand > 0},
@@ -538,25 +728,25 @@ namespace InvisibleHand.Items
             {Trait.wrench, Binary.isWrench},
 
             {Trait.accessory, (i) => i.accessory},
-            {Trait.vanity, (i) => i.vanity},
+            {Trait.vanity, (i)    => i.vanity},
 
             // armor slots
             {Trait.slot_head, (i) => i.headSlot > 0},
             {Trait.slot_body, (i) => i.bodySlot > 0},
-            {Trait.slot_leg, (i) => i.legSlot > 0},
+            {Trait.slot_leg, (i)  => i.legSlot > 0},
 
 
             // accy slots
-            {Trait.slot_face, (i) => i.faceSlot > 0},
-            {Trait.slot_neck, (i) => i.neckSlot > 0},
-            {Trait.slot_back, (i) => i.backSlot > 0},
-            {Trait.wings, (i) => i.wingSlot > 0},
-            {Trait.slot_handon, (i) => i.handOnSlot > 0},
+            {Trait.slot_face, (i)    => i.faceSlot > 0},
+            {Trait.slot_neck, (i)    => i.neckSlot > 0},
+            {Trait.slot_back, (i)    => i.backSlot > 0},
+            {Trait.wings, (i)        => i.wingSlot > 0},
+            {Trait.slot_handon, (i)  => i.handOnSlot > 0},
             {Trait.slot_handoff, (i) => i.handOffSlot > 0},
-            {Trait.slot_shield, (i) => i.shieldSlot > 0},
-            {Trait.slot_waist, (i) => i.waistSlot > 0},
-            {Trait.balloon, (i) => i.balloonSlot > 0},
-            {Trait.slot_front, (i) => i.frontSlot > 0},
+            {Trait.slot_shield, (i)  => i.shieldSlot > 0},
+            {Trait.slot_waist, (i)   => i.waistSlot > 0},
+            {Trait.balloon, (i)      => i.balloonSlot > 0},
+            {Trait.slot_front, (i)   => i.frontSlot > 0},
 
             {Trait.placeable, Binary.CanBePlaced},
             {Trait.equipable, Binary.isEquipable},
@@ -580,7 +770,7 @@ namespace InvisibleHand.Items
             {Trait.dye_lunar, Dye.LunarDyes},
 
             {Trait.hair_dye, (i) => i.hairDye != 0},
-            {Trait.paint, (i) => i.paint > 0},
+            {Trait.paint, (i)    => i.paint > 0},
 
             {Trait.pet_light, Binary.isLightPet},
             {Trait.pet_vanity, Binary.isVanityPet},
@@ -649,9 +839,9 @@ namespace InvisibleHand.Items
             {Trait.anvil, ByTileID.Anvil}, // just the low-level ones (iron & lead)
 
             {Trait.wall_deco, Groupings.WallDeco},
-            {Trait.trophy, (i) => Types.WallDeco(i) == WallDecoType.Trophy},
+            {Trait.trophy, (i)   => Types.WallDeco(i) == WallDecoType.Trophy},
             {Trait.painting, (i) => Types.WallDeco(i) == WallDecoType.Painting},
-            {Trait.rack, (i) => Types.WallDeco(i) == WallDecoType.Rack},
+            {Trait.rack, (i)     => Types.WallDeco(i) == WallDecoType.Rack},
 
 
             {Trait.firework, ByTileID.Firework},
@@ -666,14 +856,14 @@ namespace InvisibleHand.Items
             {Trait.musicbox, ByTileID.MusicBox},
 
             {Trait.ammo, Binary.isAmmo},
-            {Trait.arrow, (i) => i.ammo == 1},
+            {Trait.arrow, (i)  => i.ammo == 1},
             {Trait.bullet, (i) => i.ammo == 14},
             {Trait.rocket, (i) => i.ammo == 771},
-            {Trait.dart, (i) => i.ammo == 51},
+            {Trait.dart, (i)   => i.ammo == 51},
 
             // {Trait.gel, (i) => i.ammo == 23},
-            {Trait.ammo_sand, (i) => i.ammo == 42},
-            {Trait.coin, (i) => i.ammo == 71},
+            {Trait.ammo_sand, (i)     => i.ammo == 42},
+            {Trait.coin, (i)          => i.ammo == 71},
             {Trait.ammo_solution, (i) => i.ammo == 780},
 
             {Trait.endless, (i) => i.ammo > 0 && !i.consumable},

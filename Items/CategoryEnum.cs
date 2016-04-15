@@ -538,11 +538,16 @@ namespace InvisibleHand.Items
         COUNT
     }
 
+    internal static class ItemFlags
+    {
+
+
     [Flags]
-    public enum generalTraits
+    public enum general
     {
         none                    = 0,
         expert                  = 1,
+        quest_item              = 1 << 1,
         material                = 1 << 2,
         mech                    = 1 << 3,
         bait                    = 1 << 4,
@@ -563,26 +568,29 @@ namespace InvisibleHand.Items
         tool                    = 1 << 19,
         placeable               = 1 << 20,
         consumable              = 1 << 21,
-        quest_item              = 1 << 1,
+        dye                     = 1 << 22,
     }
 
     [Flags]
-    public enum placeabletype
+    public enum placeable
     {
-        none     = 0,
+        none      = 0,
         furniture = 1,
-        seed = 1 << 1,
-        block = 1 << 2,
-        brick = 1 << 3,
-        ore = 1 << 4,
-        bar = 1 << 5,
-        wood = 1 << 6,
-        wall = 1 << 7,
+        seed      = 1 << 1,
+        block     = 1 << 2,
+        brick     = 1 << 3,
+        ore       = 1 << 4,
+        bar       = 1 << 5,
+        wood      = 1 << 6,
+        wall      = 1 << 7,
         wall_deco = 1 << 8,
+        dye_plant = 1 << 9,
+        strange_plant = 1 << 10,
+        gem = 1 << 11,
     }
 
     [Flags]
-    public enum ammotype
+    public enum ammo
     {
         none     = 0,
         arrow    = 1,
@@ -600,21 +608,21 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum dyetype
+    public enum dye
     {
         none         = 0,
-        dye_basic    = 1,
-        dye_black    = 1 << 1,
-        dye_bright   = 1 << 2,
-        dye_silver   = 1 << 3,
-        dye_flame    = 1 << 4,
-        dye_gradient = 1 << 5,
-        dye_strange  = 1 << 6,
-        dye_lunar    = 1 << 7,
+        basic    = 1,
+        black    = 1 << 1,
+        bright   = 1 << 2,
+        silver   = 1 << 3,
+        flame    = 1 << 4,
+        gradient = 1 << 5,
+        strange  = 1 << 6,
+        lunar    = 1 << 7,
     }
 
     [Flags]
-    public enum equiptype
+    public enum equip
     {
         none           = 0,
         armor          = 1,
@@ -651,7 +659,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum weaponflags
+    public enum weapon : ulong
     {
         none = 0,
         automatic = 1,
@@ -689,10 +697,10 @@ namespace InvisibleHand.Items
             homing     = 1 << 28,
             bouncing   = 1 << 29,
             controlled = 1 << 30,
-            stream     = 1 << 31,
+            stream     = 1ul << 31,
             piercing   = 1 << 23,
 
-        summon         = 1 << 32,
+        summon         = 1ul << 32,
             minion     = 1 << 24,
             sentry     = 1 << 22,
 
@@ -701,7 +709,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum toolflags
+    public enum tool
     {
         none         = 0,
         pick         = 1,
@@ -715,7 +723,7 @@ namespace InvisibleHand.Items
     }
 
     [Flags]
-    public enum consumabletype
+    public enum consumable
     {
         none   = 0,
         buff   = 1,
@@ -727,69 +735,73 @@ namespace InvisibleHand.Items
         mana   = 1 << 6,
     }
 
+    [Flags]
     public enum housing
     {
-        door,
-        light,
-        chair,
-        table,
+        none = 0,
+        door = 1,
+        light = 1 << 1,
+        chair = 1 << 2,
+        table = 1 << 3,
     }
 
     [Flags]
-    public enum furniture
+    public enum furniture : ulong
     {
         none                      = 0,
-        valid_housing,            = 1,
-        clutter,                  = 1 << 1,
-        crafting_station,         = 1 << 2,
-        container,                = 1 << 3,
-        useable,                  = 1 << 4,
-        decorative,               = 1 << 5,
+        valid_housing            = 1,
+        clutter                  = 1 << 1,
+        crafting_station         = 1 << 2,
+        container                = 1 << 3,
+        useable                  = 1 << 4,
+        decorative               = 1 << 5,
 
         // housing_furniture,
             // housing_door,
-                door,             = 1 << 6,
+                door             = 1 << 6,
 
 
             // housing_light,
-                torch,            = 1 << 7,
-                candle,           = 1 << 8,
-                chandelier,       = 1 << 9,
-                hanging_lantern,  = 1 << 10,
-                lamp,             = 1 << 11,
-                holiday_light,    = 1 << 12,
-                candelabra,       = 1 << 13,
+                torch            = 1 << 7,
+                candle           = 1 << 8,
+                chandelier       = 1 << 9,
+                hanging_lantern  = 1 << 10,
+                lamp             = 1 << 11,
+                holiday_light    = 1 << 12,
+                candelabra       = 1 << 13,
 
             // housing_chair,
-                chair,            = 1 << 15,
-                bed,              = 1 << 16,
-                bench,            = 1 << 17,
+                chair            = 1 << 15,
+                bed              = 1 << 16,
+                bench            = 1 << 17,
 
             // housing_table,
-                table,            = 1 << 18,
-                workbench,        = 1 << 19,
-                dresser,          = 1 << 20,
-                piano,            = 1 << 21,
-                bookcase,         = 1 << 22,
-                bathtub,          = 1 << 23,
+                table            = 1 << 18,
+                workbench        = 1 << 19,
+                dresser          = 1 << 20,
+                piano            = 1 << 21,
+                bookcase         = 1 << 22,
+                bathtub          = 1 << 23,
 
         // other
-        sink,                     = 1 << 24,
-        clock,                    = 1 << 25,
-        bottle,                   = 1 << 26,
-        bowl,                     = 1 << 27,
-        beachstuff,               = 1 << 28,
-        tombstone,                = 1 << 29,
-        campfire,                 = 1 << 30,
-        statue,                   = 1 << 31,
-        statue_alphabet,          = 1 << 32,
-        crate,                    = 1 << 33,
-        monolith,                 = 1 << 34,
-        cooking_pot,              = 1 << 35,
-        anvil,                    = 1 << 36,
-        cannon,                   = 1 << 37,
-        planter,                  = 1 << 14,
+        sink                     = 1 << 24,
+        clock                    = 1 << 25,
+        bottle                   = 1 << 26,
+        bowl                     = 1 << 27,
+        beachstuff               = 1 << 28,
+        tombstone                = 1 << 29,
+        campfire                 = 1 << 30,
+        statue                   = 1ul << 31,
+        statue_alphabet          = 1ul << 32,
+        crate                    = 1ul << 33,
+        monolith                 = 1ul << 34,
+        cooking_pot              = 1ul << 35,
+        anvil                    = 1ul << 36,
+        cannon                   = 1ul << 37,
+        fountain                 = 1ul << 38,
+        planter                  = 1 << 14,
     }
+}
 
 
 }

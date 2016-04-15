@@ -21,6 +21,18 @@ namespace InvisibleHand.Items
             return iwi.TraitList;
         }
 
+        private static void ClassifyItem(Item item, CategoryInfo info)
+        {
+            classifyitem(new ItemWithInfo(item, info));
+        }
+
+        private static void classifyitem(ItemWithInfo item)
+        {
+            var _item = item.item;
+            bool weapon, tool, placeable;
+            weapon = tool = placeable = false;
+        }
+
         private static void classify(ItemWithInfo item)
         {
             var _item = item.item;

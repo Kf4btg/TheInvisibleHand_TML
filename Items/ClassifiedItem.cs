@@ -26,6 +26,7 @@ namespace InvisibleHand.Items
             else
             {
                 cinfo.Traits = ItemCategorizer.Classify(item);
+                // ItemCategorizer.ClassifyItem(item, cinfo);
                 // classify(item, getCategoryInfo(item));
             }
         }

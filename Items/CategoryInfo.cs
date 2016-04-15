@@ -9,6 +9,25 @@ using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
+
+    internal struct FlagInfo
+    {
+        internal ItemFlags.general general;
+
+        internal ItemFlags.placeable placeable;
+        internal ItemFlags.housing meetsHousingNeed;
+        internal ItemFlags.furniture furniture;
+
+        internal ItemFlags.weapon weapon;
+        internal ItemFlags.tool tool;
+        internal ItemFlags.ammo ammo;
+
+        internal ItemFlags.equip equip;
+        internal ItemFlags.dye dye;
+        internal ItemFlags.consumable consumable;
+
+    }
+
     /// store the information about an item's category here.
     public class CategoryInfo : ItemInfo
     {
@@ -30,7 +49,24 @@ namespace InvisibleHand.Items
             }
         }
 
-        public BitArray TraitArray = new BitArray((int)Trait.COUNT, false);
+        internal FlagInfo flags;
+
+        // public BitArray TraitArray = new BitArray((int)Trait.COUNT, false);
+        //
+        // internal ItemFlags.general flags_general = ItemFlags.general.none;
+        //
+        // internal ItemFlags.placeable flags_placeable = ItemFlags.placeable.none;
+        // internal ItemFlags.housing meetsHousingNeed = ItemFlags.housing.none;
+        // internal ItemFlags.furniture flags_furniture = ItemFlags.furniture.none;
+        //
+        // internal ItemFlags.weapon flags_weapon = ItemFlags.weapon.none;
+        // internal ItemFlags.tool flags_tool = ItemFlags.tool.none;
+        // internal ItemFlags.ammo flags_ammo = ItemFlags.ammo.none;
+        //
+        // internal ItemFlags.equip flags_equip = ItemFlags.equip.none;
+        // internal ItemFlags.dye flags_dye = ItemFlags.dye.none;
+        // internal ItemFlags.consumable flags_consumable = ItemFlags.consumable.none;
+
 
 
         public void AddTrait(Trait t)
@@ -69,8 +105,9 @@ namespace InvisibleHand.Items
     internal class ItemWithInfo
     {
         public Item item;
-        // public CategoryInfo info;
+        public CategoryInfo info;
 
+        private static IDictionary<string, IList<Enum>> traitstore;
 
         // for the multi-tag operations, this can be checked to see if the operation was successful for that given scenario.
         /// Holds whether the most recent tagging attempt was successful
@@ -83,6 +120,14 @@ namespace InvisibleHand.Items
         public ISet<Trait> TraitList { get; private set; }
 
         private IDictionary<Trait, Func<Item, bool>> conditionTable;
+
+        public ItemWithInfo(Item item, CategoryInfo info)
+        {
+            this.item = item;
+            this.info = info;
+            this.conditionTable = Rules.TConditionTable;
+            this.TraitList = new HashSet<Trait>();
+        }
 
         public ItemWithInfo(Item item)
         {
@@ -125,6 +170,51 @@ namespace InvisibleHand.Items
             // if we've gotten here, then the condition check (if any)
             // was successful, so we set LastResult=true
             Success = true;
+            return this;
+        }
+
+        public ItemWithInfo SetFlag(string type, Enum flag)
+        {
+            switch (type)
+            {
+                case "general":
+                    info.flags.general |= (ItemFlags.general)flag;
+                    break;
+                case "placeable":
+                    info.flags.placeable |= (ItemFlags.placeable)flag;
+                    break;
+                case "housing":
+                    info.flags.meetsHousingNeed |= (ItemFlags.housing)flag;
+                    break;
+                case "furniture":
+                    info.flags.furniture |= (ItemFlags.furniture)flag;
+                    break;
+                case "weapon":
+                    info.flags.weapon |= (ItemFlags.weapon)flag;
+                    break;
+                case "tool":
+                    info.flags.tool |= (ItemFlags.tool)flag;
+                    break;
+                case "ammo":
+                    info.flags.ammo |= (ItemFlags.ammo)flag;
+                    break;
+                case "equip":
+                    info.flags.equip |= (ItemFlags.equip)flag;
+                    break;
+                case "consumable":
+                    info.flags.consumable |= (ItemFlags.consumable)flag;
+                    break;
+                case "dye":
+                    info.flags.dye |= (ItemFlags.dye)flag;
+                    break;
+
+            }
+            return this;
+        }
+
+        public ItemWithInfo Flag(Enum flag)
+        {
+
             return this;
         }
 
