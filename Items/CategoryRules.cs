@@ -210,7 +210,7 @@ namespace InvisibleHand.Items
             public static bool GoesInExtractinator(Item item) => ItemID.Sets.NebulaPickup[item.type];
         }
 
-        internal static class Dye
+        internal static class Dyes
         {
             private const short base_dye_start = 1007; // ItemID.RedDye
             private const short base_dye_end   = 1018; // ItemID.PinkDye
@@ -456,14 +456,14 @@ namespace InvisibleHand.Items
         //  1) Use Recipe.ItemMatches() for added materials
         //
 
-        public static bool REPLACE_ME(Item item) => true;
+        internal static bool REPLACE_ME(Item item) => true;
 
         /// C# just doesn't understand ducks...
         public static readonly dynamic ConditionMatrix = new ExpandoObject();
 
-        static Rules()
+        internal static class Conditions
         {
-            ConditionMatrix.General = new Dictionary<general, Func<Item, bool>>()
+            public static readonly Dictionary<general, Func<Item, bool>> General = new Dictionary<general, Func<Item, bool>>()
             {
                 {general.quest_item, (i)    => i.questItem},
                 {general.expert, (i)        => i.expert},
@@ -485,7 +485,7 @@ namespace InvisibleHand.Items
                 {general.consumable, Binary.isConsumable},
                 {general.weapon, Binary.isWeapon},
             };
-            ConditionMatrix.Placeable = new Dictionary<placeable, Func<Item, bool>>()
+            public static readonly Dictionary<placeable, Func<Item, bool>> Placeable = new Dictionary<placeable, Func<Item, bool>>()
             {
                 // {placeable.furniture, REPLACE_ME},
                 {placeable.seed, ByTileID.ImmatureHerb},
@@ -500,7 +500,7 @@ namespace InvisibleHand.Items
                 {placeable.wall_deco, Groupings.WallDeco},
                 {placeable.gem, ByTileID.Gem},
             };
-            ConditionMatrix.Ammo = new Dictionary<ammo, Func<Item, bool>>()
+            public static readonly Dictionary<ammo, Func<Item, bool>> Ammo = new Dictionary<ammo, Func<Item, bool>>()
             {
                 {ammo.arrow, (i)  => i.ammo == 1},
                 {ammo.bullet, (i)  => i.ammo == 14},
@@ -512,18 +512,18 @@ namespace InvisibleHand.Items
                 {ammo.endless, (i) => i.ammo > 0 && !i.consumable},
                 // {ammo.bomb, REPLACE_ME}
             };
-            ConditionMatrix.Dye = new Dictionary<dye, Func<Item, bool>>()
+            public static readonly Dictionary<dye, Func<Item, bool>> Dye = new Dictionary<dye, Func<Item, bool>>()
             {
-                {dye.basic, Dye.BasicDyes},
-                {dye.black, Dye.BlackDyes},
-                {dye.bright, Dye.BrightDyes},
-                {dye.silver, Dye.SilverDyes},
-                {dye.flame, Dye.FlameDyes},
-                {dye.gradient, Dye.GradientDyes},
-                {dye.strange, Dye.StrangeDyes},
-                {dye.lunar, Dye.LunarDyes},
+                {dye.basic, Dyes.BasicDyes},
+                {dye.black, Dyes.BlackDyes},
+                {dye.bright, Dyes.BrightDyes},
+                {dye.silver, Dyes.SilverDyes},
+                {dye.flame, Dyes.FlameDyes},
+                {dye.gradient, Dyes.GradientDyes},
+                {dye.strange, Dyes.StrangeDyes},
+                {dye.lunar, Dyes.LunarDyes},
             };
-            ConditionMatrix.Equip = new Dictionary<equip, Func<Item, bool>>()
+            public static readonly Dictionary<equip, Func<Item, bool>> Equip = new Dictionary<equip, Func<Item, bool>>()
             {
                 // {equip.armor, REPLACE_ME},
                 {equip.accessory, (i) => i.accessory},
@@ -551,7 +551,7 @@ namespace InvisibleHand.Items
                 // {equip.grapple_multi, REPLACE_ME},
                 // {equip.mount_cart, REPLACE_ME},
             };
-            ConditionMatrix.Weapon = new Dictionary<weapon, Func<Item, bool>>()
+            public static readonly Dictionary<weapon, Func<Item, bool>> Weapon = new Dictionary<weapon, Func<Item, bool>>()
             {
                 {weapon.automatic, (i) => i.autoReuse},
                 {weapon.melee, (i) => i.melee},
@@ -591,7 +591,7 @@ namespace InvisibleHand.Items
                 {weapon.throwing, (i) => i.thrown},
                 // {weapon.weapon_other, REPLACE_ME},
             };
-            ConditionMatrix.Tool = new Dictionary<tool, Func<Item, bool>>()
+            public static readonly Dictionary<tool, Func<Item, bool>> Tool = new Dictionary<tool, Func<Item, bool>>()
             {
                 {tool.pick, (i)         => i.pick > 0},
                 {tool.axe, (i)          => i.axe > 0},
@@ -602,7 +602,7 @@ namespace InvisibleHand.Items
                 // {tool.recall, REPLACE_ME},
                 // {tool.other, REPLACE_ME},
             };
-            ConditionMatrix.Consumable = new Dictionary<consumable, Func<Item, bool>>()
+            public static readonly Dictionary<consumable, Func<Item, bool>> Consumable = new Dictionary<consumable, Func<Item, bool>>()
             {
                 {consumable.buff, Binary.timedBuff},
                 {consumable.food, Binary.isFood},
@@ -612,14 +612,14 @@ namespace InvisibleHand.Items
                 // {consumable.life, REPLACE_ME},
                 // {consumable.mana, REPLACE_ME},
             };
-            ConditionMatrix.Housing = new Dictionary<housing, Func<Item, bool>>()
+            public static readonly Dictionary<housing, Func<Item, bool>> Housing = new Dictionary<housing, Func<Item, bool>>()
             {
                 {housing.door, Groupings.housingDoor},
                 {housing.light, Groupings.housingTorch},
                 {housing.chair, Groupings.housingChair},
                 {housing.table, Groupings.housingTable},
             };
-            ConditionMatrix.Furniture = new Dictionary<furniture, Func<Item, bool>>()
+            public static readonly Dictionary<furniture, Func<Item, bool>> Furniture = new Dictionary<furniture, Func<Item, bool>>()
             {
                 {furniture.valid_housing, Groupings.Furniture},
                 // {furniture.clutter, REPLACE_ME},
@@ -760,14 +760,14 @@ namespace InvisibleHand.Items
             {Trait.potion, Binary.isPotion}, // dependent on consumable & !isFood
 
             {Trait.dye, (i) => i.dye > 0},
-            {Trait.dye_basic, Dye.BasicDyes},
-            {Trait.dye_black, Dye.BlackDyes},
-            {Trait.dye_bright, Dye.BrightDyes},
-            {Trait.dye_silver, Dye.SilverDyes},
-            {Trait.dye_flame, Dye.FlameDyes},
-            {Trait.dye_gradient, Dye.GradientDyes},
-            {Trait.dye_strange, Dye.StrangeDyes},
-            {Trait.dye_lunar, Dye.LunarDyes},
+            {Trait.dye_basic, Dyes.BasicDyes},
+            {Trait.dye_black, Dyes.BlackDyes},
+            {Trait.dye_bright, Dyes.BrightDyes},
+            {Trait.dye_silver, Dyes.SilverDyes},
+            {Trait.dye_flame, Dyes.FlameDyes},
+            {Trait.dye_gradient, Dyes.GradientDyes},
+            {Trait.dye_strange, Dyes.StrangeDyes},
+            {Trait.dye_lunar, Dyes.LunarDyes},
 
             {Trait.hair_dye, (i) => i.hairDye != 0},
             {Trait.paint, (i)    => i.paint > 0},
