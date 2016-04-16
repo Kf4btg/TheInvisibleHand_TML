@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 namespace InvisibleHand.Items
 {
     using static ItemFlags;
+    using ConditionTable = Dictionary<int, Func<Item, bool>>;
 
     public static class ClassificationRules
     {
@@ -212,64 +213,109 @@ namespace InvisibleHand.Items
         internal static class Dyes
         {
             private const short base_dye_start = 1007; // ItemID.RedDye
-            private const short base_dye_end   = 1018; // ItemID.PinkDye
+            private const short base_dye_end = 1018; // ItemID.PinkDye
+            private const short dye_range_length = base_dye_end - base_dye_start + 1;
 
-            private const short black_dye_start = base_dye_start + 12;
-            private const short black_dye_end   = base_dye_end + 12;
+            private static readonly IEnumerable<int> basic_dye_ids =
+                (Enumerable.Range(base_dye_start, dye_range_length)
+                    .ToList()
+                    .Concat(new int[3] { ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye }))
+                    .ToList();
 
-            private const short bright_dye_start = base_dye_start + 31;
-            private const short bright_dye_end   = base_dye_end + 31;
+            private static readonly IEnumerable<int> black_dye_ids =
+                (Enumerable.Range(base_dye_start + 12, dye_range_length)
+                .ToList()
+                .Concat(new int[2] { ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye }))
+                .ToList();
 
-            private const short silver_dye_start = base_dye_start + 44;
-            private const short silver_dye_end   = base_dye_end + 44;
+            private static readonly IEnumerable<int> bright_dye_ids =
+                (Enumerable.Range(base_dye_start + 31, dye_range_length)
+                .ToList()
+                .Concat(new int[2] { ItemID.BrownDye + 2, ItemID.BrightSilverDye }))
+                .ToList();
 
-            private static readonly int[] other_base_dyes = new int[3] { ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye };
-            private static readonly int[] other_black_dyes = new int[2] { ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye };
-            private static readonly int[] other_bright_dyes = new int[2] { ItemID.BrownDye + 2, ItemID.BrightSilverDye };
-            private static readonly int[] other_silver_dyes = new int[2] { ItemID.BrownDye + 3, ItemID.SilverAndBlackDye };
+            private static readonly IEnumerable<int> silver_dye_ids =
+                (Enumerable.Range(base_dye_start + 44, dye_range_length)
+                .ToList()
+                .Concat(new int[2] { ItemID.BrownDye + 3, ItemID.SilverAndBlackDye }))
+                .ToList();
 
-
-            public static bool BasicDyes(Item item) => (item.type >= base_dye_start && item.type <= base_dye_end) || other_base_dyes.Contains(item.type);
-
-            /// the "... and Black" dyes
-            public static bool BlackDyes(Item item) => (item.type >= black_dye_start && item.type <= black_dye_end) || other_black_dyes.Contains(item.type);
-
-            public static bool BrightDyes(Item item) => (item.type >= bright_dye_start && item.type <= bright_dye_end) || other_bright_dyes.Contains(item.type);
-
-            /// the "... and Silver" dyes
-            public static bool SilverDyes(Item item) => (item.type >= silver_dye_start && item.type <= silver_dye_end) || other_silver_dyes.Contains(item.type);
-
-            /// including intense versions
-            public static bool FlameDyes(Item item) => (item.type >= 1031 && item.type <= 1036) || (item.type >= 1063 && item.type <= 1065) || (item.type >= 3550 && item.type <= 3552);
-
-            /// gradient and rainbow dyes
-            public static bool GradientDyes(Item item) => (item.type >= 1066 && item.type <= 1070);
-
-
-            private static readonly Tuple<int, int>[] strange_dye_ranges = new[]
+            private static readonly IEnumerable<int>[] flame_dye_ids = new[]
             {
-                Tuple.Create(2869, 2873),
-                Tuple.Create(2883, 2885),
-                Tuple.Create(3024, 3028),
-                Tuple.Create(3038, 3042),
-                Tuple.Create(3533, 3535),
-                Tuple.Create(3553, 3556),
-                Tuple.Create(3560, 3562),
-                Tuple.Create(3597, 3600)
+                Enumerable.Range(1031, 1036-1031+1),
+                Enumerable.Range(1063, 1065-1063+1),
+                Enumerable.Range(3550, 3552-3550+1)
             };
 
-            private static readonly int[] more_strange_dyes = new int[4] { 2878, 2879, 3190, 3530 };
+            private static readonly IEnumerable<int> gradient_dye_ids = Enumerable.Range(1066, 1070 - 1066 + 1).ToList();
+
+            // private const short black_dye_start = base_dye_start + 12;
+            // private const short black_dye_end   = base_dye_end + 12;
+            //
+            // private const short bright_dye_start = base_dye_start + 31;
+            // private const short bright_dye_end   = base_dye_end + 31;
+            //
+            // private const short silver_dye_start = base_dye_start + 44;
+            // private const short silver_dye_end   = base_dye_end + 44;
+            //
+            // private static readonly int[] other_base_dyes = new int[3] { ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye };
+            // private static readonly int[] other_black_dyes = new int[2] { ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye };
+            // private static readonly int[] other_bright_dyes = new int[2] { ItemID.BrownDye + 2, ItemID.BrightSilverDye };
+            // private static readonly int[] other_silver_dyes = new int[2] { ItemID.BrownDye + 3, ItemID.SilverAndBlackDye };
+
+
+            public static bool BasicDyes(Item item) => basic_dye_ids.Contains(item.type);
+            // (item.type >= base_dye_start && item.type <= base_dye_end) || other_base_dyes.Contains(item.type);
+
+            /// the "... and Black" dyes
+            public static bool BlackDyes(Item item) =>  basic_dye_ids.Contains(item.type);
+            //  (item.type >= black_dye_start && item.type <= black_dye_end) || other_black_dyes.Contains(item.type);
+
+            public static bool BrightDyes(Item item) => basic_dye_ids.Contains(item.type);
+            // (item.type >= bright_dye_start && item.type <= bright_dye_end) || other_bright_dyes.Contains(item.type);
+
+            /// the "... and Silver" dyes
+            public static bool SilverDyes(Item item) =>  basic_dye_ids.Contains(item.type);
+            // (item.type >= silver_dye_start && item.type <= silver_dye_end) || other_silver_dyes.Contains(item.type);
+
+            /// gradient and rainbow dyes
+            public static bool GradientDyes(Item item) => gradient_dye_ids.Contains(item.type);
+
+            /// including intense versions
+            public static bool FlameDyes(Item item)
+            {
+                var itemid = item.type;
+                foreach (var range in flame_dye_ids)
+                {
+                    if (range.Contains(itemid)) return true;
+                }
+                return false;
+            }
+
+            private static readonly IEnumerable<int>[] strange_dye_ranges = new[]
+            {
+                Enumerable.Range(2869, 2873-2869+1),
+                Enumerable.Range(2883, 2885-2883+1),
+                Enumerable.Range(3024, 3028-3024+1),
+                Enumerable.Range(3038, 3042-3038+1),
+                Enumerable.Range(3533, 3535-3533+1),
+                Enumerable.Range(3553, 3556-3553+1),
+                Enumerable.Range(3560, 3562-3560+1),
+                Enumerable.Range(3597, 3600-3597+1),
+                new[] {2878, 2879, 3190, 3530}
+            };
+
+            // private static readonly int[] more_strange_dyes = new int[4] { 2878, 2879, 3190, 3530 };
 
             public static bool StrangeDyes(Item item)
             {
                 var itemid = item.type;
 
-                if (more_strange_dyes.Contains(itemid)) return true;
+                // if (more_strange_dyes.Contains(itemid)) return true;
 
                 foreach (var range in strange_dye_ranges)
                 {
-                    if (itemid >= range.Item1 && itemid <= range.Item2)
-                        return true;
+                    if (range.Contains(itemid)) return true;
                 }
                 return false;
             }
@@ -295,10 +341,10 @@ namespace InvisibleHand.Items
 
             /// call with an Item instance and the name of a
             /// property such as "faceSlot", "wingsSlot", etc.
-            public static bool AccySlot(Item item, string slot_type)
-            {
-                return (int)(typeof(Item).GetField(slot_type, BindingFlags.Public | BindingFlags.Instance).GetValue(item)) > 0;
-            }
+            // public static bool AccySlot(Item item, string slot_type)
+            // {
+            //     return (int)(typeof(Item).GetField(slot_type, BindingFlags.Public | BindingFlags.Instance).GetValue(item)) > 0;
+            // }
 
             // public static string AccessoryType(Item item)
             // {
@@ -460,285 +506,557 @@ namespace InvisibleHand.Items
         /// C# just doesn't understand ducks...
         internal static class Conditions
         {
-            public static readonly Dictionary<int, Func<Item, bool>>
-            General = new Dictionary<int, Func<Item, bool>>()
+            public static readonly Dictionary<ItemFlags.Type, ConditionTable> Matrix =
+            new Dictionary<ItemFlags.Type, ConditionTable>()
             {
-                {general.quest_item, (i)    => i.questItem},
-                {general.expert, (i)        => i.expert},
-                {general.material, (i)      => i.material},
-                {general.mech, (i)          => i.mech},
-                {general.channeled, (i)     => i.channel},
-                {general.bait, (i)          => i.bait > 0},
-                {general.reach_boost, (i)   => i.tileBoost > 0},
-                {general.reach_penalty, (i) => i.tileBoost < 0},
-                {general.heal_life, (i)     => i.healLife > 0},
-                {general.regen_life, (i)    => i.lifeRegen > 0},
-                {general.heal_mana, (i)     => i.healMana > 0},
-                {general.boost_mana, (i)    => i.manaIncrease > 0},
-                {general.use_mana, (i)      => i.mana > 0},
-                {general.vanity, (i)        => i.vanity},
-                {general.dye, (i)           => i.dye > 0},
-                {general.equipable, Binary.isEquipable},
-                {general.placeable, Binary.CanBePlaced},
-                {general.consumable, Binary.isConsumable},
-                {general.weapon, Binary.isWeapon},
-                {general.ammo, Binary.isAmmo},
-                {general.soul, Groupings.Soul},
-                {general.hair_dye, (i) => i.hairDye > 0},
-                {general.coin, (i) => i.ammo == 71},
-                {general.paint, (i) => i.paint > 0},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Placeable = new Dictionary<int, Func<Item, bool>>()
-            {
-                // {placeable.furniture, REPLACE_ME},
-                {placeable.seed, ByTileID.ImmatureHerb},
-                {placeable.dye_plant, ByTileID.DyePlant},
-                {placeable.strange_plant, Groupings.StrangePlant},
-                // {placeable.block, REPLACE_ME},
-                // {placeable.brick, REPLACE_ME},
-                {placeable.ore, Groupings.Ore},
-                {placeable.bar, ByTileID.MetalBar},
-                // {placeable.wood, REPLACE_ME},
-                {placeable.wall, (i) => i.createWall > 0},
-                {placeable.wall_deco, Groupings.WallDeco},
-                {placeable.gem, ByTileID.Gem},
-                {placeable.musicbox, ByTileID.MusicBox},
-                {placeable.banner, ByTileID.Banner},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Ammo = new Dictionary<int, Func<Item, bool>>()
-            {
-                {ammo.arrow, (i)  => i.ammo == 1},
-                {ammo.bullet, (i)  => i.ammo == 14},
-                {ammo.rocket, (i)  => i.ammo == 771},
-                {ammo.dart, (i)  => i.ammo == 51},
-                {ammo.sand, (i)  => i.ammo == 42},
-                {ammo.coin, (i)  => i.ammo == 71},
-                {ammo.solution, (i)  => i.ammo == 780},
-                {ammo.endless, (i) => i.ammo > 0 && !i.consumable},
-                // {ammo.bomb, REPLACE_ME}
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Dye = new Dictionary<int, Func<Item, bool>>()
-            {
-                {dye.basic, Dyes.BasicDyes},
-                {dye.black, Dyes.BlackDyes},
-                {dye.bright, Dyes.BrightDyes},
-                {dye.silver, Dyes.SilverDyes},
-                {dye.flame, Dyes.FlameDyes},
-                {dye.gradient, Dyes.GradientDyes},
-                {dye.strange, Dyes.StrangeDyes},
-                {dye.lunar, Dyes.LunarDyes},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Equip = new Dictionary<int, Func<Item, bool>>()
-            {
-                // {equip.armor, REPLACE_ME},
-                {equip.accessory, (i) => i.accessory},
-                // {equip.pet, REPLACE_ME},
-                {equip.vanity, (i)    => i.vanity},
-                {equip.mount, Binary.isMount},
-                {equip.grapple, Binary.isHook},
-                {equip.slot_head, (i) => i.headSlot > 0},
-                {equip.slot_body, (i) => i.bodySlot > 0},
-                {equip.slot_leg, (i)  => i.legSlot > 0},
-                {equip.slot_face,    (i) => i.faceSlot > 0},
-                {equip.slot_neck,    (i) => i.neckSlot > 0},
-                {equip.slot_back,    (i) => i.backSlot > 0},
-                {equip.wings,        (i) => i.wingSlot > 0},
-                {equip.slot_shoe,    (i) => i.shoeSlot > 0},
-                {equip.slot_handon,  (i) => i.handOnSlot > 0},
-                {equip.slot_handoff, (i) => i.handOffSlot > 0},
-                {equip.slot_shield,  (i) => i.shieldSlot > 0},
-                {equip.slot_waist,   (i) => i.waistSlot > 0},
-                {equip.balloon,      (i) => i.balloonSlot > 0},
-                {equip.slot_front,   (i) => i.frontSlot > 0},
-                {equip.pet_light, Binary.isLightPet},
-                {equip.pet_vanity, Binary.isVanityPet},
-                // {equip.grapple_single, REPLACE_ME},
-                // {equip.grapple_multi, REPLACE_ME},
-                // {equip.mount_cart, REPLACE_ME},
-            };
-            public static readonly Dictionary<long, Func<Item, bool>>
-            Weapon = new Dictionary<long, Func<Item, bool>>()
-            {
-                {weapon.automatic, (i) => i.autoReuse},
-                {weapon.melee, (i) => i.melee},
-                {weapon.style_swing, Weapons.Melee.Swing},
-                {weapon.style_jab, Weapons.Melee.Jab},
-                {weapon.style_directional, Weapons.Melee.Directional},
-                {weapon.style_thrown, Weapons.Melee.Thrown},
-                {weapon.broadsword, Weapons.Melee.BroadSword},
-                {weapon.boomerang, Weapons.Melee.Boomerang},
-                {weapon.spear, Weapons.Melee.Spear},
-                {weapon.flail, Weapons.Melee.Flail},
-                {weapon.yoyo, Weapons.Melee.Yoyo},
-                {weapon.has_projectile, (i) => i.shoot > 0},
-                // {weapon.shortsword, REPLACE_ME},
-                {weapon.ranged, (i) => i.ranged},
-                {weapon.bullet_consuming, Weapons.Ranged.BulletConsuming},
-                {weapon.arrow_consuming, Weapons.Ranged.ArrowConsuming},
-                {weapon.rocket_consuming, Weapons.Ranged.RocketConsuming},
-                {weapon.dart_consuming, Weapons.Ranged.DartConsuming},
-                {weapon.gel_consuming, Weapons.Ranged.GelConsuming},
-                {weapon.no_ammo, (i) => i.useAmmo < 0},
-                // {weapon.gun, REPLACE_ME},
-                // {weapon.automatic_gun, REPLACE_ME},
-                // {weapon.bow, REPLACE_ME},
-                // {weapon.repeater, REPLACE_ME},
-                // {weapon.launcher, REPLACE_ME},
-                {weapon.magic, (i) => i.magic},
-                {weapon.area, Weapons.Magic.Area},
-                {weapon.homing, Weapons.Magic.Homing},
-                {weapon.bouncing, Weapons.Magic.Bouncing},
-                {weapon.controlled,Weapons.Magic.Controllable},
-                {weapon.stream, Weapons.Magic.Stream},
-                {weapon.piercing, Weapons.Magic.Piercing},
-                {weapon.summon, (i) => i.summon},
-                {weapon.minion, Weapons.Summon.Minion},
-                {weapon.sentry, Weapons.Summon.Sentry},
-                {weapon.throwing, (i) => i.thrown},
-                // {weapon.weapon_other, REPLACE_ME},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Tool = new Dictionary<int, Func<Item, bool>>()
-            {
-                {tool.pick, (i)         => i.pick > 0},
-                {tool.axe, (i)          => i.axe > 0},
-                {tool.hammer, (i)       => i.hammer > 0},
-                {tool.fishing_pole, (i) => i.fishingPole > 0},
-                {tool.wand, (i)         => i.tileWand > 0},
-                {tool.wrench, Binary.isWrench},
-                // {tool.recall, REPLACE_ME},
-                // {tool.other, REPLACE_ME},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Consumable = new Dictionary<int, Func<Item, bool>>()
-            {
-                {consumable.buff, Binary.timedBuff},
-                {consumable.food, Binary.isFood},
-                {consumable.potion, Binary.isPotion},
-                // {consumable.heal, REPLACE_ME},
-                // {consumable.regen, REPLACE_ME},
-                // {consumable.life, REPLACE_ME},
-                // {consumable.mana, REPLACE_ME},
-            };
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Housing = new Dictionary<int, Func<Item, bool>>()
-            {
-                {housing.door, Groupings.housingDoor},
-                {housing.light, Groupings.housingTorch},
-                {housing.chair, Groupings.housingChair},
-                {housing.table, Groupings.housingTable},
-            };
-            public static readonly Dictionary<long, Func<Item, bool>>
-            Furniture = new Dictionary<long, Func<Item, bool>>()
-            {
-                {furniture.valid_housing, Groupings.Furniture},
-                // {furniture.clutter, REPLACE_ME},
-                {furniture.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
-                {furniture.container, ByTileID.Container},
-                // {furniture.useable, REPLACE_ME},
-                // {furniture.decorative, REPLACE_ME},
-                {furniture.door, ByTileID.Door},
-                {furniture.torch, ByTileID.Torch},
-                {furniture.candle, ByTileID.Candle},
-                {furniture.chandelier, ByTileID.Chandelier},
-                {furniture.hanging_lantern, ByTileID.HangingLantern},
-                {furniture.lamp, ByTileID.Lamp},
-                {furniture.holiday_light, ByTileID.HolidayLight},
-                {furniture.candelabra, ByTileID.Candelabra},
-                {furniture.chair, ByTileID.Chair},
-                {furniture.bed, ByTileID.Bed},
-                {furniture.bench, ByTileID.Bench},
-                {furniture.table, ByTileID.Table},
-                {furniture.workbench, ByTileID.WorkBench},
-                {furniture.dresser, ByTileID.Dresser},
-                {furniture.piano, ByTileID.Piano},
-                {furniture.bookcase, ByTileID.Bookcase},
-                {furniture.bathtub, ByTileID.Bathtub},
-                {furniture.sink, ByTileID.Sink},
-                {furniture.clock, ByTileID.GrandfatherClock},
-                {furniture.bottle, ByTileID.Bottle},
-                {furniture.bowl, ByTileID.Bowl},
-                {furniture.beachstuff, ByTileID.BeachPile},
-                {furniture.tombstone, ByTileID.Tombstone},
-                {furniture.campfire, ByTileID.Campfire},
-                {furniture.statue, ByTileID.Statue},
-                {furniture.statue_alphabet, ByTileID.AlphabetStatue},
-                {furniture.crate, ByTileID.FishingCrate},
-                {furniture.monolith, ByTileID.LunarMonolith},
-                {furniture.cooking_pot, ByTileID.CookingPot},
-                {furniture.anvil, ByTileID.Anvil},
-                {furniture.cannon, ByTileID.Cannon},
-                {furniture.planter, ByTileID.PlanterBox},
-                {furniture.fountain, ByTileID.WaterFountain},
+                {Type.General, new ConditionTable
+                    {
+                        {general.quest_item, (i)    => i.questItem},
+                        {general.expert, (i)        => i.expert},
+                        {general.material, (i)      => i.material},
+                        {general.mech, (i)          => i.mech},
+                        {general.channeled, (i)     => i.channel},
+                        {general.bait, (i)          => i.bait > 0},
+                        {general.reach_boost, (i)   => i.tileBoost > 0},
+                        {general.reach_penalty, (i) => i.tileBoost < 0},
+                        {general.heal_life, (i)     => i.healLife > 0},
+                        {general.regen_life, (i)    => i.lifeRegen > 0},
+                        {general.heal_mana, (i)     => i.healMana > 0},
+                        {general.boost_mana, (i)    => i.manaIncrease > 0},
+                        {general.use_mana, (i)      => i.mana > 0},
+                        {general.vanity, (i)        => i.vanity},
+                        {general.dye, (i)           => i.dye > 0},
+                        {general.equipable, Binary.isEquipable},
+                        {general.placeable, Binary.CanBePlaced},
+                        {general.consumable, Binary.isConsumable},
+                        {general.weapon, Binary.isWeapon},
+                        {general.ammo, Binary.isAmmo},
+                        {general.soul, Groupings.Soul},
+                        {general.hair_dye, (i) => i.hairDye > 0},
+                        {general.coin, (i)     => i.ammo == 71},
+                        {general.paint, (i)    => i.paint > 0},
+                    }
+                },
+                {Type.Placeable, new ConditionTable
+                    {
+                        // {placeable.furniture, REPLACE_ME},
+                        {placeable.seed, ByTileID.ImmatureHerb},
+                        {placeable.dye_plant, ByTileID.DyePlant},
+                        {placeable.strange_plant, Groupings.StrangePlant},
+                        // {placeable.block, REPLACE_ME},
+                        // {placeable.brick, REPLACE_ME},
+                        {placeable.ore, Groupings.Ore},
+                        {placeable.bar, ByTileID.MetalBar},
+                        // {placeable.wood, REPLACE_ME},
+                        {placeable.wall, (i) => i.createWall > 0},
+                        {placeable.wall_deco, Groupings.WallDeco},
+                        {placeable.gem, ByTileID.Gem},
+                        {placeable.musicbox, ByTileID.MusicBox},
+                        {placeable.banner, ByTileID.Banner},
+                    }
+                },
+                {Type.Ammo, new ConditionTable
+                    {
+                        {ammo.arrow, (i)    => i.ammo == 1},
+                        {ammo.bullet, (i)   => i.ammo == 14},
+                        {ammo.rocket, (i)   => i.ammo == 771},
+                        {ammo.dart, (i)     => i.ammo == 51},
+                        {ammo.sand, (i)     => i.ammo == 42},
+                        {ammo.coin, (i)     => i.ammo == 71},
+                        {ammo.solution, (i) => i.ammo == 780},
+                        {ammo.endless, (i)  => i.ammo > 0 && !i.consumable},
+                    }
+                },
+                {Type.Dye, new ConditionTable
+                    {
+                        {dye.basic, Dyes.BasicDyes},
+                        {dye.black, Dyes.BlackDyes},
+                        {dye.bright, Dyes.BrightDyes},
+                        {dye.silver, Dyes.SilverDyes},
+                        {dye.flame, Dyes.FlameDyes},
+                        {dye.gradient, Dyes.GradientDyes},
+                        {dye.strange, Dyes.StrangeDyes},
+                        {dye.lunar, Dyes.LunarDyes},
+                    }
+                },
+                {Type.Equip, new ConditionTable
+                    {
+                        // {equip.armor, REPLACE_ME},
+                        {equip.accessory, (i) => i.accessory},
+                        // {equip.pet, REPLACE_ME},
+                        {equip.vanity, (i)    => i.vanity},
+                        {equip.mount, Binary.isMount},
+                        {equip.grapple, Binary.isHook},
+                        {equip.slot_head, (i)    => i.headSlot > 0},
+                        {equip.slot_body, (i)    => i.bodySlot > 0},
+                        {equip.slot_leg, (i)     => i.legSlot > 0},
+                        {equip.slot_face, (i)    => i.faceSlot > 0},
+                        {equip.slot_neck, (i)    => i.neckSlot > 0},
+                        {equip.slot_back, (i)    => i.backSlot > 0},
+                        {equip.wings, (i)        => i.wingSlot > 0},
+                        {equip.slot_shoe, (i)    => i.shoeSlot > 0},
+                        {equip.slot_handon, (i)  => i.handOnSlot > 0},
+                        {equip.slot_handoff, (i) => i.handOffSlot > 0},
+                        {equip.slot_shield, (i)  => i.shieldSlot > 0},
+                        {equip.slot_waist, (i)   => i.waistSlot > 0},
+                        {equip.balloon, (i)      => i.balloonSlot > 0},
+                        {equip.slot_front, (i)   => i.frontSlot > 0},
+                        {equip.pet_light, Binary.isLightPet},
+                        {equip.pet_vanity, Binary.isVanityPet},
+                        // {equip.grapple_single, REPLACE_ME},
+                        // {equip.grapple_multi, REPLACE_ME},
+                        // {equip.mount_cart, REPLACE_ME},
+                    }
+                },
+                {Type.Weapon, new ConditionTable
+                    {
+                        {weapon.automatic, (i) => i.autoReuse},
+                        {weapon.type_melee, (i) => i.melee},
+                        // {weapon.style_swing, Weapons.Melee.Swing},
+                        // {weapon.style_jab, Weapons.Melee.Jab},
+                        // {weapon.style_directional, Weapons.Melee.Directional},
+                        // {weapon.style_thrown, Weapons.Melee.Thrown},
+                        // {weapon.broadsword, Weapons.Melee.BroadSword},
+                        // {weapon.boomerang, Weapons.Melee.Boomerang},
+                        // {weapon.spear, Weapons.Melee.Spear},
+                        // {weapon.flail, Weapons.Melee.Flail},
+                        // {weapon.yoyo, Weapons.Melee.Yoyo},
+                        {weapon.has_projectile, (i) => i.shoot > 0},
+                        // {weapon.shortsword, REPLACE_ME},
+                        {weapon.type_ranged, (i) => i.ranged},
+                        // {weapon.bullet_consuming, Weapons.Ranged.BulletConsuming},
+                        // {weapon.arrow_consuming, Weapons.Ranged.ArrowConsuming},
+                        // {weapon.rocket_consuming, Weapons.Ranged.RocketConsuming},
+                        // {weapon.dart_consuming, Weapons.Ranged.DartConsuming},
+                        // {weapon.gel_consuming, Weapons.Ranged.GelConsuming},
+                        // {weapon.no_ammo, (i) => i.useAmmo < 0},
+                        // {weapon.gun, REPLACE_ME},
+                        // {weapon.automatic_gun, REPLACE_ME},
+                        // {weapon.bow, REPLACE_ME},
+                        // {weapon.repeater, REPLACE_ME},
+                        // {weapon.launcher, REPLACE_ME},
+                        {weapon.type_magic, (i) => i.magic},
+                        // {weapon.area, Weapons.Magic.Area},
+                        // {weapon.homing, Weapons.Magic.Homing},
+                        // {weapon.bouncing, Weapons.Magic.Bouncing},
+                        // {weapon.controlled,Weapons.Magic.Controllable},
+                        // {weapon.stream, Weapons.Magic.Stream},
+                        // {weapon.piercing, Weapons.Magic.Piercing},
+                        {weapon.type_summon, (i) => i.summon},
+                        {weapon.type_thrown, (i) => i.thrown},
+                        // {weapon.weapon_other, REPLACE_ME},
+                    }
+                },
+                {Type.WeaponMelee, new ConditionTable
+                    {
+                        {weapon.melee.style_swing, Weapons.Melee.Swing},
+                        {weapon.melee.style_jab, Weapons.Melee.Jab},
+                        {weapon.melee.style_directional, Weapons.Melee.Directional},
+                        {weapon.melee.style_thrown, Weapons.Melee.Thrown},
+                        {weapon.melee.broadsword, Weapons.Melee.BroadSword},
+                        {weapon.melee.boomerang, Weapons.Melee.Boomerang},
+                        {weapon.melee.spear, Weapons.Melee.Spear},
+                        {weapon.melee.flail, Weapons.Melee.Flail},
+                        {weapon.melee.yoyo, Weapons.Melee.Yoyo},
+                    }
+                },
+                {Type.WeaponRanged, new ConditionTable
+                    {
+                        {weapon.ranged.bullet_consuming, Weapons.Ranged.BulletConsuming},
+                        {weapon.ranged.arrow_consuming, Weapons.Ranged.ArrowConsuming},
+                        {weapon.ranged.rocket_consuming, Weapons.Ranged.RocketConsuming},
+                        {weapon.ranged.dart_consuming, Weapons.Ranged.DartConsuming},
+                        {weapon.ranged.gel_consuming, Weapons.Ranged.GelConsuming},
+                        {weapon.ranged.no_ammo, (i) => i.useAmmo < 0},
+                    }
+                },
+                {Type.WeaponMagic, new ConditionTable
+                    {
+                        {weapon.magic.area, Weapons.Magic.Area},
+                        {weapon.magic.homing, Weapons.Magic.Homing},
+                        {weapon.magic.bouncing, Weapons.Magic.Bouncing},
+                        {weapon.magic.controlled,Weapons.Magic.Controllable},
+                        {weapon.magic.stream, Weapons.Magic.Stream},
+                        {weapon.magic.piercing, Weapons.Magic.Piercing},
+                    }
+                },
+                {Type.WeaponSummon, new ConditionTable
+                    {
+                        {weapon.summon.minion, Weapons.Summon.Minion},
+                        {weapon.summon.sentry, Weapons.Summon.Sentry},
+                    }
+                },
+                {Type.Tool, new ConditionTable
+                    {
+                        {tool.pick, (i)         => i.pick > 0},
+                        {tool.axe, (i)          => i.axe > 0},
+                        {tool.hammer, (i)       => i.hammer > 0},
+                        {tool.fishing_pole, (i) => i.fishingPole > 0},
+                        {tool.wand, (i)         => i.tileWand > 0},
+                        {tool.wrench, Binary.isWrench},
+                        // {tool.recall, REPLACE_ME},
+                        // {tool.other, REPLACE_ME},
+                    }
+                },
+                {Type.Consumable, new ConditionTable
+                    {
+                        {consumable.buff, Binary.timedBuff},
+                        {consumable.food, Binary.isFood},
+                        {consumable.potion, Binary.isPotion},
+                        // {consumable.heal, REPLACE_ME},
+                        // {consumable.regen, REPLACE_ME},
+                        // {consumable.life, REPLACE_ME},
+                        // {consumable.mana, REPLACE_ME},
+                    }
+                },
+                {Type.Mech, new ConditionTable
+                    {
+                        {mech.timer, ByTileID.Timer},
+                        // {mech.Switch, ByTileID.L},
+                        {mech.trap, ByTileID.Trap},
+                        {mech.track, (i) => i.cartTrack},
+                        {mech.firework, ByTileID.Firework},
+                        // {mech.lever, REPLACE_ME},
+                        {mech.pressure_plate, ByTileID.PressurePlate},
+                    }
+                },
+                {Type.Furniture, new ConditionTable
+                    {
+                        {furniture.valid_housing, Groupings.Furniture},
+                        {furniture.housing_door, Groupings.housingDoor},
+                        {furniture.housing_light, Groupings.housingTorch},
+                        {furniture.housing_chair, Groupings.housingChair},
+                        {furniture.housing_table, Groupings.housingTable},
+                        // {furniture.clutter, REPLACE_ME},
+                        {furniture.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
+                        {furniture.container, ByTileID.Container},
+                        // {furniture.useable, REPLACE_ME},
+                        // {furniture.decorative, REPLACE_ME},
+                    }
+                },
+                {Type.FurnitureDoor, new ConditionTable
+                    {
+                        {furniture.doors.door, ByTileID.Door},
+                    }
+                },
+                {Type.FurnitureLight, new ConditionTable
+                    {
+                        {furniture.lighting.torch, ByTileID.Torch},
+                        {furniture.lighting.candle, ByTileID.Candle},
+                        {furniture.lighting.chandelier, ByTileID.Chandelier},
+                        {furniture.lighting.hanging_lantern, ByTileID.HangingLantern},
+                        {furniture.lighting.lamp, ByTileID.Lamp},
+                        {furniture.lighting.holiday_light, ByTileID.HolidayLight},
+                        {furniture.lighting.candelabra, ByTileID.Candelabra}
+                    }
+                },
+                {Type.FurnitureTable, new ConditionTable
+                    {
+                        {furniture.tables.table, ByTileID.Table},
+                        {furniture.tables.workbench, ByTileID.WorkBench},
+                        {furniture.tables.dresser, ByTileID.Dresser},
+                        {furniture.tables.piano, ByTileID.Piano},
+                        {furniture.tables.bookcase, ByTileID.Bookcase},
+                        {furniture.tables.bathtub, ByTileID.Bathtub},
+                    }
+                },
+                {Type.FurnitureChair, new ConditionTable
+                    {
+                        {furniture.chairs.chair, ByTileID.Chair},
+                        {furniture.chairs.bed, ByTileID.Bed},
+                        {furniture.chairs.bench, ByTileID.Bench}
+                    }
+                },
+                {Type.FurnitureOther, new ConditionTable
+                    {
+                        {furniture.other.sink, ByTileID.Sink},
+                        {furniture.other.clock, ByTileID.GrandfatherClock},
+                        {furniture.other.bottle, ByTileID.Bottle},
+                        {furniture.other.bowl, ByTileID.Bowl},
+                        {furniture.other.beachstuff, ByTileID.BeachPile},
+                        {furniture.other.tombstone, ByTileID.Tombstone},
+                        {furniture.other.campfire, ByTileID.Campfire},
+                        {furniture.other.statue, ByTileID.Statue},
+                        {furniture.other.statue_alphabet, ByTileID.AlphabetStatue},
+                        {furniture.other.crate, ByTileID.FishingCrate},
+                        {furniture.other.monolith, ByTileID.LunarMonolith},
+                        {furniture.other.cooking_pot, ByTileID.CookingPot},
+                        {furniture.other.anvil, ByTileID.Anvil},
+                        {furniture.other.cannon, ByTileID.Cannon},
+                        {furniture.other.planter, ByTileID.PlanterBox},
+                        {furniture.other.fountain, ByTileID.WaterFountain},
+                    }
+                }
             };
 
-            public static readonly Dictionary<int, Func<Item, bool>>
-            Mech = new Dictionary<int, Func<Item, bool>>()
-            {
-                {mech.timer, ByTileID.Timer},
-                // {mech.Switch, ByTileID.L},
-                {mech.trap, ByTileID.Trap},
-                {mech.track, (i) => i.cartTrack},
-                {mech.firework, ByTileID.Firework},
-                // {mech.lever, REPLACE_ME},
-                {mech.pressure_plate, ByTileID.PressurePlate},
-            };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // General = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {general.quest_item, (i)    => i.questItem},
+            //     {general.expert, (i)        => i.expert},
+            //     {general.material, (i)      => i.material},
+            //     {general.mech, (i)          => i.mech},
+            //     {general.channeled, (i)     => i.channel},
+            //     {general.bait, (i)          => i.bait > 0},
+            //     {general.reach_boost, (i)   => i.tileBoost > 0},
+            //     {general.reach_penalty, (i) => i.tileBoost < 0},
+            //     {general.heal_life, (i)     => i.healLife > 0},
+            //     {general.regen_life, (i)    => i.lifeRegen > 0},
+            //     {general.heal_mana, (i)     => i.healMana > 0},
+            //     {general.boost_mana, (i)    => i.manaIncrease > 0},
+            //     {general.use_mana, (i)      => i.mana > 0},
+            //     {general.vanity, (i)        => i.vanity},
+            //     {general.dye, (i)           => i.dye > 0},
+            //     {general.equipable, Binary.isEquipable},
+            //     {general.placeable, Binary.CanBePlaced},
+            //     {general.consumable, Binary.isConsumable},
+            //     {general.weapon, Binary.isWeapon},
+            //     {general.ammo, Binary.isAmmo},
+            //     {general.soul, Groupings.Soul},
+            //     {general.hair_dye, (i) => i.hairDye > 0},
+            //     {general.coin, (i) => i.ammo == 71},
+            //     {general.paint, (i) => i.paint > 0},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Placeable = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     // {placeable.furniture, REPLACE_ME},
+            //     {placeable.seed, ByTileID.ImmatureHerb},
+            //     {placeable.dye_plant, ByTileID.DyePlant},
+            //     {placeable.strange_plant, Groupings.StrangePlant},
+            //     // {placeable.block, REPLACE_ME},
+            //     // {placeable.brick, REPLACE_ME},
+            //     {placeable.ore, Groupings.Ore},
+            //     {placeable.bar, ByTileID.MetalBar},
+            //     // {placeable.wood, REPLACE_ME},
+            //     {placeable.wall, (i) => i.createWall > 0},
+            //     {placeable.wall_deco, Groupings.WallDeco},
+            //     {placeable.gem, ByTileID.Gem},
+            //     {placeable.musicbox, ByTileID.MusicBox},
+            //     {placeable.banner, ByTileID.Banner},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Ammo = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {ammo.arrow, (i)  => i.ammo == 1},
+            //     {ammo.bullet, (i)  => i.ammo == 14},
+            //     {ammo.rocket, (i)  => i.ammo == 771},
+            //     {ammo.dart, (i)  => i.ammo == 51},
+            //     {ammo.sand, (i)  => i.ammo == 42},
+            //     {ammo.coin, (i)  => i.ammo == 71},
+            //     {ammo.solution, (i)  => i.ammo == 780},
+            //     {ammo.endless, (i) => i.ammo > 0 && !i.consumable},
+            //     // {ammo.bomb, REPLACE_ME}
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Dye = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {dye.basic, Dyes.BasicDyes},
+            //     {dye.black, Dyes.BlackDyes},
+            //     {dye.bright, Dyes.BrightDyes},
+            //     {dye.silver, Dyes.SilverDyes},
+            //     {dye.flame, Dyes.FlameDyes},
+            //     {dye.gradient, Dyes.GradientDyes},
+            //     {dye.strange, Dyes.StrangeDyes},
+            //     {dye.lunar, Dyes.LunarDyes},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Equip = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     // {equip.armor, REPLACE_ME},
+            //     {equip.accessory, (i) => i.accessory},
+            //     // {equip.pet, REPLACE_ME},
+            //     {equip.vanity, (i)    => i.vanity},
+            //     {equip.mount, Binary.isMount},
+            //     {equip.grapple, Binary.isHook},
+            //     {equip.slot_head, (i) => i.headSlot > 0},
+            //     {equip.slot_body, (i) => i.bodySlot > 0},
+            //     {equip.slot_leg, (i)  => i.legSlot > 0},
+            //     {equip.slot_face,    (i) => i.faceSlot > 0},
+            //     {equip.slot_neck,    (i) => i.neckSlot > 0},
+            //     {equip.slot_back,    (i) => i.backSlot > 0},
+            //     {equip.wings,        (i) => i.wingSlot > 0},
+            //     {equip.slot_shoe,    (i) => i.shoeSlot > 0},
+            //     {equip.slot_handon,  (i) => i.handOnSlot > 0},
+            //     {equip.slot_handoff, (i) => i.handOffSlot > 0},
+            //     {equip.slot_shield,  (i) => i.shieldSlot > 0},
+            //     {equip.slot_waist,   (i) => i.waistSlot > 0},
+            //     {equip.balloon,      (i) => i.balloonSlot > 0},
+            //     {equip.slot_front,   (i) => i.frontSlot > 0},
+            //     {equip.pet_light, Binary.isLightPet},
+            //     {equip.pet_vanity, Binary.isVanityPet},
+            //     // {equip.grapple_single, REPLACE_ME},
+            //     // {equip.grapple_multi, REPLACE_ME},
+            //     // {equip.mount_cart, REPLACE_ME},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Weapon = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {weapon.automatic, (i) => i.autoReuse},
+            //     {weapon.melee, (i) => i.melee},
+            //     {weapon.style_swing, Weapons.Melee.Swing},
+            //     {weapon.style_jab, Weapons.Melee.Jab},
+            //     {weapon.style_directional, Weapons.Melee.Directional},
+            //     {weapon.style_thrown, Weapons.Melee.Thrown},
+            //     {weapon.broadsword, Weapons.Melee.BroadSword},
+            //     {weapon.boomerang, Weapons.Melee.Boomerang},
+            //     {weapon.spear, Weapons.Melee.Spear},
+            //     {weapon.flail, Weapons.Melee.Flail},
+            //     {weapon.yoyo, Weapons.Melee.Yoyo},
+            //     {weapon.has_projectile, (i) => i.shoot > 0},
+            //     // {weapon.shortsword, REPLACE_ME},
+            //     {weapon.ranged, (i) => i.ranged},
+            //     {weapon.bullet_consuming, Weapons.Ranged.BulletConsuming},
+            //     {weapon.arrow_consuming, Weapons.Ranged.ArrowConsuming},
+            //     {weapon.rocket_consuming, Weapons.Ranged.RocketConsuming},
+            //     {weapon.dart_consuming, Weapons.Ranged.DartConsuming},
+            //     {weapon.gel_consuming, Weapons.Ranged.GelConsuming},
+            //     {weapon.no_ammo, (i) => i.useAmmo < 0},
+            //     // {weapon.gun, REPLACE_ME},
+            //     // {weapon.automatic_gun, REPLACE_ME},
+            //     // {weapon.bow, REPLACE_ME},
+            //     // {weapon.repeater, REPLACE_ME},
+            //     // {weapon.launcher, REPLACE_ME},
+            //     {weapon.magic, (i) => i.magic},
+            //     {weapon.area, Weapons.Magic.Area},
+            //     {weapon.homing, Weapons.Magic.Homing},
+            //     {weapon.bouncing, Weapons.Magic.Bouncing},
+            //     {weapon.controlled,Weapons.Magic.Controllable},
+            //     {weapon.stream, Weapons.Magic.Stream},
+            //     {weapon.piercing, Weapons.Magic.Piercing},
+            //     {weapon.summon, (i) => i.summon},
+            //     {weapon.minion, Weapons.Summon.Minion},
+            //     {weapon.sentry, Weapons.Summon.Sentry},
+            //     {weapon.throwing, (i) => i.thrown},
+            //     // {weapon.weapon_other, REPLACE_ME},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Tool = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {tool.pick, (i)         => i.pick > 0},
+            //     {tool.axe, (i)          => i.axe > 0},
+            //     {tool.hammer, (i)       => i.hammer > 0},
+            //     {tool.fishing_pole, (i) => i.fishingPole > 0},
+            //     {tool.wand, (i)         => i.tileWand > 0},
+            //     {tool.wrench, Binary.isWrench},
+            //     // {tool.recall, REPLACE_ME},
+            //     // {tool.other, REPLACE_ME},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Consumable = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {consumable.buff, Binary.timedBuff},
+            //     {consumable.food, Binary.isFood},
+            //     {consumable.potion, Binary.isPotion},
+            //     // {consumable.heal, REPLACE_ME},
+            //     // {consumable.regen, REPLACE_ME},
+            //     // {consumable.life, REPLACE_ME},
+            //     // {consumable.mana, REPLACE_ME},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Housing = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {housing.door, Groupings.housingDoor},
+            //     {housing.light, Groupings.housingTorch},
+            //     {housing.chair, Groupings.housingChair},
+            //     {housing.table, Groupings.housingTable},
+            // };
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Furniture = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {furniture.valid_housing, Groupings.Furniture},
+            //     // {furniture.clutter, REPLACE_ME},
+            //     {furniture.crafting_station, (i) => TileSets.CraftingStations.Contains(i.createTile)},
+            //     {furniture.container, ByTileID.Container},
+            //     // {furniture.useable, REPLACE_ME},
+            //     // {furniture.decorative, REPLACE_ME},
+            //     {furniture.door, ByTileID.Door},
+            //     {furniture.torch, ByTileID.Torch},
+            //     {furniture.candle, ByTileID.Candle},
+            //     {furniture.chandelier, ByTileID.Chandelier},
+            //     {furniture.hanging_lantern, ByTileID.HangingLantern},
+            //     {furniture.lamp, ByTileID.Lamp},
+            //     {furniture.holiday_light, ByTileID.HolidayLight},
+            //     {furniture.candelabra, ByTileID.Candelabra},
+            //     {furniture.chair, ByTileID.Chair},
+            //     {furniture.bed, ByTileID.Bed},
+            //     {furniture.bench, ByTileID.Bench},
+            //     {furniture.table, ByTileID.Table},
+            //     {furniture.workbench, ByTileID.WorkBench},
+            //     {furniture.dresser, ByTileID.Dresser},
+            //     {furniture.piano, ByTileID.Piano},
+            //     {furniture.bookcase, ByTileID.Bookcase},
+            //     {furniture.bathtub, ByTileID.Bathtub},
+            //     {furniture.sink, ByTileID.Sink},
+            //     {furniture.clock, ByTileID.GrandfatherClock},
+            //     {furniture.bottle, ByTileID.Bottle},
+            //     {furniture.bowl, ByTileID.Bowl},
+            //     {furniture.beachstuff, ByTileID.BeachPile},
+            //     {furniture.tombstone, ByTileID.Tombstone},
+            //     {furniture.campfire, ByTileID.Campfire},
+            //     {furniture.statue, ByTileID.Statue},
+            //     {furniture.statue_alphabet, ByTileID.AlphabetStatue},
+            //     {furniture.crate, ByTileID.FishingCrate},
+            //     {furniture.monolith, ByTileID.LunarMonolith},
+            //     {furniture.cooking_pot, ByTileID.CookingPot},
+            //     {furniture.anvil, ByTileID.Anvil},
+            //     {furniture.cannon, ByTileID.Cannon},
+            //     {furniture.planter, ByTileID.PlanterBox},
+            //     {furniture.fountain, ByTileID.WaterFountain},
+            // };
+            //
+            // public static readonly Dictionary<int, Func<Item, bool>>
+            // Mech = new Dictionary<int, Func<Item, bool>>()
+            // {
+            //     {mech.timer, ByTileID.Timer},
+            //     // {mech.Switch, ByTileID.L},
+            //     {mech.trap, ByTileID.Trap},
+            //     {mech.track, (i) => i.cartTrack},
+            //     {mech.firework, ByTileID.Firework},
+            //     // {mech.lever, REPLACE_ME},
+            //     {mech.pressure_plate, ByTileID.PressurePlate},
+            // };
 
             public static bool Check(ItemFlags.Type table, Item item, int flag)
             {
-                switch (table)
-                {
-                    case ItemFlags.Type.General:
-                        return General[flag](item);
+                return Matrix[table][flag](item);
 
-                    case ItemFlags.Type.Placeable:
-                        return Placeable[flag](item);
-
-                    case ItemFlags.Type.Housing:
-                        return Housing[flag](item);
-
-                    case ItemFlags.Type.Tool:
-                        return Tool[flag](item);
-
-                    case ItemFlags.Type.Ammo:
-                        return Ammo[flag](item);
-
-                    case ItemFlags.Type.Equip:
-                        return Equip[flag](item);
-
-                    case ItemFlags.Type.Consumable:
-                        return Consumable[flag](item);
-
-                    case ItemFlags.Type.Dye:
-                        return Dye[flag](item);
-
-                    case ItemFlags.Type.Mech:
-                        return Mech[flag](item);
-
-                    case ItemFlags.Type.Furniture:
-                        return Furniture[flag](item);
-
-                    case ItemFlags.Type.Weapon:
-                        return Weapon[flag](item);
-                }
-                return false;
-            }
-
-            public static bool Check(ItemFlags.Type table, Item item, long flag)
-            {
-                switch (table)
-                {
-                    case ItemFlags.Type.Furniture:
-                        return Furniture[flag](item);
-
-                    case ItemFlags.Type.Weapon:
-                        return Weapon[flag](item);
-                }
-                return false;
+                // switch (table)
+                // {
+                //     case Type.General:
+                //         return General[flag](item);
+                //
+                //     case Type.Placeable:
+                //         return Placeable[flag](item);
+                //
+                //     case Type.Housing:
+                //         return Housing[flag](item);
+                //
+                //     case Type.Tool:
+                //         return Tool[flag](item);
+                //
+                //     case Type.Ammo:
+                //         return Ammo[flag](item);
+                //
+                //     case Type.Equip:
+                //         return Equip[flag](item);
+                //
+                //     case Type.Consumable:
+                //         return Consumable[flag](item);
+                //
+                //     case Type.Dye:
+                //         return Dye[flag](item);
+                //
+                //     case Type.Mech:
+                //         return Mech[flag](item);
+                //
+                //     case Type.Furniture:
+                //         return Furniture[flag](item);
+                //
+                //     case Type.Weapon:
+                //         return Weapon[flag](item);
+                // }
+                // return false;
             }
         }
 

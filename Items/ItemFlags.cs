@@ -19,7 +19,7 @@ namespace InvisibleHand.Items
             WeaponMelee,
             WeaponRanged,
             WeaponMagic,
-            // Summon,
+            WeaponSummon,
             // Thrown,
             Tool,
             Consumable,
@@ -181,8 +181,8 @@ namespace InvisibleHand.Items
             public const int type_magic     = 1 << 4;
 
             public const int type_summon    = 1 << 5;
-                public const int minion     = 1 << 8;
-                public const int sentry     = 1 << 9;
+                // public const int minion     = 1 << 8;
+                // public const int sentry     = 1 << 9;
 
             public const int type_thrown    = 1 << 6;
             public const int type_other     = 1 << 7;
@@ -229,6 +229,13 @@ namespace InvisibleHand.Items
                 public const int controlled = 1 << 3;
                 public const int stream     = 1 << 4;
                 public const int piercing   = 1 << 5;
+            }
+
+            public static class summon
+            {
+                public const int none = 0;
+                public const int minion     = 1;
+                public const int sentry     = 1 << 1;
             }
 
             // public const int melee = 1 << 1;
@@ -320,13 +327,13 @@ namespace InvisibleHand.Items
 
         public static class furniture
         {
-            public const long none             = 0;
-            public const long valid_housing    = 1;
-            public const long clutter          = 1 << 1;
-            public const long crafting_station = 1 << 2;
-            public const long container        = 1 << 3;
-            public const long useable          = 1 << 4;
-            public const long decorative = 1 << 5;
+            public const int none             = 0;
+            public const int valid_housing    = 1;
+            public const int clutter          = 1 << 1;
+            public const int crafting_station = 1 << 2;
+            public const int container        = 1 << 3;
+            public const int useable          = 1 << 4;
+            public const int decorative = 1 << 5;
 
             public const int housing_door  = 1 << 6;
             public const int housing_light = 1 << 7;

@@ -21,6 +21,7 @@ namespace InvisibleHand.Items
         public int w_melee;
         public int w_ranged;
         public int w_magic;
+        public int w_summon;
 
         public int tool;
         public int ammo;
@@ -59,6 +60,7 @@ namespace InvisibleHand.Items
             {WeaponMelee, 0},
             {WeaponRanged, 0},
             {WeaponMagic, 0},
+            {WeaponSummon, 0},
             {Tool, 0},
             {Consumable, 0},
             {Mech, 0},
@@ -93,7 +95,6 @@ namespace InvisibleHand.Items
         /// return the modified instance
         public ItemWithInfo SetFlag(ItemFlags.Type type, int flag)
         {
-
             this.FlagTracker[type] |= flag;
             this.Success = true;
             this.LastFlag = Tuple.Create(type, this.FlagTracker[type]);
@@ -155,6 +156,7 @@ namespace InvisibleHand.Items
         {
             return this.Flag(type, flag).Success;
         }
+
         /// set the values of the FlagInfo struct to the accumulated flag values
         public void Finish()
         {
@@ -171,6 +173,7 @@ namespace InvisibleHand.Items
             info.Flags.w_melee    = this.FlagTracker[WeaponMelee];
             info.Flags.w_magic    = this.FlagTracker[WeaponMagic];
             info.Flags.w_ranged   = this.FlagTracker[WeaponRanged];
+            info.Flags.w_summon   = this.FlagTracker[WeaponSummon];
 
             info.Flags.furniture  = this.FlagTracker[Furniture];
             info.Flags.f_door     = this.FlagTracker[FurnitureDoor];

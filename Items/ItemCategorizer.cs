@@ -46,17 +46,17 @@ namespace InvisibleHand.Items
             {
                 item.Flag(Type.Weapon, weapon.has_projectile);
                 if (item.FlagFirst(Type.Weapon,
-                    weapon.melee,
-                    weapon.ranged,
-                    weapon.magic,
-                    weapon.summon,
-                    weapon.throwing
+                    weapon.type_melee,
+                    weapon.type_ranged,
+                    weapon.type_magic,
+                    weapon.type_summon,
+                    weapon.type_thrown
                     ).Success)
                 {
-                    classifyWeapon(item, item.LastFlag.Item2);
+                    classifyWeapon(item, item.LastFlag.Item1, item.LastFlag.Item2);
                 }
                 else
-                    item.SetFlag(Type.Weapon, weapon.weapon_other);
+                    item.SetFlag(Type.Weapon, weapon.type_other);
             }
 
             // equipables
@@ -108,41 +108,44 @@ namespace InvisibleHand.Items
 
                 if (item.TryFlag(Type.Furniture,  furniture.valid_housing))
                 {
-                    if (item.TryFlag(Type.Housing, housing.door))
+                    if (item.TryFlag(Type.Furniture, furniture.housing_door))
                     {//break down
-                        item.Flag(Type.Furniture, furniture.door);
+                        item.Flag(Type.FurnitureDoor, furniture.doors.door);
                         // TODO: platforms, tall gate,
                         // TrapdoorClosed
                     }
-                    else if (item.TryFlag(Type.Housing, housing.table))
+                    else if (item.TryFlag(Type.Furniture, furniture.housing_table))
                     {
-                        item.FlagFirst(Type.Furniture,
-                            furniture.table,
-                            furniture.workbench,
-                            furniture.dresser,
-                            furniture.piano,
-                            furniture.bookcase,
-                            furniture.bathtub
+                        item.FlagFirst(Type.FurnitureTable,
+                            furniture.tables.table,
+                            furniture.tables.workbench,
+                            furniture.tables.dresser,
+                            furniture.tables.piano,
+                            furniture.tables.bookcase,
+                            furniture.tables.bathtub
                             // TODO: bewitching table, alchemy table, tinkerer's bench
                         );
 
                     }
-                    else if (item.TryFlag(Type.Housing, housing.chair))
+                    else if (item.TryFlag(Type.Furniture, furniture.housing_chair))
                     {
-                        item.FlagFirst(Type.Furniture, furniture.chair, furniture.bed, furniture.bench
+                        item.FlagFirst(Type.FurnitureChair,
+                            furniture.chairs.chair,
+                            furniture.chairs.bed,
+                            furniture.chairs.bench
                             // TODO: thrones
                         );
                     }
-                    else if (item.TryFlag(Type.Housing, housing.light))
+                    else if (item.TryFlag(Type.Furniture, furniture.housing_light))
                     {
-                        item.FlagFirst(Type.Furniture,
-                            furniture.torch,
-                            furniture.candle,
-                            furniture.chandelier,
-                            furniture.hanging_lantern,
-                            furniture.lamp,
-                            furniture.holiday_light,
-                            furniture.candelabra
+                        item.FlagFirst(Type.FurnitureLight,
+                            furniture.lighting.torch,
+                            furniture.lighting.candle,
+                            furniture.lighting.chandelier,
+                            furniture.lighting.hanging_lantern,
+                            furniture.lighting.lamp,
+                            furniture.lighting.holiday_light,
+                            furniture.lighting.candelabra
                             // TODO: TileID.WaterCandle,
         					// TileID.ChineseLanterns,
                             // TileID.Jackolanterns,
@@ -178,15 +181,33 @@ namespace InvisibleHand.Items
                 }
                 else
                 {
-                    item.FlagFirst(Type.Furniture, furniture.container, furniture.statue, furniture.sink,
-                                        furniture.clock, furniture.statue_alphabet, furniture.tombstone,
-                                        furniture.crate, furniture.planter, furniture.cannon,
-                                        furniture.campfire, furniture.fountain, furniture.bottle,
-                                        furniture.bowl, furniture.beachstuff, furniture.cooking_pot,
-                                        furniture.anvil, furniture.monolith)
-                        .FlagFirst(Type.Placeable, placeable.wall, placeable.dye_plant,
-                                        placeable.strange_plant, placeable.banner,
-                                        placeable.seed, placeable.ore, placeable.bar, placeable.gem);
+                    item.FlagFirst(Type.Furniture, furniture.container)
+                        .FlagFirst(Type.FurnitureOther,
+                                    furniture.other.statue,
+                                    furniture.other.sink,
+                                    furniture.other.clock,
+                                    furniture.other.statue_alphabet,
+                                    furniture.other.tombstone,
+                                    furniture.other.crate,
+                                    furniture.other.planter,
+                                    furniture.other.cannon,
+                                    furniture.other.campfire,
+                                    furniture.other.fountain,
+                                    furniture.other.bottle,
+                                    furniture.other.bowl,
+                                    furniture.other.beachstuff,
+                                    furniture.other.cooking_pot,
+                                    furniture.other.anvil,
+                                    furniture.other.monolith)
+                        .FlagFirst(Type.Placeable,
+                                    placeable.wall,
+                                    placeable.dye_plant,
+                                    placeable.strange_plant,
+                                    placeable.banner,
+                                    placeable.seed,
+                                    placeable.ore,
+                                    placeable.bar,
+                                    placeable.gem);
 
                 }
             }
@@ -417,57 +438,70 @@ namespace InvisibleHand.Items
 
         // }
 
-        private static void classifyWeapon(ItemWithInfo item, long weaponType)
+        private static void classifyWeapon(ItemWithInfo item, ItemFlags.Type type, int flag)
         {
-            var _item = item.item;
-            switch (weaponType)
+            if (type != Type.Weapon) return;
+
+            ItemFlags.Type weaponType;
+            switch (flag)
             {
-                case weapon.melee:
+                case weapon.type_melee:
+                    weaponType = Type.WeaponMelee;
                     // item.Tag(has_projectile);
-                    if (item.TryFlag(Type.Weapon, weapon.style_directional))
-                        item.FlagFirst(Type.Weapon,
-                                        weapon.flail,
-                                        weapon.yoyo);
-                    else if (item.TryFlag(Type.Weapon, weapon.style_swing))
-                        item.Flag(Type.Weapon,
-                                    weapon.broadsword);
-                    else if (item.TryFlag(Type.Weapon, weapon.style_thrown))
-                        item.Flag(Type.Weapon,
-                                    weapon.boomerang);
+                    if (item.TryFlag(weaponType, weapon.melee.style_directional))
+                        item.FlagFirst(weaponType,
+                                        weapon.melee.flail,
+                                        weapon.melee.yoyo);
+                    else if (item.TryFlag(weaponType, weapon.melee.style_swing))
+                        item.Flag(weaponType,
+                                    weapon.melee.broadsword);
+                    else if (item.TryFlag(weaponType, weapon.melee.style_thrown))
+                        item.Flag(weaponType,
+                                    weapon.melee.boomerang);
                     else
-                        item.FlagIf(item.TryFlag(Type.Weapon, weapon.style_jab),
-                                    Type.Weapon, weapon.shortsword);
+                        item.FlagIf(item.TryFlag(weaponType, weapon.melee.style_jab),
+                                    weaponType, weapon.melee.shortsword);
                     break;
 
-                case weapon.ranged:
-                    if (item.TryFlag(Type.Weapon, weapon.arrow_consuming))
-                        item.Flag(Type.Weapon,
-                                    weapon.repeater);
-                    else if (item.TryFlag(Type.Weapon, weapon.bullet_consuming))
-                        item.Flag(Type.Weapon,
-                                    weapon.automatic_gun);
-                    else
-                        item.FlagFirst(Type.Weapon,
-                                        weapon.rocket_consuming,
-                                        weapon.dart_consuming,
-                                        weapon.gel_consuming,
-                                        weapon.no_ammo);
+                case weapon.type_ranged:
+                    weaponType = Type.WeaponRanged;
+                    // if (item.TryFlag(weaponType, weapon.ranged.arrow_consuming))
+                    //     item.Flag(weaponType,
+                    //                 weapon.ranged.repeater);
+                    // else if (item.TryFlag(weaponType, weapon.ranged.bullet_consuming))
+                    //     item.Flag(weaponType,
+                    //                 weapon.ranged.automatic_gun);
+                    // else
+                    item.FlagFirst(weaponType,
+                                        weapon.ranged.arrow_consuming,
+                                        weapon.ranged.bullet_consuming,
+                                        weapon.ranged.rocket_consuming,
+                                        weapon.ranged.dart_consuming,
+                                        weapon.ranged.gel_consuming,
+                                        weapon.ranged.no_ammo);
                     break;
 
-                case weapon.magic:
-                    item.FlagFirst(Type.Weapon,
-                                    weapon.area,
-                                    weapon.homing,
-                                    weapon.controlled,
-                                    weapon.bouncing,
-                                    weapon.stream);
+                case weapon.type_magic:
+                    weaponType = Type.WeaponMagic;
+                    item.FlagFirst(weaponType,
+                                    weapon.magic.area,
+                                    weapon.magic.homing,
+                                    weapon.magic.controlled,
+                                    weapon.magic.bouncing,
+                                    weapon.magic.stream);
                     break;
-                case weapon.summon:
-                    item.FlagIf(!item.TryFlag(Type.Weapon, weapon.minion),
-                                Type.Weapon, weapon.sentry);
+                case weapon.type_summon:
+                    weaponType = Type.WeaponSummon;
+                    item.FlagIf(!item.TryFlag(weaponType, weapon.summon.minion),
+                                weaponType, weapon.summon.sentry);
                     break;
-                case weapon.throwing:
+                case weapon.type_thrown:
+                    break;
                 default:
+                    // tag as 'other' if not a throwing weapon
+                    // (there are no sub-categories for thrown weapons yet,
+                    // so there's no Flag Type or extra condititions for them either)
+                    item.Flag(Type.Weapon, weapon.type_other);
                     break;
             }
         }
