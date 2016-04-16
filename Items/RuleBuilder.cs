@@ -13,7 +13,7 @@ namespace InvisibleHand.Items
     public class Rule
     {
         ///
-        /// Denotes the rules predictate (e.g. Name); comparison operator(e.g. ExpressionType.GreaterThan); value (e.g. "Cole")
+        /// Denotes the rules predictate (e.g. Name); comparison operator(e.g. ExpressionType.GreaterThan); value (e.g. "George")
         ///
         public string ComparisonPredicate { get; set; }
         public ExpressionType ComparisonOperator { get; set; }
@@ -31,7 +31,18 @@ namespace InvisibleHand.Items
         public Rule(string comparisonPredicate, string comparisonOperator, string comparisonValue)
         {
             ComparisonPredicate = comparisonPredicate;
-            ComparisonOperator = getComparisonOperator(comparisonOperator);
+            ExpressionType compop;
+
+            if (SymbolToOperator.TryGetValue(comparisonOperator, out compop))
+            {
+                ComparisonOperator = compop;
+            }
+            else
+            {
+                // TODO: throw a better exception, log an error, and/or find a better default
+                ComparisonOperator = ExpressionType.IsFalse;
+            }
+
             ComparisonValue = comparisonValue;
         }
 
@@ -125,15 +136,6 @@ namespace InvisibleHand.Items
                 {"debug", ExpressionType.DebugInfo},
             };
         }
-
-        private static ExpressionType getComparisonOperator(string symbol)
-        {
-            return SymbolToOperator[symbol];
-        }
-
-
-
-
     }
 
     /// The pre-compiled rules type
@@ -164,13 +166,84 @@ namespace InvisibleHand.Items
         }
     }
 
+
+    public class Test
+    {
+
+        internal interface ICar
+        {
+            int Year { get;  }
+            string Make { get;  }
+            string Model { get;  }
+        }
+        internal class Car : ICar
+        {
+            public int Year { get; set; }
+            public string Make { get; set; }
+            public string Model { get; set; }
+        }
+
+        static void Main()
+        {
+            // Examples:
+            List<Rule> rules = new List<Rule>
+            {
+            //  Create some rules using LINQ.ExpressionTypes for the comparison operators
+                 new Rule ( "Year", ">", "2012"),
+                 new Rule ( "Make", "==", "El Diablo"),
+                 new Rule ( "Model", "==", "Torch" )
+            };
+
+
+            var compiledMakeModelYearRules = PrecompiledRules.CompileRule(new List<ICar>(), rules);
+
+
+            // Create a list to house your test cars
+            List<Car> cars = new List<Car>();
+
+            // Create a car that's year and model fail the rules validations
+            Car car1_Bad = new Car {
+                Year = 2013,
+                Make = "El Diablo",
+                Model = "Torche"
+            };
+
+            // Create a car that meets all the conditions of the rules validations
+            Car car2_Good = new Car
+            {
+                Year = 2015,
+                Make = "El Diablo",
+                Model = "Torch"
+            };
+
+            // Add your cars to the list
+            cars.Add(car1_Bad);
+            cars.Add(car2_Good);
+
+            // Iterate through your list of cars to see which ones meet the rules vs. the ones that don't
+            cars.ForEach(car =>
+            {
+                // if (compiledMakeModelYearRules.TakeWhile(rule => rule(car)).Count() > 0)
+
+                if (compiledMakeModelYearRules.All(rule => rule(car)))
+                {
+                    Console.WriteLine(string.Concat("Car model: ", car.Model, " Passed the compiled rules engine check!"));
+                }
+                else
+                {
+                    Console.WriteLine(string.Concat("Car model: ", car.Model, " Failed the compiled rules engine check!"));
+                }
+            });
+
+        }
+    }
     // Examples:
     // List<Rule> rules = new List<Rule>
     // {
-     // Create some rules using LINQ.ExpressionTypes for the comparison operators
-        //      new Rule ( "Year", ExpressionType.GreaterThan, "2012"),
-        //      new Rule ( "Make", ExpressionType.Equal, "El Diablo"),
-        //      new Rule ( "Model", ExpressionType.Equal, "Torch" )
+    // //  Create some rules using LINQ.ExpressionTypes for the comparison operators
+        //      new Rule ( "Year", ">", "2012"),
+        //      new Rule ( "Make", "==", "El Diablo"),
+        //      new Rule ( "Model", "==", "Torch" )
         // };
         //
         // var compiledMakeModelYearRules= PrecompiledRules.CompileRule(new List<ICar>(), rules);
