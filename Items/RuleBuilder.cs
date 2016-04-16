@@ -9,7 +9,8 @@ namespace InvisibleHand.Items
 
     //https://www.psclistens.com/insight/blog/quickly-build-a-business-rules-engine-using-c-and-lambda-expression-trees/
 
-    /// The Rule type
+    /// The Rule type.
+    /// Represents a binary comparison rule, e.g.:  MyObj.someProperty > 17;
     public class Rule
     {
         ///
@@ -27,12 +28,13 @@ namespace InvisibleHand.Items
             ComparisonValue = comparisonValue;
         }
 
-        /// Constructor for the Rule 'method'
+        /// Constructor for the Rule 'method', taking a string representing the desired comparison ExpressionType
         public Rule(string comparisonPredicate, string comparisonOperator, string comparisonValue)
         {
             ComparisonPredicate = comparisonPredicate;
             ExpressionType compop;
 
+            // from the string repr, get the real ExpressionType
             if (SymbolToOperator.TryGetValue(comparisonOperator, out compop))
             {
                 ComparisonOperator = compop;
@@ -40,12 +42,13 @@ namespace InvisibleHand.Items
             else
             {
                 // TODO: throw a better exception, log an error, and/or find a better default
-                ComparisonOperator = ExpressionType.IsFalse;
+                ComparisonOperator = ExpressionType.TypeEqual;
             }
 
             ComparisonValue = comparisonValue;
         }
 
+        /// converts string representations of ExpressionType to their corresponding Enum value
         private static IDictionary<string, ExpressionType> SymbolToOperator;
         static Rule()
         {
@@ -147,17 +150,24 @@ namespace InvisibleHand.Items
         ///
         public static List<Func<T, bool>> CompileRule<T>(List<T> targetEntity, List<Rule> rules)
         {
+            // storage for the compiled rules
             var compiledRules = new List<Func<T, bool>>();
+            // get the type of the entity these rules are meant to govern (constant for each rule)
+            var genericType = Expression.Parameter(typeof(T));
 
             // Loop through the rules and compile them against the properties of the supplied shallow object
             rules.ForEach(rule =>
             {
-                var genericType = Expression.Parameter(typeof(T));
+                // find the object Property specified by the predicate (i.e. the property name)
                 var key = MemberExpression.Property(genericType, rule.ComparisonPredicate);
+                // get the Type of that property
                 var propertyType = typeof(T).GetProperty(rule.ComparisonPredicate).PropertyType;
+                // get the value to be checked as a member of the property's type
                 var value = Expression.Constant(Convert.ChangeType(rule.ComparisonValue, propertyType));
+                // create the 2-sided comparison expression btw. the prop value and the supplied constant
                 var binaryExpression = Expression.MakeBinary(rule.ComparisonOperator, key, value);
 
+                // compile the expression and add it to the list of compiled rules
                 compiledRules.Add(Expression.Lambda<Func<T, bool>>(binaryExpression, genericType).Compile());
             });
 
@@ -167,119 +177,75 @@ namespace InvisibleHand.Items
     }
 
 
-    public class Test
-    {
-
-        internal interface ICar
-        {
-            int Year { get;  }
-            string Make { get;  }
-            string Model { get;  }
-        }
-        internal class Car : ICar
-        {
-            public int Year { get; set; }
-            public string Make { get; set; }
-            public string Model { get; set; }
-        }
-
-        static void Main()
-        {
-            // Examples:
-            List<Rule> rules = new List<Rule>
-            {
-            //  Create some rules using LINQ.ExpressionTypes for the comparison operators
-                 new Rule ( "Year", ">", "2012"),
-                 new Rule ( "Make", "==", "El Diablo"),
-                 new Rule ( "Model", "==", "Torch" )
-            };
-
-
-            var compiledMakeModelYearRules = PrecompiledRules.CompileRule(new List<ICar>(), rules);
-
-
-            // Create a list to house your test cars
-            List<Car> cars = new List<Car>();
-
-            // Create a car that's year and model fail the rules validations
-            Car car1_Bad = new Car {
-                Year = 2013,
-                Make = "El Diablo",
-                Model = "Torche"
-            };
-
-            // Create a car that meets all the conditions of the rules validations
-            Car car2_Good = new Car
-            {
-                Year = 2015,
-                Make = "El Diablo",
-                Model = "Torch"
-            };
-
-            // Add your cars to the list
-            cars.Add(car1_Bad);
-            cars.Add(car2_Good);
-
-            // Iterate through your list of cars to see which ones meet the rules vs. the ones that don't
-            cars.ForEach(car =>
-            {
-                // if (compiledMakeModelYearRules.TakeWhile(rule => rule(car)).Count() > 0)
-
-                if (compiledMakeModelYearRules.All(rule => rule(car)))
-                {
-                    Console.WriteLine(string.Concat("Car model: ", car.Model, " Passed the compiled rules engine check!"));
-                }
-                else
-                {
-                    Console.WriteLine(string.Concat("Car model: ", car.Model, " Failed the compiled rules engine check!"));
-                }
-            });
-
-        }
-    }
-    // Examples:
-    // List<Rule> rules = new List<Rule>
+    // public class Test
     // {
-    // //  Create some rules using LINQ.ExpressionTypes for the comparison operators
-        //      new Rule ( "Year", ">", "2012"),
-        //      new Rule ( "Make", "==", "El Diablo"),
-        //      new Rule ( "Model", "==", "Torch" )
-        // };
-        //
-        // var compiledMakeModelYearRules= PrecompiledRules.CompileRule(new List<ICar>(), rules);
-        //
-        // // Create a list to house your test cars
-        // List cars = new List();
-        //
-        // // Create a car that's year and model fail the rules validations
-        // Car car1_Bad = new Car {
-        //     Year = 2011,
-        //     Make = "El Diablo",
-        //     Model = "Torche"
-        // };
-        //
-        // // Create a car that meets all the conditions of the rules validations
-        // Car car2_Good = new Car
-        // {
-        //     Year = 2015,
-        //     Make = "El Diablo",
-        //     Model = "Torch"
-        // };
-        //
-        // // Add your cars to the list
-        // cars.Add(car1_Bad);
-        // cars.Add(car2_Good);
-        //
-        // // Iterate through your list of cars to see which ones meet the rules vs. the ones that don't
-        // cars.ForEach(car => {
-        //     if (compiledMakeModelYearRules.TakeWhile(rule => rule(car)).Count() > 0)
-        //     {
-        //         Console.WriteLine(string.Concat("Car model: ", car.Model, " Passed the compiled rules engine check!"));
-        //     }
-        //     else
-        //     {
-        //         Console.WriteLine(string.Concat("Car model: ", car.Model, " Failed the compiled rules engine check!"));
-        //     }
-        // });
-        //
+    //
+    //     internal interface ICar
+    //     {
+    //         int Year { get;  }
+    //         string Make { get;  }
+    //         string Model { get;  }
+    //     }
+    //     internal class Car : ICar
+    //     {
+    //         public int Year { get; set; }
+    //         public string Make { get; set; }
+    //         public string Model { get; set; }
+    //     }
+    //
+    //     static void Main()
+    //     {
+    //         // Examples:
+    //         List<Rule> rules = new List<Rule>
+    //         {
+    //         //  Create some rules using LINQ.ExpressionTypes for the comparison operators
+    //              new Rule ( "Year", ">", "2012"),
+    //              new Rule ( "Make", "==", "El Diablo"),
+    //              new Rule ( "Model", "==", "Torch" )
+    //         };
+    //
+    //
+    //         var compiledMakeModelYearRules = PrecompiledRules.CompileRule(new List<ICar>(), rules);
+    //
+    //
+    //         // Create a list to house your test cars
+    //         List<Car> cars = new List<Car>();
+    //
+    //         // Create a car that's year and model fail the rules validations
+    //         Car car1_Bad = new Car {
+    //             Year = 2013,
+    //             Make = "El Diablo",
+    //             Model = "Torche"
+    //         };
+    //
+    //         // Create a car that meets all the conditions of the rules validations
+    //         Car car2_Good = new Car
+    //         {
+    //             Year = 2015,
+    //             Make = "El Diablo",
+    //             Model = "Torch"
+    //         };
+    //
+    //         // Add your cars to the list
+    //         cars.Add(car1_Bad);
+    //         cars.Add(car2_Good);
+    //
+    //         // Iterate through your list of cars to see which ones meet the rules vs. the ones that don't
+    //         cars.ForEach(car =>
+    //         {
+    //             // if (compiledMakeModelYearRules.TakeWhile(rule => rule(car)).Count() > 0)
+    //
+    //             if (compiledMakeModelYearRules.All(rule => rule(car)))
+    //             {
+    //                 Console.WriteLine(string.Concat("Car model: ", car.Model, " Passed the compiled rules engine check!"));
+    //             }
+    //             else
+    //             {
+    //                 Console.WriteLine(string.Concat("Car model: ", car.Model, " Failed the compiled rules engine check!"));
+    //             }
+    //         });
+    //
+    //     }
+    // }
+
 }
