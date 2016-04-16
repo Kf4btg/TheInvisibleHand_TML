@@ -156,7 +156,7 @@ namespace InvisibleHand.Items
                 var value = Expression.Constant(Convert.ChangeType(rule.ComparisonValue, propertyType));
                 var binaryExpression = Expression.MakeBinary(rule.ComparisonOperator, key, value);
 
-                compiledRules.Add(Expression.Lambda<Func>(binaryExpression, genericType).Compile());
+                compiledRules.Add(Expression.Lambda<Func<T, bool>>(binaryExpression, genericType).Compile());
             });
 
             // Return the compiled rules to the caller
