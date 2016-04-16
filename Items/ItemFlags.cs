@@ -16,10 +16,20 @@ namespace InvisibleHand.Items
             Dye,
             Equip,
             Weapon,
+            WeaponMelee,
+            WeaponRanged,
+            WeaponMagic,
+            // Summon,
+            // Thrown,
             Tool,
             Consumable,
-            Housing,
+            // Housing,
             Furniture,
+            FurnitureDoor,
+            FurnitureLight,
+            FurnitureTable,
+            FurnitureChair,
+            FurnitureOther,
             Mech
         }
 
@@ -163,52 +173,103 @@ namespace InvisibleHand.Items
 
         public static class weapon
         {
-            public const long none           = 0;
-            public const long automatic      = 1;
-            public const long has_projectile = 1 << 12;
+            public const int none           = 0;
+            public const int automatic      = 1;
+            public const int has_projectile = 1 << 1;
+            public const int type_melee     = 1 << 2;
+            public const int type_ranged    = 1 << 3;
+            public const int type_magic     = 1 << 4;
 
-            public const long melee = 1 << 1;
+            public const int type_summon    = 1 << 5;
+                public const int minion     = 1 << 8;
+                public const int sentry     = 1 << 9;
 
-                public const long style_swing       = 1 << 2;
-                public const long style_jab         = 1 << 3;
-                public const long style_directional = 1 << 4;
-                public const long style_thrown      = 1 << 5;
-                public const long broadsword        = 1 << 7;
-                public const long boomerang         = 1 << 8;
-                public const long spear             = 1 << 9;
-                public const long flail             = 1 << 10;
-                public const long yoyo              = 1 << 11;
+            public const int type_thrown    = 1 << 6;
+            public const int type_other     = 1 << 7;
 
-                public const long shortsword = melee | style_jab;
+            public static class melee
+            {
+                public const int none = 0;
+                public const int style_swing       = 1;
+                public const int style_jab         = 1 << 1;
+                public const int style_directional = 1 << 2;
+                public const int style_thrown      = 1 << 3;
+                public const int broadsword        = 1 << 4;
+                public const int boomerang         = 1 << 5;
+                public const int spear             = 1 << 6;
+                public const int flail             = 1 << 7;
+                public const int yoyo              = 1 << 8;
 
-            public const long ranged               = 1 << 13;
-                public const long bullet_consuming = 1 << 14;
-                public const long arrow_consuming  = 1 << 15;
-                public const long rocket_consuming = 1 << 16;
-                public const long dart_consuming   = 1 << 18;
-                public const long gel_consuming    = 1 << 19;
-                public const long no_ammo          = 1 << 20;
+                public const int shortsword = style_jab;
+            }
 
-                public const long gun           = ranged | bullet_consuming;
-                public const long automatic_gun = gun | automatic;
-                public const long bow           = ranged | arrow_consuming;
-                public const long repeater      = bow | automatic;
-                public const long launcher      = ranged | rocket_consuming;
+            public static class ranged
+            {
+                public const int none = 0;
+                public const int bullet_consuming = 1;
+                public const int arrow_consuming  = 1 << 1;
+                public const int rocket_consuming = 1 << 2;
+                public const int dart_consuming   = 1 << 3;
+                public const int gel_consuming    = 1 << 4;
+                public const int no_ammo          = 1 << 5;
 
-            public const long magic          = 1 << 26;
-                public const long area       = 1 << 27;
-                public const long homing     = 1 << 28;
-                public const long bouncing   = 1 << 29;
-                public const long controlled = 1 << 30;
-                public const long stream     = 1L << 31;
-                public const long piercing   = 1 << 23;
+                public const int gun           = bullet_consuming;
+                // public const int automatic_gun = automatic;
+                public const int bow           = arrow_consuming;
+                // public const int repeater      = automatic;
+                public const int launcher      = rocket_consuming;
+            }
 
-            public const long summon         = 1L << 32;
-                public const long minion     = 1 << 24;
-                public const long sentry     = 1 << 22;
+            public static class magic
+            {
+                public const int none = 0;
+                public const int area       = 1;
+                public const int homing     = 1 << 1;
+                public const int bouncing   = 1 << 2;
+                public const int controlled = 1 << 3;
+                public const int stream     = 1 << 4;
+                public const int piercing   = 1 << 5;
+            }
 
-            public const long throwing       = 1 << 21;
-            public const long weapon_other   = 1 << 25;
+            // public const int melee = 1 << 1;
+
+                // public const long style_swing       = 1 << 2;
+                // public const long style_jab         = 1 << 3;
+                // public const long style_directional = 1 << 4;
+                // public const long style_thrown      = 1 << 5;
+                // public const long broadsword        = 1 << 7;
+                // public const long boomerang         = 1 << 8;
+                // public const long spear             = 1 << 9;
+                // public const long flail             = 1 << 10;
+                // public const long yoyo              = 1 << 11;
+                //
+                // public const long shortsword = melee | style_jab;
+
+            // public const int ranged               = 1 << 2;
+                // public const long bullet_consuming = 1 << 14;
+                // public const long arrow_consuming  = 1 << 15;
+                // public const long rocket_consuming = 1 << 16;
+                // public const long dart_consuming   = 1 << 18;
+                // public const long gel_consuming    = 1 << 19;
+                // public const long no_ammo          = 1 << 20;
+                //
+                // public const long gun           = ranged | bullet_consuming;
+                // public const long automatic_gun = gun | automatic;
+                // public const long bow           = ranged | arrow_consuming;
+                // public const long repeater      = bow | automatic;
+                // public const long launcher      = ranged | rocket_consuming;
+
+            // public const int magic          = 1 << 3;
+                // public const long area       = 1 << 27;
+                // public const long homing     = 1 << 28;
+                // public const long bouncing   = 1 << 29;
+                // public const long controlled = 1 << 30;
+                // public const long stream     = 1L << 31;
+                // public const long piercing   = 1 << 23;
+
+
+
+
         }
 
         public static class tool
@@ -236,14 +297,26 @@ namespace InvisibleHand.Items
             public const int mana   = 1 << 6;
         }
 
-        public static class housing
-        {
-            public const int none  = 0;
-            public const int door  = 1;
-            public const int light = 1 << 1;
-            public const int chair = 1 << 2;
-            public const int table = 1 << 3;
-        }
+        // public static class housing
+        // {
+        //     public const int none  = 0;
+        //     public const int door  = 1;
+        //     public const int light = 1 << 1;
+        //     public const int chair = 1 << 2;
+        //     public const int table = 1 << 3;
+        // }
+
+        // public static class lighting
+        // {
+        //     // housing_light,
+        //     public const int torch            = 1 << 7;
+        //     public const int candle           = 1 << 8;
+        //     public const int chandelier       = 1 << 9;
+        //     public const int hanging_lantern  = 1 << 10;
+        //     public const int lamp             = 1 << 11;
+        //     public const int holiday_light    = 1 << 12;
+        //     public const int candelabra       = 1 << 13;
+        // }
 
         public static class furniture
         {
@@ -253,51 +326,89 @@ namespace InvisibleHand.Items
             public const long crafting_station = 1 << 2;
             public const long container        = 1 << 3;
             public const long useable          = 1 << 4;
-            public const long decorative       = 1 << 5;
+            public const long decorative = 1 << 5;
+
+            public const int housing_door  = 1 << 6;
+            public const int housing_light = 1 << 7;
+            public const int housing_chair = 1 << 8;
+            public const int housing_table = 1 << 9;
+
+            public static class lighting
+            {
+                public const int none = 0;
+                public const int torch            = 1;
+                public const int candle           = 1 << 1;
+                public const int chandelier       = 1 << 2;
+                public const int hanging_lantern  = 1 << 3;
+                public const int lamp             = 1 << 4;
+                public const int holiday_light    = 1 << 5;
+                public const int candelabra       = 1 << 6;
+            }
+
+            public static class chairs
+            {
+                public const int none = 0;
+                public const int chair = 1;
+                public const int bed   = 1 << 1;
+                public const int bench = 1 << 2;
+            }
 
             // housing_furniture,
             // housing_door,
-            public const long door             = 1 << 6;
+            public static class doors
+            {
+                public const int none = 0;
+                public const int door = 1;
+                public const int other = 1 << 1;
+            }
 
             // housing_light,
-            public const long torch            = 1 << 7;
-            public const long candle           = 1 << 8;
-            public const long chandelier       = 1 << 9;
-            public const long hanging_lantern  = 1 << 10;
-            public const long lamp             = 1 << 11;
-            public const long holiday_light    = 1 << 12;
-            public const long candelabra       = 1 << 13;
+            // public const long torch            = 1 << 7;
+            // public const long candle           = 1 << 8;
+            // public const long chandelier       = 1 << 9;
+            // public const long hanging_lantern  = 1 << 10;
+            // public const long lamp             = 1 << 11;
+            // public const long holiday_light    = 1 << 12;
+            // public const long candelabra       = 1 << 13;
 
             // housing_chair,
-            public const long chair = 1 << 15;
-            public const long bed   = 1 << 16;
-            public const long bench = 1 << 17;
+            // public const long chair = 1 << 15;
+            // public const long bed   = 1 << 16;
+            // public const long bench = 1 << 17;
 
             // housing_table,
-            public const long table     = 1 << 18;
-            public const long workbench = 1 << 19;
-            public const long dresser   = 1 << 20;
-            public const long piano     = 1 << 21;
-            public const long bookcase  = 1 << 22;
-            public const long bathtub   = 1 << 23;
+            public static class tables
+            {
+                public const int none = 0;
+                public const int table     = 1;
+                public const int workbench = 1 << 1;
+                public const int dresser   = 1 << 2;
+                public const int piano     = 1 << 3;
+                public const int bookcase  = 1 << 4;
+                public const int bathtub   = 1 << 5;
+            }
 
             // other
-            public const long sink            = 1 << 24;
-            public const long clock           = 1 << 25;
-            public const long bottle          = 1 << 26;
-            public const long bowl            = 1 << 27;
-            public const long beachstuff      = 1 << 28;
-            public const long tombstone       = 1 << 29;
-            public const long campfire        = 1 << 30;
-            public const long statue          = 1L << 31;
-            public const long statue_alphabet = 1L << 32;
-            public const long crate           = 1L << 33;
-            public const long monolith        = 1L << 34;
-            public const long cooking_pot     = 1L << 35;
-            public const long anvil           = 1L << 36;
-            public const long cannon          = 1L << 37;
-            public const long fountain        = 1L << 38;
-            public const long planter         = 1 << 14;
+            public static class other
+            {
+                public const int none = 0;
+                public const int sink            = 1;
+                public const int clock           = 1 << 1;
+                public const int bottle          = 1 << 2;
+                public const int bowl            = 1 << 3;
+                public const int beachstuff      = 1 << 4;
+                public const int tombstone       = 1 << 5;
+                public const int campfire        = 1 << 6;
+                public const int statue          = 1 << 7;
+                public const int statue_alphabet = 1 << 8;
+                public const int crate           = 1 << 9;
+                public const int monolith        = 1 << 10;
+                public const int cooking_pot     = 1 << 11;
+                public const int anvil           = 1 << 12;
+                public const int cannon          = 1 << 13;
+                public const int fountain        = 1 << 14;
+                public const int planter         = 1 << 15;
+            }
         }
     }
 
