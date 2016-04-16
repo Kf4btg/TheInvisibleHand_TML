@@ -10,12 +10,11 @@ namespace InvisibleHand.Items
 {
     using static ItemFlags.Type;
 
-    public struct FlagInfo
+    public struct FlagInfo : IEquatable<FlagInfo>
     {
         public int general;
 
         public int placeable;
-        // public int meetsHousingNeed;
 
         public int weapon;
         public int w_melee;
@@ -37,6 +36,178 @@ namespace InvisibleHand.Items
         public int f_table;
         public int f_chair;
         public int f_other;
+
+        public FlagInfo(int general = 0, int placeable = 0, int weapon = 0, int w_melee = 0, int w_ranged = 0, int w_magic = 0, int w_summon = 0, int tool = 0, int ammo = 0, int equip = 0, int dye = 0, int consumable = 0, int mech = 0, int furniture = 0, int f_door = 0, int f_light = 0, int f_table = 0, int f_chair = 0, int f_other = 0)
+        {
+            this.general    = general;
+            this.placeable  = placeable;
+            this.weapon     = weapon;
+            this.tool       = tool;
+            this.furniture  = furniture;
+            this.equip      = equip;
+            this.ammo       = ammo;
+            this.consumable = consumable;
+            this.dye        = dye;
+            this.mech       = mech;
+            this.w_melee    = w_melee;
+            this.w_ranged   = w_ranged;
+            this.w_magic    = w_magic;
+            this.w_summon   = w_summon;
+            this.f_door     = f_door;
+            this.f_light    = f_light;
+            this.f_table    = f_table;
+            this.f_chair    = f_chair;
+            this.f_other    = f_other;
+
+            this._hash = null;
+        }
+
+
+        /// Here, we implement IEquatable<T>, override Object.Equals,
+        /// Object.GetHashCode, ==, and != operators, all to make this
+        /// struct actually usable and efficient in dictionaries and such
+        /// by preventing boxing.
+        #region equatable
+
+        public bool Equals(FlagInfo other)
+        {
+            return this.general == other.general &&
+                this.placeable  == other.placeable &&
+                this.weapon     == other.weapon &&
+                this.tool       == other.tool &&
+                this.furniture  == other.furniture &&
+                this.equip      == other.equip &&
+                this.ammo       == other.ammo &&
+                this.consumable == other.consumable &&
+                this.dye        == other.dye &&
+                this.mech       == other.mech &&
+                this.w_melee    == other.w_melee &&
+                this.w_ranged   == other.w_ranged &&
+                this.w_magic    == other.w_magic &&
+                this.w_summon   == other.w_summon &&
+                this.f_door     == other.f_door &&
+                this.f_light    == other.f_light &&
+                this.f_table    == other.f_table &&
+                this.f_chair    == other.f_chair &&
+                this.f_other    == other.f_other;
+        }
+
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+
+            try {
+                return Equals((FlagInfo)other);
+            }
+            catch (InvalidCastException) {
+                return false;
+            }
+        }
+
+        private int? _hash;
+        public override int GetHashCode()
+        {
+            return _hash ?? comphash();
+        }
+
+        private int comphash()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + this.general;
+                hash = hash * 31 + this.placeable;
+                hash = hash * 31 + this.weapon;
+                hash = hash * 31 + this.w_melee;
+                hash = hash * 31 + this.w_ranged;
+                hash = hash * 31 + this.w_magic;
+                hash = hash * 31 + this.w_summon;
+                hash = hash * 31 + this.tool;
+                hash = hash * 31 + this.ammo;
+                hash = hash * 31 + this.equip;
+                hash = hash * 31 + this.dye;
+                hash = hash * 31 + this.consumable;
+                hash = hash * 31 + this.mech;
+                hash = hash * 31 + this.furniture;
+                hash = hash * 31 + this.f_door;
+                hash = hash * 31 + this.f_light;
+                hash = hash * 31 + this.f_table;
+                hash = hash * 31 + this.f_chair;
+                hash = hash * 31 + this.f_other;
+
+                _hash = hash;
+                return hash;
+            }
+        }
+
+        public static bool operator ==(FlagInfo left, FlagInfo right)
+        {
+            return left.Equals(right);
+        }
+        public static bool operator !=(FlagInfo left, FlagInfo right)
+        {
+            return !left.Equals(right);
+        }
+        #endregion equatable
+
+        #region bitwise
+
+        public static FlagInfo operator &(FlagInfo left, FlagInfo other)
+        {
+            FlagInfo ret = new FlagInfo();
+            ret.general    = left.general & other.general;
+            ret.placeable  = left.placeable & other.placeable;
+            ret.weapon     = left.weapon & other.weapon;
+            ret.tool       = left.tool & other.tool;
+            ret.furniture  = left.furniture & other.furniture;
+            ret.equip      = left.equip & other.equip;
+            ret.ammo       = left.ammo & other.ammo;
+            ret.consumable = left.consumable & other.consumable;
+            ret.dye        = left.dye & other.dye;
+            ret.mech       = left.mech & other.mech;
+            ret.w_melee    = left.w_melee & other.w_melee;
+            ret.w_ranged   = left.w_ranged & other.w_ranged;
+            ret.w_magic    = left.w_magic & other.w_magic;
+            ret.w_summon   = left.w_summon & other.w_summon;
+            ret.f_door     = left.f_door & other.f_door;
+            ret.f_light    = left.f_light & other.f_light;
+            ret.f_table    = left.f_table & other.f_table;
+            ret.f_chair    = left.f_chair & other.f_chair;
+            ret.f_other    = left.f_other & other.f_other;
+
+            return ret;
+
+        }
+
+        public static FlagInfo operator |(FlagInfo left, FlagInfo other)
+        {
+            FlagInfo ret = new FlagInfo();
+            ret.general    = left.general | other.general;
+            ret.placeable  = left.placeable | other.placeable;
+            ret.weapon     = left.weapon | other.weapon;
+            ret.tool       = left.tool | other.tool;
+            ret.furniture  = left.furniture | other.furniture;
+            ret.equip      = left.equip | other.equip;
+            ret.ammo       = left.ammo | other.ammo;
+            ret.consumable = left.consumable | other.consumable;
+            ret.dye        = left.dye | other.dye;
+            ret.mech       = left.mech | other.mech;
+            ret.w_melee    = left.w_melee | other.w_melee;
+            ret.w_ranged   = left.w_ranged | other.w_ranged;
+            ret.w_magic    = left.w_magic | other.w_magic;
+            ret.w_summon   = left.w_summon | other.w_summon;
+            ret.f_door     = left.f_door | other.f_door;
+            ret.f_light    = left.f_light | other.f_light;
+            ret.f_table    = left.f_table | other.f_table;
+            ret.f_chair    = left.f_chair | other.f_chair;
+            ret.f_other    = left.f_other | other.f_other;
+
+            return ret;
+
+        }
+
+        #endregion bitwise
+
 
     }
 
