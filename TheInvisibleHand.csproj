@@ -117,6 +117,7 @@
     <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
     <Compile Include="Items\Sets.cs" />
+    <Compile Include="Items\RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <!-- <Compile Include="DynamicQuery\Dynamic.cs" /> -->
     <!-- <Compile Include="DynamicQuery\Properties\AssemblyInfo.cs" /> -->
