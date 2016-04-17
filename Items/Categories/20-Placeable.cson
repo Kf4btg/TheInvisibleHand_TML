@@ -1,0 +1,117 @@
+category:
+  name: 'Ore'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['ore']
+  ]
+
+category:
+  name: 'Metal Bar'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['bar']
+  ]
+
+category:
+  name: 'Gem'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['gem']
+  ]
+
+
+category:
+  name: 'Banner'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['banner']
+  ]
+
+
+category:
+  name: 'Wall Decoration'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['wall_deco']
+  ]
+category:
+  name: 'Painting'
+  parent: 'Wall Decoration'
+  requires: [
+    Placeable: ['painting']
+  ]
+category:
+  name: 'Trophy'
+  parent: 'Wall Decoration'
+  requires: [
+    Placeable: ['trophy']
+  ]
+category:
+  name: 'Rack'
+  parent: 'Wall Decoration'
+  requires: [
+    Placeable: ['rack']
+  ]
+
+
+category:
+  name: 'Dye Plant'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['dye_plant']
+  ]
+category:
+  name: 'Strange Plant'
+  parent: 'Dye Plant'
+  requires: [
+    Placeable: ['strange_plant']
+  ]
+
+
+category:
+  name: 'Herb Seed'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['seed']
+  ]
+
+category:
+  name: 'Wall'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['wall']
+  ]
+category:
+  name: 'Wallpaper'
+  parent: 'Wall'
+  requires: [
+    Placeable: ['wallpaper']
+  ]
+
+category:
+  name: 'Music Box'
+  parent: 'Placeable'
+  requires: [
+    Placeable: ['musicbox']
+  ]
+
+category:
+  name: 'Furniture'
+  parent: 'Placeable'
+  requires:[
+    Placeable: ['furniture']
+]
+
+# category:
+#   name: 'Block'
+#   parent: 'Placeable'
+#   requires:[
+#     Placeable: ['block']
+# ]
+
+# category:
+#   name: 'Brick'
+#   parent: 'Placeable'
+#   requires:[
+#     Placeable: ['brick']
+# ]

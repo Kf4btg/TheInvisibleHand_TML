@@ -1,0 +1,6 @@
+category:
+  name: 'Door'
+  parent: 'Doors'
+  requires:[
+    Furniture.Doors: ['door']
+]
