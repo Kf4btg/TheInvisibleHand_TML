@@ -1,0 +1,17 @@
+category:
+  name: 'Minion'
+  parent: 'Summon'
+  requires: [
+    Weapon.Summon: [
+      'minion'
+    ]
+  ]
+
+category:
+  name: 'Sentry'
+  parent: 'Summon'
+  requires: [
+    Weapon.Summon: [
+      'sentry'
+    ]
+  ]

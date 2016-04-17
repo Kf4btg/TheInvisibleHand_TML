@@ -1,0 +1,57 @@
+category:
+  name: 'Broadsword'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'style_swing'
+      'broadsword'
+    ]
+  ]
+
+category:
+  name: 'Boomerang'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'style_thrown'
+      'boomerang'
+    ]
+  ]
+
+category:
+  name: 'Flail'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'style_directional'
+      'flail'
+    ]
+  ]
+
+category:
+  name: 'Spear'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'style_directional'
+      'spear'
+    ]
+  ]
+
+category:
+  name: 'Yoyo'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'yoyo'
+    ]
+  ]
+
+category:
+  name: 'Shortsword'
+  parent: 'Melee'
+  requires: [
+    Weapon.Melee: [
+      'style_jab'
+    ]
+  ]

@@ -1,0 +1,34 @@
+category:
+  name: 'Melee'
+  parent: 'Weapon'
+  requires: [
+    Weapon: ['type_melee']
+  ]
+
+category:
+  name: 'Ranged'
+  parent: 'Weapon'
+  requires: [
+    Weapon: ['type_ranged']
+  ]
+
+category:
+  name: 'Magic'
+  parent: 'Weapon'
+  requires: [
+    Weapon: ['type_magic']
+  ]
+
+category:
+  name: 'Summon'
+  parent: 'Weapon'
+  requires: [
+    Weapon: ['type_summon']
+  ]
+
+category:
+  name: 'Throwing'
+  parent: 'Weapon'
+  requires: [
+    Weapon: ['type_throwing']
+  ]

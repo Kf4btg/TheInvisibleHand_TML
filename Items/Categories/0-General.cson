@@ -1,0 +1,48 @@
+# start a category definition
+category:
+  # give it a meaningful name
+  name: 'Template'
+  # if it is a nested category (e.g. Weapon > Melee),
+  # put the name of its parent here. Only items that meet the
+  # requirements of the parent will considered for the nested category.
+  # If it is a top level category, set this to null
+  parent: null
+
+  # The list (of lists) of traits required for an item
+  # to match this category. For a top-level category, a General
+  # trait entry will likely always be included. For sub-categories,
+  # the parent will fulfill the General requirements, so only
+  # traits from more specific families are needed.
+  requires: [
+    General: []
+  ]
+
+# Some broad, generic categories. Most are probably a 1:1 mapping of
+# a trait to a category
+category:
+  name: 'Tool'
+  parent: null
+  requires: [
+    General: [ 'tool' ]
+  ]
+
+category:
+  name: 'Weapon'
+  parent: null
+  requires: [
+    General: ['weapon']
+  ]
+
+category:
+  name: 'Equipable'
+  parent: null
+  requires: [
+    General: ['equipable']
+  ]
+
+category:
+  name: 'Placeable'
+  parent: null
+  requires: [
+    General: ['placeable']
+  ]
