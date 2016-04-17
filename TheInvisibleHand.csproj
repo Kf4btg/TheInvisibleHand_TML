@@ -71,6 +71,8 @@
     <Reference Include="System" />
     <!-- <Reference Include="System.Core" /> -->
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Hjson">
+        <HintPath>References\Hjson.dll</HintPath>
     <Reference Include="FNA, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('WINDOWS'))">
         <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ref\Terraria\ModCompile\FNA.dll</HintPath>
