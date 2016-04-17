@@ -1,0 +1,250 @@
+General:
+  traits: [
+    'expert'
+    'quest_item'
+    'material'
+    'mech'
+    'bait'
+    'explosive'
+    'auto'
+    'channeled'
+    'weapon'
+    'equipable'
+    'vanity'
+    'defense'
+    'reach_boost'
+    'reach_penalty'
+    'heal_life'
+    'regen_life'
+    'heal_mana'
+    'boost_mana'
+    'use_mana'
+    'tool'
+    'placeable'
+    'consumable'
+    'dye'
+    'ammo'
+    'soul'
+    'coin'
+    'paint'
+    'hair_dye'
+  ]
+
+Placeable:
+  traits: [
+    'furniture'
+    'seed'
+    'block'
+    'brick'
+    'ore'
+    'bar'
+    'wood'
+    'wall'
+    'wall_deco'
+    'dye_plant'
+    'strange_plant'
+    'gem'
+    'musicbox'
+    'painting'
+    'rack'
+    'trophy'
+    'banner'
+    'wallpaper'
+  ]
+
+Mech:
+  traits: [
+    'trap'
+    'timer'
+    'switch'
+    'lever'
+    'pressure_plate'
+    'track'
+    'firework'
+  ]
+
+Ammo:
+  traits: [
+    'arrow'
+    'bullet'
+    'rocket'
+    'dart'
+    'sand'
+    'coin'
+    'solution'
+    'endless'
+    'bomb'
+  ]
+
+Dye:
+  traits: [
+    'basic'
+    'black'
+    'bright'
+    'silver'
+    'flame'
+    'gradient'
+    'strange'
+    'lunar'
+  ]
+
+Equip:
+  traits: [
+    'armor'
+    'accessory'
+    'vanity'
+    'pet'
+    'pet_light'
+    'pet_vanity'
+    'mount'
+    'mount_cart'
+    'grapple'
+    'grapple_single'
+    'grapple_multi'
+    'slot_head'
+    'slot_body'
+    'slot_leg'
+    'slot_face'
+    'slot_neck'
+    'slot_back'
+    'wings'
+    'slot_shoe'
+    'slot_handon'
+    'slot_handoff'
+    'slot_shield'
+    'slot_waist'
+    'balloon'
+    'slot_front'
+  ]
+
+Weapon:
+  traits: [
+    'automatic'
+    'has_projectile'
+    'type_melee'
+    'type_ranged'
+    'type_magic'
+    'type_summon'
+    'type_throwing'
+  ]
+  Melee:
+    traits: [
+      'style_swing'
+      'style_jab'
+      'style_directional'
+      'style_thrown'
+      'broadsword'
+      'boomerang'
+      'spear'
+      'flail'
+      'yoyo'
+      'shortsword'
+    ]
+  Ranged:
+    traits: [
+      'bullet_consuming'
+      'arrow_consuming'
+      'rocket_consuming'
+      'dart_consuming'
+      'gel_consuming'
+      'no_ammo'
+    ]
+  Magic:
+    traits: [
+      'area'
+      'homing'
+      'bouncing'
+      'controlled'
+      'stream'
+      'piercing'
+    ]
+  Summon:
+    traits: [
+      'minion'
+      'sentry'
+    ]
+
+Tool:
+  traits: [
+    'pick'
+    'axe'
+    'hammer'
+    'fishing_pole'
+    'wrench'
+    'wand'
+    'recall'
+  ]
+
+Consumable:
+  traits: [
+    'buff'
+    'food'
+    'potion'
+    'heal'
+    'regen'
+    'life'
+    'mana'
+  ]
+
+Furniture:
+  traits: [
+    'valid_housing'
+    'clutter'
+    'crafting_station'
+    'container'
+    'useable'
+    'decorative'
+    'housing_door'
+    'housing_light'
+    'housing_chair'
+    'housing_table'
+  ]
+  Lighting:
+    traits: [
+      'torch'
+      'candle'
+      'chandelier'
+      'hanging_lantern'
+      'lamp'
+      'holiday_light'
+      'candelabra'
+    ]
+  Chairs:
+    traits: [
+      'chair'
+      'bed'
+      'bench'
+    ]
+  Doors:
+    traits: [
+      'door'
+      'other'
+    ]
+  Tables:
+    traits: [
+      'table'
+      'workbench'
+      'dresser'
+      'piano'
+      'bookcase'
+      'bathtub'
+    ]
+  Other:
+    traits: [
+      'sink'
+      'clock'
+      'bottle'
+      'bowl'
+      'beachstuff'
+      'tombstone'
+      'campfire'
+      'statue'
+      'statue_alphabet'
+      'crate'
+      'monolith'
+      'cooking_pot'
+      'anvil'
+      'cannon'
+      'fountain'
+      'planter'
+    ]
