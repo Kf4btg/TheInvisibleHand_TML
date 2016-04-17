@@ -1,23 +1,25 @@
 [
-    {
-      name: Chair
-      parent: Chairs
-      requires: {
-          Furniture.Chairs: ["chair"]
-      }
+  {
+    name: Chair
+    parent: Chairs
+    requires: {
+      Furniture.Chairs: ["chair"]
     }
-    {
-      name: Bed
-      parent: Chairs
-      requires: {
-        Furniture.Chairs: ["bed"]
-      }
+  }
+
+  {
+    name: Bed
+    parent: Chairs
+    requires: {
+      Furniture.Chairs: ["bed"]
     }
-    {
-      name: Bench
-      parent: Chairs
-      requires: {
-        Furniture.Chairs: ["bench"]
-      }
+  }
+  
+  {
+    name: Bench
+    parent: Chairs
+    requires: {
+      Furniture.Chairs: ["bench"]
     }
+  }
 ]

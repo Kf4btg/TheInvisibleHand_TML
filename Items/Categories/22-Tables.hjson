@@ -1,0 +1,44 @@
+[
+  {
+    name: Bathtub
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "bathtub" ]
+    }
+  }
+  {
+    name: Bookcase
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "bookcase" ]
+    }
+  }
+  {
+    name: Dresser
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "dresser" ]
+    }
+  }
+  {
+    name: Piano
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "piano" ]
+    }
+  }
+  {
+    name: Table
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "table" ]
+    }
+  }
+  {
+    name: Work Bench
+    parent: Tables
+    requires: {
+      Furniture.Tables: [ "workbench" ]
+    }
+  }
+]

@@ -1,0 +1,64 @@
+[
+  # {
+  #   name: Lighting
+  #   parent: Room Needs
+  #   requires: {
+  #     Furniture: [ "housing_light" ]
+  # }
+
+  {
+    name: Torch
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "torch" ]
+    }
+  }
+
+  {
+    name: Candelabra
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "candelabra" ]
+    }
+  }
+
+  {
+    name: Candle
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "candle" ]
+    }
+  }
+
+  {
+    name: Chandelier
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "chandelier" ]
+    }
+  }
+
+  {
+    name: Hanging Lantern
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "hanging_lantern" ]
+    }
+  }
+
+  {
+    name: Lamp
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "lamp" ]
+    }
+  }
+  
+  {
+    name: Holiday Light
+    parent: Lighting
+    requires: {
+      Furniture.Lighting: [ "holiday_light" ]
+    }
+  }
+]

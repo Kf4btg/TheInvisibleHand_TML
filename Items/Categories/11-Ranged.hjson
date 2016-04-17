@@ -1,0 +1,57 @@
+[
+  {
+    name: Gun
+    parent: Ranged
+    requires:  {
+      Weapon.Ranged: [ "bullet_consuming" ]
+    }
+  }
+
+  {
+    name: Automatic Gun
+    parent: Gun
+    requires:  {
+      General: ["auto"]
+    }
+  }
+
+  {
+    name: Bow
+    parent: Ranged
+    requires:  {
+      Weapon.Ranged: [ "arrow_consuming" ]
+    }
+  }
+
+  {
+    name: Repeater
+    parent: Bow
+    requires:  {
+      General: ["auto"]
+    }
+  }
+
+  {
+    name: Launcher
+    parent: Ranged
+    requires:  {
+      Weapon.Ranged: [ "rocket_consuming" ]
+    }
+  }
+
+  {
+    name: Dart
+    parent: Ranged
+    requires:  {
+      Weapon.Ranged: [ "dart_consuming" ]
+    }
+  }
+
+  {
+    name: Special
+    parent: Ranged
+    requires:  {
+      Weapon.Ranged: [ "no_ammo" ]
+    }
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    name: Minion
+    parent: Summon
+    requires:  {
+      Weapon.Summon: [ "minion" ]
+    }
+  }
+
+  {
+    name: Sentry
+    parent: Summon
+    requires:  {
+      Weapon.Summon: [ "sentry" ]
+    }
+  }
+]

@@ -1,0 +1,49 @@
+[
+  {
+    name: Area
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "area" ]
+    }
+  }
+
+  {
+    name: Bouncing
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "bouncing" ]
+    }
+  }
+
+  {
+    name: Controlled
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "controlled" ]
+    }
+  }
+
+  {
+    name: Homing
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "homing" ]
+    }
+  }
+
+  {
+    name: Piercing
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "piercing" ]
+    }
+  }
+
+  {
+    name: Stream
+    parent: Magic
+    requires:  {
+      Weapon.Magic: [ "stream" ]
+    }
+  }
+]

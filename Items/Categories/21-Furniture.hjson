@@ -1,0 +1,57 @@
+[
+  {
+    name: Crafting Station
+    parent: Furniture
+    requires: {
+      Furniture: ["crafting_station"]
+    }
+  }
+  
+  {
+    name: Container
+    parent: Furniture
+    requires: {
+      Furniture: ["container"]
+    }
+  }
+
+  {
+    name: Room Needs
+    parent: Furniture
+    requires: {
+      Furniture: ["valid_housing"]
+    }
+  }
+
+  {
+    name: Lighting
+    parent: Room Needs
+    requires: {
+      Furniture: ["housing_light"]
+    }
+  }
+
+  {
+    name: Tables
+    parent: Room Needs
+    requires: {
+      Furniture: ["housing_table"]
+    }
+  }
+
+  {
+    name: Doors
+    parent: Room Needs
+    requires: {
+      Furniture: ["housing_door"]
+    }
+  }
+
+  {
+    name: Chairs
+    parent: Room Needs
+    requires: {
+      Furniture: ["housing_chair"]
+    }
+  }
+]

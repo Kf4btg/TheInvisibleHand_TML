@@ -1,0 +1,137 @@
+[
+  {
+    name: Ore
+    parent: Placeable
+    requires:  {
+      Placeable: ["ore"]
+    }
+  }
+
+  {
+    name: Metal Bar
+    parent: Placeable
+    requires:  {
+      Placeable: ["bar"]
+    }
+  }
+
+  {
+    name: Gem
+    parent: Placeable
+    requires:  {
+      Placeable: ["gem"]
+    }
+  }
+
+  {
+    name: Banner
+    parent: Placeable
+    requires:  {
+      Placeable: ["banner"]
+    }
+  }
+
+  {
+    name: Wall Decoration
+    parent: Placeable
+    requires:  {
+      Placeable: ["wall_deco"]
+    }
+  }
+
+  {
+    name: Painting
+    parent: Wall Decoration
+    requires:  {
+      Placeable: ["painting"]
+    }
+  }
+
+  {
+    name: Trophy
+    parent: Wall Decoration
+    requires:  {
+      Placeable: ["trophy"]
+    }
+  }
+
+  {
+    name: Rack
+    parent: Wall Decoration
+    requires:  {
+      Placeable: ["rack"]
+    }
+  }
+
+  {
+    name: Dye Plant
+    parent: Placeable
+    requires:  {
+      Placeable: ["dye_plant"]
+    }
+  }
+
+  {
+    name: Strange Plant
+    parent: Dye Plant
+    requires:  {
+      Placeable: ["strange_plant"]
+    }
+  }
+
+  {
+    name: Herb Seed
+    parent: Placeable
+    requires:  {
+      Placeable: ["seed"]
+    }
+  }
+
+  {
+    name: Wall
+    parent: Placeable
+    requires:  {
+      Placeable: ["wall"]
+    }
+  }
+
+  {
+    name: Wallpaper
+    parent: Wall
+    requires:  {
+      Placeable: ["wallpaper"]
+    }
+  }
+
+  {
+    name: Music Box
+    parent: Placeable
+    requires:  {
+      Placeable: ["musicbox"]
+    }
+  }
+
+  {
+    name: Furniture
+    parent: Placeable
+    requires: {
+      Placeable: ["furniture"]
+    }
+  }
+
+  # {
+  #   name: Block
+  #   parent: Placeable
+  #   requires: {
+  #     Placeable: ["block"]
+  #  }
+  # }
+
+  # {
+  #   name: Brick
+  #   parent: Placeable
+  #   requires: {
+  #     Placeable: ["brick"]
+  #  }
+  # }
+]

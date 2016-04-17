@@ -1,0 +1,114 @@
+[
+  {
+    name: Anvil
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "anvil" ]
+    }
+  }
+  {
+    name: Beachstuff
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "beachstuff" ]
+    }
+  }
+  {
+    name: Bottle
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "bottle" ]
+    }
+  }
+  {
+    name: Bowl
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "bowl" ]
+    }
+  }
+  {
+    name: Campfire
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "campfire" ]
+    }
+  }
+  {
+    name: Cannon
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "cannon" ]
+    }
+  }
+  {
+    name: Grandfather Clock
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "clock" ]
+    }
+  }
+  {
+    name: Cooking Pot
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "cooking_pot" ]
+    }
+  }
+  {
+    name: Crate
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "crate" ]
+    }
+  }
+  {
+    name: Water Fountain
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "fountain" ]
+    }
+  }
+  {
+    name: Lunar Monolith
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "monolith" ]
+    }
+  }
+  {
+    name: Planter Box
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "planter" ]
+    }
+  }
+  {
+    name: Sink
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "sink" ]
+    }
+  }
+  {
+    name: Statue
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "statue" ]
+    }
+  }
+  {
+    name: Alphabet Statue
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "statue_alphabet" ]
+    }
+  }
+  {
+    name: Tombstone
+    parent: Furniture
+    requires: {
+      Furniture.Other: [ "tombstone" ]
+    }
+  }
+]

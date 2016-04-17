@@ -1,0 +1,61 @@
+[
+  {
+    name: Broadsword
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [
+        "style_swing"
+        "broadsword"
+      ]
+    }
+  }
+
+  {
+    name: Boomerang
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [
+        "style_thrown"
+        "boomerang"
+      ]
+    }
+  }
+
+  {
+    name: Flail
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [
+        "style_directional"
+        "flail"
+      ]
+    }
+  }
+
+  {
+    name: Spear
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [
+        "style_directional"
+        "spear"
+      ]
+    }
+  }
+
+  {
+    name: Yoyo
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [ "yoyo" ]
+    }
+  }
+
+  {
+    name: Shortsword
+    parent: Melee
+    requires:  {
+      Weapon.Melee: [ "style_jab" ]
+    }
+  }
+]

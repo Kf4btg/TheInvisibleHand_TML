@@ -1,0 +1,41 @@
+[
+  {
+    name: Melee
+    parent: Weapon
+    requires:  {
+      Weapon: [ "type_melee" ]
+    }
+  }
+
+  {
+    name: Ranged
+    parent: Weapon
+    requires:  {
+      Weapon: [ "type_ranged" ]
+    }
+  }
+
+  {
+    name: Magic
+    parent: Weapon
+    requires:  {
+      Weapon: [ "type_magic" ]
+    }
+  }
+
+  {
+    name: Summon
+    parent: Weapon
+    requires:  {
+      Weapon: [ "type_summon" ]
+    }
+  }
+
+  {
+    name: Throwing
+    parent: Weapon
+    requires:  {
+      Weapon: [ "type_throwing" ]
+    }
+  }
+]
