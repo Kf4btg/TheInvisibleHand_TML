@@ -257,9 +257,9 @@ namespace InvisibleHand.Items
                     else if (item.TryFlag(weaponType, weapon.melee.style_thrown))
                         item.Flag(weaponType,
                                     weapon.melee.boomerang);
-                    else
-                        item.FlagIf(item.TryFlag(weaponType, weapon.melee.style_jab),
-                                    weaponType, weapon.melee.shortsword);
+                    // else
+                        // item.FlagIf(item.TryFlag(weaponType, weapon.melee.style_jab),
+                                    // weaponType, weapon.melee.shortsword);
                     break;
 
                 case weapon.type_ranged:

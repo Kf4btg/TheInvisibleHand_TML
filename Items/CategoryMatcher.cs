@@ -16,7 +16,7 @@ namespace InvisibleHand.Items
     // most appropriate categorization for unrecognized items. Defining these rules externally
     // (e.g. in a json file that is read in on load) would be best, but doing it here will
     // have to do for now.
-    public static class CategoryMatcher
+    public static class CategoryMatcher_Alpha
     {
         public static CategoryCollection categories = new CategoryCollection();
         public static FlagMatcher flagegories = new FlagMatcher();
@@ -61,7 +61,7 @@ namespace InvisibleHand.Items
             private static bool thrown(FlagInfo info) => (info.weapon & IF.weapon.type_thrown) != 0;
         }
 
-        static CategoryMatcher()
+        static CategoryMatcher_Alpha()
         {
             // var what = new[]
             // {
