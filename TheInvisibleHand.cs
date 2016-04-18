@@ -4,13 +4,36 @@ using Terraria.ModLoader;
 // using Terraria;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
+using InvisibleHand.Items;
 
 namespace InvisibleHand
 {
+
+    using _flagCollection = IDictionary<string, IDictionary<string, int>>;
+
     public class IHBase : Mod
     {
-
         internal static int[] itemCategories;
+
+        /// Mapping of:
+        /// 	Item Trait-Group Name (e.g. "Weapon") ->
+        ///				(Mapping of: Trait Name (e.g "melee") -> int flag value (power of 2))
+        ///
+        /// Examples (arbitrary values used):
+        /// 	var mel_weapon = FlagCollection["Weapon"]["style_melee"] // == 4;
+        ///		var tombstone = FlagCollection["Furniture.Other"]["tombstone"] // == 1048576;
+        ///
+        ///
+        /// This allows such operations as (this fictional, bad idea):
+        ///		Func<Item, bool> TombSledge = (item) =>
+        ///				(item.Flags["Weapon"] &amp; mel_weapon) > 0
+        ///				&amp;&amp; (item.Flags["Furniture.Other"] &amp; tombstone) > 0;
+        public static _flagCollection FlagCollection => CategoryParser.FlagCollection;
+
+        /// This holds the loaded values for how to match an item to given category;
+        /// It is a mapping of "Category_Name" -> {"TraitGroup": combined_value_of_flags_for_group}
+        public static _flagCollection CategoryDefs => CategoryParser.CategoryDefinitions;
+
 
         /// holds the game's original strings for loot-all, dep-all, quick-stack, etc;
         /// we're going to be removing these later on, but will use their
@@ -69,6 +92,9 @@ namespace InvisibleHand
 
             // setup help output
             commandHandler.Initialize();
+
+            // load the item flags and category definitions
+            CategoryParser.Parse();
         }
 
         public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
