@@ -1,0 +1,281 @@
+General:
+{
+  traits: [
+    ammo
+    auto
+    bait
+    boost_mana
+    channeled
+    coin
+    consumable
+    damage
+    defense
+    dye
+    equipable
+    expert
+    explosive
+    hair_dye
+    heal_life
+    heal_mana
+    material
+    mech
+    paint
+    placeable
+    quest_item
+    reach_boost
+    reach_penalty
+    regen_life
+    soul
+    tool
+    use_mana
+    vanity
+    weapon
+  ]
+}
+
+Placeable:
+{
+  traits: [
+    banner
+    bar
+    block
+    brick
+    dye_plant
+    furniture
+    gem
+    musicbox
+    ore
+    painting
+    rack
+    seed
+    strange_plant
+    trophy
+    wall_deco
+    wall
+    wallpaper
+    wood
+  ]
+}
+Mech:
+{
+  traits: [
+    firework
+    lever
+    pressure_plate
+    switch
+    timer
+    track
+    trap
+  ]
+}
+Ammo:
+{
+  traits: [
+    arrow
+    bomb
+    bullet
+    coin
+    dart
+    endless
+    rocket
+    sand
+    solution
+  ]
+}
+Dye:
+{
+  traits: [
+    basic
+    black
+    bright
+    flame
+    gradient
+    lunar
+    silver
+    strange
+  ]
+}
+Equip:
+{
+  traits: [
+    accessory
+    armor
+    balloon
+    grapple_multi
+    grapple_single
+    grapple
+    mount_cart
+    mount
+    pet_light
+    pet_vanity
+    pet
+    slot_back
+    slot_body
+    slot_face
+    slot_front
+    slot_handoff
+    slot_handon
+    slot_head
+    slot_leg
+    slot_neck
+    slot_shield
+    slot_shoe
+    slot_waist
+    vanity
+    wings
+  ]
+}
+Weapon:
+{
+  traits: [
+    automatic
+    has_projectile
+    type_magic
+    type_melee
+    type_ranged
+    type_summon
+    type_throwing
+  ]
+  Melee:
+  {
+    traits: [
+      boomerang
+      broadsword
+      flail
+      shortsword
+      spear
+      style_directional
+      style_jab
+      style_swing
+      style_thrown
+      yoyo
+    ]
+  }
+  Ranged:
+  {
+    traits: [
+      arrow_consuming
+      bullet_consuming
+      dart_consuming
+      gel_consuming
+      no_ammo
+      rocket_consuming
+    ]
+  }
+  Magic:
+  {
+    traits: [
+      area
+      bouncing
+      controlled
+      homing
+      piercing
+      stream
+    ]
+  }
+  Summon:
+  {
+    traits: [
+      minion
+      sentry
+    ]
+  }
+}
+Tool:
+{
+  traits: [
+    axe
+    fishing_pole
+    hammer
+    pick
+    recall
+    wand
+    wrench
+  ]
+}
+Consumable:
+{
+  traits: [
+    buff
+    food
+    heal
+    life
+    mana
+    potion
+    regen
+  ]
+}
+Furniture:
+{
+  traits: [
+    clutter
+    container
+    crafting_station
+    decorative
+    housing_chair
+    housing_door
+    housing_light
+    housing_table
+    useable
+    valid_housing
+  ]
+  Lighting:
+  {
+    traits: [
+      candelabra
+      candle
+      chandelier
+      hanging_lantern
+      holiday_light
+      lamp
+      torch
+    ]
+  }
+  Chairs:
+  {
+    traits: [
+      bed
+      bench
+      chair
+    ]
+  }
+  Doors:
+  {
+    traits: [
+      door
+      other
+    ]
+  }
+  Tables:
+  {
+    traits: [
+      bathtub
+      bookcase
+      dresser
+      piano
+      table
+      workbench
+    ]
+  }
+  Other:
+  {
+    traits: [
+      anvil
+      beachstuff
+      bottle
+      bowl
+      campfire
+      cannon
+      clock
+      cooking_pot
+      crate
+      fountain
+      monolith
+      planter
+      sink
+      statue_alphabet
+      statue
+      tombstone
+    ]
+  }
+}

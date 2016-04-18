@@ -61,7 +61,6 @@ namespace InvisibleHand.Items
             private static bool thrown(FlagInfo info) => (info.weapon & IF.weapon.type_thrown) != 0;
         }
 
-
         static CategoryMatcher()
         {
             // var what = new[]
