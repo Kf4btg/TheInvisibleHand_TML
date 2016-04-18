@@ -1,13 +1,13 @@
-// using Microsoft.Xna.Framework;
-// using System.Collections.Generic;
-// using System;
-// using Terraria;
-// using Terraria.ID;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace InvisibleHand.Items
 {
     internal static class ItemFlags
     {
+
         public enum Type
         {
             General,
@@ -151,7 +151,6 @@ namespace InvisibleHand.Items
             public const int slot_leg       = 1 << 9;
 
             // accy by slot
-
             public const int slot_face      = 1 << 10;
             public const int slot_neck      = 1 << 11;
             public const int slot_back      = 1 << 12;
@@ -181,8 +180,6 @@ namespace InvisibleHand.Items
             public const int type_magic     = 1 << 4;
 
             public const int type_summon    = 1 << 5;
-                // public const int minion     = 1 << 8;
-                // public const int sentry     = 1 << 9;
 
             public const int type_thrown    = 1 << 6;
             public const int type_other     = 1 << 7;
@@ -200,7 +197,7 @@ namespace InvisibleHand.Items
                 public const int flail             = 1 << 7;
                 public const int yoyo              = 1 << 8;
 
-                public const int shortsword = style_jab;
+                // public const int shortsword = style_jab;
             }
 
             public static class ranged
@@ -212,12 +209,6 @@ namespace InvisibleHand.Items
                 public const int dart_consuming   = 1 << 3;
                 public const int gel_consuming    = 1 << 4;
                 public const int no_ammo          = 1 << 5;
-
-                public const int gun           = bullet_consuming;
-                // public const int automatic_gun = automatic;
-                public const int bow           = arrow_consuming;
-                // public const int repeater      = automatic;
-                public const int launcher      = rocket_consuming;
             }
 
             public static class magic
@@ -237,46 +228,6 @@ namespace InvisibleHand.Items
                 public const int minion     = 1;
                 public const int sentry     = 1 << 1;
             }
-
-            // public const int melee = 1 << 1;
-
-                // public const long style_swing       = 1 << 2;
-                // public const long style_jab         = 1 << 3;
-                // public const long style_directional = 1 << 4;
-                // public const long style_thrown      = 1 << 5;
-                // public const long broadsword        = 1 << 7;
-                // public const long boomerang         = 1 << 8;
-                // public const long spear             = 1 << 9;
-                // public const long flail             = 1 << 10;
-                // public const long yoyo              = 1 << 11;
-                //
-                // public const long shortsword = melee | style_jab;
-
-            // public const int ranged               = 1 << 2;
-                // public const long bullet_consuming = 1 << 14;
-                // public const long arrow_consuming  = 1 << 15;
-                // public const long rocket_consuming = 1 << 16;
-                // public const long dart_consuming   = 1 << 18;
-                // public const long gel_consuming    = 1 << 19;
-                // public const long no_ammo          = 1 << 20;
-                //
-                // public const long gun           = ranged | bullet_consuming;
-                // public const long automatic_gun = gun | automatic;
-                // public const long bow           = ranged | arrow_consuming;
-                // public const long repeater      = bow | automatic;
-                // public const long launcher      = ranged | rocket_consuming;
-
-            // public const int magic          = 1 << 3;
-                // public const long area       = 1 << 27;
-                // public const long homing     = 1 << 28;
-                // public const long bouncing   = 1 << 29;
-                // public const long controlled = 1 << 30;
-                // public const long stream     = 1L << 31;
-                // public const long piercing   = 1 << 23;
-
-
-
-
         }
 
         public static class tool
@@ -303,27 +254,6 @@ namespace InvisibleHand.Items
             public const int life   = 1 << 5;
             public const int mana   = 1 << 6;
         }
-
-        // public static class housing
-        // {
-        //     public const int none  = 0;
-        //     public const int door  = 1;
-        //     public const int light = 1 << 1;
-        //     public const int chair = 1 << 2;
-        //     public const int table = 1 << 3;
-        // }
-
-        // public static class lighting
-        // {
-        //     // housing_light,
-        //     public const int torch            = 1 << 7;
-        //     public const int candle           = 1 << 8;
-        //     public const int chandelier       = 1 << 9;
-        //     public const int hanging_lantern  = 1 << 10;
-        //     public const int lamp             = 1 << 11;
-        //     public const int holiday_light    = 1 << 12;
-        //     public const int candelabra       = 1 << 13;
-        // }
 
         public static class furniture
         {
@@ -360,8 +290,6 @@ namespace InvisibleHand.Items
                 public const int bench = 1 << 2;
             }
 
-            // housing_furniture,
-            // housing_door,
             public static class doors
             {
                 public const int none = 0;
@@ -369,21 +297,6 @@ namespace InvisibleHand.Items
                 public const int other = 1 << 1;
             }
 
-            // housing_light,
-            // public const long torch            = 1 << 7;
-            // public const long candle           = 1 << 8;
-            // public const long chandelier       = 1 << 9;
-            // public const long hanging_lantern  = 1 << 10;
-            // public const long lamp             = 1 << 11;
-            // public const long holiday_light    = 1 << 12;
-            // public const long candelabra       = 1 << 13;
-
-            // housing_chair,
-            // public const long chair = 1 << 15;
-            // public const long bed   = 1 << 16;
-            // public const long bench = 1 << 17;
-
-            // housing_table,
             public static class tables
             {
                 public const int none = 0;
@@ -417,6 +330,97 @@ namespace InvisibleHand.Items
                 public const int planter         = 1 << 15;
             }
         }
+
+        public static readonly Dictionary<string, FlagGroup> FlagCollection;
+
+        /// This initializes the FlagCollection (i.e. a version of the consts above that can be retrieved with strings)
+        /// using reflection on this class.  TODO: Perhaps it would be better to ditch the hard-coded consts altogether
+        /// and parse the Traits.hjson file to generate the flag names and values.
+        static ItemFlags()
+        {
+            System.Type thistype = typeof(ItemFlags);
+            IEnumerable<System.Type> nested = thistype.GetNestedTypes(BindingFlags.Public)
+				.Where(type => type != typeof(ItemFlags.Type)); // don't want the enum
+
+
+            FlagCollection = new Dictionary<string, FlagGroup>();
+            foreach (var nested_type in nested)
+            {
+                var flag_group_name = nested_type.Name;
+                FlagCollection[flag_group_name] = createFlagGroup(nested_type, flag_group_name);
+
+                // recurse once
+                foreach (var subtype in nested_type.GetNestedTypes(BindingFlags.Public))
+                {
+                    // Flatten the nested types by making the dictionary key "ParentName.ChildName",
+                    // e.g. "Weapon.Melee". this will greatly simplify referencing things later.
+                    var combiname = $"{flag_group_name}.{subtype.Name}";
+                    FlagCollection[combiname] = createFlagGroup(subtype, combiname);
+                }
+            }
+        }
+
+
+        private static FlagGroup createFlagGroup(System.Type nested_type, string group_name)
+        {
+            // var trait_collection_name = nested_type.Name;
+            var fg = new FlagGroup(group_name);
+            foreach (var flag in nested_type.GetFields().Where(f => f.Name != "none"))
+            {
+                // TODO: if I'm defining the consts above, this should probably
+                // set the flag-values explicitly
+                // if (flag.Name != "none")
+                fg.AddFlag(flag.Name);
+            }
+            return fg;
+        }
+    }
+
+    /// A string-indexable version of the const Flag values
+    public class FlagGroup
+    {
+        public string Name { get; private set; }
+
+
+        private Dictionary<string, int> bitnames;
+		public Dictionary<string, int> FlagsByName => bitnames;
+        public int FlagCount => bitnames.Count;
+
+
+        // private Dictionary<string, TraitFlags> _children;
+        // public Dictionary<string, TraitFlags> Children { get { return _children;}}
+        // public int ChildCount => _children == null ? 0 : _children.Count;
+
+
+
+        public int this[string flagname]
+        {
+            get {
+                int val;
+                if (bitnames.TryGetValue(flagname, out val))
+                    return val;
+                return 0; // TODO: should this return -1? Or null? Or throw an exception? Or???
+            }
+            set
+            {
+                // FIXME: this isn't right...needs to verify...something...like the shift factor shouldn't be bigger than bitnames.Count or something...i dunno. i can't think
+                bitnames[flagname] = value;
+            }
+        }
+
+        public FlagGroup(string name)
+        {
+            Name = name;
+            bitnames = new Dictionary<string, int>();
+            bitnames["none"] = 0;
+        }
+
+        /// add a new bit value with the given label and a bit-value based on the current number of items in the flag-collection
+        public void AddFlag(string label)
+        {
+            bitnames.Add(label, 1 << (bitnames.Count-1));
+        }
+
     }
 
     //
@@ -477,118 +481,7 @@ namespace InvisibleHand.Items
     //     Other = 0x20
     // }
     //
-    // [Flags]
-    // public enum MeleeSpecialties
-    // {
-    //     None = 0,
-    //
-    //     Stab = 0x1,
-    //     Swing = 0x2, // useStyle==1
-    //     Throw = 0x4,
-    //     Spin = 0x8,
-    //
-    //     Directional = 0x10,
-    //     Follow = 0x20, // attempt to seek out/point at cursor; e.g. chainsaws, yoyos
-    //
-    //
-    //     // Thrust = 0x10,
-    //     // Yoyo = 0x20,
-    //
-    //     // Directional: (useStyle==5) includes Spears, flails, yoyos, Arkhalis, chainsaws, golem fist, & many similar things.
-    //
-    //     // Other = 0x40, // e.g. Solar Eruption, (Arkhalis?)
-    //     // // can include solar eruption & arkhalis as Directional | Follow
-    //
-    //     Auto = 0x40,
-    //
-    //     Shortsword = Stab, // useStyle == 3
-    //
-    //     Sword = Swing,
-    //     AutoSwing = Swing | Auto,
-    //     Tool = AutoSwing, // pickaxe, axe, hammer
-    //     MechTool = Directional | Auto | Follow, //  chainsaws, drills, etc.
-    //
-    //
-    //     Spear = Directional | Stab,
-    //     Flail = Throw | Spin, // (most flails, anyway)
-    //     Boomerang = Throw,
-    //     Yoyo = Throw | Follow,
-    //
-    // }
-    //
-    // [Flags]
-    // public enum RangedSpecialties
-    // {
-    //     None = 0,
-    //
-    //     Gun = 0x1,
-    //     Bow = 0x2,
-    //     Repeater = 0x4,
-    //     Launcher = 0x8,
-    //     Dart = 0x10,
-    //     Flame = 0x20,
-    //     NoAmmo = 0x40,
-    //
-    //     Other = 0x80, // flare gun, star cannon, sandgun, etc.
-    //
-    //     Arrows = Bow | Repeater,
-    //     Bullets = Gun,
-    //     Rockets = Launcher,
-    // }
-    //
-    // [Flags]
-    // public enum MagicSpecialties
-    // {
-    //     None = 0,
-    //     Direct = 0x1,
-    //     Area = 0x2,
-    //     Homing = 0x4,
-    //     Bouncing = 0x8,
-    //     Controlled = 0x10,
-    // }
-    //
-    // [Flags]
-    // public enum SummonSpecialties
-    // {
-    //     None = 0,
-    //     Minion = 0x1,
-    //     Sentry = 0x2,
-    // }
-    //
-    // [Flags]
-    // public enum ThrownSpecialties
-    // {
-    //     None = 0,
-    //     Basic = 0x1,
-    //     Explosive = 0x2,
-    // }
-    //
-    // [Flags]
-    // public enum OtherWeaponSpecialties
-    // {
-    //     None = 0,
-    //
-    //     Explosive = 0x1,
-    //     Placeable = 0x2,
-    // }
 
-    //
-    // public enum EquipType
-    // {
-    //     HeadSlot,
-    //     BodySlot,
-    //     LegSlot,
-    //     Accessory,
-    //     Hook,
-    //     Mount,
-    //     LightPet,
-    //     VanityPet
-    // }
-    //
-    //
-    //
-    //
-    //
     //
     // public enum ValuedAttribute
     // {
