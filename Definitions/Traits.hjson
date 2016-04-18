@@ -101,14 +101,14 @@ Equip:
     accessory
     armor
     balloon
-    grapple_multi
-    grapple_single
     grapple
-    mount_cart
+    grapple_single
+    grapple_multi
     mount
+    mount_cart
+    pet
     pet_light
     pet_vanity
-    pet
     slot_back
     slot_body
     slot_face
@@ -142,7 +142,7 @@ Weapon:
       boomerang
       broadsword
       flail
-      shortsword
+      /*shortsword*/
       spear
       style_directional
       style_jab
