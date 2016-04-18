@@ -181,7 +181,7 @@ namespace InvisibleHand.Items
 
             public const int type_summon    = 1 << 5;
 
-            public const int type_thrown    = 1 << 6;
+            public const int type_throwing    = 1 << 6;
             public const int type_other     = 1 << 7;
 
             public static class melee

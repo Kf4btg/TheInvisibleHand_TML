@@ -569,7 +569,7 @@ namespace InvisibleHand.Items
                         {weapon.type_ranged, (i) => i.ranged},
                         {weapon.type_magic, (i) => i.magic},
                         {weapon.type_summon, (i) => i.summon},
-                        {weapon.type_thrown, (i) => i.thrown},
+                        {weapon.type_throwing, (i) => i.thrown},
                         // {weapon.weapon_other, REPLACE_ME},
                     }
                 },

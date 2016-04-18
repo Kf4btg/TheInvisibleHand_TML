@@ -58,7 +58,7 @@ namespace InvisibleHand.Items
             private static bool ranged(FlagInfo info) => (info.weapon & IF.weapon.type_ranged) != 0;
             private static bool magic(FlagInfo info) => (info.weapon & IF.weapon.type_magic) != 0;
             private static bool summon(FlagInfo info) => (info.weapon & IF.weapon.type_summon) != 0;
-            private static bool thrown(FlagInfo info) => (info.weapon & IF.weapon.type_thrown) != 0;
+            private static bool thrown(FlagInfo info) => (info.weapon & IF.weapon.type_throwing) != 0;
         }
 
         static CategoryMatcher_Alpha()

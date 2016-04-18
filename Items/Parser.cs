@@ -16,24 +16,25 @@ namespace InvisibleHand.Items
         private string TraitFilePath;
         private string CategoryDefsPath;
 
+        public CategoryMatcher CatMatcher {get; private set;}
+
         public CategoryParser(string category_dir = "Categories", string trait_file = "Traits.hjson")
         {
             this.CategoryDefsPath = category_dir;
             this.TraitFilePath = trait_file;
         }
 
-        public void ReadConfigFiles(string path)
+        public void ReadConfigFiles()
         {
             // this returns an enumerable of <Filename: List-of-category-objects> pairs
-            var category_list = from file in Directory.GetFiles(path, "*.hjson", SearchOption.TopDirectoryOnly)
-                         orderby file ascending
-                         from catlist in HjsonValue.Load(file).Qa()
-                         select new
-                         {
-                             File = file,
-                             CatObjList = catlist
-                         };
-
+            var category_list =
+                from file in Directory.GetFiles(CategoryDefsPath, "*.hjson", SearchOption.TopDirectoryOnly)
+                orderby file
+                select new
+                {
+                    File = file,
+                    CatObjList = HjsonValue.Load(file).Qa()
+                };
 
             // Maps: CategoryName to (TraitType1: combined_flag_value, TraitType2: ...)
             var catmatcher = new CategoryMatcher();
@@ -48,7 +49,7 @@ namespace InvisibleHand.Items
             foreach (var pair in category_list)
             {
                 var fname = pair.File;
-                foreach (JsonValue catobj in pair.CatObjList)
+                foreach (var catobj in pair.CatObjList)
                 {
                     string category_name = catobj["name"].Qs();
                     string parent = catobj["parent"]?.Qs();
@@ -61,8 +62,6 @@ namespace InvisibleHand.Items
 
                     foreach (var newreqs in catobj["requires"].Qo())
                     {
-                        // var traitType = newreqs.Key; //string
-
                         // FlagCollection[TraitCategory][TraitName]
                         var traitCategory = newreqs.Key;
                         var flagvalues = ItemFlags.FlagCollection[traitCategory];
@@ -77,6 +76,8 @@ namespace InvisibleHand.Items
                     catmatcher[category_name] = reqs;
                 }
             }
+
+            CatMatcher = catmatcher;
         }
     }
 }
