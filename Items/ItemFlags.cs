@@ -1,10 +1,12 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Collections.Generic;
+// using System;
+// using System.Linq;
+// using System.Reflection;
+// using System.Collections.Generic;
 
 namespace InvisibleHand.Items
 {
+
+    /// Deprecated; Likely to be removed in favor of Loading from hjson definition files
     internal static class ItemFlags
     {
 
@@ -331,96 +333,58 @@ namespace InvisibleHand.Items
             }
         }
 
-        public static readonly Dictionary<string, FlagGroup> FlagCollection;
-
-        /// This initializes the FlagCollection (i.e. a version of the consts above that can be retrieved with strings)
-        /// using reflection on this class.  TODO: Perhaps it would be better to ditch the hard-coded consts altogether
-        /// and parse the Traits.hjson file to generate the flag names and values.
-        static ItemFlags()
-        {
-            System.Type thistype = typeof(ItemFlags);
-            IEnumerable<System.Type> nested = thistype.GetNestedTypes(BindingFlags.Public)
-				.Where(type => type != typeof(ItemFlags.Type)); // don't want the enum
-
-
-            FlagCollection = new Dictionary<string, FlagGroup>();
-            foreach (var nested_type in nested)
-            {
-                var flag_group_name = nested_type.Name;
-                FlagCollection[flag_group_name] = createFlagGroup(nested_type, flag_group_name);
-
-                // recurse once
-                foreach (var subtype in nested_type.GetNestedTypes(BindingFlags.Public))
-                {
-                    // Flatten the nested types by making the dictionary key "ParentName.ChildName",
-                    // e.g. "Weapon.Melee". this will greatly simplify referencing things later.
-                    var combiname = $"{flag_group_name}.{subtype.Name}";
-                    FlagCollection[combiname] = createFlagGroup(subtype, combiname);
-                }
-            }
-        }
-
-
-        private static FlagGroup createFlagGroup(System.Type nested_type, string group_name)
-        {
-            // var trait_collection_name = nested_type.Name;
-            var fg = new FlagGroup(group_name);
-            foreach (var flag in nested_type.GetFields().Where(f => f.Name != "none"))
-            {
-                // TODO: if I'm defining the consts above, this should probably
-                // set the flag-values explicitly
-                // if (flag.Name != "none")
-                fg.AddFlag(flag.Name);
-            }
-            return fg;
-        }
-    }
-
-    /// A string-indexable version of the const Flag values
-    public class FlagGroup
-    {
-        public string Name { get; private set; }
-
-
-        private Dictionary<string, int> bitnames;
-		public Dictionary<string, int> FlagsByName => bitnames;
-        public int FlagCount => bitnames.Count;
-
-
-        // private Dictionary<string, TraitFlags> _children;
-        // public Dictionary<string, TraitFlags> Children { get { return _children;}}
-        // public int ChildCount => _children == null ? 0 : _children.Count;
-
-
-
-        public int this[string flagname]
-        {
-            get {
-                int val;
-                if (bitnames.TryGetValue(flagname, out val))
-                    return val;
-                return 0; // TODO: should this return -1? Or null? Or throw an exception? Or???
-            }
-            set
-            {
-                // FIXME: this isn't right...needs to verify...something...like the shift factor shouldn't be bigger than bitnames.Count or something...i dunno. i can't think
-                bitnames[flagname] = value;
-            }
-        }
-
-        public FlagGroup(string name)
-        {
-            Name = name;
-            bitnames = new Dictionary<string, int>();
-            bitnames["none"] = 0;
-        }
-
-        /// add a new bit value with the given label and a bit-value based on the current number of items in the flag-collection
-        public void AddFlag(string label)
-        {
-            bitnames.Add(label, 1 << (bitnames.Count-1));
-        }
-
+        // public static readonly Dictionary<string, FlagGroup> FlagCollection;
+    //     public static readonly Dictionary<string, Dictionary<string, int>> FlagCollection;
+    //
+    //
+    //     /// This initializes the FlagCollection (i.e. a version of the consts above that can be retrieved with strings)
+    //     /// using reflection on this class.  TODO: Perhaps it would be better to ditch the hard-coded consts altogether
+    //     /// and parse the Traits.hjson file to generate the flag names and values.
+    //     static ItemFlags()
+    //     {
+    //         System.Type thistype = typeof(ItemFlags);
+    //         IEnumerable<System.Type> nested = thistype.GetNestedTypes(BindingFlags.Public)
+	// 			.Where(type => type != typeof(ItemFlags.Type)); // don't want the enum
+    //
+    //
+    //         // FlagCollection = new Dictionary<string, FlagGroup>();
+    //         FlagCollection = new Dictionary<string, Dictionary<string, int>>();
+    //         foreach (var nested_type in nested)
+    //         {
+    //             var flag_group_name = nested_type.Name;
+    //             FlagCollection[flag_group_name] = createFlagGroup(nested_type);
+    //
+    //             // recurse once
+    //             foreach (var subtype in nested_type.GetNestedTypes(BindingFlags.Public))
+    //             {
+    //                 // Flatten the nested types by making the dictionary key "ParentName.ChildName",
+    //                 // e.g. "Weapon.Melee". this will greatly simplify referencing things later.
+    //                 var combiname = $"{flag_group_name}.{subtype.Name}";
+    //                 FlagCollection[combiname] = createFlagGroup(subtype);
+    //             }
+    //         }
+    //     }
+    //
+    //
+    //     private static Dictionary<string, int> createFlagGroup(System.Type nested_type)
+    //     {
+    //         // var trait_collection_name = nested_type.Name;
+    //         // var fg = new FlagGroup(group_name);
+    //         var fg = new Dictionary<string, int>();
+    //
+    //         // always add a none
+    //         fg["none"] = 0;
+    //         foreach (var flag in nested_type.GetFields().Where(f => f.Name != "none"))
+    //         {
+    //             // TODO: if I'm defining the consts above, this should probably
+    //             // set the flag-values explicitly
+    //             // fg.AddFlag(flag.Name);
+    //
+    //             // each new value added is a (binary) order of magnitude larger than the previous
+    //             fg.Add(flag.Name, 1 << (fg.Count-1));
+    //         }
+    //         return fg;
+    //     }
     }
 
     //
@@ -432,6 +396,7 @@ namespace InvisibleHand.Items
         Other
     }
 
+#region oldstuff
     //
     // [Flags]
     // public enum ItemFamilies
@@ -847,5 +812,5 @@ namespace InvisibleHand.Items
     //     COUNT
     // }
     //
-
+    #endregion
 }
