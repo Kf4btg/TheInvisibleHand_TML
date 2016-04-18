@@ -6,26 +6,27 @@ using Hjson;
 
 namespace InvisibleHand.Items
 {
-    using Requirements = Dictionary<string, int>;
-    using CategoryMatcher = Dictionary<string, Dictionary<string, int>>;
-
     /// read in the category specs from the hjson files and convert to something useable
-    public class CategoryParser
+    public static class CategoryParser
     {
-        private string TraitFilePath;
-        private string CategoryDefsPath;
+        private static string TraitFilePath;
+        private static string CategoryDefsPath;
 
-        public CategoryMatcher CatMatcher { get; private set; }
+        public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
+        public static IDictionary<string, IDictionary<string, int>> FlagCollection {get; private set;}
+        public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
 
-        public IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
-
-        public CategoryParser(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits.hjson")
+        public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits.hjson")
         {
-            this.CategoryDefsPath = category_dir;
-            this.TraitFilePath = trait_file;
+            CategoryDefsPath = category_dir;
+            TraitFilePath = trait_file;
+
+            LoadTraitDefinitions();
+            AssignFlagValues();
+            LoadCategoryDefinitions();
         }
 
-        public void LoadTraitDefinitions()
+        public static void LoadTraitDefinitions()
         {
             var traitGroups = HjsonValue.Load(TraitFilePath).Qo();
 
@@ -47,7 +48,7 @@ namespace InvisibleHand.Items
         /// of the parent group(s) supplied for the name_prefix. The name of the nested group will
         /// be appended to the parent name with a "." (e.g. "Weapon.Melee"), thereby flattening
         /// the nesting to a single-layer Mapping
-        private void LoadGroup(KeyValuePair<string, JsonValue> group_object, string name_prefix="")
+        private static void LoadGroup(KeyValuePair<string, JsonValue> group_object, string name_prefix="")
         {
             string name = group_object.Key;
             if (name_prefix != String.Empty)
@@ -67,7 +68,31 @@ namespace InvisibleHand.Items
             }
         }
 
-        public void LoadCategoryDefinitions()
+        public static void AssignFlagValues()
+        {
+            if (TraitDefinitions==null)
+                LoadTraitDefinitions();
+
+            FlagCollection = new Dictionary<string, IDictionary<string, int>>();
+
+            foreach (var tgroup in TraitDefinitions)
+            {
+                var flagGroup = new Dictionary<string, int>();
+
+                // always initialize with a "none"
+                flagGroup["none"] = 0;
+                foreach (var trait in tgroup.Value)
+                {
+                    // each new value added is a (binary) order of magnitude larger than the last
+                    flagGroup[trait] = 1 << (flagGroup.Count-1);
+                }
+
+                // add flag group to collection
+                FlagCollection[tgroup.Key] = flagGroup;
+            }
+        }
+
+        public static void LoadCategoryDefinitions()
         {
             // this returns an enumerable of <Filename: List-of-category-objects> pairs
             var category_list =
@@ -80,7 +105,7 @@ namespace InvisibleHand.Items
                 };
 
             // Maps: CategoryName to (TraitType1: combined_flag_value, TraitType2: ...)
-            var catmatcher = new CategoryMatcher();
+            var catmatcher = new Dictionary<string, IDictionary<string, int>>();
 
             // Structure of a category object:
             // 'name': string
@@ -96,7 +121,7 @@ namespace InvisibleHand.Items
                 {
                     string category_name = catobj["name"].Qs();
                     string parent = catobj["parent"]?.Qs();
-                    var reqs = new Requirements();
+                    var reqs = new Dictionary<string, int>();
 
                     // get the parent requirements first
                     if (parent != null)
@@ -107,7 +132,7 @@ namespace InvisibleHand.Items
                     {
                         var traitCategory = newreqs.Key.ToLower();
                         // FlagCollection[TraitCategory][TraitName]
-                        var flagvalues = ItemFlags.FlagCollection[traitCategory];
+                        var flagvalues = FlagCollection[traitCategory];
 
                         if (!reqs.ContainsKey(traitCategory))
                             reqs[traitCategory] = 0;
@@ -118,7 +143,7 @@ namespace InvisibleHand.Items
                     catmatcher[category_name] = reqs;
                 }
             }
-            CatMatcher = catmatcher;
+            CategoryDefinitions = catmatcher;
         }
     }
 }
