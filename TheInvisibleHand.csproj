@@ -113,12 +113,13 @@
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
     <Compile Include="Utils\IDecision.cs" />
-    <Compile Include="Items\ItemFlags.cs" />
     <Compile Include="Items\CategoryInfo.cs" />
     <Compile Include="Items\CategoryMatcher.cs" />
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
+    <Compile Include="Items\ItemFlags.cs" />
+    <Compile Include="Items\Parser.cs" />
     <Compile Include="Items\Sets.cs" />
     <Compile Include="Rules\Rule.cs" />
     <Compile Include="Rules\RuleBuilder.cs" />
@@ -127,6 +128,20 @@
     <!-- <Compile Include="DynamicQuery\Properties\AssemblyInfo.cs" /> -->
   </ItemGroup>
   <ItemGroup>
+      <Content Include="Definitions\Traits.hjson" />
+      <Content Include="Definitions\Categories\0-General.hjson" />
+      <Content Include="Definitions\Categories\10-Weapons.hjson" />
+      <Content Include="Definitions\Categories\11-Magic.hjson" />
+      <Content Include="Definitions\Categories\11-Melee.hjson" />
+      <Content Include="Definitions\Categories\11-Ranged.hjson" />
+      <Content Include="Definitions\Categories\11-Summon.hjson" />
+      <Content Include="Definitions\Categories\20-Placeable.hjson" />
+      <Content Include="Definitions\Categories\21-Furniture.hjson" />
+      <Content Include="Definitions\Categories\22-Chairs.hjson" />
+      <Content Include="Definitions\Categories\22-Doors.hjson" />
+      <Content Include="Definitions\Categories\22-Lighting.hjson" />
+      <Content Include="Definitions\Categories\22-Tables.hjson" />
+      <Content Include="Definitions\Categories\23-FurnOther.hjson" />
       <Content Include="build.txt" />
       <Content Include="description.txt" />
       <Content Include="IHicon.png" />

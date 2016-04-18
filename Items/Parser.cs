@@ -18,13 +18,18 @@ namespace InvisibleHand.Items
 
         public CategoryMatcher CatMatcher {get; private set;}
 
-        public CategoryParser(string category_dir = "Categories", string trait_file = "Traits.hjson")
+        public CategoryParser(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits.hjson")
         {
             this.CategoryDefsPath = category_dir;
             this.TraitFilePath = trait_file;
         }
 
-        public void ReadConfigFiles()
+        public void LoadTraitDefinitions()
+        {
+            
+        }
+
+        public void LoadCategoryDefinitions()
         {
             // this returns an enumerable of <Filename: List-of-category-objects> pairs
             var category_list =
