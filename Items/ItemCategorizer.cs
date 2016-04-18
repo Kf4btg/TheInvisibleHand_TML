@@ -50,7 +50,7 @@ namespace InvisibleHand.Items
                     weapon.type_ranged,
                     weapon.type_magic,
                     weapon.type_summon,
-                    weapon.type_thrown
+                    weapon.type_throwing
                     ).Success)
                 {
                     classifyWeapon(item, item.LastFlag.Item1, item.LastFlag.Item2);
@@ -294,7 +294,7 @@ namespace InvisibleHand.Items
                     item.FlagIf(!item.TryFlag(weaponType, weapon.summon.minion),
                                 weaponType, weapon.summon.sentry);
                     break;
-                case weapon.type_thrown:
+                case weapon.type_throwing:
                     // break;
                 default:
                     // tag as 'other' if not a throwing weapon
