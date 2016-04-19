@@ -21,6 +21,7 @@ namespace InvisibleHand.Items
             CategoryDefsPath = category_dir;
             TraitFilePath = trait_file;
 
+            // the order is important here
             LoadTraitDefinitions();
             AssignFlagValues();
             LoadCategoryDefinitions();
