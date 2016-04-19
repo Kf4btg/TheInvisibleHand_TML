@@ -146,6 +146,11 @@
       <Content Include="Definitions\Categories\22-Lighting.hjson" />
       <Content Include="Definitions\Categories\22-Tables.hjson" />
       <Content Include="Definitions\Categories\23-FurnOther.hjson" />
+      <Content Include="Definitions\Categories\40-Equipable.hjson" />
+      <Content Include="Definitions\Categories\41-Vanity.hjson" />
+      <Content Include="Definitions\Categories\42-Armor.hjson" />
+      <Content Include="Definitions\Categories\43-Accessory.hjson" />
+      <Content Include="Definitions\Categories\99-Merge.hjson" />
       <Content Include="build.txt" />
       <Content Include="description.txt" />
       <Content Include="IHicon.png" />
