@@ -175,11 +175,11 @@ namespace InvisibleHand
             // NOTE: this used to check player.chestItems==null, but I once got a
             // "object reference not set to instance of object" or whatever kind of error
             // with that check elsewhere in the code. This should be safer and have the exact same result.
-            if (player.chest == -1) // no valid chest open, sort player inventory
+            if (player.chest == -1 && !player.noItems) // no valid chest open, sort player inventory
                 // shift-pressed XOR Reverse-sort-mod-option:
                 //   this will reverse the sort IFF exactly one of these two bools is true
                 IHOrganizer.SortPlayerInv(player,
-                    reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
+                reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
             else
                 // call sort on the Item[] array returned by chestItems
                 DoChestUpdateAction(() =>
@@ -219,6 +219,7 @@ namespace InvisibleHand
         public void DepositAll(bool smartDeposit = false)
         {
             // if (player.chest == -1) return;
+            if (player.noItems) return;
 
             if (smartDeposit)
                 this.SmartDeposit();
