@@ -278,8 +278,8 @@ namespace InvisibleHand.Items
         public ItemWithInfo Flag(ItemFlags.Type type, int flag)
         {
             Success = false; // reset
-            if (ConditionTable.Check(type, item, flag))
-                return SetFlag(type, flag);
+            // if (ConditionTable.Check(type, item, flag))
+                // return SetFlag(type, flag);
             return this;
         }
 

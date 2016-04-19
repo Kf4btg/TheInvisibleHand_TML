@@ -1,4 +1,5 @@
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.ID;
 using System.Collections.Generic;
 
@@ -10,7 +11,7 @@ namespace InvisibleHand.Items
     {
         public string name { get; private set; }
 
-        public readonly ICollection<int> IDs;
+        public readonly ISet<int> IDs;
 
         public Set(string name, int[] ids)
         {
@@ -26,7 +27,7 @@ namespace InvisibleHand.Items
         }
 
         /// Create the set from a union of int lists
-        public Set(string name, params int[][] ids)
+        public Set(string name, params IEnumerable<int>[] ids)
         {
             this.name = name;
             var idset = new HashSet<int>();
@@ -42,9 +43,9 @@ namespace InvisibleHand.Items
             this.IDs.Add(id);
         }
 
-        public void Extend(int[] ids)
+        public void Extend(IEnumerable<int> ids)
         {
-            ((HashSet<int>)this.IDs).UnionWith(ids);
+            this.IDs.UnionWith(ids);
         }
 
         public bool Contains(int id)
@@ -57,13 +58,17 @@ namespace InvisibleHand.Items
             ((HashSet<int>)this.IDs).TrimExcess();
         }
 
+        // a static, baseline, "no-such-set" set
+        public static readonly Set Empty = new Set(string.Empty);
+
     }
 
     public static class TileSets
     {
-        public static Set Furniture;
 
-        public static Set CraftingStations;
+        public static readonly Set Furniture;
+
+        public static readonly Set CraftingStations;
 
         static TileSets()
         {
@@ -91,6 +96,54 @@ namespace InvisibleHand.Items
             CraftingStations.Trim();
         }
 
+        /// return a set by name
+        public static Set Get(string set_name)
+        {
+            // Note: if someday a large amount of sets get implemented,
+            // should use an actual dictionary for this...
+            switch (set_name)
+            {
+                case "Furniture":
+                    return Furniture;
+                case "Crafting":
+                case "CraftingStations":
+                    return CraftingStations;
+                default:
+                    ErrorLogger.Log($"No such set: '{set_name}'");
+                    break;
+            }
+            return Set.Empty;
+        }
+
+    }
+
+    public static class ItemSets
+    {
+        public static readonly Set Wood;
+
+        static ItemSets()
+        {
+            // cache this here so we don't need to do a lookup each time we check
+            Wood = new Set("Wood", CraftGroup.Wood.Items);
+            Wood.Trim();
+        }
+
+        /// return a set by name
+        public static Set Get(string set_name)
+        {
+            // Note: if someday a large amount of sets get implemented,
+            // should use an actual dictionary for this...
+            switch (set_name)
+            {
+                case "Wood":
+                    return Wood;
+                default:
+                    ErrorLogger.Log($"No such set: '{set_name}'");
+                    break;
+
+            }
+            return Set.Empty;
+        }
     }
 
     // public static class ItemSets

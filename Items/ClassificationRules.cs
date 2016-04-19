@@ -4,7 +4,6 @@ using System.Linq;
 using Terraria;
 using Terraria.ID;
 using System.Text.RegularExpressions;
-// using Terraria.ModLoader;
 // using InvisibleHand.Utils;
 
 namespace InvisibleHand.Items
@@ -66,6 +65,8 @@ namespace InvisibleHand.Items
             public static bool Explosive(Item item) => TestProjectileAI(item.shoot, 16);
 
             public static bool oneDropYoyo(Item item) => new[] { 3315, 3316, 3317, 3262, 3282, 3283, 3284, 3285, 3286, 3389 }.Contains(item.type);
+
+            public static bool isWood(Item item) => ItemSets.Wood.Contains(item.type);
         }
 
         /// these rules are dependent on Binary.CanBePlaced()
@@ -132,7 +133,7 @@ namespace InvisibleHand.Items
 
             public static bool MusicBox(Item item) => item.createTile == TileID.MusicBoxes;
 
-            /// green, blue, & yellow rockets
+            /// green, blue, &amp; yellow rockets
             public static bool Firework(Item item) => item.createTile == TileID.Firework;
 
             /// NOTE: Strange Plants have a special Set in ItemID.Sets
