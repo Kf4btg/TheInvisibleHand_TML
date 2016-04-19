@@ -58,7 +58,8 @@ namespace InvisibleHand.Items
             public static bool timedBuff(Item item) => item.buffTime > 0;
 
             // maybe?
-            public static bool isPotion(Item item)  => timedBuff(item) && !isFood(item);
+            public static bool isPotion(Item item) => timedBuff(item) && !isFood(item); // item.potion -> not always helpful
+            public static bool isFlask(Item item) => Main.meleeBuff[item.buffType];
 
             public static bool falling(Item item)   => TileID.Sets.Falling[item.createTile];
 
@@ -72,9 +73,50 @@ namespace InvisibleHand.Items
         /// these rules are dependent on Binary.CanBePlaced()
         internal static class ByTileID
         {
+            //TODO: consider:
+            // Main.tileRope[]
+            // Main.tileTable[]
+            // Main.tileHammer[] -> walls, i assume, maybe shadoworbs and tracks
+            // tileAxe[]
+            // tileStone[]
+            // tileSand
+            // tileFlame
+            // tileAlch[]
+            // tileCut[]
+            // tileContainer[]
+            // tileSign[]
+            // tileLighted[]
+            // tileDungeon[]
+            // tileSpelunker[]
+            // tileBouncy[]
+            // tileValue[] ??
+            //
+            // tileLargeFrames[]
+            // wallLargeFrames[]
+            //
+            // wallHouse[]
+            // wallDungeon[]
+            // wallLight[]
+            // wallBlend[]
+            //
+            // npcCatchable
+            //
+            // bool Main.critterCage;
+            //
+            // public static Tile[,] tile = new Tile[Main.maxTilesX, Main.maxTilesY];
+            //
+            // ...
+            // Maybe more!
+            //
+
+
+            /// despite the name of the array using the word 'brick', this appears to hold most
+            /// items that could be considered a 'block', including bricks, but also e.g. mud, wood,
+            /// glass, etc. It also includes sands, but notably seems to missing DIRT...
+            public static bool Block(Item item) => Main.tileBrick[item.createTile];
 
             #region roomneeds doors
-    		public static bool Door(Item item)     => item.createTile == TileID.ClosedDoor;
+            public static bool Door(Item item)     => item.createTile == TileID.ClosedDoor;
             public static bool Platform(Item item) => item.createTile == TileID.Platforms;
             #endregion roomneeds doors
 
