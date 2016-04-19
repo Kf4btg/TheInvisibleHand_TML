@@ -47,5 +47,29 @@
         requires: {
             General: [ "placeable" ]
         }
+    } {
+        name: Consumable
+        parent: null
+        requires: {
+            General: [ "consumable" ]
+        }
+    } {
+        name: Mech
+        parent: null
+        requires: {
+            General: [ "mech" ]
+        }
+    } {
+        name: Ammo
+        parent: null
+        requires: {
+            General: [ "ammo" ]
+        }
+    } {
+        name: Dye
+        parent: null
+        requires: {
+            General: [ "dye" ]
+        }
     }
 ]

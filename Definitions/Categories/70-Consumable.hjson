@@ -1,0 +1,23 @@
+[
+  {
+    name: Food
+    parent: Consumable
+    requires: {
+      Consumable: ["food"]
+    }
+  }
+  {
+    name: Potion
+    parent: Consumable
+    requires: {
+      Consumable: ["potion"]
+    }
+  }
+  /*{
+    name: Flask
+    parent: Consumable
+    requires: {
+      Consumable: ["flask"]
+    }
+  }*/
+]

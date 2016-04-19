@@ -1,0 +1,33 @@
+[
+  ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
+  {
+    name: Hair Dye
+    parent: null
+    requires: {
+      General: [ "hair_dye" ]
+    }
+  }
+  {
+    name: Paint
+    parent: null
+    requires: {
+      General: [ "paint" ]
+    }
+  }
+  {
+    name: Soul
+    parent: null
+    requires: {
+      General: [ "soul" ]
+    }
+  }
+  {
+    // FIXME: this category is awful. A catch all. Do better.
+    name: Materials
+    parent: null
+    requires: {
+      General: ["material"]
+    }
+
+  }
+]

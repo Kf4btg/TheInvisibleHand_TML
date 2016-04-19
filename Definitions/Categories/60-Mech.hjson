@@ -1,0 +1,38 @@
+[
+  {
+    name: Pressure Plate
+    parent: Mech
+    requires: {
+      Mech: [ "pressure_plate" ]
+    }
+  }
+  {
+    name: Timer
+    parent: Mech
+    requires: {
+      Mech: [ "timer" ]
+    }
+  }
+  {
+    name: Traps
+    parent: Mech
+    requires: {
+      Mech: ["trap"]
+    }
+  }
+  {
+    name: Minecart Track
+    parent: Mech
+    requires: {
+      Mech: [ "track" ]
+    }
+  }
+  {
+    name: Fireworks
+    parent: Mech
+    requires: {
+      Mech: [ "firework" ]
+    }
+  }
+  // TODO: other? like wires and actuators and stuff?
+]
