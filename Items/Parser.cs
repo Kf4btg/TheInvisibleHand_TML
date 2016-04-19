@@ -130,7 +130,7 @@ namespace InvisibleHand.Items
 
                     foreach (var newreqs in catobj["requires"].Qo())
                     {
-                        var traitCategory = newreqs.Key.ToLower();
+                        var traitCategory = newreqs.Key; //.ToLower();
                         // FlagCollection[TraitCategory][TraitName]
                         var flagvalues = FlagCollection[traitCategory];
 

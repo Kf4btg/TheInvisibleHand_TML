@@ -117,6 +117,7 @@
     <Compile Include="Items\CategoryMatcher.cs" />
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ClassifiedItem.cs" />
+    <Compile Include="Items\ConditionTable.cs" />
     <Compile Include="Items\ItemCategorizer.cs" />
     <Compile Include="Items\ItemFlags.cs" />
     <Compile Include="Items\Parser.cs" />
