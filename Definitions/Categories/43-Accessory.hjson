@@ -1,0 +1,88 @@
+[
+  // TODO: figure out how to handle some of the corner-cases
+  // where a single accy fills multiple slots: e.g. Master Ninja Gear
+  {
+    name: Wings
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_wings" ]
+    }
+  }
+  {
+    name: Balloon
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_balloon" ]
+    }
+  }
+  {
+    name: Face Accessory
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_face" ]
+    }
+  }
+  {
+    name: Neckwear
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_neck" ]
+    }
+  }
+  {
+    name: Shields
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_shield" ]
+    }
+  }
+  {
+    name: Boots
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_shoe" ]
+    }
+  }
+  {
+    name: Belt Accessory
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_waist" ]
+    }
+  }
+  {
+    name: Back Accessory
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_back" ]
+    }
+  }
+
+  // Note: accessories can (and often do) have a value for both
+  // of the hand slots. For this reason, it seems natural that these
+  // two categories should be merged (see 99-Merge.hjson)
+  {
+    name: On-Hand Gauntlet
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_handon" ]
+    }
+  }
+  {
+    name: Off-Hand Gauntlet
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_handoff" ]
+    }
+  }
+
+  # Note: there are none of these in Vanilla
+  {
+    name: Front Accessory
+    parent: Accessory
+    requires: {
+      Equip: [ "slot_front" ]
+    }
+  }
+
+]

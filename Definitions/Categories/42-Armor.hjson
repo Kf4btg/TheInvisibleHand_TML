@@ -1,0 +1,23 @@
+[
+  {
+    name: Helm
+    parent: Armor
+    requires: {
+      Equip: [ "slot_head" ]
+    }
+  }
+  {
+    name: Cuirass
+    parent: Armor
+    requires: {
+      Equip: [ "slot_body" ]
+    }
+  }
+  {
+    name: Greaves
+    parent: Vanity
+    requires: {
+      Equip: [ "slot_leg" ]
+    }
+  }
+]

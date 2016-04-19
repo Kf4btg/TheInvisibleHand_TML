@@ -1,0 +1,57 @@
+[
+  {
+    name: Armor
+    parent: Equipable
+    requires: {
+      Equip: [ "armor" ]
+    }
+  }
+  {
+    // Notes: many accessories are given a/multiple slot values
+    // (e.g. neck, shoe, wings, etc.; see 43-Accessory.hjson),
+    // but some are 'generic' in that they do not have an
+    // assigned slot (and thus will not conflict with any
+    // other worn accy)
+    name: Accessory
+    parent: Equipable
+    requires: {
+      Equip: [ "accessory" ]
+    }
+  }
+  {
+    name: Vanity Item
+    parent: Equipable
+    requires: {
+      Equip: [ "vanity" ]
+    }
+  }
+  {
+    name: Vanity Pet
+    parent: Equipable
+    requires: {
+      Equip: [ "pet_vanity" ]
+    }
+  }
+  {
+    name: Light Pet
+    parent: Equipable
+    requires: {
+      Equip: [ "pet_light" ]
+    }
+  }
+  {
+    name: Grappling Hook
+    parent: Equipable
+    requires: {
+      Equip: [ "grapple" ]
+    }
+  }
+  {
+    name: Mount
+    parent: Equipable
+    requires: {
+      Equip: [ "mount" ]
+    }
+  }
+
+]

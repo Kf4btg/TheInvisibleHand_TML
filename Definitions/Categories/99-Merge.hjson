@@ -1,0 +1,50 @@
+# This file is for combining any of the more specific categories
+# defined in earlier categories into broader, 'merged' categories,
+# in case the level of granularity given by the individual categories
+# is not needed. It should be possible to enable/disable these merged
+# categories to fit one's tastes.
+[
+  {
+    # the first two fields are the same as a regular Category object
+    name: Pet
+    parent: Equipable
+
+    # here is the default value for whether this
+    # grouping is performed by default
+    enabled: false
+
+    # and this is the merge-list; each item within
+    # the list is the name of a previously-defined category
+    merge: [
+      Light Pet
+      Vanity Pet
+    ]
+  }
+  {
+    name: Firearms
+    parent: Ranged
+    enabled: true
+    merge: [
+      Gun
+      Automatic Gun
+    ]
+  }
+  {
+    name: Archery
+    parent: Ranged
+    enabled: true
+    merge: [
+      Bow
+      Repeater
+    ]
+  }
+  {
+    name: Gauntlets
+    parent: Accessory
+    enabled: true
+    merge: [
+      On-Hand Gauntlet
+      Off-Hand Gauntlet
+    ]
+  }
+]

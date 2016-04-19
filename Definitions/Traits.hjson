@@ -100,7 +100,6 @@ Equip:
   traits: [
     accessory
     armor
-    balloon
     grapple
     grapple_single
     grapple_multi
@@ -109,20 +108,21 @@ Equip:
     pet
     pet_light
     pet_vanity
-    slot_back
+    slot_head
     slot_body
+    slot_leg
+    slot_back
+    slot_balloon
     slot_face
     slot_front
     slot_handoff
     slot_handon
-    slot_head
-    slot_leg
     slot_neck
     slot_shield
     slot_shoe
     slot_waist
+    slot_wings
     vanity
-    wings
   ]
 }
 Weapon:
