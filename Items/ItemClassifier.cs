@@ -61,16 +61,17 @@ namespace InvisibleHand.Items
                 else if (item.TryFlag("Equip", "accessory"))
                 {
                     item.Flag("Placeable", "musicbox")
-                        .FlagFirst("Equip", "slot_face",
+                        // turns out these aren't all mutually exclusive...
+                        .FlagAny("Equip", "slot_face",
                                             "slot_neck",
                                             "slot_back",
-                                            "wings",
+                                            "slot_wings",
                                             "slot_shoe",
                                             "slot_handon",
                                             "slot_handoff",
                                             "slot_shield",
                                             "slot_waist",
-                                            "balloon",
+                                            "slot_balloon",
                                             "slot_front"
                         );
 

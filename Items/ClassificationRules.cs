@@ -22,7 +22,7 @@ namespace InvisibleHand.Items
         internal static class Binary
         {
             public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
-            public static bool isArmor(Item item)  => item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0; // && !item.vanity
+            public static bool isArmor(Item item)  => !item.vanity && (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0);
 
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;

@@ -13,7 +13,7 @@ namespace InvisibleHand.Items
         public Item item;
         public ItemFlagInfo info;
 
-        public Dictionary<string, int> Item_Flags => info.Flags;
+        public IDictionary<string, int> Item_Flags => info.Flags;
 
         public bool Success { get; private set; }
         public KeyValuePair<string, string> LastFlag { get; private set; }
