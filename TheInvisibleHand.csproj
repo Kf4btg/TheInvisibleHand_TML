@@ -150,6 +150,11 @@
       <Content Include="Definitions\Categories\41-Vanity.hjson" />
       <Content Include="Definitions\Categories\42-Armor.hjson" />
       <Content Include="Definitions\Categories\43-Accessory.hjson" />
+      <Content Include="Definitions\Categories\51-Ammo.hjson" />
+      <Content Include="Definitions\Categories\52-Dye.hjson" />
+      <Content Include="Definitions\Categories\60-Mech.hjson" />
+      <Content Include="Definitions\Categories\70-Consumable.hjson" />
+      <Content Include="Definitions\Categories\80-Misc.hjson" />
       <Content Include="Definitions\Categories\99-Merge.hjson" />
       <Content Include="build.txt" />
       <Content Include="description.txt" />
