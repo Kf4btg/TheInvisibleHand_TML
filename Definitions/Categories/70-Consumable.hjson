@@ -13,11 +13,25 @@
       Consumable: ["potion"]
     }
   }
-  /*{
+  {
     name: Flask
     parent: Consumable
     requires: {
       Consumable: ["flask"]
     }
-  }*/
+  }
+  {
+    name: Healing Potion
+    parent: Potion
+    requires: {
+      General: ["heal_life"]
+    }
+  }
+  {
+    name: Mana Potion
+    parent: Potion
+    requires: {
+      General: ["heal_mana"]
+    }
+  }
 ]

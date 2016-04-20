@@ -37,8 +37,7 @@
     } {
         name: Equipable
         parent: null
-        requires:
-        {
+        requires: {
             General: [ "equipable" ]
         }
     } {
@@ -70,6 +69,15 @@
         parent: null
         requires: {
             General: [ "dye" ]
+        }
+    } {
+        # for items whose _primary_ use is as a material, though they may meet
+        # requirements for other categories (e.g. ore is placeable, but is mainly
+        # used to create bars or potions.)
+        name: Material
+        parent: null
+        requires: {
+          General: [ "material" ]
         }
     }
 ]

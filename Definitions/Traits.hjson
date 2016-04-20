@@ -25,7 +25,7 @@ General:
     reach_boost
     reach_penalty
     regen_life
-    soul
+    /*soul*/
     tool
     use_mana
     vanity
@@ -37,23 +37,37 @@ Placeable:
 {
   traits: [
     banner
-    bar
+    /*bar*/
     block
     brick
-    dye_plant
+    /*dye_plant*/
     furniture
-    gem
+    /*gem*/
     musicbox
-    ore
+    /*ore*/
     painting
     rack
+    rope
+    /*chain -- is this different than rope? */
     seed
     strange_plant
+    track
     trophy
     wall_deco
     wall
     wallpaper
     wood
+  ]
+}
+Material:
+{
+  traits: [
+    ore
+    bar
+    gem
+    dye_plant
+    alchemy
+    soul
   ]
 }
 Mech:
@@ -141,6 +155,7 @@ Weapon:
     traits: [
       boomerang
       broadsword
+      chain
       flail
       /*shortsword*/
       spear
@@ -160,6 +175,7 @@ Weapon:
       gel_consuming
       no_ammo
       rocket_consuming
+      flamethrower
     ]
   }
   Magic:
@@ -205,6 +221,14 @@ Consumable:
     flask
     regen
   ]
+  /*Potion:
+  {
+    traits: [
+      health
+      mana
+      buff
+    ]
+  }*/
 }
 Furniture:
 {

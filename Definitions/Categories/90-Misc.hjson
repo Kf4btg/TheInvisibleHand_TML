@@ -15,19 +15,26 @@
     }
   }
   {
-    name: Soul
+    name: Coin
     parent: null
     requires: {
-      General: [ "soul" ]
+      General: [ "coin" ]
     }
   }
   {
+    name: Bait
+    parent: null
+    requires: {
+      General: ["bait"]
+    }
+  }
+
+  /*{
     // FIXME: this category is awful. A catch all. Do better.
     name: Materials
     parent: null
     requires: {
       General: ["material"]
     }
-
-  }
+  }*/
 ]

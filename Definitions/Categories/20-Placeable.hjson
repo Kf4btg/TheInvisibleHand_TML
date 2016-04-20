@@ -1,5 +1,5 @@
 [
-  {
+  /*{
     name: Ore
     parent: Placeable
     requires:  {
@@ -21,7 +21,7 @@
     requires:  {
       Placeable: ["gem"]
     }
-  }
+  }*/
   {
     name: Wood
     parent: Placeable
@@ -70,13 +70,13 @@
     }
   }
 
-  {
+  /*{
     name: Dye Plant
     parent: Placeable
     requires:  {
       Placeable: ["dye_plant"]
     }
-  }
+  }*/
 
   {
     name: Strange Plant

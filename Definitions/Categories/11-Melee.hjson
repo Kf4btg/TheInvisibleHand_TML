@@ -52,6 +52,14 @@
   }
 
   {
+    name: Chain
+    parent: Melee
+    requires: {
+      Weapon.Melee: ["chain"]
+    }
+  }
+
+  {
     name: Shortsword
     parent: Melee
     requires:  {

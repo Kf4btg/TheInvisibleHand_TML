@@ -1,0 +1,44 @@
+[
+  {
+    name: Ore
+    parent: Material
+    requires: {
+      Material: ["ore"]
+    }
+  }
+  {
+    name: Bar
+    parent: Material
+    requires: {
+      Material: ["bar"]
+    }
+  }
+  {
+    name: Gem
+    parent: Material
+    requires: {
+      Material: ["gem"]
+    }
+  }
+  {
+    name: Alchemy Ingredient
+    parent: Material
+    requires: {
+      Material: ["alchemy"]
+    }
+  }
+  {
+    name: Dye Plant
+    parent: Material
+    requires: {
+      Material: ["dye_plant"]
+    }
+  }
+  {
+    name: Soul
+    parent: Material
+    requires: {
+      Material: ["soul"]
+    }
+  }
+]

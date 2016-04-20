@@ -154,7 +154,8 @@
       <Content Include="Definitions\Categories\52-Dye.hjson" />
       <Content Include="Definitions\Categories\60-Mech.hjson" />
       <Content Include="Definitions\Categories\70-Consumable.hjson" />
-      <Content Include="Definitions\Categories\80-Misc.hjson" />
+      <Content Include="Definitions\Categories\80-Material.hjson" />
+      <Content Include="Definitions\Categories\90-Misc.hjson" />
       <Content Include="Definitions\Categories\99-Merge.hjson" />
       <Content Include="build.txt" />
       <Content Include="description.txt" />
