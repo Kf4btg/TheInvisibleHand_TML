@@ -71,6 +71,99 @@ namespace InvisibleHand
 
     public static class Constants
     {
+        /// This is obviously not all of the possible AIs, but just
+        /// a subset of them that I've found useful for identifying items.
+        public static class ProjectileAI
+        {
+            /// A simple, ballistic curve. Nothing special.
+            /// Think arrows, javelins, bullets, North-Pole ice shards.
+            public const int Ballistic = 1;
+
+            /// not quite sure what to call this one...
+            /// It's for projectiles that work like the throwing knife:
+            /// they fly fairly straight for a while, then begin
+            /// to spin and quickly drop to the ground & disappear
+            public const int SpinDrop = 2;
+
+            /// includes the LightDiscs
+            public const int Boomerang = 3;
+
+            /// anything that fires in a straight line and passes through
+            /// blocks, just like the vilethorn
+            public const int Vilethorn = 4;
+
+            /// It's usually easier to check Main.projHook[item.shoot]
+            /// than dig out the item's AI style to check this
+            public const int GrapplingHook = 7;
+
+            /// e.g. Flower of Fire, Meowmere
+            public const int HyperBounce = 8;
+
+            /// e.g. magic missile, magic knife
+            public const int FollowCursor = 9;
+
+            /// e.g. aqua scepter
+            public const int Stream = 12;
+
+            /// Literally projectiles attached to chains:
+            /// e.g. harpoon, chain-knife/guillotine, golem-fist
+            public const int Chained = 13;
+
+            ///e.g. Beenade, boulder
+            public const int HeavyBounce = 14;
+
+            /// Note: Flairon does NOT match this AI type (it is unique)
+            public const int Flail = 15;
+
+            /// grenades, bombs, dynamite, etc.
+            public const int Explosive = 16;
+
+            /// when they pop out at death.
+            public const int Tombstone = 17;
+
+            /// demon scythe, death sickle...
+            public const int Sickle = 18;
+
+            public const int Spear = 19;
+
+            /// matches all drills, chainsaws, jackhammers
+            public const int PowerTool = 20;
+
+            /// Note: there's also a Projectile named 'Flamethrower'
+            /// but it uses a different AI...It doesn't match up with the
+            /// Item.shoot value of either the flamethrower or the Elf Melter, either.
+            public const int FlameThrower = 23;
+
+            /// TerraBlade, Enchanted Sword, Unholy Trident
+            public const int SwordBeam = 27;
+
+            /// also minions
+            public const int PetSpawn = 26;
+
+            /// Clentaminator
+            public const int Spray = 31;
+
+            /// Rockets also match Explosive...
+            public const int Rocket = 34;
+
+            public const int RopeCoil = 35;
+
+            /// also not quite sure what to call this one;
+            /// matches items that create little critters on use,
+            /// e.g. Bat, Bee, Wasps, Tiny Eaters, etc.
+            public const int CritterSpawn = 36;
+
+            /// I don't know if this is used for the actual Rain,
+            /// but it is used for the Blood cloud and Nimbus Staff
+            public const int Rain = 45;
+
+            public const int Bobber = 61;
+
+            /// Note: the counterweight accessory also has a .shoot value that
+            /// corresponds to this ai-style
+            public const int Yoyo = 99;
+        }
+
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
         /// the category matching rules. This is important due to a kind
