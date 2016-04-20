@@ -27,6 +27,8 @@ namespace InvisibleHand.Items
             LoadCategoryDefinitions();
         }
 
+        /// Read in Traits.hjson and organize the Traits by family name;
+        /// (a trait-family is something like "General", "Consumable", "Weapon", "Weapon.Melee")
         public static void LoadTraitDefinitions()
         {
             var traitGroups = HjsonValue.Load(TraitFilePath).Qo();
@@ -69,8 +71,13 @@ namespace InvisibleHand.Items
             }
         }
 
+        /// After reading in the Trait families in LoadTraitDefinitions(),
+        /// assign each trait a flag-bit-value (power of 2) based on its location
+        /// within the family. As we're using ints, there should not be more than
+        /// 32 members in a single family
         public static void AssignFlagValues()
         {
+            // make sure trait-defs were loaded
             if (TraitDefinitions==null)
                 LoadTraitDefinitions();
 
@@ -93,6 +100,14 @@ namespace InvisibleHand.Items
             }
         }
 
+        /// After all the trait-definitions have been loaded, read in all the Category definition
+        /// files and assign each Category a List of {Trait-Family: combined_flag_value} pairs
+        /// using the bit-flag-values assigned in AssignFlagValues(). These family::flags maps
+        /// define the full set of flags required for an individual item to match the given
+        /// category. Note that it is possible for an item to match multiple categories. Conflict
+        /// resolution will be weighted by [currently by order of appearance in the cat-def files;
+        /// later on a "priority" field may be implemented to further define which categories
+        /// override others].
         public static void LoadCategoryDefinitions()
         {
             // this returns an enumerable of <Filename: List-of-category-objects> pairs
@@ -111,7 +126,7 @@ namespace InvisibleHand.Items
             // Structure of a category object:
             // 'name': string
             // 'parent': string (must be a name of a previously-encountered category) || null (for top level categories)
-            // 'requires': a mapping (dict) of Trait-groups to a list of required traits of that type;
+            // 'requires': a mapping (dict) of Trait-families to a list of required traits of that type;
             // this list will be combined with the 'required' list from the parent (if any) to define
             // the full requirements for items matching this category.
 

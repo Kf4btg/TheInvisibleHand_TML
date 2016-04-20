@@ -1,27 +1,4 @@
 [
-  /*{
-    name: Ore
-    parent: Placeable
-    requires:  {
-      Placeable: ["ore"]
-    }
-  }
-
-  {
-    name: Metal Bar
-    parent: Placeable
-    requires:  {
-      Placeable: ["bar"]
-    }
-  }
-
-  {
-    name: Gem
-    parent: Placeable
-    requires:  {
-      Placeable: ["gem"]
-    }
-  }*/
   {
     name: Wood
     parent: Placeable
@@ -70,14 +47,6 @@
     }
   }
 
-  /*{
-    name: Dye Plant
-    parent: Placeable
-    requires:  {
-      Placeable: ["dye_plant"]
-    }
-  }*/
-
   {
     name: Strange Plant
     parent: Dye Plant
@@ -123,6 +92,21 @@
     parent: Placeable
     requires: {
       Placeable: ["furniture"]
+    }
+  }
+
+  {
+    name: Rope
+    parent: Placeable
+    requires: {
+      Placeable: ["rope"]
+    }
+  }
+  {
+    name: Rope Coil
+    parent: Placeable
+    requires: {
+      Placeable: ["rope_coil"]
     }
   }
 

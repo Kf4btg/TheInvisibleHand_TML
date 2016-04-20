@@ -25,7 +25,6 @@ General:
     reach_boost
     reach_penalty
     regen_life
-    /*soul*/
     tool
     use_mana
     vanity
@@ -37,17 +36,14 @@ Placeable:
 {
   traits: [
     banner
-    /*bar*/
     block
     brick
-    /*dye_plant*/
     furniture
-    /*gem*/
     musicbox
-    /*ore*/
     painting
     rack
     rope
+    rope_coil
     /*chain -- is this different than rope? */
     seed
     strange_plant
@@ -157,7 +153,6 @@ Weapon:
       broadsword
       chain
       flail
-      /*shortsword*/
       spear
       style_directional
       style_jab
@@ -214,21 +209,9 @@ Consumable:
   traits: [
     buff
     food
-    heal
-    life
-    mana
     potion
     flask
-    regen
   ]
-  /*Potion:
-  {
-    traits: [
-      health
-      mana
-      buff
-    ]
-  }*/
 }
 Furniture:
 {
@@ -268,7 +251,6 @@ Furniture:
   {
     traits: [
       door
-      other
     ]
   }
   Tables:

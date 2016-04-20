@@ -46,6 +46,13 @@
       Weapon.Ranged: [ "dart_consuming" ]
     }
   }
+  {
+    name: Flamethrower
+    parent: Ranged
+    requires: {
+      Weapon.Ranged: ["flamethrower"]
+    }
+  }
 
   {
     name: Special

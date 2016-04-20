@@ -47,4 +47,13 @@
       Off-Hand Gauntlet
     ]
   }
+  {
+    name: Ropes
+    parent: Placeable
+    enabled: true
+    merge: [
+      Rope
+      Rope Coil
+    ]
+  }
 ]

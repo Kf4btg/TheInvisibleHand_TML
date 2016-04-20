@@ -1,19 +1,19 @@
 // using System.Collections.Generic;
 // using System;
 // using System.Linq;
-using Terraria;
-using Terraria.ModLoader;
+// using Terraria;
+// using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
     public static class ItemClassifier
     {
-        public static void ClassifyItem(Item item, ItemFlagInfo info)
-        {
-            classifyitem(new ItemClassificationWrapper(item, info));
-        }
+        // public static void ClassifyItem(Item item, ItemFlagInfo info)
+        // {
+        //     classifyitem(new ItemClassificationWrapper(item, info));
+        // }
 
-        private static void classifyitem(ItemClassificationWrapper item)
+        internal static void ClassifyItem(ItemClassificationWrapper item)
         {
             var _item = item.item;
             bool _weapon, _tool;
@@ -21,14 +21,16 @@ namespace InvisibleHand.Items
 
             item.FlagAny("General", "quest_item",
                                     "expert",
-                                    "material",
                                     "bait",
                                     "explosive",
                                     "defense",
                                     "heal_life",
                                     "heal_mana",
                                     "boost_mana",
-                                    "use_mana"
+                                    "use_mana",
+                                    "coin",
+                                    "paint",
+                                    "hair_dye"
             );
 
             if (!item.TryFlag("General", "reach_boost"))
@@ -87,49 +89,80 @@ namespace InvisibleHand.Items
                 _tool = item.SetFlag("General", "tool").Success;
             }
 
-            var _placeable = !(_weapon || _tool) && item.TryFlag("General", "placeable");
 
-            // if (!(_weapon || _tool)
-            // && item.TryFlag("General", "placeable")
-            // && )
-            if (_placeable)
-                classifyPlaceable(item);
-            else if (item.TryFlag("General", "ammo"))
-                item.FlagFirst("Ammo", "arrow",
-                                       "bullet",
-                                       "rocket",
-                                       "dart",
-                                       "sand",
-                                       "solution")
-                    .FlagIf(!_item.consumable, "Ammo", "endless"); // endless quiver, musket pouch, etc
+            // placeables, ammo, consumables, dyes
+            if (!(_weapon | _tool))
+            {
+                if (item.TryFlag("General", "placeable"))
+                    classifyPlaceable(item);
 
-            else if (item.TryFlag("General", "consumable"))
-                item.Flag("Consumable", "buff")
-                    .FlagFirst("Consumable", "food", "potion");
-                // or possibly flask...
+                else if (item.TryFlag("General", "ammo"))
+                    classifyAmmo(item);
 
-            else if (item.TryFlag("General", "dye"))
-                item.FlagFirst("Dye", "basic",
-                                      "black",
-                                      "flame",
-                                      "gradient",
-                                      "strange",
-                                      "bright",
-                                      "silver",
-                                      "lunar");
-            else
-                item.FlagFirst("General", "coin", "soul", "paint", "hair_dye");
+                else if (item.TryFlag("General", "consumable"))
+                    classifyConsumable(item);
+
+                else if (item.TryFlag("General", "dye"))
+                    item.FlagFirst("Dye", "basic",
+                                          "black",
+                                          "flame",
+                                          "gradient",
+                                          "strange",
+                                          "bright",
+                                          "silver",
+                                          "lunar");
+            }
+
+
+            // materials
+            if (item.TryFlag("General", "material"))
+            {
+                // there's obviously many more types of materials than this, but this is a decent set
+                // of items that are **primarily** used as materials
+                item.FlagAny("Material", "ore",
+                                         "bar",
+                                         "gem",
+                                         "dye_plant",
+                                         "alchemy",
+                                         "soul"
+                                        );
+            }
+
 
             if (item.TryFlag("General", "mech"))
                 item.FlagFirst("Mech", "trap", "pressure_plate", "timer", "firework", "track");
-
         }
+
+        private static void classifyAmmo(ItemClassificationWrapper item)
+        {
+            item.FlagFirst("Ammo", "arrow",
+                                   "bullet",
+                                   "rocket",
+                                   "dart",
+                                   "sand",
+                                   "solution")
+                .FlagIf(!item.item.consumable, "Ammo", "endless"); // endless quiver, musket pouch, etc
+        }
+
+        private static void classifyConsumable(ItemClassificationWrapper item)
+        {
+            item.Flag("Consumable", "buff")
+                .FlagFirst("Consumable", "food", "flask", "potion");
+        }
+
 
         private static void classifyPlaceable(ItemClassificationWrapper item)
         {
             // flag blocks, walls, misc
-            if (item.Flag("Placeable", "block") // TODO: separate bricks from blocks
-                    .FlagFirst("Placeable", "wall", "banner", "seed", "strange_plant", "track").Success)
+            // TODO: separate bricks from blocks
+            if (item.Flag("Placeable", "block").FlagFirst("Placeable", "wall",
+                                                                       "banner",
+                                                                       "seed",
+                                                                       "strange_plant",
+                                                                       "track",
+                                                                       "rope",
+                                                                       "rope_coil"
+            ).Success)
                 return;
 
             // Wall-hangables
@@ -202,21 +235,21 @@ namespace InvisibleHand.Items
             }
             else
                 is_furniture |= item.FlagFirst("Furniture.Other", "statue",
-                                                  "sink",
-                                                  "clock",
-                                                  "statue_alphabet",
-                                                  "tombstone",
-                                                  "crate",
-                                                  "planter",
-                                                  "cannon",
-                                                  "campfire",
-                                                  "fountain",
-                                                  "bottle",
-                                                  "bowl",
-                                                  "beachstuff",
-                                                  "cooking_pot",
-                                                  "anvil",
-                                                  "monolith").Success;
+                                                                  "sink",
+                                                                  "clock",
+                                                                  "statue_alphabet",
+                                                                  "tombstone",
+                                                                  "crate",
+                                                                  "planter",
+                                                                  "cannon",
+                                                                  "campfire",
+                                                                  "fountain",
+                                                                  "bottle",
+                                                                  "bowl",
+                                                                  "beachstuff",
+                                                                  "cooking_pot",
+                                                                  "anvil",
+                                                                  "monolith").Success;
 
             item.FlagIf(is_furniture, "Placeable", "furniture");
         }
@@ -232,7 +265,7 @@ namespace InvisibleHand.Items
                     weaponType = "Weapon.Melee";
 
                     if (item.TryFlag(weaponType, "style_directional"))
-                        item.FlagFirst(weaponType, "flail", "yoyo");
+                        item.FlagFirst(weaponType, "flail", "yoyo", "chain");
 
                     else if (item.TryFlag(weaponType, "style_swing"))
                         item.Flag(weaponType, "broadsword");
@@ -240,25 +273,19 @@ namespace InvisibleHand.Items
                     else if (item.TryFlag(weaponType, "style_thrown"))
                         item.Flag(weaponType, "boomerang");
 
+                    // the 'chain' weapons can be various styles, but they all
+                    // have the same item.shoot projectileAI value
+                    item.Flag(weaponType, "chain");
 
-                    // else
-                        // item.FlagIf(item.TryFlag(weaponType, "style_jab"),
-                                    // weaponType, "shortsword");
                     break;
 
                 case "type_ranged":
                     weaponType = "Weapon.Ranged";
-                    // if (item.TryFlag(weaponType, "arrow_consuming"))
-                    //     item.Flag(weaponType,
-                    //                 "repeater");
-                    // else if (item.TryFlag(weaponType, "bullet_consuming"))
-                    //     item.Flag(weaponType,
-                    //                 "automatic_gun");
-                    // else
                     item.FlagFirst(weaponType, "arrow_consuming",
                                                "bullet_consuming",
                                                "rocket_consuming",
                                                "dart_consuming",
+                                               "flamethrower",
                                                "gel_consuming",
                                                "no_ammo");
                     break;
@@ -273,8 +300,9 @@ namespace InvisibleHand.Items
                     break;
                 case "type_summon":
                     weaponType = "Weapon.Summon";
-                    item.FlagIf(!item.TryFlag(weaponType, "minion"),
-                                weaponType, "sentry");
+                    if (!item.TryFlag(weaponType, "minion"))
+                        item.SetFlag(weaponType, "sentry");
+
                     break;
                 case "type_throwing":
                     // break;

@@ -112,13 +112,13 @@
     <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
-    <Compile Include="Utils\IDecision.cs" />
-    <Compile Include="Items\CategoryInfo.cs" />
-    <Compile Include="Items\CategoryMatcher.cs" />
+    <!-- <Compile Include="Utils\IDecision.cs" /> -->
+    <!-- <Compile Include="Items\CategoryInfo.cs" /> -->
+    <!--<Compile Include="Items\CategoryMatcher.cs" />-->
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ClassifiedItem.cs" />
     <Compile Include="Items\ConditionTable.cs" />
-    <Compile Include="Items\ItemCategorizer.cs" />
+    <!-- <Compile Include="Items\ItemCategorizer.cs" /> -->
     <Compile Include="Items\ItemClassHandler.cs" />
     <Compile Include="Items\ItemClassifier.cs" />
     <Compile Include="Items\ItemFlagInfo.cs" />
