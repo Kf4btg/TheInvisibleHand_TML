@@ -164,6 +164,17 @@ namespace InvisibleHand
             public const int Yoyo = 99;
         }
 
+        public static class AmmoID
+        {
+            public const int Arrow  = 1;
+            public const int Bullet = 14;
+            public const int Gel    = 23;
+            public const int Dart   = 51;
+            public const int Coin   = 71;
+            public const int Rocket = 771;
+            public const int Solution = 780;
+        }
+
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
         /// the category matching rules. This is important due to a kind
