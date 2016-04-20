@@ -72,11 +72,7 @@ namespace InvisibleHand.Items
                                             "slot_shield",
                                             "slot_waist",
                                             "slot_balloon",
-                                            "slot_front"
-                        );
-
-                    if (!item.Success)
-                        ErrorLogger.Log($"Unknown accessory type for item '{_item.name}', type {_item.type}");
+                                            "slot_front");
                 }
                 else
                     item.FlagFirst("Equip", "pet_light",
@@ -91,113 +87,13 @@ namespace InvisibleHand.Items
                 _tool = item.SetFlag("General", "tool").Success;
             }
 
-            // _placeable = !(_weapon || _tool) && item.TryFlag("General", "placeable");
+            var _placeable = !(_weapon || _tool) && item.TryFlag("General", "placeable");
 
-            // if (_placeable)
-            if (!(_weapon || _tool) && item.TryFlag("General", "placeable"))
-            {
-                item.Flag("Furniture", "crafting_station");
-
-                if (item.TryFlag("Furniture",  "valid_housing"))
-                {
-                    if (item.TryFlag("Furniture", "housing_door"))
-                    {
-                        //break down
-                        item.Flag("Furniture.Doors", "door");
-                        // TODO: platforms, tall gate,
-                        // TrapdoorClosed
-                    }
-                    else if (item.TryFlag("Furniture", "housing_table"))
-                    {
-                        item.FlagFirst("Furniture.Tables", "table",
-                                                           "workbench",
-                                                           "dresser",
-                                                           "piano",
-                                                           "bookcase",
-                                                           "bathtub"
-                            // TODO: bewitching table, alchemy table, tinkerer's bench
-                        );
-
-                    }
-                    else if (item.TryFlag("Furniture", "housing_chair"))
-                    {
-                        item.FlagFirst("Furniture.Chairs", "chair",
-                                                           "bed",
-                                                           "bench"
-                           // TODO: thrones
-                        );
-                    }
-                    else if (item.TryFlag("Furniture", "housing_light"))
-                    {
-                        item.FlagFirst("Furniture.Lighting", "torch",
-                                                             "candle",
-                                                             "chandelier",
-                                                             "hanging_lantern",
-                                                             "lamp",
-                                                             "holiday_light",
-                                                             "candelabra"
-                            // TODO: TileID.WaterCandle,
-        					// TileID.ChineseLanterns,
-                            // TileID.Jackolanterns,
-        					// TileID.SkullLanterns,
-        					// TileID.PlatinumCandelabra,
-        					// TileID.PlatinumCandle,
-        					// TileID.FireflyinaBottle,
-        					// TileID.LightningBuginaBottle,
-        					// TileID.BlueJellyfishBowl,
-        					// TileID.GreenJellyfishBowl,
-        					// TileID.PinkJellyfishBowl,
-        					// TileID.PeaceCandle,
-        					// TileID.Fireplace
-                        );
-                    }
-                }
-                else if (item.TryFlag("Placeable", "wall_deco"))
-                {
-                    switch (ClassificationRules.Types.WallDeco(_item))
-                    {
-                        // TODO: these flag values should probably be somewhere else,
-                        // like maybe the furniture enum, or even a new enum for decorations
-                        case WallDecoType.Painting:
-                            item.SetFlag("Placeable", "painting");
-                            break;
-                        case WallDecoType.Trophy:
-                            item.SetFlag("Placeable", "trophy");
-                            break;
-                        case WallDecoType.Rack:
-                            item.SetFlag("Placeable", "rack");
-                            break;
-                    }
-                }
-                else
-                {
-                    item.FlagFirst("Furniture", "container")
-                        .FlagFirst("Furniture.Other", "statue",
-                                                      "sink",
-                                                      "clock",
-                                                      "statue_alphabet",
-                                                      "tombstone",
-                                                      "crate",
-                                                      "planter",
-                                                      "cannon",
-                                                      "campfire",
-                                                      "fountain",
-                                                      "bottle",
-                                                      "bowl",
-                                                      "beachstuff",
-                                                      "cooking_pot",
-                                                      "anvil",
-                                                      "monolith")
-                        .FlagFirst("Placeable", "wall",
-                                                "dye_plant",
-                                                "strange_plant",
-                                                "banner",
-                                                "seed",
-                                                "ore",
-                                                "bar",
-                                                "gem");
-                }
-            }
+            // if (!(_weapon || _tool)
+            // && item.TryFlag("General", "placeable")
+            // && )
+            if (_placeable)
+                classifyPlaceable(item);
             else if (item.TryFlag("General", "ammo"))
                 item.FlagFirst("Ammo", "arrow",
                                        "bullet",
@@ -227,6 +123,102 @@ namespace InvisibleHand.Items
             if (item.TryFlag("General", "mech"))
                 item.FlagFirst("Mech", "trap", "pressure_plate", "timer", "firework", "track");
 
+        }
+
+        private static void classifyPlaceable(ItemClassificationWrapper item)
+        {
+            // flag blocks, walls, misc
+            if (item.Flag("Placeable", "block") // TODO: separate bricks from blocks
+                    .FlagFirst("Placeable", "wall", "banner", "seed", "strange_plant", "track").Success)
+                return;
+
+            // Wall-hangables
+            if (item.TryFlag("Placeable", "wall_deco"))
+            {
+                switch (ClassificationRules.Types.WallDeco(item.item))
+                {
+                    // TODO: these flag values should probably be somewhere else,
+                    // like maybe the furniture enum, or even a new enum for decorations
+                    case WallDecoType.Painting:
+                        item.SetFlag("Placeable", "painting");
+                        return;
+                    case WallDecoType.Trophy:
+                        item.SetFlag("Placeable", "trophy");
+                        return;
+                    case WallDecoType.Rack:
+                        item.SetFlag("Placeable", "rack");
+                        return;
+                }
+            }
+
+            // track whether this fits any of the furniture traits
+            bool is_furniture = item.FlagAny("Furniture", "crafting_station", "container").Success;
+
+            if (item.TryFlag("Furniture",  "valid_housing"))
+            {
+                is_furniture = true;
+                //break down general->specific
+                if (item.TryFlag("Furniture", "housing_door"))
+                    item.Flag("Furniture.Doors", "door");
+                    // TODO: platforms, tall gate, TrapdoorClosed
+                else if (item.TryFlag("Furniture", "housing_table"))
+                    item.FlagFirst("Furniture.Tables", "table",
+                                                       "workbench",
+                                                       "dresser",
+                                                       "piano",
+                                                       "bookcase",
+                                                       "bathtub"
+                        // TODO: bewitching table, alchemy table, tinkerer's bench
+                    );
+
+                else if (item.TryFlag("Furniture", "housing_chair"))
+                    item.FlagFirst("Furniture.Chairs", "chair",
+                                                       "bed",
+                                                       "bench"
+                       // TODO: thrones
+                    );
+                else if (item.TryFlag("Furniture", "housing_light"))
+                    item.FlagFirst("Furniture.Lighting", "torch",
+                                                         "candle",
+                                                         "chandelier",
+                                                         "hanging_lantern",
+                                                         "lamp",
+                                                         "holiday_light",
+                                                         "candelabra"
+                        // TODO: TileID.WaterCandle,
+                        // TileID.ChineseLanterns,
+                        // TileID.Jackolanterns,
+                        // TileID.SkullLanterns,
+                        // TileID.PlatinumCandelabra,
+                        // TileID.PlatinumCandle,
+                        // TileID.FireflyinaBottle,
+                        // TileID.LightningBuginaBottle,
+                        // TileID.BlueJellyfishBowl,
+                        // TileID.GreenJellyfishBowl,
+                        // TileID.PinkJellyfishBowl,
+                        // TileID.PeaceCandle,
+                        // TileID.Fireplace
+                    );
+            }
+            else
+                is_furniture |= item.FlagFirst("Furniture.Other", "statue",
+                                                  "sink",
+                                                  "clock",
+                                                  "statue_alphabet",
+                                                  "tombstone",
+                                                  "crate",
+                                                  "planter",
+                                                  "cannon",
+                                                  "campfire",
+                                                  "fountain",
+                                                  "bottle",
+                                                  "bowl",
+                                                  "beachstuff",
+                                                  "cooking_pot",
+                                                  "anvil",
+                                                  "monolith").Success;
+
+            item.FlagIf(is_furniture, "Placeable", "furniture");
         }
 
         private static void classifyWeapon(ItemClassificationWrapper item, string type, string flag)

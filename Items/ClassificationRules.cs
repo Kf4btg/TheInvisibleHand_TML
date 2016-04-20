@@ -63,58 +63,19 @@ namespace InvisibleHand.Items
 
             public static bool falling(Item item)   => TileID.Sets.Falling[item.createTile];
 
-            public static bool Explosive(Item item) => TestProjectileAI(item.shoot, 16);
+            public static bool Explosive(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Explosive);
 
             public static bool oneDropYoyo(Item item) => new[] { 3315, 3316, 3317, 3262, 3282, 3283, 3284, 3285, 3286, 3389 }.Contains(item.type);
 
             public static bool isWood(Item item) => ItemSets.Wood.Contains(item.type);
+
+            /// this returns true for all the '... Rope' items (web, silk, regular, etc) AND their coil-counterparts
+            public static bool makesRope(Item item) => Main.tileRope[item.createTile] || TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
         }
 
         /// these rules are dependent on Binary.CanBePlaced()
         internal static class ByTileID
         {
-            //TODO: consider:
-            // Main.tileRope[]
-            // Main.tileTable[]
-            // Main.tileHammer[] -> walls, i assume, maybe shadoworbs and tracks
-            // tileAxe[]
-            // tileStone[]
-            // tileSand
-            // tileFlame
-            // tileAlch[]
-            // tileCut[]
-            // tileContainer[]
-            // tileSign[]
-            // tileLighted[]
-            // tileDungeon[]
-            // tileSpelunker[]
-            // tileBouncy[]
-            // tileValue[] ??
-            //
-            // tileLargeFrames[]
-            // wallLargeFrames[]
-            //
-            // wallHouse[]
-            // wallDungeon[]
-            // wallLight[]
-            // wallBlend[]
-            //
-            // npcCatchable
-            //
-            // bool Main.critterCage;
-            //
-            // public static Tile[,] tile = new Tile[Main.maxTilesX, Main.maxTilesY];
-            //
-            // ...
-            // Maybe more!
-            //
-
-
-            /// despite the name of the array using the word 'brick', this appears to hold most
-            /// items that could be considered a 'block', including bricks, but also e.g. mud, wood,
-            /// glass, etc. It also includes sands, but notably seems to missing DIRT...
-            public static bool Block(Item item) => Main.tileBrick[item.createTile];
-
             #region roomneeds doors
             public static bool Door(Item item)     => item.createTile == TileID.ClosedDoor;
             public static bool Platform(Item item) => item.createTile == TileID.Platforms;
@@ -198,9 +159,62 @@ namespace InvisibleHand.Items
             public static bool LunarMonolith(Item item)  => item.createTile == TileID.LunarMonolith;
         }
 
-        internal static class Groupings
+        internal static class Sets
         {
+            #region from Sets
+
             public static bool Furniture(Item item) => TileSets.Furniture.Contains(item.createTile);
+            public static bool CraftingStation(Item item) => TileSets.CraftingStations.Contains(item.createTile);
+            public static bool AlchemyIngredient(Item item) => TileSets.AlchemyIngredients.Contains(item.type);
+
+            #endregion
+
+            //TODO: consider:
+            // Main.tileTable[] // seems to be things that you can walk on like a platform
+            // Main.tileHammer[] -> walls, i assume, maybe shadoworbs and tracks
+            // tileAxe[] // choppable things, like trees, cacti, big shrooms...
+            // tileStone[] // things that look like stone, i guess (gems & active-stone)
+            // tileSand // ...sand.
+            // tileFlame // things what are on fire (mainly candles)
+            // tileAlch[] // immatureherbs (seeds), + mature/blooming which aren't applicable here
+            // tileCut[] // can be cut with weapon; e.g. grass, lifefruit, bee larva, etc.
+            // tileContainer[]
+            // tileSign[]
+            // tileLighted[]
+            // tileDungeon[]
+            // tileSpelunker[]
+            // tileBouncy[]
+            // tileValue[] ??
+            //
+            // tileLargeFrames[]
+            // wallLargeFrames[]
+            //
+            // wallHouse[]
+            // wallDungeon[]
+            // wallLight[]
+            // wallBlend[]
+            //
+            // npcCatchable
+            //
+            // bool Main.critterCage;
+            //
+            // public static Tile[,] tile = new Tile[Main.maxTilesX, Main.maxTilesY];
+            //
+            // ...
+            // Maybe more!
+            //
+
+
+            /// despite the name of the array using the word 'brick', this appears to hold most
+            /// items that could be considered a 'block', including bricks, but also e.g. mud, wood,
+            /// glass, etc. It also includes sands, but notably seems to missing DIRT...
+            public static bool Block(Item item) => Main.tileBrick[item.createTile];
+
+            public static bool Rope(Item item) => Main.tileRope[item.createTile];
+            public static bool RopeCoil(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
+
+            public static bool Sand(Item item) => Main.tileSand[item.createTile];
+
 
             public static bool housingDoor(Item item) =>
                     TileID.Sets.RoomNeeds.CountsAsDoor.Contains(item.createTile);
@@ -218,7 +232,7 @@ namespace InvisibleHand.Items
             public static bool CrimsonBlock(Item item)    => TileID.Sets.Crimson[item.createTile];
             public static bool CorruptionBlock(Item item) => TileID.Sets.Corrupt[item.createTile];
 
-            public static bool Sand(Item item)          => TileID.Sets.Conversion.Sand[item.createTile];
+            // public static bool Sand(Item item)          => TileID.Sets.Conversion.Sand[item.createTile];
             public static bool HardenedSand (Item item) => TileID.Sets.Conversion.HardenedSand[item.createTile];
             public static bool Sandstone(Item item)     => TileID.Sets.Conversion.Sandstone[item.createTile];
 
@@ -237,16 +251,18 @@ namespace InvisibleHand.Items
             /// they all seem to end in "Rack"; Some other decorative wall hangings (like
             /// Ship's wheel, Compass Rose, etc.), will likely be difficult to distinguish
             /// from paintings, though.
-            public static bool WallDeco(Item item) => new int[] { TileID.Painting3X3, TileID.Painting4X3, TileID.Painting6X4, TileID.Painting2X3, TileID.Painting3X2 }.Contains(item.createTile);
+            private static readonly int[] wall_deco_tileIDs = new int[] { TileID.Painting3X3, TileID.Painting4X3, TileID.Painting6X4, TileID.Painting2X3, TileID.Painting3X2 };
+            public static bool WallDeco(Item item) => wall_deco_tileIDs.Contains(item.createTile);
+
             // public static bool Painting3X3(Item item) => item.createTile == TileID.Painting3X3;
             // public static bool Painting4X3(Item item) => item.createTile == TileID.Painting4X3;
             // public static bool Painting6X4(Item item) => item.createTile == TileID.Painting6X4;
             // public static bool Painting2X3(Item item) => item.createTile == TileID.Painting2X3;
             // public static bool Painting3X2(Item item) => item.createTile == TileID.Painting3X2;
 
-            public static bool NebulaPickup(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
+            public static bool NebulaPickup(Item item) => ItemID.Sets.NebulaPickup[item.type];
 
-            public static bool GoesInExtractinator(Item item) => ItemID.Sets.NebulaPickup[item.type];
+            public static bool GoesInExtractinator(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
         }
 
         internal static class Dyes
@@ -397,7 +413,10 @@ namespace InvisibleHand.Items
                 public static bool ShortSword(Item item) => Jab(item);
 
                 /// Dependent on 'Thrown' (well. maybe not really)
-                public static bool Boomerang(Item item) => TestProjectileAI(item.shoot, 3);
+                public static bool Boomerang(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Boomerang);
+
+                /// could be combined with flail
+                public static bool ChainWeapon(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Chained);
 
 
                 //***
@@ -419,26 +438,26 @@ namespace InvisibleHand.Items
                 //
                 // Actually, I think using the aiStyle of the item.shoot projectile is better.
                 // NOTE: spears and mech tools also have a projectiles w/ tileCollide==False
-                public static bool Spear(Item item) => TestProjectileAI(item.shoot, 19);
+                public static bool Spear(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Spear);
 
                 // all (vanilla) flails (other than Flairon, which is just...weird) use animations 40 or 45
                 // NOTE: also, flails have a projectile id (item.shoot) of 15;
                 // public static bool Flail(Item item) => /*Directional(item) && */ (item.useAnimation == 40 || item.useAnimation == 45);
-                public static bool Flail(Item item) => TestProjectileAI(item.shoot, 15);
+                public static bool Flail(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Flail);
 
                 // Yoyos; the 'usetime' check is necessary to distinguish from the Arkhalis
                 // public static bool Yoyo(Item item) => /*Directional(item) &&*/ (item.channel && item.useAnimation == 25 && item.useTime == 25);
-                public static bool Yoyo(Item item) => TestProjectileAI(item.shoot, 99);
+                public static bool Yoyo(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Yoyo);
             }
 
 
             internal static class Ranged
             {
-                public static bool ArrowConsuming(Item item)  => item.useAmmo == 1;
-                public static bool BulletConsuming(Item item) => item.useAmmo == 14;
-                public static bool RocketConsuming(Item item) => item.useAmmo == 771;
-                public static bool DartConsuming(Item item)   => item.useAmmo == 51;
-                public static bool GelConsuming(Item item)    => item.useAmmo == 23;
+                public static bool ArrowConsuming(Item item)  => item.useAmmo == Constants.AmmoID.Arrow;
+                public static bool BulletConsuming(Item item) => item.useAmmo == Constants.AmmoID.Bullet;
+                public static bool RocketConsuming(Item item) => item.useAmmo == Constants.AmmoID.Rocket;
+                public static bool DartConsuming(Item item)   => item.useAmmo == Constants.AmmoID.Dart;
+                public static bool GelConsuming(Item item)    => item.useAmmo == Constants.AmmoID.Gel;
 
                 public static bool NoAmmo(Item item) => item.useAmmo < 1;
 
@@ -446,6 +465,8 @@ namespace InvisibleHand.Items
                 /// it's probably the best we can do, though.
                 public static bool Repeater(Item item) => ArrowConsuming(item) && item.autoReuse;
                 public static bool AutomaticGun(Item item) => BulletConsuming(item) && item.autoReuse;
+
+                public static bool FlameThrower(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.FlameThrower);
 
             }
 
@@ -461,22 +482,23 @@ namespace InvisibleHand.Items
                 }
 
                 // e.g. magic missile
-                public static bool Controllable(Item item) => TestProjectileAI(item.shoot, 9);
+                public static bool Controllable(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.FollowCursor);
                 // e.g. water bolt
                 public static bool Bouncing(Item item)
                 {
                     if (item.shoot < 1) return false;
                     var projectile = Main.projectile[item.shoot];
-                    return projectile.aiStyle == 8 || projectile.aiStyle == 14;
+                    return projectile.aiStyle == Constants.ProjectileAI.HyperBounce ||
+                           projectile.aiStyle == Constants.ProjectileAI.HeavyBounce;
                 }
 
                 // e.g. aqua scepter
-                public static bool Stream(Item item) => TestProjectileAI(item.shoot, 12);
+                public static bool Stream(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Stream);
                 // e.g. a lot of things; anything that passes through at least one enemy
                 public static bool Piercing(Item item) => Main.projectile[item.shoot].maxPenetrate > 1;
 
                 // i.e. straight(ish) line that passes through blocks
-                public static bool VilethornAI(Item item) => TestProjectileAI(item.shoot, 4);
+                public static bool VilethornAI(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Vilethorn);
             }
 
             internal static class Summon

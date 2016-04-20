@@ -37,39 +37,42 @@ namespace InvisibleHand.Items
                     {"consumable",    Binary.isConsumable},
                     {"weapon",        Binary.isWeapon},
                     {"ammo",          Binary.isAmmo},
-                    {"soul",          Groupings.Soul},
+                    //~ {"soul",          Sets.Soul},
                     {"hair_dye",      (i) => i.hairDye > 0},
-                    {"coin",          (i) => i.ammo == 71},
+                    {"coin",          (i) => i.ammo == Constants.AmmoID.Coin},
                     {"paint",         (i) => i.paint > 0},
                 }
             },
             {"Placeable", new string_table
                 {
-                    // {"furniture",  REPLACE_ME},
+                    //~ {"furniture",  REPLACE_ME},
                     {"seed",          ByTileID.ImmatureHerb},
-                    {"dye_plant",     ByTileID.DyePlant},
-                    {"strange_plant", Groupings.StrangePlant},
-                    {"block",         ByTileID.Block},
+                    //~ {"dye_plant",     ByTileID.DyePlant},
+                    {"strange_plant", Sets.StrangePlant},
+                    {"block",         Sets.Block},
                     // {"brick",      REPLACE_ME},
-                    {"ore",           Groupings.Ore},
-                    {"bar",           ByTileID.MetalBar},
+                    //~ {"ore",           Sets.Ore},
+                    //~ {"bar",           ByTileID.MetalBar},
                     {"wood",          Binary.isWood},
                     {"wall",          (i) => i.createWall > 0},
-                    {"wall_deco",     Groupings.WallDeco},
-                    {"gem",           ByTileID.Gem},
+                    {"wall_deco",     Sets.WallDeco},
+                    //~ {"gem",           ByTileID.Gem},
                     {"musicbox",      ByTileID.MusicBox},
                     {"banner",        ByTileID.Banner},
+                    {"track",         (i) => i.cartTrack},
+                    {"rope",          Sets.Rope},
+                    {"rope_coil",     Sets.RopeCoil},
                 }
             },
             {"Ammo", new string_table
                 {
-                    {"arrow",     (i) => i.ammo == 1},
-                    {"bullet",    (i) => i.ammo == 14},
-                    {"rocket",    (i) => i.ammo == 771},
-                    {"dart",      (i) => i.ammo == 51},
+                    {"arrow",     (i) => i.ammo == Constants.AmmoID.Arrow},
+                    {"bullet",    (i) => i.ammo == Constants.AmmoID.Bullet},
+                    {"rocket",    (i) => i.ammo == Constants.AmmoID.Rocket},
+                    {"dart",      (i) => i.ammo == Constants.AmmoID.Dart},
                     {"sand",      (i) => i.ammo == 42},
-                    {"coin",      (i) => i.ammo == 71},
-                    {"solution",  (i) => i.ammo == 780},
+                    {"coin",      (i) => i.ammo == Constants.AmmoID.Coin},
+                    {"solution",  (i) => i.ammo == Constants.AmmoID.Solution},
                     {"endless",   (i) => i.ammo > 0 && !i.consumable},
                 }
             },
@@ -134,6 +137,7 @@ namespace InvisibleHand.Items
                     {"style_thrown",      Weapons.Melee.Thrown},
                     {"broadsword",        Weapons.Melee.BroadSword},
                     {"boomerang",         Weapons.Melee.Boomerang},
+                    {"chain",             Weapons.Melee.ChainWeapon},
                     {"spear",             Weapons.Melee.Spear},
                     {"flail",             Weapons.Melee.Flail},
                     {"yoyo",              Weapons.Melee.Yoyo},
@@ -146,6 +150,7 @@ namespace InvisibleHand.Items
                     {"rocket_consuming", Weapons.Ranged.RocketConsuming},
                     {"dart_consuming",   Weapons.Ranged.DartConsuming},
                     {"gel_consuming",    Weapons.Ranged.GelConsuming},
+                    {"flamethrower",     Weapons.Ranged.FlameThrower},
                     {"no_ammo",          (i) => i.useAmmo < 0},
                 }
             },
@@ -202,13 +207,13 @@ namespace InvisibleHand.Items
             },
             {"Furniture", new string_table
                 {
-                    {"valid_housing",    Groupings.Furniture},
-                    {"housing_door",     Groupings.housingDoor},
-                    {"housing_light",    Groupings.housingTorch},
-                    {"housing_chair",    Groupings.housingChair},
-                    {"housing_table",    Groupings.housingTable},
+                    {"valid_housing",    Sets.Furniture},
+                    {"housing_door",     Sets.housingDoor},
+                    {"housing_light",    Sets.housingTorch},
+                    {"housing_chair",    Sets.housingChair},
+                    {"housing_table",    Sets.housingTable},
                     // {"clutter",       REPLACE_ME},
-                    {"crafting_station", (i) => TileSets.CraftingStations.Contains(i.createTile)},
+                    {"crafting_station", Sets.CraftingStation},
                     {"container",        ByTileID.Container},
                     // {"useable",  REPLACE_ME},
                     // {"decorative",  REPLACE_ME},
@@ -266,7 +271,19 @@ namespace InvisibleHand.Items
                     {"planter",         ByTileID.PlanterBox},
                     {"fountain",        ByTileID.WaterFountain},
                 }
+            },
+            {"Material", new string_table
+                {
+                    {"ore",           Sets.Ore},
+                    {"dye_plant",     ByTileID.DyePlant},
+                    {"bar",           ByTileID.MetalBar},
+                    {"gem",           ByTileID.Gem},
+                    {"alchemy",       Sets.AlchemyIngredient},
+                    {"soul",          Sets.Soul},
+                }
+
             }
+
         };
 
         // static ConditionTable()
