@@ -15,7 +15,7 @@
   }
   {
     name: Greaves
-    parent: Vanity
+    parent: Armor
     requires: {
       Equip: [ "slot_leg" ]
     }

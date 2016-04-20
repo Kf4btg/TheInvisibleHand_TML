@@ -29,6 +29,14 @@
     }
   }
 
+  {
+    name: Strange Plant
+    parent: Placeable
+    requires:  {
+      Placeable: ["strange_plant"]
+    }
+  }
+
   /*{
     // FIXME: this category is awful. A catch all. Do better.
     name: Materials

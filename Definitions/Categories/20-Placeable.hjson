@@ -48,14 +48,6 @@
   }
 
   {
-    name: Strange Plant
-    parent: Dye Plant
-    requires:  {
-      Placeable: ["strange_plant"]
-    }
-  }
-
-  {
     name: Herb Seed
     parent: Placeable
     requires:  {

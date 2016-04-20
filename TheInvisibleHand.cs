@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 // using Terraria;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
-using InvisibleHand.Items;
+using InvisibleHand.Definitions;
 
 namespace InvisibleHand
 {
@@ -32,7 +32,7 @@ namespace InvisibleHand
 
         /// This holds the loaded values for how to match an item to given category;
         /// It is a mapping of "Category_Name" -> {"TraitGroup": combined_value_of_flags_for_group}
-        public static _flagCollection CategoryDefs => CategoryParser.CategoryDefinitions;
+        public static IDictionary<string, ItemCategory> CategoryDefs => CategoryParser.CategoryDefinitions;
 
 
         /// holds the game's original strings for loot-all, dep-all, quick-stack, etc;

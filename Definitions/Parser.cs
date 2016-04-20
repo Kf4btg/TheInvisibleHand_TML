@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Hjson;
 
-namespace InvisibleHand.Items
+namespace InvisibleHand.Definitions
 {
     /// read in the category specs from the hjson files and convert to something useable
     public static class CategoryParser
@@ -13,10 +13,12 @@ namespace InvisibleHand.Items
         private static string CategoryDefsPath;
 
         public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
-        public static IDictionary<string, IDictionary<string, int>> FlagCollection {get; private set;}
-        public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
+        public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
 
-        public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits.hjson")
+        // public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
+        public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
+
+        public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
         {
             CategoryDefsPath = category_dir;
             TraitFilePath = trait_file;
@@ -120,8 +122,7 @@ namespace InvisibleHand.Items
                     CatObjList = HjsonValue.Load(file).Qa()
                 };
 
-            // Maps: CategoryName to (TraitType1: combined_flag_value, TraitType2: ...)
-            var catmatcher = new Dictionary<string, IDictionary<string, int>>();
+            var category_defs = new Dictionary<string, ItemCategory>();
 
             // Structure of a category object:
             // 'name': string
@@ -136,30 +137,85 @@ namespace InvisibleHand.Items
                 foreach (var catobj in pair.CatObjList)
                 {
                     string category_name = catobj["name"].Qs();
-                    string parent = catobj["parent"]?.Qs();
+                    string parent_name = catobj["parent"]?.Qs();
+
                     var reqs = new Dictionary<string, int>();
 
+                    ItemCategory parent = null;
                     // get the parent requirements first
-                    if (parent != null)
-                        foreach (var kvp in catmatcher[parent])
+                    if (parent_name != null)
+                    {
+                        // TODO: don't fail on malformed categories, but log the error somewhere
+                        parent = category_defs[parent_name];
+                        foreach (var kvp in parent.Requirements)
                             reqs[kvp.Key] = kvp.Value;
 
-                    foreach (var newreqs in catobj["requires"].Qo())
-                    {
-                        var traitCategory = newreqs.Key; //.ToLower();
-                        // FlagCollection[TraitCategory][TraitName]
-                        var flagvalues = FlagCollection[traitCategory];
 
-                        if (!reqs.ContainsKey(traitCategory))
+                        // try {
+                        // }
+                        // catch (KeyNotFoundException e)
+                        // {
+                        //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
+                        //     Console.WriteLine("{0}", parent);
+                        //     throw e;
+                        // }
+                    }
+
+                    if (catobj.ContainsKey("requires"))
+                    {
+                        foreach (var newreqs in catobj["requires"].Qo())
+                        {
+                            var traitCategory = newreqs.Key;
+                            // FlagCollection[TraitCategory][TraitName]
+                            var flagvalues = FlagCollection[traitCategory];
+
+                            if (!reqs.ContainsKey(traitCategory))
                             reqs[traitCategory] = 0;
 
-                        foreach (string trait_name in newreqs.Value.Qa())
+                            foreach (string trait_name in newreqs.Value.Qa())
                             reqs[traitCategory] |= flagvalues[trait_name];
+                        }
+
+                        /// if, somehow, there are no requirements, don't bother adding to list
+                        if (reqs.Count > 0)
+                            category_defs[category_name] = new ItemCategory(category_name, reqs, parent);
                     }
-                    catmatcher[category_name] = reqs;
-                }
+                    else if (catobj.ContainsKey("merge"))
+                    {
+                        var merge_container = new ItemCategory(category_name, parent, true);
+                        foreach (var mergecat in catobj["merge"].Qa())
+                        {
+                            try
+                            {
+                                category_defs[mergecat].Merge(merge_container);
+                            }
+                            catch (KeyNotFoundException)// e)
+                            {
+                                //FIXME: use ErrorLogger
+                                // Console.WriteLine(e.Message);
+                            }
+                        }
+                        category_defs[category_name] = merge_container;
+                    }
+                } // end of category-object list
             }
-            CategoryDefinitions = catmatcher;
+            CategoryDefinitions = category_defs;
+
+            // foreach (var kvp in CategoryDefinitions)
+            // {
+            //     Console.WriteLine("{0}:", kvp.Key);
+            //     if (kvp.Value.MergeContainer)
+            //         Console.WriteLine("    {0}", string.Join(",\n    ", kvp.Value.Merged.ToArray()));
+            //     else
+            //     {
+            //         foreach (var flv in kvp.Value.Requirements)
+            //         {
+            //             Console.WriteLine("    {0}: {1}", flv.Key, flv.Value);
+            //         }
+            //     }
+            // }
+
+            // Console.WriteLine("{0}, {1}", CategoryDefinitions.Count, string.Join(",\n", CategoryDefinitions.Select(kv=>kv.Key).ToArray()));
         }
     }
 }
