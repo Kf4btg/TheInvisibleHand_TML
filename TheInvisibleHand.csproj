@@ -111,6 +111,7 @@
     <Compile Include="IHPlayer.cs" />
     <Compile Include="Definitions\Parser.cs" />
     <Compile Include="Definitions\ItemCategory.cs" />
+    <Compile Include="Utils\AutoDict.cs" />
     <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\SoundManager.cs" />
