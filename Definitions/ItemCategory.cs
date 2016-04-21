@@ -76,7 +76,23 @@ namespace InvisibleHand.Definitions
                 Requirements[trait_family] = flag_value;
         }
 
-        public ItemCategory Matches(IDictionary<string, int> item_flags)
+        public bool Matches(IDictionary<string, int> item_flags)
+        {
+            // return this.Matches(item_flags) != null;
+            foreach (var kvp in Requirements)
+            {
+                var reqval = kvp.Value;
+                int flagval;
+
+                // if ever the item does not have a required trait or it does
+                // have the correct flag value for the trait, return false to indicate no match
+                if (!item_flags.TryGetValue(kvp.Key, out flagval) || ((flagval & reqval) != reqval))
+                    return false;
+            }
+            return true;
+        }
+
+        public ItemCategory Match(IDictionary<string, int> item_flags)
         {
             foreach (var kvp in Requirements)
             {
@@ -105,5 +121,9 @@ namespace InvisibleHand.Definitions
         {
             this.MergeTo = null;
         }
+
+
+        /// this is what will be returned when an item somehow doesn't match any defined category
+        public static readonly ItemCategory None = new ItemCategory("Unknown", null, false, int.MaxValue);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
+// using InvisibleHand.Definitions;
 
 namespace InvisibleHand.Items
 {
@@ -9,6 +10,14 @@ namespace InvisibleHand.Items
 
         public static IDictionary<int, IDictionary<string, int>> flag_cache = new Dictionary<int, IDictionary<string, int>>();
         public ItemFlagInfo getFlagInfo(Item item) => (ItemFlagInfo)item.GetModInfo(mod, "ItemFlagInfo");
+
+        // public ItemCategory Category { get; set; }
+
+        /// name of the category this item belongs to;
+        /// not quite sure If this should store a reference
+        /// to the actual ItemCategory object instead
+        /// (might save a lookup?)
+        // public string Category { get; set; }
 
         public override void SetDefaults(Item item)
         {
