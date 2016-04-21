@@ -34,6 +34,9 @@ namespace InvisibleHand
         /// It is a mapping of "Category_Name" -> {"TraitGroup": combined_value_of_flags_for_group}
         public static IDictionary<string, ItemCategory> CategoryDefs => CategoryParser.CategoryDefinitions;
 
+        /// And this returns the traversal tree used to assign a category to an item
+        public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
+
 
         /// holds the game's original strings for loot-all, dep-all, quick-stack, etc;
         /// we're going to be removing these later on, but will use their

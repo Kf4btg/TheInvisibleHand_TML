@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Hjson;
 
+using InvisibleHand.Utils;
+
 namespace InvisibleHand.Definitions
 {
     /// read in the category specs from the hjson files and convert to something useable
@@ -17,7 +19,10 @@ namespace InvisibleHand.Definitions
 
         // public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
+        public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
 
+
+        /// Call this method to run all the other class methods
         public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
         {
             CategoryDefsPath = category_dir;
@@ -27,6 +32,7 @@ namespace InvisibleHand.Definitions
             LoadTraitDefinitions();
             AssignFlagValues();
             LoadCategoryDefinitions();
+            BuildCategoryTree();
         }
 
         /// Read in Traits.hjson and organize the Traits by family name;
@@ -216,6 +222,47 @@ namespace InvisibleHand.Definitions
             // }
 
             // Console.WriteLine("{0}, {1}", CategoryDefinitions.Count, string.Join(",\n", CategoryDefinitions.Select(kv=>kv.Key).ToArray()));
+        }
+
+        /// After reading in all of the category definitions, build a tree structure based on the parent-child relationships
+        /// between the categories. Traversing the tree structure when testing an item's traits will be far more efficient than
+        /// checking each category individually.
+        public static void BuildCategoryTree()
+        {
+            // TODO: make sure these are sorted based on priority
+            // create the root of the tree; the label here is unimportant. All other labels
+            // will be created automatically during autovivification
+            var cattree = new SortedAutoTree<string, ItemCategory>() { Label = "root" };
+
+            foreach (var kvp in CategoryDefinitions)
+            {
+                var category = kvp.Value;
+
+                var parent = category.Parent;
+
+                // get the ancestors for the category as a stack,
+                // with the top-level category on top.
+                var catstack = new Stack<ItemCategory>();
+                while (parent != null)
+                {
+                    catstack.Push(parent);
+                    parent = parent.Parent;
+                }
+                var subtree = cattree;
+                // descend from the root down the parent-stack to the
+                // proper depth of the child, auto-creating(vivifying!)
+                // any non-existent nodes.
+                while (catstack.Count > 0)
+                {
+                    subtree = subtree[catstack.Pop().Name];
+                }
+
+                // now create the child/set its data if it
+                // has already been created by a previous operation
+                subtree[category.Name].Data = category;
+            }
+
+            CategoryTree = cattree;
         }
     }
 }

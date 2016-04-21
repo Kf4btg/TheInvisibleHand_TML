@@ -12,6 +12,9 @@ namespace InvisibleHand.Utils
     /// constraint()).
     public class DefaultDict<K, V> : Dictionary<K, V> where V : new()
     {
+
+        public bool HasChildren => this.Count > 0;
+
         public new V this[K key]
         {
             get
@@ -62,12 +65,11 @@ namespace InvisibleHand.Utils
 
         public V Data { get; set; }
 
+        public bool HasData => this.Data != null;
+
+
         private static int depth = 0;
-
         private static string indent => new string(' ', depth);
-
-
-
         public override string ToString()
         {
             string s = $"{indent}{Label}:\n";
@@ -85,6 +87,7 @@ namespace InvisibleHand.Utils
             return sb.ToString();
         }
 
+        /// Automatically assigns the Label based on the key
         public override void Add(K key, AutoTree<K, V> val)
         {
             val.Label = key;
@@ -98,6 +101,9 @@ namespace InvisibleHand.Utils
     /// Same as the DefaultDict, but based on a SortedList rather than a Dictionary
     public class SortedDefaultDict<K, V> : SortedList<K, V> where V : new()
     {
+
+        public bool HasChildren => this.Count > 0;
+
         public new V this[K key]
         {
             get
@@ -129,6 +135,7 @@ namespace InvisibleHand.Utils
 
         public V Data { get; set; }
 
+        public bool HasData => this.Data != null;
 
 
 
@@ -151,7 +158,8 @@ namespace InvisibleHand.Utils
             }
             return sb.ToString();
         }
-
+        
+        /// Automatically assigns the Label based on the key
         public override void Add(K key, SortedAutoTree<K, V> val)
         {
             val.Label = key;
