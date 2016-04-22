@@ -71,9 +71,10 @@
     <Reference Include="System" />
     <!-- <Reference Include="System.Core" /> -->
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Hjson">
+    <!-- <Reference Include="Hjson" >
+        <SpecificVersion>False</SpecificVersion>
         <HintPath>lib\Hjson.dll</HintPath>
-    </Reference>
+    </Reference> -->
     <Reference Include="FNA, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('WINDOWS'))">
         <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ref\Terraria\ModCompile\FNA.dll</HintPath>
@@ -132,39 +133,56 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <!-- <Compile Include="DynamicQuery\Dynamic.cs" /> -->
     <!-- <Compile Include="DynamicQuery\Properties\AssemblyInfo.cs" /> -->
+    <Compile Include="Hjson\HjsonOptions.cs" />
+    <Compile Include="Hjson\JsonValue.cs" />
+    <Compile Include="Hjson\JsonWriter.cs" />
+    <Compile Include="Hjson\JsonType.cs" />
+    <Compile Include="Hjson\BaseReader.cs" />
+    <Compile Include="Hjson\HjsonWsc.cs" />
+    <Compile Include="Hjson\HjsonValue.cs" />
+    <Compile Include="Hjson\IJsonReader.cs" />
+    <Compile Include="Hjson\JsonReader.cs" />
+    <Compile Include="Hjson\HjsonWriter.cs" />
+    <Compile Include="Hjson\JsonPrimitive.cs" />
+    <Compile Include="Hjson\JsonUtil.cs" />
+    <Compile Include="Hjson\JsonArray.cs" />
+    <Compile Include="Hjson\HjsonReader.cs" />
+    <Compile Include="Hjson\JsonObject.cs" />
   </ItemGroup>
   <ItemGroup>
-      <Content Include="Definitions\Traits\0-All.hjson" />
-      <Content Include="Definitions\Categories\0-General.hjson" />
-      <Content Include="Definitions\Categories\10-Weapons.hjson" />
-      <Content Include="Definitions\Categories\11-Magic.hjson" />
-      <Content Include="Definitions\Categories\11-Melee.hjson" />
-      <Content Include="Definitions\Categories\11-Ranged.hjson" />
-      <Content Include="Definitions\Categories\11-Summon.hjson" />
-      <Content Include="Definitions\Categories\20-Placeable.hjson" />
-      <Content Include="Definitions\Categories\21-Furniture.hjson" />
-      <Content Include="Definitions\Categories\22-Chairs.hjson" />
-      <Content Include="Definitions\Categories\22-Doors.hjson" />
-      <Content Include="Definitions\Categories\22-Lighting.hjson" />
-      <Content Include="Definitions\Categories\22-Tables.hjson" />
-      <Content Include="Definitions\Categories\23-FurnOther.hjson" />
-      <Content Include="Definitions\Categories\40-Equipable.hjson" />
-      <Content Include="Definitions\Categories\41-Vanity.hjson" />
-      <Content Include="Definitions\Categories\42-Armor.hjson" />
-      <Content Include="Definitions\Categories\43-Accessory.hjson" />
-      <Content Include="Definitions\Categories\51-Ammo.hjson" />
-      <Content Include="Definitions\Categories\52-Dye.hjson" />
-      <Content Include="Definitions\Categories\60-Mech.hjson" />
-      <Content Include="Definitions\Categories\70-Consumable.hjson" />
-      <Content Include="Definitions\Categories\80-Material.hjson" />
-      <Content Include="Definitions\Categories\90-Misc.hjson" />
-      <Content Include="Definitions\Categories\99-Merge.hjson" />
-      <Content Include="build.txt" />
-      <Content Include="description.txt" />
-      <Content Include="IHicon.png" />
+    <EmbeddedResource Include="Definitions\Traits\0-All.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\0-General.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\10-Weapons.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\11-Magic.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\11-Melee.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\11-Ranged.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\11-Summon.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\20-Placeable.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\21-Furniture.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\22-Chairs.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\22-Doors.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\22-Lighting.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\22-Tables.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\23-FurnOther.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\40-Equipable.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\41-Vanity.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\42-Armor.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\43-Accessory.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\51-Ammo.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\52-Dye.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\60-Mech.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\70-Consumable.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\80-Material.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\90-Misc.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\99-Merge.hjson" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="build.txt" />
+    <Content Include="description.txt" />
+    <Content Include="IHicon.png" />
+  </ItemGroup>
+  <!-- <ItemGroup>
      <EmbeddedResource Include="lib\Hjson.dll" />
- </ItemGroup>
+ </ItemGroup> -->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
