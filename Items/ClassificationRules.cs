@@ -307,12 +307,12 @@ namespace InvisibleHand.Items
             public static bool BasicDyes(Item item) => basic_dye_ids.Contains(item.type);
 
             /// the "... and Black" dyes
-            public static bool BlackDyes(Item item) =>  basic_dye_ids.Contains(item.type);
+            public static bool BlackDyes(Item item) =>  black_dye_ids.Contains(item.type);
 
-            public static bool BrightDyes(Item item) => basic_dye_ids.Contains(item.type);
+            public static bool BrightDyes(Item item) => bright_dye_ids.Contains(item.type);
 
             /// the "... and Silver" dyes
-            public static bool SilverDyes(Item item) =>  basic_dye_ids.Contains(item.type);
+            public static bool SilverDyes(Item item) =>  silver_dye_ids.Contains(item.type);
 
             /// gradient and rainbow dyes
             public static bool GradientDyes(Item item) => gradient_dye_ids.Contains(item.type);
@@ -525,7 +525,7 @@ namespace InvisibleHand.Items
         //     new Dictionary<ItemFlags.Type, condition_table>()
 
     }
-    
+
     public enum WallDecoType
     {
         Painting,
