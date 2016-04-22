@@ -6,6 +6,8 @@ using Terraria;
 using Terraria.ID;
 
 using InvisibleHand.Utils;
+using InvisibleHand.Items;
+using InvisibleHand.Definitions;
 
 namespace InvisibleHand
 {
@@ -81,14 +83,22 @@ namespace InvisibleHand
             return item.type == 0 || item.stack == 0;
         }
 
-        public static ItemCat GetCategory(this Item item)
+        // public static ItemCat GetCategory(this Item item)
+        // {
+        //     foreach (ItemCat catID in Constants.CheckOrder)
+        //     {
+        //         if (CategoryDef.Categories[catID].Invoke(item)) return catID;
+        //     }
+        //     return ItemCat.OTHER;
+        // }
+
+        public static ItemCategory GetCategory(this Item item)
         {
-            foreach (ItemCat catID in Constants.CheckOrder)
-            {
-                if (CategoryDef.Categories[catID].Invoke(item)) return catID;
-            }
-            return ItemCat.OTHER;
+            var iteminfo = (ItemFlagInfo)(item.GetModInfo(IHBase.Instance, "ItemFlagInfo"));
+
+            return iteminfo.Category;
         }
+
 
         public static bool Matches(this Item item, ItemCat isCategory)
         {

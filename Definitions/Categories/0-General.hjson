@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         # start a category definition by giving it a meaningful name
         name: Template
         # if it is a nested category (e.g. Weapon > Melee),
@@ -15,7 +15,7 @@
         requires: {
             General: []
         }
-    }
+    }*/
 
     /*
     Some broad, generic categories. Most are probably a 1:1 mapping of

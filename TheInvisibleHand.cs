@@ -15,6 +15,8 @@ namespace InvisibleHand
     {
         internal static int[] itemCategories;
 
+        public static IHBase Instance { get; private set; }
+
         /// Mapping of:
         /// 	Item Trait-Group Name (e.g. "Weapon") ->
         ///				(Mapping of: Trait Name (e.g "melee") -> int flag value (power of 2))
@@ -57,6 +59,8 @@ namespace InvisibleHand
 
         public IHBase()
         {
+            Instance = this;
+
             Properties = new ModProperties()
             {
                 Autoload = true

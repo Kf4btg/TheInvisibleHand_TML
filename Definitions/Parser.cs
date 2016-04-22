@@ -137,6 +137,7 @@ namespace InvisibleHand.Definitions
             // this list will be combined with the 'required' list from the parent (if any) to define
             // the full requirements for items matching this category.
 
+            int count=0; // track order of added categories
             foreach (var pair in category_list)
             {
                 var fname = pair.File;
@@ -184,16 +185,16 @@ namespace InvisibleHand.Definitions
 
                         /// if, somehow, there are no requirements, don't bother adding to list
                         if (reqs.Count > 0)
-                            category_defs[category_name] = new ItemCategory(category_name, reqs, parent);
+                            category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
                     }
                     else if (catobj.ContainsKey("merge"))
                     {
-                        var merge_container = new ItemCategory(category_name, parent, true);
-                        foreach (var mergecat in catobj["merge"].Qa())
+                        var merge_container = new ItemCategory(category_name, parent, true, count++);
+                        foreach (var mergedcat in catobj["merge"].Qa())
                         {
                             try
                             {
-                                category_defs[mergecat].Merge(merge_container);
+                                category_defs[mergedcat].Merge(merge_container);
                             }
                             catch (KeyNotFoundException)// e)
                             {

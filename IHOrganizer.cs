@@ -16,37 +16,70 @@ namespace InvisibleHand
             if (source == null) return null;
 
             // returns an IEnumerable<IGrouping<ItemCat,Item>>
-            var byCategory =
+            // var byCategory =
+            //     from item in source
+            //     group item by item.GetCategory() into category
+            //     orderby category.Key
+            //     select category;
+
+            // IEnumerable<IGrouping<string,Item>>
+            var catquery =
                 from item in source
-                group item by item.GetCategory() into category
-                orderby category.Key
-                select category;
+                let category = item.GetCategory()
+                orderby category.Priority, category.Name
+                group item by new { prio =  category.Priority, name = category.Name } into catgroup
+                // orderby catgroup.Key, category.Name
+                select new
+                {
+                    Priority = catgroup.Key.prio,
+                    Name = catgroup.Key.name,
+                    // until we replace Dynamic Linq, just sort the categorized items by name
+                    Members = from im in catgroup
+                              orderby im.name
+                              select im
+                };
 
             var sortedList = new List<Item>();
 
+            foreach (var category in catquery)
+            {
+                sortedList.AddRange(category.Members);
+            }
+
+            // foreach (var category in catquery)
+            // {
+            //     // until we replace Dynamic Linq, just sort the categorized items by name
+            //     var result =
+            //         from item in category.Members
+            //         orderby item.name
+            //         select item;
+            //
+            //     sortedList.AddRange(result);
+            // }
+
             //  Now we can dynamically construct Queries using Dynamic LINQ
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
-            foreach (var category in byCategory)
-            {
-                // until we replace Dynamic Linq, just sort the categorized items by name
-
-                var result =
-                    from item in category
-                    orderby item.name
-                    select item;
-
-                sortedList.AddRange(result);
-
-                // var result = category.AsQueryable().OrderBy(Func<Item, TKey> keySelector, IComparer<TKey> comparer)
-
-                //     // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
-                //     // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
-                //     var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
-                //
-                //     // execute the query and put the result in a list to return
-                //     foreach (var s_item in result)
-                //         sortedList.Add(s_item);
-            }
+            // foreach (var category in byCategory)
+            // {
+            //     // until we replace Dynamic Linq, just sort the categorized items by name
+            //
+            //     var result =
+            //         from item in category
+            //         orderby item.name
+            //         select item;
+            //
+            //     sortedList.AddRange(result);
+            //
+            //     // var result = category.AsQueryable().OrderBy(Func<Item, TKey> keySelector, IComparer<TKey> comparer)
+            //
+            //     //     // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
+            //     //     // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
+            //     //     var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
+            //     //
+            //     //     // execute the query and put the result in a list to return
+            //     //     foreach (var s_item in result)
+            //     //         sortedList.Add(s_item);
+            // }
             return sortedList;
 
         }
