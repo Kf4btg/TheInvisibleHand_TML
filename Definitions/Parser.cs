@@ -2,7 +2,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Hjson;
+
+using Terraria.ModLoader;
 
 using InvisibleHand.Utils;
 
@@ -14,6 +17,8 @@ namespace InvisibleHand.Definitions
         private static string TraitFilePath;
         private static string CategoryDefsPath;
 
+        private static Assembly assembly;
+
         public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
         public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
 
@@ -23,34 +28,48 @@ namespace InvisibleHand.Definitions
 
 
         /// Call this method to run all the other class methods
-        public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
+        // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
+        public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits.0-All.hjson")
         {
-            CategoryDefsPath = category_dir;
-            TraitFilePath = trait_file;
+            assembly = Assembly.GetExecutingAssembly();
+            // Console.WriteLine(assembly.FullName);
+
+            CategoryDefsPath = "InvisibleHand."+category_path;
+            TraitFilePath = "InvisibleHand." + trait_path;
+
+            // foreach (var res in assembly.GetManifestResourceNames())
+            // {
+            //     Console.WriteLine(res);
+            // }
 
             // the order is important here
-            LoadTraitDefinitions();
+            LoadTraitDefinitions(TraitFilePath);
             AssignFlagValues();
-            LoadCategoryDefinitions();
+            LoadCategoryDefinitions(CategoryDefsPath);
             BuildCategoryTree();
         }
 
         /// Read in Traits.hjson and organize the Traits by family name;
         /// (a trait-family is something like "General", "Consumable", "Weapon", "Weapon.Melee")
-        public static void LoadTraitDefinitions()
+        private static void LoadTraitDefinitions(string trait_resource)
         {
-            var traitGroups = HjsonValue.Load(TraitFilePath).Qo();
-
-            TraitDefinitions = new Dictionary<string, IList<string>>();
-
-            // Trait Group object:
-            //  object name = object.Key
-            //  "traits": list of strings defining the names of traits in this group
-            //              Note: there should not be more than 32 traits in any single group
-            //  optional Subobjects: in same form
-            foreach (var tgroup in traitGroups)
+            using (Stream s = assembly.GetManifestResourceStream(trait_resource))
             {
-                LoadGroup(tgroup);
+                // var traitGroups = HjsonValue.Load(TraitFilePath).Qo();
+                var traitGroups = HjsonValue.Load(s).Qo();
+
+                TraitDefinitions = new Dictionary<string, IList<string>>();
+
+                // Trait Group object:
+                //  object name = object.Key
+                //  "traits": list of strings defining the names of traits in this group
+                //              Note: there should not be more than 32 traits in any single group
+                //  optional Subobjects: in same form
+                foreach (var tgroup in traitGroups)
+                {
+                    LoadGroup(tgroup);
+                }
+
             }
         }
 
@@ -83,11 +102,11 @@ namespace InvisibleHand.Definitions
         /// assign each trait a flag-bit-value (power of 2) based on its location
         /// within the family. As we're using ints, there should not be more than
         /// 32 members in a single family
-        public static void AssignFlagValues()
+        private static void AssignFlagValues()
         {
             // make sure trait-defs were loaded
             if (TraitDefinitions==null)
-                LoadTraitDefinitions();
+                LoadTraitDefinitions(TraitFilePath);
 
             FlagCollection = new Dictionary<string, IDictionary<string, int>>();
 
@@ -116,97 +135,172 @@ namespace InvisibleHand.Definitions
         /// resolution will be weighted by [currently by order of appearance in the cat-def files;
         /// later on a "priority" field may be implemented to further define which categories
         /// override others].
-        public static void LoadCategoryDefinitions()
+        private static void LoadCategoryDefinitions(string category_resources_path)
         {
-            // this returns an enumerable of <Filename: List-of-category-objects> pairs
-            var category_list =
-                from file in Directory.GetFiles(CategoryDefsPath, "*.hjson", SearchOption.TopDirectoryOnly)
-                orderby file
-                select new
-                {
-                    File = file,
-                    CatObjList = HjsonValue.Load(file).Qa()
-                };
-
             var category_defs = new Dictionary<string, ItemCategory>();
-
-            // Structure of a category object:
-            // 'name': string
-            // 'parent': string (must be a name of a previously-encountered category) || null (for top level categories)
-            // 'requires': a mapping (dict) of Trait-families to a list of required traits of that type;
-            // this list will be combined with the 'required' list from the parent (if any) to define
-            // the full requirements for items matching this category.
-
             int count=0; // track order of added categories
-            foreach (var pair in category_list)
+
+            foreach(var res in assembly.GetManifestResourceNames().Where(n=>n.StartsWith(category_resources_path)).OrderBy(n=>n))
             {
-                var fname = pair.File;
-                foreach (var catobj in pair.CatObjList)
+                using (Stream s = assembly.GetManifestResourceStream(res))
                 {
-                    string category_name = catobj["name"].Qs();
-                    string parent_name = catobj["parent"]?.Qs();
+                    var CatObjList = HjsonValue.Load(s).Qa();
 
-                    var reqs = new Dictionary<string, int>();
-
-                    ItemCategory parent = null;
-                    // get the parent requirements first
-                    if (parent_name != null)
+                    foreach (var catobj in CatObjList)
                     {
-                        // TODO: don't fail on malformed categories, but log the error somewhere
-                        parent = category_defs[parent_name];
-                        foreach (var kvp in parent.Requirements)
-                            reqs[kvp.Key] = kvp.Value;
+                        string category_name = catobj["name"].Qs();
+                        string parent_name = catobj["parent"]?.Qs();
 
+                        var reqs = new Dictionary<string, int>();
 
-                        // try {
-                        // }
-                        // catch (KeyNotFoundException e)
-                        // {
-                        //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
-                        //     Console.WriteLine("{0}", parent);
-                        //     throw e;
-                        // }
-                    }
-
-                    if (catobj.ContainsKey("requires"))
-                    {
-                        foreach (var newreqs in catobj["requires"].Qo())
+                        ItemCategory parent = null;
+                        // get the parent requirements first
+                        if (parent_name != null)
                         {
-                            var traitCategory = newreqs.Key;
-                            // FlagCollection[TraitCategory][TraitName]
-                            var flagvalues = FlagCollection[traitCategory];
+                            // TODO: don't fail on malformed categories, but log the error somewhere
+                            parent = category_defs[parent_name];
+                            foreach (var kvp in parent.Requirements)
+                                reqs[kvp.Key] = kvp.Value;
 
-                            if (!reqs.ContainsKey(traitCategory))
-                            reqs[traitCategory] = 0;
 
-                            foreach (string trait_name in newreqs.Value.Qa())
-                            reqs[traitCategory] |= flagvalues[trait_name];
+                            // try {
+                            // }
+                            // catch (KeyNotFoundException e)
+                            // {
+                            //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
+                            //     Console.WriteLine("{0}", parent);
+                            //     throw e;
+                            // }
                         }
 
-                        /// if, somehow, there are no requirements, don't bother adding to list
-                        if (reqs.Count > 0)
-                            category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
-                    }
-                    else if (catobj.ContainsKey("merge"))
-                    {
-                        var merge_container = new ItemCategory(category_name, parent, true, count++);
-                        foreach (var mergedcat in catobj["merge"].Qa())
+                        if (catobj.ContainsKey("requires"))
                         {
-                            try
+                            foreach (var newreqs in catobj["requires"].Qo())
                             {
-                                category_defs[mergedcat].Merge(merge_container);
+                                var traitCategory = newreqs.Key;
+                                // FlagCollection[TraitCategory][TraitName]
+                                var flagvalues = FlagCollection[traitCategory];
+
+                                if (!reqs.ContainsKey(traitCategory))
+                                reqs[traitCategory] = 0;
+
+                                foreach (string trait_name in newreqs.Value.Qa())
+                                reqs[traitCategory] |= flagvalues[trait_name];
                             }
-                            catch (KeyNotFoundException)// e)
-                            {
-                                //FIXME: use ErrorLogger
-                                // Console.WriteLine(e.Message);
-                            }
+
+                            /// if, somehow, there are no requirements, don't bother adding to list
+                            if (reqs.Count > 0)
+                                category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
                         }
-                        category_defs[category_name] = merge_container;
-                    }
-                } // end of category-object list
+                        else if (catobj.ContainsKey("merge"))
+                        {
+                            var merge_container = new ItemCategory(category_name, parent, true, count++);
+                            foreach (var mergedcat in catobj["merge"].Qa())
+                            {
+                                try
+                                {
+                                    category_defs[mergedcat].Merge(merge_container);
+                                }
+                                catch (KeyNotFoundException)// e)
+                                {
+                                    //FIXME: use ErrorLogger
+                                    // Console.WriteLine(e.Message);
+                                }
+                            }
+                            category_defs[category_name] = merge_container;
+                        }
+                    } // end of category-object list
+                }
             }
             CategoryDefinitions = category_defs;
+
+            // this returns an enumerable of <Filename: List-of-category-objects> pairs
+            // var category_list =
+            //     from file in Directory.GetFiles(CategoryDefsPath, "*.hjson", SearchOption.TopDirectoryOnly)
+            //     orderby file
+            //     select new
+            //     {
+            //         File = file,
+            //         CatObjList = HjsonValue.Load(file).Qa()
+            //     };
+            //
+            //
+            // // Structure of a category object:
+            // // 'name': string
+            // // 'parent': string (must be a name of a previously-encountered category) || null (for top level categories)
+            // // 'requires': a mapping (dict) of Trait-families to a list of required traits of that type;
+            // // this list will be combined with the 'required' list from the parent (if any) to define
+            // // the full requirements for items matching this category.
+            //
+            // foreach (var pair in category_list)
+            // {
+            //     var fname = pair.File;
+            //     foreach (var catobj in pair.CatObjList)
+            //     {
+            //         string category_name = catobj["name"].Qs();
+            //         string parent_name = catobj["parent"]?.Qs();
+            //
+            //         var reqs = new Dictionary<string, int>();
+            //
+            //         ItemCategory parent = null;
+            //         // get the parent requirements first
+            //         if (parent_name != null)
+            //         {
+            //             // TODO: don't fail on malformed categories, but log the error somewhere
+            //             parent = category_defs[parent_name];
+            //             foreach (var kvp in parent.Requirements)
+            //                 reqs[kvp.Key] = kvp.Value;
+            //
+            //
+            //             // try {
+            //             // }
+            //             // catch (KeyNotFoundException e)
+            //             // {
+            //             //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
+            //             //     Console.WriteLine("{0}", parent);
+            //             //     throw e;
+            //             // }
+            //         }
+            //
+            //         if (catobj.ContainsKey("requires"))
+            //         {
+            //             foreach (var newreqs in catobj["requires"].Qo())
+            //             {
+            //                 var traitCategory = newreqs.Key;
+            //                 // FlagCollection[TraitCategory][TraitName]
+            //                 var flagvalues = FlagCollection[traitCategory];
+            //
+            //                 if (!reqs.ContainsKey(traitCategory))
+            //                 reqs[traitCategory] = 0;
+            //
+            //                 foreach (string trait_name in newreqs.Value.Qa())
+            //                 reqs[traitCategory] |= flagvalues[trait_name];
+            //             }
+            //
+            //             /// if, somehow, there are no requirements, don't bother adding to list
+            //             if (reqs.Count > 0)
+            //                 category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
+            //         }
+            //         else if (catobj.ContainsKey("merge"))
+            //         {
+            //             var merge_container = new ItemCategory(category_name, parent, true, count++);
+            //             foreach (var mergedcat in catobj["merge"].Qa())
+            //             {
+            //                 try
+            //                 {
+            //                     category_defs[mergedcat].Merge(merge_container);
+            //                 }
+            //                 catch (KeyNotFoundException)// e)
+            //                 {
+            //                     //FIXME: use ErrorLogger
+            //                     // Console.WriteLine(e.Message);
+            //                 }
+            //             }
+            //             category_defs[category_name] = merge_container;
+            //         }
+            //     } // end of category-object list
+            // }
+            // CategoryDefinitions = category_defs;
 
             // foreach (var kvp in CategoryDefinitions)
             // {
@@ -228,7 +322,7 @@ namespace InvisibleHand.Definitions
         /// After reading in all of the category definitions, build a tree structure based on the parent-child relationships
         /// between the categories. Traversing the tree structure when testing an item's traits will be far more efficient than
         /// checking each category individually.
-        public static void BuildCategoryTree()
+        private static void BuildCategoryTree()
         {
             // TODO: make sure these are sorted based on priority
             // create the root of the tree; the label here is unimportant. All other labels
