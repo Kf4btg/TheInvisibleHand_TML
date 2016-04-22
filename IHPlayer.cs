@@ -5,7 +5,7 @@ using System.IO;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.UI;
-// using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 
 namespace InvisibleHand
@@ -127,6 +127,23 @@ namespace InvisibleHand
         //     prevState = Main.keyState;
         // }
 
+
+        // track Keyboard state (pressed keys)
+        // internal static KeyboardState prevState = Keyboard.GetState();
+
+
+        public override void PostUpdate()
+        {
+            // reset the "holding-key" state, if needed
+            // if the key has been released
+            if (IHBase.holding_hotkey && IHBase.HeldHotKey.Up())
+            {
+                IHBase.holding_hotkey = false;
+                IHBase.HeldHotKey = Keys.None;
+            }
+        }
+
+
         /// <summary>
         /// Takes an Action and will perform it wrapped in some net update code if we are a client. Otherwise it just does whatever it is.
         /// </summary>
@@ -172,20 +189,31 @@ namespace InvisibleHand
         /// performs the most appropriate sort action
         public void Sort(bool reverse = false)
         {
+            Console.WriteLine("Sort");
+            Console.WriteLine(" player.chest = {0}", player.chest);
             // NOTE: this used to check player.chestItems==null, but I once got a
             // "object reference not set to instance of object" or whatever kind of error
             // with that check elsewhere in the code. This should be safer and have the exact same result.
-            if (player.chest == -1 && !player.noItems) // no valid chest open, sort player inventory
+            if (player.chest == -1) // no valid chest open, sort player inventory
+            {
+                Console.WriteLine("sort player inv");
+                if (player.noItems) return;
                 // shift-pressed XOR Reverse-sort-mod-option:
                 //   this will reverse the sort IFF exactly one of these two bools is true
                 IHOrganizer.SortPlayerInv(player,
                 reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
+
+            }
             else
+            {
+                Console.WriteLine("sort chest");
                 // call sort on the Item[] array returned by chestItems
                 DoChestUpdateAction(() =>
-                   IHOrganizer.SortChest(chestItems,
-                   reverse ^ IHBase.ModOptions["ReverseSortChest"])
+                IHOrganizer.SortChest(chestItems,
+                reverse ^ IHBase.ModOptions["ReverseSortChest"])
                 );
+
+            }
         }
 
         /// performs the most appropriate clean action

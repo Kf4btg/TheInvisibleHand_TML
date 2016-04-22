@@ -50,21 +50,21 @@ namespace InvisibleHand
         }
 
         /// query an arbitrary keystate about the given key
-        // public static bool Down(this Keys key, KeyboardState state)
-        // {
-        //     return state.IsKeyDown(key);
-        // }
-        // public static bool Up(this Keys key, KeyboardState state)
-        // {
-        //     return state.IsKeyUp(key);
-        // }
+        public static bool Down(this Keys key, KeyboardState state)
+        {
+            return state.IsKeyDown(key);
+        }
+        public static bool Up(this Keys key, KeyboardState state)
+        {
+            return state.IsKeyUp(key);
+        }
         //
         //
-        // /// returns true if the key is down now, but was up in the previous state
-        // public static bool Pressed(this Keys key, KeyboardState previous_state)
-        // {
-        //     return key.Up(previous_state) && key.Down();
-        // }
+        /// returns true if the key is down now, but was up in the previous state
+        public static bool Pressed(this Keys key, KeyboardState previous_state)
+        {
+            return key.Up(previous_state) && key.Down();
+        }
 
         #endregion
 

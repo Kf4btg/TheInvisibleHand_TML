@@ -1,7 +1,7 @@
-// ﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using Terraria.ModLoader;
-// using Terraria;
+using Terraria;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 using InvisibleHand.Definitions;
@@ -16,6 +16,26 @@ namespace InvisibleHand
         internal static int[] itemCategories;
 
         public static IHBase Instance { get; private set; }
+
+        public static KeyboardState lastState = Keyboard.GetState();
+
+        private static Dictionary<string, Keys> modhotkeys;
+
+        internal static bool holding_hotkey = false;
+        // private static string held_hotkey = String.Empty;
+        public static Keys HeldHotKey { get; set; } = Keys.None;
+
+
+        internal static string ConfiguredHotkey(string action_name) =>
+            Main.Configuration.Get<string>("TheInvisibleHand_HotKey_"+action_name.Replace(' ', '_'), Constants.DefaultKeys[action_name]);
+
+        // {
+        //     get { return _held_hotkey; }
+        //     set
+        //     {
+        //
+        //     }
+        // }
 
         /// Mapping of:
         /// 	Item Trait-Group Name (e.g. "Weapon") ->
@@ -69,6 +89,8 @@ namespace InvisibleHand
             };
 
             commandHandler = new IHCommandHandler(this);
+            modhotkeys = new Dictionary<string, Keys>();
+
 
             // default options
             // ModOptions["UseReplacers"] = new BoolOption(this, true);
@@ -94,6 +116,14 @@ namespace InvisibleHand
             foreach (var kvp in Constants.DefaultKeys)
             {
                 RegisterHotKey(kvp.Key, kvp.Value);
+
+                Keys actualkey;
+                string configval = ConfiguredHotkey(kvp.Key);
+                if (Enum.TryParse(configval, out actualkey))
+                    modhotkeys[kvp.Key] = actualkey;
+                else
+                    // TODO: this should throw an error
+                    modhotkeys[kvp.Key] = Keys.None;
                 // ActionKeys[kvp.Key]=kvp.Value;
             }
 
@@ -108,6 +138,19 @@ namespace InvisibleHand
 
         public override void HotKeyPressed(string name)
         {
+
+            // Main.Configuration.Get<string>(this.Name+"_HotKey_"+name.Replace(' ', '_'), Constants.DefaultKeys[name]);
+
+            // don't rapid-fire
+            if (holding_hotkey)
+                return;
+
+            holding_hotkey = true;
+
+            // TODO: track when the key-configuration changes
+            HeldHotKey = modhotkeys[name];
+
+
             switch (name)
             {
                 case "Sort":
