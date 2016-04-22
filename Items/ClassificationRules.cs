@@ -511,6 +511,8 @@ namespace InvisibleHand.Items
             }
 
         }
+
+
         // Ideas for dealing with mod items:
         //  1) Use Recipe.ItemMatches() for added materials
         //
@@ -522,5 +524,13 @@ namespace InvisibleHand.Items
         //     public static readonly Dictionary<ItemFlags.Type, condition_table> Matrix =
         //     new Dictionary<ItemFlags.Type, condition_table>()
 
+    }
+    
+    public enum WallDecoType
+    {
+        Painting,
+        Trophy,
+        Rack,
+        Other
     }
 }

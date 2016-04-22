@@ -1,9 +1,7 @@
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System;
-using Terraria.ModLoader;
 using Terraria;
-using Terraria.ID;
 
 using InvisibleHand.Utils;
 using InvisibleHand.Items;
@@ -100,37 +98,37 @@ namespace InvisibleHand
         }
 
 
-        public static bool Matches(this Item item, ItemCat isCategory)
-        {
-            return CategoryDef.Categories[isCategory].Invoke(item);
-        }
+        // public static bool Matches(this Item item, ItemCat isCategory)
+        // {
+        //     return CategoryDef.Categories[isCategory].Invoke(item);
+        // }
 
-        public static bool IsHook(this Item item)
-        {
-            return Main.projHook[item.shoot];
-            // return ProjectileLoader. .byType.ContainsKey(item.shoot) && (ProjDef.byType[item.shoot].hook || ProjDef.byType[item.shoot].aiStyle==7);
-        }
+        // public static bool IsHook(this Item item)
+        // {
+        //     return Main.projHook[item.shoot];
+        //     // return ProjectileLoader. .byType.ContainsKey(item.shoot) && (ProjDef.byType[item.shoot].hook || ProjDef.byType[item.shoot].aiStyle==7);
+        // }
 
-        public static bool IsBomb(this Item item)
-        {   //grenades, bombs, etc
-            var proj = ProjectileLoader.GetProjectile(item.shoot);
-            return proj != null && proj.projectile.aiStyle == 16;
+        // public static bool IsBomb(this Item item)
+        // {   //grenades, bombs, etc
+        //     var proj = ProjectileLoader.GetProjectile(item.shoot);
+        //     return proj != null && proj.projectile.aiStyle == 16;
+        //
+        //     // return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
+        // }
 
-            // return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
-        }
-
-        // FIXME: glowstick and flaregun and...the whole thing, really
-        public static bool IsTool(this Item item)
-        {
-            return item.createTile == TileID.Rope || item.createTile == TileID.Chain || item.name.EndsWith("Bucket") ||
-            item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() ||
-            // ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
-            item.type == 1991 || item.type == 50 || item.type == 1326 ||
-            // ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
-            item.name.Contains("Paintbrush") || item.name.Contains("Paint Roller") || item.name.Contains("Paint Scraper") ||
-            (item.type >= 1543 && item.type <= 1545);
-            //bucket, bug net, magic mirror, rod of discord, spectre paint tools
-        }
+        // // FIXME: glowstick and flaregun and...the whole thing, really
+        // public static bool IsTool(this Item item)
+        // {
+        //     return item.createTile == TileID.Rope || item.createTile == TileID.Chain || item.name.EndsWith("Bucket") ||
+        //     item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() ||
+        //     // ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
+        //     item.type == 1991 || item.type == 50 || item.type == 1326 ||
+        //     // ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
+        //     item.name.Contains("Paintbrush") || item.name.Contains("Paint Roller") || item.name.Contains("Paint Scraper") ||
+        //     (item.type >= 1543 && item.type <= 1545);
+        //     //bucket, bug net, magic mirror, rod of discord, spectre paint tools
+        // }
     #endregion
 
     #region buttonExtensions
