@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-// using System;
 using Terraria;
+
+using System;
+using System.Linq;
 
 namespace InvisibleHand.Items
 {
@@ -33,9 +35,25 @@ namespace InvisibleHand.Items
         /// return the modified instance
         public ItemClassificationWrapper SetFlag(string type, string flag)
         {
-            this.Item_Flags[type] |= IHBase.FlagCollection[type][flag];
-            this.Success = true;
-            this.LastFlag = new KeyValuePair<string, string>(type, flag);
+            // try
+            // {
+
+                if (this.Item_Flags.ContainsKey(type))
+                    this.Item_Flags[type] |= IHBase.FlagCollection[type][flag];
+                else
+                    this.Item_Flags[type] = IHBase.FlagCollection[type][flag];
+
+                this.Success = true;
+                this.LastFlag = new KeyValuePair<string, string>(type, flag);
+            // }
+            // catch (KeyNotFoundException)
+            // {
+
+                // Console.WriteLine("{0}[{1}]", type, flag);
+                // Console.WriteLine(string.Join(", ", IHBase.FlagCollection.Select(kvp => kvp.Key).ToArray()));
+                // Console.WriteLine(string.Join(", ", IHBase.FlagCollection[type].Select(kvp => kvp.Key).ToArray()));
+                // throw;
+            // }
             return this;
         }
 

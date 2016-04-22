@@ -39,6 +39,7 @@ build_target() {
 			return 1 ;;
 	esac
 
+	#/verbosity:detailed 
 	xbuild "/p:Configuration=${platform}${build}" "$CSPROJ" && move_to_modsources "$platform" "$build"
 }
 

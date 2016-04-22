@@ -15,7 +15,7 @@ namespace InvisibleHand.Items
 
         internal static void ClassifyItem(ItemClassificationWrapper item)
         {
-            var _item = item.item;
+            // var _item = item.item;
             bool _weapon, _tool;
             _weapon = _tool = false;
 
@@ -49,8 +49,8 @@ namespace InvisibleHand.Items
                 {
                     classifyWeapon(item, item.LastFlag.Key, item.LastFlag.Value);
                 }
-                else
-                    item.SetFlag("Weapon", "type_other");
+                // else
+                //     item.SetFlag("Weapon", "type_other");
             }
 
             // equipables

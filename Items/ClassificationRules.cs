@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 // using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -10,6 +11,9 @@ namespace InvisibleHand.Items
 {
     public static class ClassificationRules
     {
+
+        static bool contains(IEnumerable<int> idlist, int id) => id > 0 && idlist.Contains(id);
+        static bool contains(IList<bool> idlist, int id) => id > 0 && idlist[id];
 
         /// prevents attempting to index Main.projectile w/ -1
         public static bool TestProjectileAI(int projid, int otherid)
@@ -26,13 +30,13 @@ namespace InvisibleHand.Items
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;
 
-            public static bool isHook(Item item)     => Main.projHook[item.shoot];
+            public static bool isHook(Item item)     => contains(Main.projHook, item.shoot);
             public static bool isMount(Item item)    => item.mountType != -1;
-            public static bool isLightPet(Item item) => item.buffType > 0 && (Main.lightPet[item.buffType]);
+            public static bool isLightPet(Item item) => contains(Main.lightPet, item.buffType);
 
-            public static bool isVanityPet(Item item) => item.buffType > 0 && (Main.vanityPet[item.buffType]);
+            public static bool isVanityPet(Item item) => contains(Main.vanityPet, item.buffType);
 
-            public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || Main.projHook[item.shoot] || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
+            public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || contains(Main.projHook, item.shoot) || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
 
             /// NOTE: not everything that has a "placeStyle" has a "createTile" (the noteable
             /// exceptions are the butterflies, which have a "createNPC" instead), and
@@ -59,9 +63,9 @@ namespace InvisibleHand.Items
 
             // maybe?
             public static bool isPotion(Item item) => timedBuff(item) && !isFood(item); // item.potion -> not always helpful
-            public static bool isFlask(Item item) => Main.meleeBuff[item.buffType];
+            public static bool isFlask(Item item) => contains(Main.meleeBuff, item.buffType);
 
-            public static bool falling(Item item)   => TileID.Sets.Falling[item.createTile];
+            public static bool falling(Item item)   => contains(TileID.Sets.Falling, item.createTile);
 
             public static bool Explosive(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Explosive);
 
@@ -70,7 +74,7 @@ namespace InvisibleHand.Items
             public static bool isWood(Item item) => ItemSets.Wood.Contains(item.type);
 
             /// this returns true for all the '... Rope' items (web, silk, regular, etc) AND their coil-counterparts
-            public static bool makesRope(Item item) => Main.tileRope[item.createTile] || TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
+            public static bool makesRope(Item item) => contains(Main.tileRope, item.createTile) || TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
         }
 
         /// these rules are dependent on Binary.CanBePlaced()
@@ -161,6 +165,9 @@ namespace InvisibleHand.Items
 
         internal static class Sets
         {
+
+
+
             #region from Sets
 
             public static bool Furniture(Item item) => TileSets.Furniture.Contains(item.createTile);
@@ -208,12 +215,13 @@ namespace InvisibleHand.Items
             /// despite the name of the array using the word 'brick', this appears to hold most
             /// items that could be considered a 'block', including bricks, but also e.g. mud, wood,
             /// glass, etc. It also includes sands, but notably seems to missing DIRT...
-            public static bool Block(Item item) => Main.tileBrick[item.createTile];
-
-            public static bool Rope(Item item) => Main.tileRope[item.createTile];
+            // public static bool Block(Item item) => Main.tileBrick[item.createTile];
+            public static bool Block(Item item) => contains(Main.tileBrick, item.createTile);
+    
+            public static bool Rope(Item item) => contains(Main.tileRope, item.createTile);
             public static bool RopeCoil(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
 
-            public static bool Sand(Item item) => Main.tileSand[item.createTile];
+            public static bool Sand(Item item) => contains(Main.tileSand, item.createTile);
 
 
             public static bool housingDoor(Item item) =>
@@ -225,26 +233,26 @@ namespace InvisibleHand.Items
             public static bool housingTorch(Item item) =>
                     TileID.Sets.RoomNeeds.CountsAsTorch.Contains(item.createTile);
 
-            public static bool Ore(Item item) => TileID.Sets.Ore[item.createTile];
-            public static bool Ice(Item item) => TileID.Sets.Ices[item.createTile];
+            public static bool Ore(Item item) => contains(TileID.Sets.Ore, item.createTile);
+            public static bool Ice(Item item) => contains(TileID.Sets.Ices, item.createTile);
 
-            public static bool HallowBlock(Item item)     => TileID.Sets.Hallow[item.createTile];
-            public static bool CrimsonBlock(Item item)    => TileID.Sets.Crimson[item.createTile];
-            public static bool CorruptionBlock(Item item) => TileID.Sets.Corrupt[item.createTile];
+            public static bool HallowBlock(Item item)     => contains(TileID.Sets.Hallow, item.createTile);
+            public static bool CrimsonBlock(Item item)    => contains(TileID.Sets.Crimson, item.createTile);
+            public static bool CorruptionBlock(Item item) => contains(TileID.Sets.Corrupt, item.createTile);
 
-            // public static bool Sand(Item item)          => TileID.Sets.Conversion.Sand[item.createTile];
-            public static bool HardenedSand (Item item) => TileID.Sets.Conversion.HardenedSand[item.createTile];
-            public static bool Sandstone(Item item)     => TileID.Sets.Conversion.Sandstone[item.createTile];
+            // public static bool Sand(Item item)          => contains(TileID.Sets.Conversion.Sand, item.createTile);
+            public static bool HardenedSand (Item item) => contains(TileID.Sets.Conversion.HardenedSand, item.createTile);
+            public static bool Sandstone(Item item)     => contains(TileID.Sets.Conversion.Sandstone, item.createTile);
 
-            public static bool Stone(Item item) => TileID.Sets.Conversion.Stone[item.createTile];
+            public static bool Stone(Item item) => contains(TileID.Sets.Conversion.Stone, item.createTile);
 
-            public static bool CanPlaceOnWall(Item item) => TileID.Sets.FramesOnKillWall[item.createTile];
+            public static bool CanPlaceOnWall(Item item) => contains(TileID.Sets.FramesOnKillWall, item.createTile);
 
-            public static bool StrangePlant(Item item) => ItemID.Sets.ExoticPlantsForDyeTrade[item.type];
+            public static bool StrangePlant(Item item) => contains(ItemID.Sets.ExoticPlantsForDyeTrade, item.type);
 
             /// Yoraizor's stuff is also in this item set, but will likely get caught by an 'isAccessory'
             /// check or something before it gets here.
-            public static bool Soul(Item item) => ItemID.Sets.AnimatesAsSoul[item.type];
+            public static bool Soul(Item item) => contains(ItemID.Sets.AnimatesAsSoul, item.type);
             /// Seems the Trophies fall in these categories, too. All the vanilla ones, at
             /// least, also end in "Trophy", so that could be a way to distinguish them;
             /// AND the decorative racks (blacksmith, helmet, spear, etc.), are here too;
@@ -260,7 +268,7 @@ namespace InvisibleHand.Items
             // public static bool Painting2X3(Item item) => item.createTile == TileID.Painting2X3;
             // public static bool Painting3X2(Item item) => item.createTile == TileID.Painting3X2;
 
-            public static bool NebulaPickup(Item item) => ItemID.Sets.NebulaPickup[item.type];
+            public static bool NebulaPickup(Item item) => contains(ItemID.Sets.NebulaPickup, item.type);
 
             public static bool GoesInExtractinator(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
         }
@@ -472,7 +480,7 @@ namespace InvisibleHand.Items
 
             internal static class Magic
             {
-                public static bool Homing(Item item) => ProjectileID.Sets.Homing[item.shoot];
+                public static bool Homing(Item item) => contains(ProjectileID.Sets.Homing, item.shoot);
 
                 public static bool Area(Item item)
                 {
@@ -495,7 +503,7 @@ namespace InvisibleHand.Items
                 // e.g. aqua scepter
                 public static bool Stream(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Stream);
                 // e.g. a lot of things; anything that passes through at least one enemy
-                public static bool Piercing(Item item) => Main.projectile[item.shoot].maxPenetrate > 1;
+                public static bool Piercing(Item item) => item.shoot > 0 && Main.projectile[item.shoot].maxPenetrate > 1;
 
                 // i.e. straight(ish) line that passes through blocks
                 public static bool VilethornAI(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Vilethorn);
@@ -503,7 +511,7 @@ namespace InvisibleHand.Items
 
             internal static class Summon
             {
-                public static bool Minion(Item item) => Main.projectile[item.shoot].minion;
+                public static bool Minion(Item item) => item.shoot > 0 && Main.projectile[item.shoot].minion;
 
                 // there's nothing like a 'sentry' field, but that's all that's left after taking
                 // out the 'minion' weapons, so...

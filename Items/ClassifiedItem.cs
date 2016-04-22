@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 // using InvisibleHand.Definitions;
+// using System;
+
 
 namespace InvisibleHand.Items
 {
@@ -21,6 +23,12 @@ namespace InvisibleHand.Items
 
         public override void SetDefaults(Item item)
         {
+
+            if (item.type == 0)
+            {
+                return;
+            }
+            // Console.WriteLine(item.name);
             var finfo = getFlagInfo(item);
 
             if (flag_cache.ContainsKey(item.type))
