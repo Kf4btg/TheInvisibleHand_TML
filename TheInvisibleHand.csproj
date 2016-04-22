@@ -72,7 +72,7 @@
     <!-- <Reference Include="System.Core" /> -->
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Hjson">
-        <HintPath>References\Hjson.dll</HintPath>
+        <HintPath>lib\Hjson.dll</HintPath>
     </Reference>
     <Reference Include="FNA, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null" Condition="!$(DefineConstants.Contains('WINDOWS'))">
         <SpecificVersion>False</SpecificVersion>
@@ -163,5 +163,8 @@
       <Content Include="description.txt" />
       <Content Include="IHicon.png" />
   </ItemGroup>
+  <ItemGroup>
+     <EmbeddedResource Include="lib\Hjson.dll" />
+ </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
