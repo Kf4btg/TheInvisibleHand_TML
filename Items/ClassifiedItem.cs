@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 // using InvisibleHand.Definitions;
@@ -10,8 +10,8 @@ namespace InvisibleHand.Items
     public class ClassifiedItem : GlobalItem
     {
 
-        public static IDictionary<int, IDictionary<string, int>> flag_cache = new Dictionary<int, IDictionary<string, int>>();
-        public ItemFlagInfo getFlagInfo(Item item) => (ItemFlagInfo)item.GetModInfo(mod, "ItemFlagInfo");
+        // public static IDictionary<int, IDictionary<string, int>> flag_cache = new Dictionary<int, IDictionary<string, int>>();
+        // public ItemFlagInfo getFlagInfo(Item item) => (ItemFlagInfo)item.GetModInfo(mod, "ItemFlagInfo");
 
         // public ItemCategory Category { get; set; }
 
@@ -23,23 +23,24 @@ namespace InvisibleHand.Items
 
         public override void SetDefaults(Item item)
         {
+            ItemClassifier.ClassifyItem(item);
 
-            if (item.type == 0)
-            {
-                return;
-            }
-            // Console.WriteLine(item.name);
-            var finfo = getFlagInfo(item);
-
-            if (flag_cache.ContainsKey(item.type))
-            {
-                finfo.Flags = flag_cache[item.type];
-            }
-            else
-            {
-                ItemClassifier.ClassifyItem(new ItemClassificationWrapper(item, finfo));
-                flag_cache[item.type] = finfo.Flags;
-            }
+            // if (item.type == 0)
+            // {
+            //     return;
+            // }
+            // // Console.WriteLine(item.name);
+            // var finfo = getFlagInfo(item);
+            //
+            // if (flag_cache.ContainsKey(item.type))
+            // {
+            //     finfo.Flags = flag_cache[item.type];
+            // }
+            // else
+            // {
+            //     ItemClassifier.ClassifyItem(new ItemClassificationWrapper(item, finfo));
+            //     flag_cache[item.type] = finfo.Flags;
+            // }
         }
     }
 }

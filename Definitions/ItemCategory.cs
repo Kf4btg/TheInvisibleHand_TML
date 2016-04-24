@@ -78,6 +78,7 @@ namespace InvisibleHand.Definitions
 
         public bool Matches(IDictionary<string, int> item_flags)
         {
+            if (this.MergeContainer) return false;
             // return this.Matches(item_flags) != null;
             foreach (var kvp in Requirements)
             {
@@ -94,6 +95,7 @@ namespace InvisibleHand.Definitions
 
         public ItemCategory Match(IDictionary<string, int> item_flags)
         {
+            if (this.MergeContainer) return null;
             foreach (var kvp in Requirements)
             {
                 var reqval = kvp.Value;

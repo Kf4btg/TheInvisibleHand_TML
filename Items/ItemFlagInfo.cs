@@ -9,25 +9,28 @@ namespace InvisibleHand.Items
 {
     public class ItemFlagInfo : ItemInfo
     {
+        // FIXME: Pre-existing items (i.e. loaded w/ the player) do not get run through set-defaults,
+        // and so do not receive any flags.
         public IDictionary<string, int> Flags { get; set; }
 
         private ItemCategory _category;
         /// The category for an item is looked up the first time it is queried, then cached.
-        public ItemCategory Category
-        {
-            get
-            {
-                return _category ?? getCategory();
-            }
-            // set;
-        }
+        public ItemCategory Category => _category ?? find_category();
+        // public ItemCategory Category
+        // {
+        //     get
+        //     {
+        //         return _category ?? getCategory();
+        //     }
+        //     // set;
+        // }
 
         /// Conflict resolution is currently done by using the first matching category
         // (at each tree level). To ensure that this is a meaningful action,
         // we need to assign priorities to the categories to sort them (or make sure
         // that they are placed into the tree in the same order they were loaded from
         // the definitions files)
-        private ItemCategory getCategory()
+        private ItemCategory find_category()
         {
             var match = ItemCategory.None;
             CheckTree(IHBase.CategoryTree, ref match);

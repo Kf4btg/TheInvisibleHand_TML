@@ -1,17 +1,43 @@
-// using System.Collections.Generic;
+using System.Collections.Generic;
 // using System;
 // using System.Linq;
-// using Terraria;
+using Terraria;
 // using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
+    using FlagValues = IDictionary<string, int>;
     public static class ItemClassifier
     {
+
+        public static IDictionary<int, FlagValues> flag_cache = new Dictionary<int, FlagValues>();
+
         // public static void ClassifyItem(Item item, ItemFlagInfo info)
         // {
         //     classifyitem(new ItemClassificationWrapper(item, info));
         // }
+        //
+        public static void ClassifyItem(Item item, ItemFlagInfo flag_info = null)
+        {
+
+            if (item.type != 0)
+            {
+                var flaginfo = flag_info ?? item.GetFlagInfo();
+
+                FlagValues flags;
+                if (flag_cache.TryGetValue(item.type, out flags))
+                {
+                    flaginfo.Flags = flags;
+                }
+                else
+                {
+                    ClassifyItem(new ItemClassificationWrapper(item, flaginfo));
+                    flag_cache[item.type] = flaginfo.Flags;
+                }
+            }
+
+
+        }
 
         internal static void ClassifyItem(ItemClassificationWrapper item)
         {

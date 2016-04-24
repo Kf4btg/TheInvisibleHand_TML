@@ -70,6 +70,11 @@ namespace InvisibleHand
 
         #region itemExensions
 
+        public static ItemFlagInfo GetFlagInfo(this Item item)
+        {
+            return item.GetModInfo<ItemFlagInfo>(IHBase.Instance);
+        }
+
         public static bool CanStackWith(this Item src_item, Item dest_item)
         {
             return !dest_item.IsBlank() && dest_item.IsTheSameAs(src_item) && dest_item.stack < dest_item.maxStack;
@@ -92,7 +97,10 @@ namespace InvisibleHand
 
         public static ItemCategory GetCategory(this Item item)
         {
-            var iteminfo = (ItemFlagInfo)(item.GetModInfo(IHBase.Instance, "ItemFlagInfo"));
+            // var iteminfo = (ItemFlagInfo)(item.GetModInfo(IHBase.Instance, "ItemFlagInfo"));
+            var iteminfo = item.GetFlagInfo();
+            if (iteminfo.Flags == null)
+                ItemClassifier.ClassifyItem(item, iteminfo);
 
             return iteminfo.Category;
         }
