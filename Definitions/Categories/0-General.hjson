@@ -2,18 +2,29 @@
     /*{
         # start a category definition by giving it a meaningful name
         name: Template
+
         # if it is a nested category (e.g. Weapon > Melee),
         # put the name of its parent here. Only items that meet the
         # requirements of the parent will considered for the nested category.
-        # If it is a top level category, set this to null
+        # If it is a top level category, set this to null (or just leave it out)
         parent: null
+
+        # The priority of a category is how its items will be sorted relative to
+        # those of other categories: lower priorities will be placed before
+        # higher. When two categories have the same priority,
+        # the priority that was loaded first will take precedence.
+        # Excluding this field means use the default of 0 for top-level categories,
+        # or the priority of the parent for child categories.
+        # Range is [-32768, 32767].
+        priority: 1
+
         # The list (of lists) of traits required for an item
         # to match this category. For a top-level category, a General
         # trait entry will likely always be included. For sub-categories,
         # the parent will fulfill the General requirements, so only
         # traits from more specific families are needed.
         requires: {
-            General: []
+            General: [ "trait1", ... ]
         }
     }*/
 
@@ -24,58 +35,62 @@
 
     {
         name: Tool
-        parent: null,
+        parent: null
+        priority: 10
         requires: {
-            General: [ "tool" ]
+          General: [ "tool" ]
         }
     } {
         name: Weapon
         parent: null
+        priority: 20
         requires: {
-            General: [ "weapon" ]
+          General: [ "weapon" ]
         }
     } {
         name: Equipable
         parent: null
+        priority: 30
         requires: {
-            General: [ "equipable" ]
+          General: [ "equipable" ]
         }
     } {
         name: Placeable
         parent: null
+        priority: 85
         requires: {
-            General: [ "placeable" ]
+          General: [ "placeable" ]
         }
     } {
         name: Consumable
-        parent: null
+        priority: 60
         requires: {
-            General: [ "consumable" ]
+          General: [ "consumable" ]
         }
     } {
         name: Mech
-        parent: null
+        priority: 75
         requires: {
-            General: [ "mech" ]
+          General: [ "mech" ]
         }
     } {
         name: Ammo
-        parent: null
+        priority: 25
         requires: {
-            General: [ "ammo" ]
+          General: [ "ammo" ]
         }
     } {
         name: Dye
-        parent: null
+        priority: 40
         requires: {
-            General: [ "dye" ]
+          General: [ "dye" ]
         }
     } {
         # for items whose _primary_ use is as a material, though they may meet
         # requirements for other categories (e.g. ore is placeable, but is mainly
         # used to create bars or potions.)
         name: Material
-        parent: null
+        priority: 90
         requires: {
           General: [ "material" ]
         }

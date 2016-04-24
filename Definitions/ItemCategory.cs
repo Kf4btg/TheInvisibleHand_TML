@@ -7,6 +7,9 @@ namespace InvisibleHand.Definitions
     {
         /// the explicitly set sort-priority for this category
         public short Priority;
+        /// this indicates whether the priority was explicitly specified
+        /// in a configuration file or was assigned a default value.
+        internal bool explicit_priority = false;
 
         /// A unique identifying number for this category; usually
         /// the order in which this item was loaded from the definition file;
@@ -15,7 +18,7 @@ namespace InvisibleHand.Definitions
 
         /// a combination of the priority and ID that can be used
         /// to properly sort this category amongst a list of other categories
-        public int ordinal => (Priority << 16) | (ID);
+        public int Ordinal => (Priority << 16) | (ID);
 
         public string Name { get; private set; }
 
@@ -143,7 +146,7 @@ namespace InvisibleHand.Definitions
         #region interface implementation
         public int CompareTo(ItemCategory other)
         {
-            return this.ordinal.CompareTo(other.ordinal);
+            return this.Ordinal.CompareTo(other.Ordinal);
             // var val = this.Priority - other.Priority;
             // if (val != 0) return val;
             //

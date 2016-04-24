@@ -27,7 +27,10 @@ namespace InvisibleHand.Definitions
 
         /// I hope 65,000 categories will be enough...
         public static IDictionary<ushort, ItemCategory> CategoryIDs { get; private set; }
-        public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
+        // public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
+
+        /// uses keys based on a category's ordinal (ordering rank).
+        public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
 
         /// Call this method to run all the other class methods
@@ -36,7 +39,7 @@ namespace InvisibleHand.Definitions
         {
             assembly = Assembly.GetExecutingAssembly();
 
-            CategoryDefsPath = "InvisibleHand."+category_path;
+            CategoryDefsPath = "InvisibleHand." + category_path;
             TraitFilePath = "InvisibleHand." + trait_path;
 
             // the order is important here
@@ -63,10 +66,7 @@ namespace InvisibleHand.Definitions
                 //              Note: there should not be more than 32 traits in any single group
                 //  optional Subobjects: in same form
                 foreach (var tgroup in traitGroups)
-                {
                     LoadGroup(tgroup);
-                }
-
             }
         }
 
@@ -78,6 +78,7 @@ namespace InvisibleHand.Definitions
         private static void LoadGroup(KeyValuePair<string, JsonValue> group_object, string name_prefix="")
         {
             string name = group_object.Key;
+
             if (name_prefix != String.Empty)
                 name = name_prefix + "." + name;
             foreach (var subitem in group_object.Value.Qo())
@@ -102,7 +103,7 @@ namespace InvisibleHand.Definitions
         private static void AssignFlagValues()
         {
             // make sure trait-defs were loaded
-            if (TraitDefinitions==null)
+            if (TraitDefinitions == null)
                 LoadTraitDefinitions(TraitFilePath);
 
             FlagCollection = new Dictionary<string, IDictionary<string, int>>();
@@ -114,10 +115,8 @@ namespace InvisibleHand.Definitions
                 // always initialize with a "none"
                 flagGroup["none"] = 0;
                 foreach (var trait in tgroup.Value)
-                {
                     // each new value added is a (binary) order of magnitude larger than the last
                     flagGroup[trait] = 1 << (flagGroup.Count-1);
-                }
 
                 // add flag group to collection
                 FlagCollection[tgroup.Key] = flagGroup;
@@ -146,19 +145,35 @@ namespace InvisibleHand.Definitions
 
                     foreach (var catobj in CatObjList)
                     {
+                        // name field is always required
                         string category_name = catobj["name"].Qs();
-                        string parent_name = catobj["parent"]?.Qs();
+
+                        // get parent, if any
+                        string parent_name = null;
+                        if (catobj.ContainsKey("parent"))
+                            parent_name = catobj["parent"]?.Qs();
 
                         var reqs = new Dictionary<string, int>();
 
                         ItemCategory parent = null;
+                        short? _pprio = null;
+
                         // get the parent requirements first
                         if (parent_name != null)
                         {
                             // TODO: don't fail on malformed categories, but log the error somewhere
                             parent = CategoryDefinitions[parent_name];
-                            foreach (var kvp in parent.Requirements)
-                                reqs[kvp.Key] = kvp.Value;
+                            // assign the category's priority from the first
+                            // explicitly-specified priority encountered in the
+                            // parent hierarchy. Default value will be handled later
+                            if (!_pprio.HasValue && parent.explicit_priority)
+                                _pprio = parent.Priority;
+
+                            // w/ the category-tree, this is unnecessary:
+                            // foreach (var kvp in parent.Requirements)
+                            // {
+                            //     reqs[kvp.Key] = kvp.Value;
+                            // }
 
 
                             // try {
@@ -171,9 +186,16 @@ namespace InvisibleHand.Definitions
                             // }
                         }
 
-                        short priority = 0;
+                        // if a priority was inherited from the parent, use that instead of the
+                        // default value of 0
+                        short priority = _pprio ?? 0;
+                        bool explicit_prio = false;
+                        // but override with an explicitly-set priority
                         if (catobj.ContainsKey("priority"))
+                        {
+                            explicit_prio = true;
                             priority = (short)(catobj["priority"].Qi());
+                        }
 
                         if (catobj.ContainsKey("requires"))
                         {
@@ -184,34 +206,39 @@ namespace InvisibleHand.Definitions
                                 var flagvalues = FlagCollection[traitCategory];
 
                                 if (!reqs.ContainsKey(traitCategory))
-                                reqs[traitCategory] = 0;
+                                    reqs[traitCategory] = 0;
 
+                                // go through the array of traits, add the appropriate flag value
                                 foreach (string trait_name in newreqs.Value.Qa())
-                                reqs[traitCategory] |= flagvalues[trait_name];
+                                    reqs[traitCategory] |= flagvalues[trait_name];
                             }
 
-                            /// if, somehow, there are no requirements, don't bother adding to list
+                            // if, somehow, there are no requirements, don't bother adding to list
                             if (reqs.Count > 0)
                             {
-                                var newcategory =  new ItemCategory(category_name, count++, reqs, parent, priority);
+                                var newcategory = new ItemCategory(category_name, count++, reqs, parent, priority);
+                                newcategory.explicit_priority = explicit_prio;
+
                                 CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                             }
                         }
                         else if (catobj.ContainsKey("merge"))
                         {
                             var merge_wrapper = new ItemCategory(category_name, count++, parent, is_merge_wrapper: true, priority: priority);
+                            merge_wrapper.explicit_priority = explicit_prio;
+
                             foreach (var wrapped in catobj["merge"].Qa())
                             {
-                                // set the "merge_wrapper" property for each category listed under "merge"
-                                // to this container category
+                                // let each category listed under "merge"
+                                // know which wrapper it has been assigned to
                                 try
                                 {
                                     CategoryDefinitions[wrapped].Merge(merge_wrapper);
                                 }
-                                catch (KeyNotFoundException)// e)
+                                catch (KeyNotFoundException e)// e)
                                 {
                                     //FIXME: use ErrorLogger
-                                    // Console.WriteLine(e.Message);
+                                    Console.WriteLine(e.Message);
                                 }
                             }
                             CategoryDefinitions[category_name] = merge_wrapper;
@@ -329,12 +356,14 @@ namespace InvisibleHand.Definitions
         /// After reading in all of the category definitions, build a tree structure based on the parent-child relationships
         /// between the categories. Traversing the tree structure when testing an item's traits will be far more efficient than
         /// checking each category individually.
+        /// NOTE: if the ordering of the categories changes (i.e. if changing priorities is allowed at runtime),
+        /// the tree will need to be rebuilt each time to reflect the changes.
         private static void BuildCategoryTree()
         {
-            // TODO: make sure these are sorted based on priority
             // create the root of the tree; the label here is unimportant. All other labels
-            // will be created automatically during autovivification
-            var cattree = new SortedAutoTree<string, ItemCategory>() { Label = "root" };
+            // will be created automatically during autovivification, using the ordinal value of the category
+            // var cattree = new SortedAutoTree<string, ItemCategory>() { Label = "root" };
+            var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
 
             foreach (var kvp in CategoryDefinitions)
             {
@@ -356,12 +385,14 @@ namespace InvisibleHand.Definitions
                 // any non-existent nodes.
                 while (catstack.Count > 0)
                 {
-                    subtree = subtree[catstack.Pop().Name];
+                    subtree = subtree[catstack.Pop().Ordinal];
+                    // subtree = subtree[catstack.Pop().Name];
                 }
 
-                // now create the child/set its data if it
-                // has already been created by a previous operation
-                subtree[category.Name].Data = category;
+                // now [create the child]/[set its data if it
+                // has already been created by a previous operation]
+                // subtree[category.Name].Data = category;
+                subtree[category.Ordinal].Data = category;
             }
 
             CategoryTree = cattree;

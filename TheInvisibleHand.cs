@@ -53,7 +53,8 @@ namespace InvisibleHand
         public static IDictionary<string, ItemCategory> CategoryDefs => CategoryParser.CategoryDefinitions;
 
         /// And this returns the traversal tree used to assign a category to an item
-        public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
+        // public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
+        public static SortedAutoTree<int, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
 
 
         // holds the game's original strings for loot-all, dep-all, quick-stack, etc;
