@@ -1,19 +1,33 @@
+using System;
 using System.Collections.Generic;
 
 namespace InvisibleHand.Definitions
 {
-    public class ItemCategory
+    public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>
     {
-        public readonly int Priority;
+        /// the explicitly set sort-priority for this category
+        public short Priority;
+
+        /// A unique identifying number for this category; usually
+        /// the order in which this item was loaded from the definition file;
+        /// used to help solve conflicts in Priority.
+        public readonly ushort ID;
+
+        /// a combination of the priority and ID that can be used
+        /// to properly sort this category amongst a list of other categories
+        public int ordinal => (Priority << 16) | (ID);
+
         public string Name { get; private set; }
 
-        public IDictionary<string, int> Requirements;
+        public IDictionary<string, int> Requirements { get; set; }
 
+
+        private ISet<string> _wrapped_cats;
         /// this may be unnecessary; intended to hold the list of
         /// category names that have been merged to this one if this is a
         /// merge-container; only the names are stored because it should
         /// not be necessary to directly access the merged categories from here.
-        public ISet<string> Merged;
+        public ISet<string> MergedCategories => _wrapped_cats;
 
         /// the parent's requirements will have already been merged into
         /// this Category's requirements, so this property is really only
@@ -26,40 +40,42 @@ namespace InvisibleHand.Definitions
         /// When a category that has been merged into this one has its
         /// Matches() method called, it will a reference to this instance
         /// rather than itself.
-        public readonly bool MergeContainer;
+        public readonly bool IsMergeWrapper;
 
-        /// if not null, then this is the Merge-Container-Category that this
-        ///
-        private ItemCategory MergeTo;
+        /// if not null, then this is the Wrapper-Category that this
+        /// category has been merged into
+        private ItemCategory _wrapper_category;
 
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
-        public ItemCategory Category => MergeTo ?? this;
+        public ItemCategory Category => _wrapper_category ?? this;
 
 
-        public ItemCategory(string name, ItemCategory parent = null, bool is_merge_container = false, int priority = 0)
+        public ItemCategory(string name, ushort cat_id, ItemCategory parent = null, bool is_merge_wrapper = false, short priority = 0)
         {
             Name = name;
             Parent = parent;
             Priority = priority;
+            ID = cat_id;
 
-            MergeContainer = is_merge_container;
+            IsMergeWrapper = is_merge_wrapper;
 
-            if (MergeContainer)
-                Merged = new HashSet<string>();
+            if (IsMergeWrapper)
+                _wrapped_cats = new HashSet<string>();
             else
                 Requirements = new Dictionary<string, int>();
         }
 
         /// initialize the category with a pre-created requirements dict
-        public ItemCategory(string name, IDictionary<string, int> requirements, ItemCategory parent = null, int priority = 0)
+        public ItemCategory(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0)
         {
             Name = name;
             Parent = parent;
             Priority = priority;
+            ID = cat_id;
 
-            MergeContainer = false;
+            IsMergeWrapper = false;
 
             Requirements = requirements;
         }
@@ -67,7 +83,7 @@ namespace InvisibleHand.Definitions
         public void AddTraitRequirement(string trait_family, int flag_value)
         {
             // TODO: throw a proper exception when attempting to add req to merge containers
-            if (MergeContainer)
+            if (IsMergeWrapper)
                 return;
 
             if (Requirements.ContainsKey(trait_family))
@@ -78,7 +94,7 @@ namespace InvisibleHand.Definitions
 
         public bool Matches(IDictionary<string, int> item_flags)
         {
-            if (this.MergeContainer) return false;
+            if (this.IsMergeWrapper) return false;
             // return this.Matches(item_flags) != null;
             foreach (var kvp in Requirements)
             {
@@ -95,7 +111,7 @@ namespace InvisibleHand.Definitions
 
         public ItemCategory Match(IDictionary<string, int> item_flags)
         {
-            if (this.MergeContainer) return null;
+            if (this.IsMergeWrapper) return null;
             foreach (var kvp in Requirements)
             {
                 var reqval = kvp.Value;
@@ -114,18 +130,67 @@ namespace InvisibleHand.Definitions
             return this.Category;
         }
 
-        public void Merge(ItemCategory merged)
+        public void Merge(ItemCategory wrapper)
         {
-            this.MergeTo = merged;
-            merged.Merged.Add(this.Name);
+            this._wrapper_category = wrapper;
+            wrapper.MergedCategories.Add(this.Name);
         }
         public void Unmerge()
         {
-            this.MergeTo = null;
+            this._wrapper_category = null;
+        }
+
+        #region interface implementation
+        public int CompareTo(ItemCategory other)
+        {
+            return this.ordinal.CompareTo(other.ordinal);
+            // var val = this.Priority - other.Priority;
+            // if (val != 0) return val;
+            //
+            // return this.ID.CompareTo(other.ID);
+        }
+
+        public bool Equals(ItemCategory other)
+        {
+            return this.ID == other?.ID;
+        }
+
+        public override bool Equals(Object other)
+        {
+            if (other == null) return false;
+
+            ItemCategory other_cat = other as ItemCategory;
+
+            return Equals(other_cat);
+        }
+
+        /// priority might change if the user modifies their preferred
+        /// sort order; ID should remain immutable throughout the lifetime
+        /// of this category.
+        public override int GetHashCode()
+        {
+            return this.ID;
+        }
+
+        public static bool operator ==(ItemCategory cat1, ItemCategory cat2)
+        {
+            if (cat1 == null || cat2 == null)
+                return Object.Equals(cat1, cat2);
+
+            return cat1.Equals(cat2);
+        }
+
+        public static bool operator !=(ItemCategory cat1, ItemCategory cat2)
+        {
+            if (cat1 == null || cat2 == null)
+                return ! Object.Equals(cat1, cat2);
+
+            return ! (cat1.Equals(cat2));
         }
 
 
+        #endregion
         /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new ItemCategory("Unknown", null, false, int.MaxValue);
+        public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
     }
 }

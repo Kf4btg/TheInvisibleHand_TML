@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using Hjson;
 
-using Terraria.ModLoader;
+// using Terraria.ModLoader;
 
 using InvisibleHand.Utils;
 
@@ -24,6 +24,9 @@ namespace InvisibleHand.Definitions
 
         // public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
+
+        /// I hope 65,000 categories will be enough...
+        public static IDictionary<ushort, ItemCategory> CategoryIDs { get; private set; }
         public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
 
 
@@ -32,15 +35,9 @@ namespace InvisibleHand.Definitions
         public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits.0-All.hjson")
         {
             assembly = Assembly.GetExecutingAssembly();
-            // Console.WriteLine(assembly.FullName);
 
             CategoryDefsPath = "InvisibleHand."+category_path;
             TraitFilePath = "InvisibleHand." + trait_path;
-
-            // foreach (var res in assembly.GetManifestResourceNames())
-            // {
-            //     Console.WriteLine(res);
-            // }
 
             // the order is important here
             LoadTraitDefinitions(TraitFilePath);
@@ -137,8 +134,9 @@ namespace InvisibleHand.Definitions
         /// override others].
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
-            var category_defs = new Dictionary<string, ItemCategory>();
-            int count=0; // track order of added categories
+            CategoryDefinitions = new Dictionary<string, ItemCategory>();
+            CategoryIDs = new Dictionary<ushort, ItemCategory>();
+            ushort count=0; // track order of added categories
 
             foreach(var res in assembly.GetManifestResourceNames().Where(n=>n.StartsWith(category_resources_path)).OrderBy(n=>n))
             {
@@ -158,7 +156,7 @@ namespace InvisibleHand.Definitions
                         if (parent_name != null)
                         {
                             // TODO: don't fail on malformed categories, but log the error somewhere
-                            parent = category_defs[parent_name];
+                            parent = CategoryDefinitions[parent_name];
                             foreach (var kvp in parent.Requirements)
                                 reqs[kvp.Key] = kvp.Value;
 
@@ -172,6 +170,10 @@ namespace InvisibleHand.Definitions
                             //     throw e;
                             // }
                         }
+
+                        short priority = 0;
+                        if (catobj.ContainsKey("priority"))
+                            priority = (short)(catobj["priority"].Qi());
 
                         if (catobj.ContainsKey("requires"))
                         {
@@ -190,16 +192,21 @@ namespace InvisibleHand.Definitions
 
                             /// if, somehow, there are no requirements, don't bother adding to list
                             if (reqs.Count > 0)
-                                category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
+                            {
+                                var newcategory =  new ItemCategory(category_name, count++, reqs, parent, priority);
+                                CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
+                            }
                         }
                         else if (catobj.ContainsKey("merge"))
                         {
-                            var merge_container = new ItemCategory(category_name, parent, true, count++);
-                            foreach (var mergedcat in catobj["merge"].Qa())
+                            var merge_wrapper = new ItemCategory(category_name, count++, parent, is_merge_wrapper: true, priority: priority);
+                            foreach (var wrapped in catobj["merge"].Qa())
                             {
+                                // set the "merge_wrapper" property for each category listed under "merge"
+                                // to this container category
                                 try
                                 {
-                                    category_defs[mergedcat].Merge(merge_container);
+                                    CategoryDefinitions[wrapped].Merge(merge_wrapper);
                                 }
                                 catch (KeyNotFoundException)// e)
                                 {
@@ -207,12 +214,12 @@ namespace InvisibleHand.Definitions
                                     // Console.WriteLine(e.Message);
                                 }
                             }
-                            category_defs[category_name] = merge_container;
+                            CategoryDefinitions[category_name] = merge_wrapper;
                         }
                     } // end of category-object list
                 }
             }
-            CategoryDefinitions = category_defs;
+            // CategoryDefinitions = category_defs;
 
             // this returns an enumerable of <Filename: List-of-category-objects> pairs
             // var category_list =
@@ -283,12 +290,12 @@ namespace InvisibleHand.Definitions
             //         }
             //         else if (catobj.ContainsKey("merge"))
             //         {
-            //             var merge_container = new ItemCategory(category_name, parent, true, count++);
+            //             var merge_wrapper = new ItemCategory(category_name, parent, true, count++);
             //             foreach (var mergedcat in catobj["merge"].Qa())
             //             {
             //                 try
             //                 {
-            //                     category_defs[mergedcat].Merge(merge_container);
+            //                     category_defs[mergedcat].Merge(merge_wrapper);
             //                 }
             //                 catch (KeyNotFoundException)// e)
             //                 {
@@ -296,7 +303,7 @@ namespace InvisibleHand.Definitions
             //                     // Console.WriteLine(e.Message);
             //                 }
             //             }
-            //             category_defs[category_name] = merge_container;
+            //             category_defs[category_name] = merge_wrapper;
             //         }
             //     } // end of category-object list
             // }
