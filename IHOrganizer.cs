@@ -29,39 +29,67 @@ namespace InvisibleHand
             try
             {
 
-            var catquery =
-                from item in source
-                let category = item.GetCategory()
-                orderby category.Priority, category.Name
-                group item by new { prio =  category.Priority, name = category.Name } into catgroup
+                // var catquery =
+                //     from item in source
+                //     let category = item.GetCategory()
+                //     orderby category.Priority, category.Name
+                //     group item by new { prio =  category.Priority, name = category.Name } into catgroup
+                //     // orderby catgroup.Key, category.Name
+                //     select new
+                //     {
+                //         Priority = catgroup.Key.prio,
+                //         Name = catgroup.Key.name,
+                //         // until we replace Dynamic Linq, just sort the categorized items by name
+                //         Members = from im in catgroup
+                //                   orderby im.name
+                //                   select im
+                //     };
+                //
+                var catquery =
+                    from item in source
+                    // let category = item.GetCategory()
+                    orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
+                    select item;
+
+                return catquery.ToList();
+                // orderby category.ordinal
+                // group item by new { prio =  category.Priority, name = category.Name } into catgroup
+                // group item by category.ordinal into catgroup
+                // orderby catgroup.Key
+                // from im in catgroup
+                //     orderby im.name
+                //     select im;
+
                 // orderby catgroup.Key, category.Name
-                select new
-                {
-                    Priority = catgroup.Key.prio,
-                    Name = catgroup.Key.name,
-                    // until we replace Dynamic Linq, just sort the categorized items by name
-                    Members = from im in catgroup
-                              orderby im.name
-                              select im
-                };
+                // select new
+                // {
+                //     // Priority = catgroup.Key.prio,
+                //     // Name = catgroup.Key.name,
+                //     // until we replace Dynamic Linq, just sort the categorized items by name
+                //     // Members =
+                //     from im in catgroup
+                //               orderby im.name
+                //               select im
+                // };
 
 
-            // Console.WriteLine($"OrganizeItems: {catquery}");
-            // ConsoleHelper.PrintList(catquery, "query");
 
-            var sortedList = new List<Item>();
+                // Console.WriteLine($"OrganizeItems: {catquery}");
+                // ConsoleHelper.PrintList(catquery, "query");
 
+                // var sortedList = new List<Item>();
 
-            foreach (var category in catquery)
-            {
-                Console.WriteLine($"OrganizeItems: category_name = {category.Name}");
-                Console.WriteLine($"OrganizeItems: category_prio = {category.Priority}");
-                // Console.WriteLine($"OrganizeItems: {category.Members}");
-                // ConsoleHelper.PrintList(category.Members, "OrganizeItems: category_members");
-
-                sortedList.AddRange(category.Members);
-                }
-                return sortedList;
+                //
+                // foreach (var category in catquery)
+                // {
+                //     Console.WriteLine($"OrganizeItems: category_name = {category.Name}");
+                //     Console.WriteLine($"OrganizeItems: category_prio = {category.Priority}");
+                //     // Console.WriteLine($"OrganizeItems: {category.Members}");
+                //     // ConsoleHelper.PrintList(category.Members, "OrganizeItems: category_members");
+                //
+                //     sortedList.AddRange(category.Members);
+                //     }
+                //     return sortedList;
             }
 
             catch (Exception e)

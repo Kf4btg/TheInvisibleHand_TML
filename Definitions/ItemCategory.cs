@@ -174,7 +174,7 @@ namespace InvisibleHand.Definitions
 
         public static bool operator ==(ItemCategory cat1, ItemCategory cat2)
         {
-            if (cat1 == null || cat2 == null)
+            if ((object)cat1 == null || (object)cat2 == null)
                 return Object.Equals(cat1, cat2);
 
             return cat1.Equals(cat2);
@@ -182,7 +182,7 @@ namespace InvisibleHand.Definitions
 
         public static bool operator !=(ItemCategory cat1, ItemCategory cat2)
         {
-            if (cat1 == null || cat2 == null)
+            if ((object)cat1 == null || (object)cat2 == null)
                 return ! Object.Equals(cat1, cat2);
 
             return ! (cat1.Equals(cat2));
