@@ -92,7 +92,7 @@ namespace InvisibleHand
                         else
                         {
                             string opt = qcmd.Dequeue();
-                            if (IHBase.ModOptions.ContainsKey(opt))
+                            if (IHBase.ModOptions.HasOption(opt))
                             {
                                 if (qcmd.Count == 0)
                                     {helper.ErrorMsg("no value provided for option '{opt}'", "ihconfig");}
@@ -120,9 +120,9 @@ namespace InvisibleHand
                         {
                             // print all available options and current values
                             StringBuilder printopts = new StringBuilder("Options:");
-                            foreach (var kvp in IHBase.ModOptions)
+                            foreach (var kvp in IHBase.ModOptions.Options)
                             {
-                                printopts.AppendFormat(" {0} [{1}],", kvp.Key, kvp.Value);
+                                printopts.AppendFormat(" {0} [{1}],", kvp.Key, kvp.Value.Value);
                             }
                             // print all but last comma
                             Main.NewText(printopts.ToString(0, printopts.Length-1));

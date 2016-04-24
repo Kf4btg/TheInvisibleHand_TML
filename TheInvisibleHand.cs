@@ -129,7 +129,7 @@ namespace InvisibleHand
             CategoryParser.Parse();
         }
 
-        public static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
+        internal static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
 
         public override void HotKeyPressed(string name)
         {
@@ -170,12 +170,18 @@ namespace InvisibleHand
             }
         }
 
-        // utilize chat commands to set mod options
+        /// utilize chat commands to set mod options
         public override void ChatInput(string text)
         {
             if (text[0] != '/' || text.Length==1) return;
 
             commandHandler.HandleCommand(text);
+        }
+
+        /// just for convenience
+        internal void UpdateOption(string option, bool new_value)
+        {
+            ModOptions.UpdateOption(option, new_value);
         }
 
         // option-change callbacks

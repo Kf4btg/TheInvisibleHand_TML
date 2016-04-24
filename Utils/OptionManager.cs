@@ -5,7 +5,7 @@ namespace InvisibleHand.Utils
 {
     public class OptionManager<T>
     {
-        public IDictionary<string, ModOption<T>> Options = new Dictionary<string, ModOption<T>>();
+        public readonly IDictionary<string, ModOption<T>> Options = new Dictionary<string, ModOption<T>>();
 
 
         // THOUGHTS: perhaps, in the future, this could be a more generically-useful tool by taking a Mod object as a parameter
@@ -21,6 +21,21 @@ namespace InvisibleHand.Utils
             set { Options[key].Value = value; }
         }
 
+        /// for some dictionary-parity
+        public bool HasOption(string option_name) => Options.ContainsKey(option_name);
+
+        /// for some dictionary-parity
+        public bool TryGetValue(string option_name, out T val)
+        {
+            ModOption<T> opt;
+            if (Options.TryGetValue(option_name, out opt))
+            {
+                val = opt.Value;
+                return true;
+            }
+            val = default(T);
+            return false;
+        }
 
         public ModOption<T> RegisterOption(string option_name, T default_value)
         {
