@@ -2,28 +2,28 @@
   ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
   {
     name: Hair Dye
-    parent: null
+    priority: 95
     requires: {
       General: [ "hair_dye" ]
     }
   }
   {
     name: Paint
-    parent: null
+    priority: 90
     requires: {
       General: [ "paint" ]
     }
   }
   {
     name: Coin
-    parent: null
+    priority: 500
     requires: {
       General: [ "coin" ]
     }
   }
   {
     name: Bait
-    parent: null
+    priority: 110
     requires: {
       General: ["bait"]
     }

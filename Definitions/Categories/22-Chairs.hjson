@@ -14,7 +14,7 @@
       Furniture.Chairs: ["bed"]
     }
   }
-  
+
   {
     name: Bench
     parent: Chairs

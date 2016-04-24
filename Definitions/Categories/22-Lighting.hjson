@@ -53,7 +53,7 @@
       Furniture.Lighting: [ "lamp" ]
     }
   }
-  
+
   {
     name: Holiday Light
     parent: Lighting

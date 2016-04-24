@@ -4,8 +4,8 @@
     parent: Melee
     requires:  {
       Weapon.Melee: [
-        "style_swing"
-        "broadsword"
+        style_swing
+        broadsword
       ]
     }
   }
@@ -15,8 +15,8 @@
     parent: Melee
     requires:  {
       Weapon.Melee: [
-        "style_thrown"
-        "boomerang"
+        style_thrown
+        boomerang
       ]
     }
   }
@@ -26,8 +26,8 @@
     parent: Melee
     requires:  {
       Weapon.Melee: [
-        "style_directional"
-        "flail"
+        style_directional
+        flail
       ]
     }
   }
@@ -37,8 +37,8 @@
     parent: Melee
     requires:  {
       Weapon.Melee: [
-        "style_directional"
-        "spear"
+        style_directional
+        spear
       ]
     }
   }

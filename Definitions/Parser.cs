@@ -149,41 +149,42 @@ namespace InvisibleHand.Definitions
                         string category_name = catobj["name"].Qs();
 
                         // get parent, if any
-                        string parent_name = null;
+                        // string parent_name = null;
+
+                        // `parent` is the "real" parent;
+                        // next_parent is used for stepping up the parent stack
+                        // to determine priority
+                        ItemCategory parent, next_parent;
+                        parent = next_parent = null;
+
                         if (catobj.ContainsKey("parent"))
-                            parent_name = catobj["parent"]?.Qs();
+                        {
+                            string parent_name = catobj["parent"]?.Qs();
+                            if (parent_name != null)
+                                // TODO: don't fail on malformed categories/missing parents,
+                                // but log the error somewhere
+                                parent = next_parent = CategoryDefinitions[parent_name];
+
+                        }
 
                         var reqs = new Dictionary<string, int>();
 
-                        ItemCategory parent = null;
                         short? _pprio = null;
 
-                        // get the parent requirements first
-                        if (parent_name != null)
+                        // get the derived priority from the parent-hierarchy
+                        while (next_parent != null)
                         {
-                            // TODO: don't fail on malformed categories, but log the error somewhere
-                            parent = CategoryDefinitions[parent_name];
+                            // parent = CategoryDefinitions[parent_name];
                             // assign the category's priority from the first
                             // explicitly-specified priority encountered in the
                             // parent hierarchy. Default value will be handled later
-                            if (!_pprio.HasValue && parent.explicit_priority)
-                                _pprio = parent.Priority;
+                            if (!_pprio.HasValue && next_parent.explicit_priority)
+                            {
+                                _pprio = next_parent.Priority;
+                                break;
+                            }
 
-                            // w/ the category-tree, this is unnecessary:
-                            // foreach (var kvp in parent.Requirements)
-                            // {
-                            //     reqs[kvp.Key] = kvp.Value;
-                            // }
-
-
-                            // try {
-                            // }
-                            // catch (KeyNotFoundException e)
-                            // {
-                            //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
-                            //     Console.WriteLine("{0}", parent);
-                            //     throw e;
-                            // }
+                            next_parent = next_parent.Parent;
                         }
 
                         // if a priority was inherited from the parent, use that instead of the

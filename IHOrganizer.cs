@@ -47,11 +47,19 @@ namespace InvisibleHand
                 //
                 var catquery =
                     from item in source
-                    // let category = item.GetCategory()
-                    orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
-                    select item;
+                    let category = item.GetCategory()
+                    // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
+                    orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
+                    // select item;
+                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item };
 
-                return catquery.ToList();
+                var catlist = catquery.ToList();
+
+                ConsoleHelper.PrintList(catlist, "Sorted items", true);
+
+                return catlist.Select(c => c.Item).ToList();
+                // return catquery.ToList();
+
                 // orderby category.ordinal
                 // group item by new { prio =  category.Priority, name = category.Name } into catgroup
                 // group item by category.ordinal into catgroup

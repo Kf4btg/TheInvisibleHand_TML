@@ -21,6 +21,13 @@ namespace InvisibleHand.Definitions
         public int Ordinal => (Priority << 16) | (ID);
 
         public string Name { get; private set; }
+        public string QualifiedName {
+            get {
+                if (Parent != null)
+                    return Parent.QualifiedName + "." + Name;
+                return Name;
+            }
+        }
 
         public IDictionary<string, int> Requirements { get; set; }
 
