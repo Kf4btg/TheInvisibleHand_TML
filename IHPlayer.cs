@@ -70,18 +70,14 @@ namespace InvisibleHand
         {
             // try //mod options
             // {
-                Console.WriteLine("readint32");
             int count = reader.ReadInt32();
 
                 for (int i = 0; i < count; i++)
             {
-                Console.WriteLine("for ... {0}<{1}", i, count);
-                    Console.WriteLine("reader.readstring");
                 string optionName = reader.ReadString();
-                    Console.WriteLine("reader.ReadBoolean()");
                 bool state = reader.ReadBoolean();
-                    Console.WriteLine("mod.updateoption({0}, {1})", optionName, state);
-                    IHBase.ModOptions.UpdateOption(optionName, state);
+                    // Console.WriteLine("mod.updateoption({0}, {1})", optionName, state);
+                IHBase.ModOptions.UpdateOption(optionName, state);
                 }
             // }
             // catch (Exception e)

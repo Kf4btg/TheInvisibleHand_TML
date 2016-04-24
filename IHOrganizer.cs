@@ -13,6 +13,8 @@ namespace InvisibleHand
         /// more specific traits. Sorting Rules defined in CategoryDef class.
         public static IList<Item> OrganizeItems(IList<Item> source)
         {
+            // Console.WriteLine($"OrganizeItems: {source}");
+            // ConsoleHelper.PrintList(source, "OrganizeItems: source");
             if (source == null) return null;
 
             // returns an IEnumerable<IGrouping<ItemCat,Item>>
@@ -23,6 +25,10 @@ namespace InvisibleHand
             //     select category;
 
             // IEnumerable<IGrouping<string,Item>>
+
+            try
+            {
+
             var catquery =
                 from item in source
                 let category = item.GetCategory()
@@ -39,11 +45,29 @@ namespace InvisibleHand
                               select im
                 };
 
+
+            // Console.WriteLine($"OrganizeItems: {catquery}");
+            // ConsoleHelper.PrintList(catquery, "query");
+
             var sortedList = new List<Item>();
+
 
             foreach (var category in catquery)
             {
+                Console.WriteLine($"OrganizeItems: category_name = {category.Name}");
+                Console.WriteLine($"OrganizeItems: category_prio = {category.Priority}");
+                // Console.WriteLine($"OrganizeItems: {category.Members}");
+                // ConsoleHelper.PrintList(category.Members, "OrganizeItems: category_members");
+
                 sortedList.AddRange(category.Members);
+                }
+                return sortedList;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
             }
 
             // foreach (var category in catquery)
@@ -80,7 +104,6 @@ namespace InvisibleHand
             //     //     foreach (var s_item in result)
             //     //         sortedList.Add(s_item);
             // }
-            return sortedList;
 
         }
 
@@ -138,6 +161,8 @@ namespace InvisibleHand
                     count++;
                 }
             }
+
+            Console.WriteLine($"GetItemCopies: Copied {count} items.");
             // return null if no items were copied to new list
             return count > 0 ? itemList : null;
         }
@@ -151,14 +176,18 @@ namespace InvisibleHand
         */
         public static void SortPlayerInv(Player player, bool reverse=false)
         {
+            Console.WriteLine("SortPlayerInv({0}, {1})", player, reverse);
             ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
+            Console.WriteLine("return from consolidate stacks");
 
+            Console.WriteLine("Calling Sort -- {0}, {1}, {2}, {3}, {4}", player.inventory, false, reverse, 10, 49);
             Sort(player.inventory, false, reverse, 10, 49);
         }
 
         // as above, but for the Item[] array of a chest
         public static void SortChest(Item[] chestitems, bool reverse=false)
         {
+            Console.WriteLine("SortChest");
             ConsolidateStacks(chestitems);
 
             Sort(chestitems, true, reverse);
@@ -167,6 +196,7 @@ namespace InvisibleHand
         // as above, but given the actual chest object, pull out the array
         public static void SortChest(Chest chest, bool reverse=false)
         {
+            Console.WriteLine("Calling Sortchest -- {0}, {1}", chest.item, reverse);
             SortChest(chest.item, reverse);
         }
 
@@ -184,13 +214,20 @@ namespace InvisibleHand
         */
         public static void Sort(Item[] container, bool chest, bool reverse)
         {
+            Console.WriteLine("Sort called w/o range: {0}, {1}, {2}", container, chest, reverse);
+
             Sort(container, chest, reverse, 0, container.Length - 1);
         }
 
         public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
+            Console.WriteLine("Sort(cont={0}, chest={1}, reverse={2}, rstart={3}, rend={4})",
+             container, chest, reverse, rangeStart, rangeEnd);
+
+
             // get copies of the items and send them off to be sorted
             var sortedItemList = OrganizeItems(GetItemCopies(container, chest, rangeStart, rangeEnd));
+            Console.WriteLine("soretedlist = {0}", sortedItemList);
             if (sortedItemList == null)
                 return;
 
@@ -268,6 +305,7 @@ namespace InvisibleHand
         */
         public static void ConsolidateStacks(Item[] container, int rangeStart, int rangeEnd)
         {
+            Console.WriteLine("ConsolidateStacks({0}, {1}, {2})", container, rangeStart, rangeEnd);
             for (int i = rangeEnd; i>=rangeStart; i--) //iterate in reverse
             {
                 var item = container[i];
@@ -283,6 +321,7 @@ namespace InvisibleHand
 
         public static void ConsolidateStacks(Item[] container)
         {
+            Console.WriteLine("ConsolidateStacks({0})", container);
             ConsolidateStacks(container, 0, container.Length - 1);
         }
 

@@ -118,6 +118,7 @@
     <Compile Include="Definitions\ItemCategory.cs" />
     <Compile Include="Utils\AutoDict.cs" />
     <Compile Include="Utils\CommandHelper.cs" />
+    <Compile Include="Utils\ConsoleHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
     <Compile Include="Utils\OptionManager.cs" />
     <Compile Include="Utils\SoundManager.cs" />
