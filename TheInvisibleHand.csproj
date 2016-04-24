@@ -71,6 +71,10 @@
     <Reference Include="System" />
     <!-- <Reference Include="System.Core" /> -->
     <Reference Include="Microsoft.CSharp" />
+
+    <!-- <Reference Include="Microsoft.CSharp, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <HintPath>\usr\lib\mono\4.5-api\Microsoft.CSharp.dll</HintPath>
+    </Reference> -->
     <!-- <Reference Include="Hjson" >
         <SpecificVersion>False</SpecificVersion>
         <HintPath>lib\Hjson.dll</HintPath>
@@ -115,6 +119,7 @@
     <Compile Include="Utils\AutoDict.cs" />
     <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ModOption.cs" />
+    <Compile Include="Utils\OptionManager.cs" />
     <Compile Include="Utils\SoundManager.cs" />
     <!-- <Compile Include="Utils\IDecision.cs" /> -->
     <!-- <Compile Include="Items\CategoryInfo.cs" /> -->
@@ -185,4 +190,5 @@
      <EmbeddedResource Include="lib\Hjson.dll" />
  </ItemGroup> -->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" /> -->
 </Project>

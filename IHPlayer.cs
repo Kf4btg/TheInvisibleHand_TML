@@ -56,31 +56,38 @@ namespace InvisibleHand
             // that during load to retrieve options
 
             // Save modoptions
-            writer.Write(IHBase.ModOptions.Count);
-            foreach (var kvp in IHBase.ModOptions)
+            var currentOptions = IHBase.ModOptions.Options;
+            writer.Write(currentOptions.Count);
+            foreach (var kvp in currentOptions)
             {
                 writer.Write(kvp.Key); // string optionname
-                writer.Write((bool)kvp.Value);
+                writer.Write(kvp.Value.Value); // bool option.Value
             }
         }
 
         ///load back locked-slot state
         public override void LoadCustomData(BinaryReader reader)
         {
-            try //mod options
-            {
-                int count = reader.ReadInt32();
+            // try //mod options
+            // {
+                Console.WriteLine("readint32");
+            int count = reader.ReadInt32();
+
                 for (int i = 0; i < count; i++)
-                {
-                    string optionName = reader.ReadString();
-                    bool state = reader.ReadBoolean();
-                    mod.UpdateOption(optionName, state);
-                }
-            }
-            catch (Exception e)
             {
-                ErrorLogger.Log("Read Error: " + e.ToString());
-            }
+                Console.WriteLine("for ... {0}<{1}", i, count);
+                    Console.WriteLine("reader.readstring");
+                string optionName = reader.ReadString();
+                    Console.WriteLine("reader.ReadBoolean()");
+                bool state = reader.ReadBoolean();
+                    Console.WriteLine("mod.updateoption({0}, {1})", optionName, state);
+                    IHBase.ModOptions.UpdateOption(optionName, state);
+                }
+            // }
+            // catch (Exception e)
+            // {
+            //     ErrorLogger.Log("Read Error: " + e.ToString());
+            // }
         }
 
         // public static bool KeyboardBusy() => Main.chatMode || Main.editSign || Main.editChest;
@@ -198,6 +205,9 @@ namespace InvisibleHand
             {
                 Console.WriteLine("sort player inv");
                 if (player.noItems) return;
+                Console.WriteLine("Player.noItems=false");
+
+
                 // shift-pressed XOR Reverse-sort-mod-option:
                 //   this will reverse the sort IFF exactly one of these two bools is true
                 IHOrganizer.SortPlayerInv(player,

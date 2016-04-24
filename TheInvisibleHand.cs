@@ -21,21 +21,17 @@ namespace InvisibleHand
 
         private static Dictionary<string, Keys> modhotkeys;
 
-        internal static bool holding_hotkey = false;
+
         // private static string held_hotkey = String.Empty;
-        public static Keys HeldHotKey { get; set; } = Keys.None;
 
 
+        internal static bool holding_hotkey = false;
+        internal static Keys HeldHotKey { get; set; } = Keys.None;
+        /// This is a tModLoader implementation detail and I know it's not safe
+        /// to rely on it...but here we are.
         internal static string ConfiguredHotkey(string action_name) =>
             Main.Configuration.Get<string>("TheInvisibleHand_HotKey_"+action_name.Replace(' ', '_'), Constants.DefaultKeys[action_name]);
 
-        // {
-        //     get { return _held_hotkey; }
-        //     set
-        //     {
-        //
-        //     }
-        // }
 
         /// Mapping of:
         /// 	Item Trait-Group Name (e.g. "Weapon") ->
@@ -60,22 +56,20 @@ namespace InvisibleHand
         public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
 
 
-        /// holds the game's original strings for loot-all, dep-all, quick-stack, etc;
-        /// we're going to be removing these later on, but will use their
-        /// original values to replace them with newer, better buttons.
+        // holds the game's original strings for loot-all, dep-all, quick-stack, etc;
+        // we're going to be removing these later on, but will use their
+        // original values to replace them with newer, better buttons.
         // public static Dictionary<int, string> OriginalButtonLabels { get; private set; }
 
-        public static readonly Dictionary<string, bool> ModOptions = new Dictionary<string, bool>();
+        internal static OptionManager<bool> ModOptions = new OptionManager<bool>();
+        // public static readonly Dictionary<string, bool> ModOptions = new Dictionary<string, bool>();
         // public static readonly Dictionary<string, Keys> ActionKeys = new Dictionary<string, Keys>();
 
         private IHCommandHandler commandHandler;
 
         public IHPlayer localplayer { get; internal set; }
 
-        public override string Name
-        {
-            get { return "TheInvisibleHand"; }
-        }
+        public override string Name => "TheInvisibleHand";
 
         public IHBase()
         {
@@ -108,8 +102,9 @@ namespace InvisibleHand
 
             foreach (var kvp in Constants.DefaultOptionValues)
             {
-                this.RegisterOption(kvp.Key, kvp.Value, onOptionChanged);
-                ModOptions[kvp.Key] = kvp.Value;
+                // ModOptions.RegisterOption(kvp.Key, kvp.Value, onOptionChanged);
+                ModOptions.RegisterOption(kvp.Key, kvp.Value);
+                // ModOptions[kvp.Key] = kvp.Value;
             }
 
             // setup default hotkeys
@@ -184,10 +179,11 @@ namespace InvisibleHand
         }
 
         // option-change callbacks
-        private static void onOptionChanged(string name, bool value)
-        {
-            ModOptions[name] = value;
-        }
+        // EDIT: this is now redundant.
+        // private static void onOptionChanged(string name, bool value)
+        // {
+        //     ModOptions[name] = value;
+        // }
 
         // private static void onKeyBindChanged(string name, Keys value)
         // {
