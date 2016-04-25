@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hjson;
+using Terraria;
 
 // using Terraria.ModLoader;
 
@@ -182,35 +184,9 @@ namespace InvisibleHand.Definitions
                             priority = (short)(catobj["priority"].Qi().Clamp(-325, 325)*100);
                         }
 
-                        // parse requirements
-                        if (catobj.ContainsKey("requires"))
-                        {
-                            var reqs = new Dictionary<string, int>();
 
-                            foreach (var newreqs in catobj["requires"].Qo())
-                            {
-                                var traitCategory = newreqs.Key;
-                                // FlagCollection[TraitCategory][TraitName]
-                                var flagvalues = FlagCollection[traitCategory];
-
-                                if (!reqs.ContainsKey(traitCategory))
-                                    reqs[traitCategory] = 0;
-
-                                // go through the array of traits, add the appropriate flag value
-                                foreach (string trait_name in newreqs.Value.Qa())
-                                    reqs[traitCategory] |= flagvalues[trait_name];
-                            }
-
-                            // if, somehow, there are no requirements, don't bother adding to list
-                            if (reqs.Count > 0)
-                            {
-                                var newcategory = new ItemCategory(category_name, count++, reqs, parent, priority);
-
-                                CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
-                            }
-                        }
                         // parse merged categories
-                        else if (catobj.ContainsKey("merge"))
+                        if (catobj.ContainsKey("merge"))
                         {
                             bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
 
@@ -235,6 +211,95 @@ namespace InvisibleHand.Definitions
                                 }
                             }
                             CategoryDefinitions[category_name] = merge_wrapper;
+                        }
+                        else
+                        {
+                            // parse requirements
+                            if (catobj.ContainsKey("requires"))
+                            {
+                                var reqs = new Dictionary<string, int>();
+
+                                foreach (var newreqs in catobj["requires"].Qo())
+                                {
+                                    var traitCategory = newreqs.Key;
+                                    // FlagCollection[TraitCategory][TraitName]
+                                    var flagvalues = FlagCollection[traitCategory];
+
+                                    if (!reqs.ContainsKey(traitCategory))
+                                        reqs[traitCategory] = 0;
+
+                                    // go through the array of traits, add the appropriate flag value
+                                    foreach (string trait_name in newreqs.Value.Qa())
+                                        reqs[traitCategory] |= flagvalues[trait_name];
+                                }
+
+                                // if, somehow, there are no requirements, don't bother adding to list
+
+                                try {
+                                    if (reqs.Count > 0)
+                                    {
+                                        var newcategory = new CategoryOf<Item>(category_name, count++, reqs, parent, priority);
+
+                                        // get sorting rules
+                                        if (catobj.ContainsKey("sort"))
+                                        {
+                                            newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv=>jv.Qs()));
+                                        }
+                                        else if (parent != null)
+                                        {
+                                            // inherit from parent
+                                            try
+                                            {
+                                                var p = parent as CategoryOf<Item>;
+                                                newcategory.SortRules = p?.SortRules;
+                                                newcategory.ruleExpressions = p?.ruleExpressions;
+
+
+                                            }
+                                            catch (NullReferenceException e)
+                                            {
+                                                Console.WriteLine($"{parent.Name} > {category_name}: {e}");
+
+                                            }
+                                        }
+
+                                        if (newcategory.SortRules == null)
+                                            newcategory.BuildSortRules(new[] {"type"}); // default
+
+                                        if (newcategory.ruleExpressions == null)
+                                        {
+                                            Console.WriteLine($"{category_name}: ruleExpressions is null");
+                                            if (newcategory.SortRules == null)
+                                                Console.WriteLine($"{category_name}: SortRules is null");
+
+                                        }
+                                        else
+                                            ConsoleHelper.PrintList(newcategory.ruleExpressions.Select(ex=>ex.ToString()), category_name, true);
+
+                                        // foreach (var ex in newcategory.ruleExpressions)
+                                        // {
+                                        //         Console.WriteLine(ex.ToString());
+                                        //     // ex.Body.ToString();
+                                        //     // Console.WriteLine(string.Join(", ", ex.Parameters.Select(p=> p.Name)));
+                                        //
+                                        // }
+
+                                        // ConsoleHelper.PrintList(newcategory.SortRules, "Rules", true);
+
+
+                                        CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
+                                    }
+                                }
+                                catch (NullReferenceException e)
+                                {
+                                    Console.WriteLine($"{category_name}: {e}");
+
+                                }
+                            }
+
+
+
+
                         }
                     } // end of category-object list
                 }

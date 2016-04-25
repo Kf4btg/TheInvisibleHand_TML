@@ -44,9 +44,10 @@ namespace InvisibleHand.Rules
             ComparisonValue = comparisonValue;
         }
 
+
         /// converts string representations of ExpressionType to their corresponding Enum value
-        private static IDictionary<string, ExpressionType> SymbolToOperator;
-        
+        public static readonly IDictionary<string, ExpressionType> SymbolToOperator;
+
         static Rule()
         {
             SymbolToOperator = new Dictionary<string, ExpressionType>()
@@ -136,5 +137,26 @@ namespace InvisibleHand.Rules
                 {"debug", ExpressionType.DebugInfo},
             };
         }
+    }
+
+    public class VsRule
+    {
+        public string ComparisonPredicate { get; set; }
+        public ExpressionType ComparisonOperator { get; set; }
+
+        public VsRule(string comparisonPredicate, string comparisonOperator)
+        {
+            ComparisonPredicate = comparisonPredicate;
+
+            ExpressionType compop;
+            // from the string repr, get the real ExpressionType
+            if (Rule.SymbolToOperator.TryGetValue(comparisonOperator, out compop))
+                ComparisonOperator = compop;
+            else
+                ComparisonOperator = ExpressionType.TypeEqual;
+                // TODO: throw a better exception, log an error, and/or find a better default
+
+        }
+
     }
 }

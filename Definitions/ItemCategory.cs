@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Collections.Generic;
+using InvisibleHand.Rules;
 
 namespace InvisibleHand.Definitions
 {
@@ -233,5 +236,33 @@ namespace InvisibleHand.Definitions
         #endregion
         /// this is what will be returned when an item somehow doesn't match any defined category
         public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
+    }
+
+    /// contains a list of compiled sorting rules
+    public class CategoryOf<T> : ItemCategory
+    {
+
+        // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
+        public IList<Func<T, T, int>> SortRules;
+
+        public List<Expression<Func<T, T, int>>> ruleExpressions;
+
+
+
+
+        public CategoryOf(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0) : base (name, cat_id, requirements, parent, priority) {}
+
+        public void BuildSortRules(IEnumerable<string> properties)
+        {
+            // List<Expression<Func<T, T, int>>> exprs;
+            if (properties.Count() > 0)
+            {
+                this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
+                // ruleExpressions = exprs;
+
+            }
+
+
+        }
     }
 }
