@@ -32,17 +32,28 @@ namespace InvisibleHand.Items
         // private void CheckTree(SortedAutoTree<string, ItemCategory> tree, ref ItemCategory match)
         private void CheckTree(SortedAutoTree<int, ItemCategory> tree, ref ItemCategory match)
         {
+            // sorted by category.ordinal
             foreach (var branch in tree)
             {
-                var childtree = branch.Value;
-                var category = childtree.Data;
+                var childtree = branch.Value; // The AutoDict container
+                var category = childtree.Data; // The Category object this AutoDict represents
                 if (category.Matches(Flags))
                 {
                     // if we found a match, update the reference
-                    match = category;
+                    // (use .Category to make sure we get the wrapper-category
+                    // if the matching one has been merged)
+                    // TODO: or should "Merge" categories only matter for smart-deposit?
+                    // match = category.Category;
+
+                    match = category.Category;
+
                     // then check all the children of the matching category (if any)
                     // for a more specific match
-                    CheckTree(childtree, ref match);
+                    // if (childtree.HasChildren)
+                    // {
+                        CheckTree(childtree, ref match);
+
+                    // }
 
                     // whether or not we found a more specific match, break out of here
                     // because we've done our job.

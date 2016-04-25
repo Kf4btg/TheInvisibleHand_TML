@@ -277,9 +277,14 @@ namespace InvisibleHand
         ///<param name="max">Maximum value boundary; default is 1</param>
         ///<returns>value bound by specified minumum and maximum
         /// values (inclusive)</returns>
-        public static float Clamp(this float value, float min = 0, float max = 1)
+        public static float Clamp(this float value, float min = 0f, float max = 1.0f)
         {
             return MathHelper.Clamp(value, min, max);
+        }
+
+        public static int Clamp(this int value, int min = 0, int max = 1)
+        {
+            return (int)MathHelper.Clamp(value, min, max);
         }
 
     #endregion

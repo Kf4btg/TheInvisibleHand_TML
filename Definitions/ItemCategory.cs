@@ -5,11 +5,24 @@ namespace InvisibleHand.Definitions
 {
     public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>
     {
-        /// the explicitly set sort-priority for this category
-        public short Priority;
+        // private short _priority;
+
+        /// the Child-depth of this category; 0 for top-level categories (no parents),
+        /// +1 for each parent above this.
+        // private short depth;
+
+        /// we SUBTRACT the depth from the priority to make sure that more specific categories are
+        /// sorted first; for example, if "Weapon" has a priority of 500:
+        //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
+        // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
+        // because the weapon.melee category was created before weapon.throwing.
+        // public short Priority { get { return (short)(_priority - depth); } set { _priority = value; } }
         /// this indicates whether the priority was explicitly specified
         /// in a configuration file or was assigned a default value.
-        internal bool explicit_priority = false;
+        // internal bool explicit_priority = false;
+
+        /// the explicitly set sort-priority for this category
+        public short Priority;
 
         /// A unique identifying number for this category; usually
         /// the order in which this item was loaded from the definition file;
@@ -69,6 +82,15 @@ namespace InvisibleHand.Definitions
             Priority = priority;
             ID = cat_id;
 
+            // short _depth = 0;
+            // while (parent != null)
+            // {
+            //     depth++;
+            //     parent = parent.Parent;
+            // }
+            //
+            // this.depth = _depth;
+
             IsMergeWrapper = is_merge_wrapper;
 
             if (IsMergeWrapper)
@@ -84,6 +106,15 @@ namespace InvisibleHand.Definitions
             Parent = parent;
             Priority = priority;
             ID = cat_id;
+
+            // short _depth = 0;
+            // while (parent != null)
+            // {
+            //     depth++;
+            //     parent = parent.Parent;
+            // }
+            //
+            // this.depth = _depth;
 
             IsMergeWrapper = false;
 

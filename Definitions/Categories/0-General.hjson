@@ -15,7 +15,8 @@
         # the priority that was loaded first will take precedence.
         # Excluding this field means use the default of 0 for top-level categories,
         # or the priority of the parent for child categories.
-        # Range is [-32768, 32767].
+        #### Range is [-32768, 32767].
+        # Range is [-325, 325].
         priority: 1
 
         # The list (of lists) of traits required for an item

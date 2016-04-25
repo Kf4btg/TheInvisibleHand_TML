@@ -128,14 +128,13 @@ namespace InvisibleHand.Definitions
         /// using the bit-flag-values assigned in AssignFlagValues(). These family::flags maps
         /// define the full set of flags required for an individual item to match the given
         /// category. Note that it is possible for an item to match multiple categories. Conflict
-        /// resolution will be weighted by [currently by order of appearance in the cat-def files;
-        /// later on a "priority" field may be implemented to further define which categories
-        /// override others].
+        /// resolution will be weighted by the category's 'Priority' value (or the value inherited from
+        /// its parent), and secondarily by the order in which it was loaded from the definition file.
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
             CategoryIDs = new Dictionary<ushort, ItemCategory>();
-            ushort count=0; // track order of added categories
+            ushort count=0; // track absolute order of added categories (this will be the unique ID for each category)
 
             foreach(var res in assembly.GetManifestResourceNames().Where(n=>n.StartsWith(category_resources_path)).OrderBy(n=>n))
             {
@@ -148,54 +147,40 @@ namespace InvisibleHand.Definitions
                         // name field is always required
                         string category_name = catobj["name"].Qs();
 
+                        ItemCategory parent = null;
+                        short priority = 0;
+
                         // get parent, if any
-                        // string parent_name = null;
-
-                        // `parent` is the "real" parent;
-                        // next_parent is used for stepping up the parent stack
-                        // to determine priority
-                        ItemCategory parent, next_parent;
-                        parent = next_parent = null;
-
                         if (catobj.ContainsKey("parent"))
                         {
                             string parent_name = catobj["parent"]?.Qs();
                             if (parent_name != null)
+                            {
                                 // TODO: don't fail on malformed categories/missing parents,
                                 // but log the error somewhere
-                                parent = next_parent = CategoryDefinitions[parent_name];
+                                parent = CategoryDefinitions[parent_name];
 
+                                // child categories inherit the priority of their parent.
+                                // each child level decreases the initial priority by 1;
+                                // we SUBTRACT the depth from the priority to make sure that more specific categories are
+                                // sorted first; for example, if "Weapon" has a priority of 500:
+                                //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
+                                // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
+                                // because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
+
+                                priority = (short)(parent.Priority - 1);
+                            }
                         }
 
                         var reqs = new Dictionary<string, int>();
 
-                        short? _pprio = null;
 
-                        // get the derived priority from the parent-hierarchy
-                        while (next_parent != null)
-                        {
-                            // parent = CategoryDefinitions[parent_name];
-                            // assign the category's priority from the first
-                            // explicitly-specified priority encountered in the
-                            // parent hierarchy. Default value will be handled later
-                            if (!_pprio.HasValue && next_parent.explicit_priority)
-                            {
-                                _pprio = next_parent.Priority;
-                                break;
-                            }
-
-                            next_parent = next_parent.Parent;
-                        }
-
-                        // if a priority was inherited from the parent, use that instead of the
-                        // default value of 0
-                        short priority = _pprio ?? 0;
-                        bool explicit_prio = false;
-                        // but override with an explicitly-set priority
+                        // an explicitly-set priority overrides default or inherited value
                         if (catobj.ContainsKey("priority"))
                         {
-                            explicit_prio = true;
-                            priority = (short)(catobj["priority"].Qi());
+                            // restrict assignable value to [-325..325] and multiply by 100
+                            // to give us some guaranteed tweaking room between the priorities
+                            priority = (short)(catobj["priority"].Qi().Clamp(-325, 325)*100);
                         }
 
                         if (catobj.ContainsKey("requires"))
@@ -218,7 +203,6 @@ namespace InvisibleHand.Definitions
                             if (reqs.Count > 0)
                             {
                                 var newcategory = new ItemCategory(category_name, count++, reqs, parent, priority);
-                                newcategory.explicit_priority = explicit_prio;
 
                                 CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                             }
@@ -226,7 +210,6 @@ namespace InvisibleHand.Definitions
                         else if (catobj.ContainsKey("merge"))
                         {
                             var merge_wrapper = new ItemCategory(category_name, count++, parent, is_merge_wrapper: true, priority: priority);
-                            merge_wrapper.explicit_priority = explicit_prio;
 
                             foreach (var wrapped in catobj["merge"].Qa())
                             {
@@ -247,109 +230,6 @@ namespace InvisibleHand.Definitions
                     } // end of category-object list
                 }
             }
-            // CategoryDefinitions = category_defs;
-
-            // this returns an enumerable of <Filename: List-of-category-objects> pairs
-            // var category_list =
-            //     from file in Directory.GetFiles(CategoryDefsPath, "*.hjson", SearchOption.TopDirectoryOnly)
-            //     orderby file
-            //     select new
-            //     {
-            //         File = file,
-            //         CatObjList = HjsonValue.Load(file).Qa()
-            //     };
-            //
-            //
-            // // Structure of a category object:
-            // // 'name': string
-            // // 'parent': string (must be a name of a previously-encountered category) || null (for top level categories)
-            // // 'requires': a mapping (dict) of Trait-families to a list of required traits of that type;
-            // // this list will be combined with the 'required' list from the parent (if any) to define
-            // // the full requirements for items matching this category.
-            //
-            // foreach (var pair in category_list)
-            // {
-            //     var fname = pair.File;
-            //     foreach (var catobj in pair.CatObjList)
-            //     {
-            //         string category_name = catobj["name"].Qs();
-            //         string parent_name = catobj["parent"]?.Qs();
-            //
-            //         var reqs = new Dictionary<string, int>();
-            //
-            //         ItemCategory parent = null;
-            //         // get the parent requirements first
-            //         if (parent_name != null)
-            //         {
-            //             // TODO: don't fail on malformed categories, but log the error somewhere
-            //             parent = category_defs[parent_name];
-            //             foreach (var kvp in parent.Requirements)
-            //                 reqs[kvp.Key] = kvp.Value;
-            //
-            //
-            //             // try {
-            //             // }
-            //             // catch (KeyNotFoundException e)
-            //             // {
-            //             //     Console.WriteLine("{0}, {1}", catmatcher.Count, string.Join(",\n", catmatcher.Select(kv=>kv.Key).ToArray()));
-            //             //     Console.WriteLine("{0}", parent);
-            //             //     throw e;
-            //             // }
-            //         }
-            //
-            //         if (catobj.ContainsKey("requires"))
-            //         {
-            //             foreach (var newreqs in catobj["requires"].Qo())
-            //             {
-            //                 var traitCategory = newreqs.Key;
-            //                 // FlagCollection[TraitCategory][TraitName]
-            //                 var flagvalues = FlagCollection[traitCategory];
-            //
-            //                 if (!reqs.ContainsKey(traitCategory))
-            //                 reqs[traitCategory] = 0;
-            //
-            //                 foreach (string trait_name in newreqs.Value.Qa())
-            //                 reqs[traitCategory] |= flagvalues[trait_name];
-            //             }
-            //
-            //             /// if, somehow, there are no requirements, don't bother adding to list
-            //             if (reqs.Count > 0)
-            //                 category_defs[category_name] = new ItemCategory(category_name, reqs, parent, count++);
-            //         }
-            //         else if (catobj.ContainsKey("merge"))
-            //         {
-            //             var merge_wrapper = new ItemCategory(category_name, parent, true, count++);
-            //             foreach (var mergedcat in catobj["merge"].Qa())
-            //             {
-            //                 try
-            //                 {
-            //                     category_defs[mergedcat].Merge(merge_wrapper);
-            //                 }
-            //                 catch (KeyNotFoundException)// e)
-            //                 {
-            //                     //FIXME: use ErrorLogger
-            //                     // Console.WriteLine(e.Message);
-            //                 }
-            //             }
-            //             category_defs[category_name] = merge_wrapper;
-            //         }
-            //     } // end of category-object list
-            // }
-            // CategoryDefinitions = category_defs;
-
-            // foreach (var kvp in CategoryDefinitions)
-            // {
-            //     Console.WriteLine("{0}:", kvp.Key);
-            //     if (kvp.Value.MergeContainer)
-            //         Console.WriteLine("    {0}", string.Join(",\n    ", kvp.Value.Merged.ToArray()));
-            //     else
-            //     {
-            //         foreach (var flv in kvp.Value.Requirements)
-            //         {
-            //             Console.WriteLine("    {0}: {1}", flv.Key, flv.Value);
-            //         }
-            //     }
-            // }
 
             // Console.WriteLine("{0}, {1}", CategoryDefinitions.Count, string.Join(",\n", CategoryDefinitions.Select(kv=>kv.Key).ToArray()));
         }
@@ -381,6 +261,7 @@ namespace InvisibleHand.Definitions
                     parent = parent.Parent;
                 }
                 var subtree = cattree;
+
                 // descend from the root down the parent-stack to the
                 // proper depth of the child, auto-creating(vivifying!)
                 // any non-existent nodes.
