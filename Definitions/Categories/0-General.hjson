@@ -35,65 +35,165 @@
     */
 
     {
-        name: Tool
-        parent: null
-        priority: 10
-        requires: {
-          General: [ "tool" ]
-        }
+      name: Tool
+      parent: null
+      priority: 10
+      requires: {
+        General: [ "tool" ]
+      }
+      sort: [
+        rare
+        type
+        value
+      ]
     } {
-        name: Weapon
-        parent: null
-        priority: 20
-        requires: {
-          General: [ "weapon" ]
-        }
+      name: Weapon
+      parent: null
+      priority: 20
+      requires: {
+        General: [ "weapon" ]
+      }
+      sort: [
+        damage
+        type
+        rare
+        value
+        stack
+      ]
     } {
-        name: Equipable
-        parent: null
-        priority: 30
-        requires: {
-          General: [ "equipable" ]
-        }
+      name: Equipable
+      parent: null
+      priority: 30
+      requires: {
+        General: [ "equipable" ]
+      }
+      sort: [
+        rare
+        type
+        value
+      ]
     } {
-        name: Placeable
-        parent: null
-        priority: 85
-        requires: {
-          General: [ "placeable" ]
-        }
+      name: Placeable
+      parent: null
+      priority: 85
+      requires: {
+        General: [ "placeable" ]
+      }
+      sort: [
+        type
+        stack
+      ]
+    }  {
+      name: Mech
+      priority: 75
+      requires: {
+        General: [ "mech" ]
+      }
+      sort: [
+        type
+        stack
+      ]
     } {
-        name: Consumable
-        priority: 60
-        requires: {
-          General: [ "consumable" ]
-        }
+      name: Ammo
+      priority: 25
+      requires: {
+        General: [ "ammo" ]
+      }
+      sort: [
+        ammo
+        damage
+        type
+        stack
+      ]
     } {
-        name: Mech
-        priority: 75
-        requires: {
-          General: [ "mech" ]
-        }
-    } {
-        name: Ammo
-        priority: 25
-        requires: {
-          General: [ "ammo" ]
-        }
-    } {
-        name: Dye
-        priority: 40
-        requires: {
-          General: [ "dye" ]
-        }
-    } {
-        # for items whose _primary_ use is as a material, though they may meet
-        # requirements for other categories (e.g. ore is placeable, but is mainly
-        # used to create bars or potions.)
-        name: Material
-        priority: 90
-        requires: {
-          General: [ "material" ]
-        }
+      name: Dye
+      priority: 40
+      requires: {
+        General: [ "dye" ]
+      }
+      sort: [
+        type
+        stack
+      ]
+    }
+    {
+      # for items whose _primary_ use is as a material, though they may meet
+      # requirements for other categories (e.g. ore is placeable, but is mainly
+      # used to create bars or potions.)
+      name: Material
+      priority: 90
+      requires: {
+        General: [ "material" ]
+      }
+      sort: [
+        rare
+        value
+        type
+        stack
+      ]
+    }
+
+    ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
+    {
+      name: Hair Dye
+      priority: 95
+      requires: {
+        General: [ "hair_dye" ]
+      }
+      sort: [
+        value
+        type
+        stack
+      ]
+    }
+    {
+      name: Paint
+      priority: 86
+      requires: {
+        General: [ "paint" ]
+      }
+      sort: [
+        value
+        type
+        stack
+      ]
+    }
+    {
+      name: Coin
+      priority: 200
+      requires: {
+        General: [ "coin" ]
+      }
+      sort: [
+        type
+        stack
+      ]
+    }
+    {
+      name: Bait
+      priority: 110
+      requires: {
+        General: ["bait"]
+      }
+      sort: [
+        rare
+        bait
+        value
+        type
+        stack
+      ]
+    }
+    {
+      name: Consumable
+      priority: 250
+      requires: {
+        General: [ "consumable" ]
+      }
+      sort: [
+        buffType
+        maxStack
+        type
+        stack
+      ]
     }
 ]

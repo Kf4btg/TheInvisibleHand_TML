@@ -222,7 +222,7 @@ namespace InvisibleHand.Definitions
                                 catch (KeyNotFoundException e)// e)
                                 {
                                     //FIXME: use ErrorLogger
-                                    Console.WriteLine(e.Message);
+                                    Console.WriteLine("{0}: {1}", wrapped, e.Message);
                                 }
                             }
                             CategoryDefinitions[category_name] = merge_wrapper;

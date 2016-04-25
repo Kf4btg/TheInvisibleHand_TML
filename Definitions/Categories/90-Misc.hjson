@@ -1,40 +1,30 @@
 [
-  ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
+
+
+
   {
-    name: Hair Dye
-    priority: 95
+    name: Quest Item
+    parent: null
+    priority: 300
     requires: {
-      General: [ "hair_dye" ]
+      General: ["quest_item"]
     }
-  }
-  {
-    name: Paint
-    priority: 90
-    requires: {
-      General: [ "paint" ]
-    }
-  }
-  {
-    name: Coin
-    priority: 500
-    requires: {
-      General: [ "coin" ]
-    }
-  }
-  {
-    name: Bait
-    priority: 110
-    requires: {
-      General: ["bait"]
-    }
+    sort: [
+      type
+    ]
   }
 
   {
     name: Strange Plant
     parent: Placeable
+    priority: 91
     requires:  {
       Placeable: ["strange_plant"]
     }
+    sort: [
+      type
+      stack
+    ]
   }
 
   /*{

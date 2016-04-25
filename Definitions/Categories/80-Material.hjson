@@ -21,6 +21,13 @@
     }
   }
   {
+    name: Soul
+    parent: Material
+    requires: {
+      Material: ["soul"]
+    }
+  }
+  {
     name: Alchemy Ingredient
     parent: Material
     requires: {
@@ -34,11 +41,5 @@
       Material: ["dye_plant"]
     }
   }
-  {
-    name: Soul
-    parent: Material
-    requires: {
-      Material: ["soul"]
-    }
-  }
+
 ]

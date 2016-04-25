@@ -21,6 +21,35 @@
     ]
   }
   {
+    name: Manual Tools
+    parent: Tool
+    enabled: false
+    merge: [
+      Pick
+      Axe
+      Hammer
+    ]
+  }
+  {
+    name: Power Tools
+    parent: Tool
+    enabled: false
+    merge: [
+      Drill
+      Chainsaw
+      Jackhammer
+    ]
+  }
+  {
+    name: Multi Tools
+    parent: Tool
+    enabled: false
+    merge: [
+      Picksaw
+      Hamaxe
+    ]
+  }
+  {
     name: Firearms
     parent: Ranged
     enabled: true
@@ -54,6 +83,15 @@
     merge: [
       Rope
       Rope Coil
+    ]
+  }
+  {
+    name: Dye Stuff
+    parent: Material
+    enabled: true
+    merge: [
+      Dye Plant
+      Strange Plant
     ]
   }
 ]

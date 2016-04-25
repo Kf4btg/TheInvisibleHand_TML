@@ -1,0 +1,130 @@
+[
+  {
+    name: Picksaw
+    parent: Tool
+    requires:  {
+      Tool: [ "pick", "axe" ]
+    }
+    sort: [
+      rare
+      pick
+      axe
+      type
+      value
+    ]
+  }
+  {
+    name: Pick
+    parent: Tool
+    requires:  {
+      Tool: [ "pick" ]
+    }
+    sort: [
+      rare
+      pick
+      type
+      value
+    ]
+  }
+  {
+    name: Hamaxe
+    parent: Tool
+    requires:  {
+      Tool: [ "hammer", "axe" ]
+    }
+    sort: [
+      rare
+      hammer
+      axe
+      type
+      value
+    ]
+  }
+  {
+    name: Axe
+    parent: Tool
+    requires:  {
+      Tool: [ "axe" ]
+    }
+    sort: [
+      rare
+      axe
+      type
+      value
+    ]
+  }
+  {
+    name: Hammer
+    parent: Tool
+    requires:  {
+      Tool: [ "hammer" ]
+    }
+    sort: [
+      rare
+      hammer
+      type
+      value
+    ]
+  }
+
+  # power tools
+  {
+    name: Drill
+    parent: Pick
+    requires:  {
+      General: [ "channeled" ]
+    }
+  }
+  {
+    name: Chainsaw
+    parent: Axe
+    requires:  {
+      General: [ "channeled" ]
+    }
+  }
+  {
+    name: Jackhammer
+    parent: Hammer
+    requires:  {
+      General: [ "channeled" ]
+    }
+  }
+
+  # other tools
+  {
+    name: Wand
+    parent: Tool
+    requires:  {
+      Tool: [ "wand" ]
+    }
+    sort: [
+      tileWand
+      type
+    ]
+  }
+  {
+    name: Fishing Pole
+    parent: Tool
+    requires:  {
+      Tool: [ "fishing_pole" ]
+    }
+    sort: [
+      rare
+      fishingPole
+      type
+    ]
+  }
+
+  # TODO: maybe this should be under mech?
+  {
+    name: Wrench
+    parent: Tool
+    requires:  {
+      Tool: [ "wrench" ]
+    }
+    sort: [
+      tooltip
+      type
+    ]
+  }
+]

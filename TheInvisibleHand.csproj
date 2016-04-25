@@ -159,6 +159,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Definitions\Traits\0-All.hjson" />
     <EmbeddedResource Include="Definitions\Categories\0-General.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\5-Tool.hjson" />
     <EmbeddedResource Include="Definitions\Categories\10-Weapons.hjson" />
     <EmbeddedResource Include="Definitions\Categories\11-Magic.hjson" />
     <EmbeddedResource Include="Definitions\Categories\11-Melee.hjson" />
