@@ -114,6 +114,7 @@
     <Compile Include="IHEvent.cs" />
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
+    <Compile Include="IHWorld.cs" />
     <Compile Include="Definitions\Parser.cs" />
     <Compile Include="Definitions\ItemCategory.cs" />
     <Compile Include="Utils\AutoDict.cs" />
@@ -126,7 +127,7 @@
     <!-- <Compile Include="Items\CategoryInfo.cs" /> -->
     <!--<Compile Include="Items\CategoryMatcher.cs" />-->
     <Compile Include="Items\ClassificationRules.cs" />
-    <Compile Include="Items\ClassifiedItem.cs" />
+    <!-- <Compile Include="Items\ClassifiedItem.cs" /> -->
     <Compile Include="Items\ConditionTable.cs" />
     <!-- <Compile Include="Items\ItemCategorizer.cs" /> -->
     <Compile Include="Items\ItemClassHandler.cs" />

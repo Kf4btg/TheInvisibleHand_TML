@@ -170,9 +170,9 @@ namespace InvisibleHand.Items
 
             #region from Sets
 
-            public static bool Furniture(Item item) => TileSets.Furniture.Contains(item.createTile);
-            public static bool CraftingStation(Item item) => TileSets.CraftingStations.Contains(item.createTile);
-            public static bool AlchemyIngredient(Item item) => TileSets.AlchemyIngredients.Contains(item.type);
+            public static bool Furniture(Item item) => ItemSets.Furniture.Contains(item.createTile);
+            public static bool CraftingStation(Item item) => ItemSets.CraftingStations.Contains(item.createTile);
+            public static bool AlchemyIngredient(Item item) => ItemSets.AlchemyIngredients.Contains(item.type);
 
             #endregion
 
@@ -217,7 +217,7 @@ namespace InvisibleHand.Items
             /// glass, etc. It also includes sands, but notably seems to missing DIRT...
             // public static bool Block(Item item) => Main.tileBrick[item.createTile];
             public static bool Block(Item item) => contains(Main.tileBrick, item.createTile);
-    
+
             public static bool Rope(Item item) => contains(Main.tileRope, item.createTile);
             public static bool RopeCoil(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
 
