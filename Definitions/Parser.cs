@@ -25,7 +25,6 @@ namespace InvisibleHand.Definitions
         public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
         public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
 
-        // public static IDictionary<string, IDictionary<string, int>> CategoryDefinitions { get; private set; }
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
         /// I hope 65,000 categories will be enough...
@@ -175,16 +174,11 @@ namespace InvisibleHand.Definitions
                             }
                         }
 
-
-
                         // an explicitly-set priority overrides default or inherited value
                         if (catobj.ContainsKey("priority"))
-                        {
                             // restrict assignable value to [-325..325] and multiply by 100
                             // to give us some guaranteed tweaking room between the priorities
                             priority = (short)(catobj["priority"].Qi().Clamp(-325, 325)*100);
-                        }
-
 
                         // parse merged categories
                         if (catobj.ContainsKey("merge"))
@@ -242,15 +236,11 @@ namespace InvisibleHand.Definitions
 
                                     // get sorting rules
                                     if (catobj.ContainsKey("sort"))
-                                    {
-                                        newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv=>jv.Qs()));
-                                    }
-                                    else if (parent != null)
-                                    {
-                                        // inherit from parent
+                                        newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv => jv.Qs()));
+
+                                    else if (parent != null) // inherit from parent
                                         newcategory.CopySortRules(parent);
                                         // newcategory.ruleExpressions = p?.ruleExpressions;
-                                    }
 
                                     // if the rules are still null, add a default rule of just sorting by type
                                     if (newcategory.SortRules == null)
@@ -269,16 +259,10 @@ namespace InvisibleHand.Definitions
                                     CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                                 }
                             }
-
-
-
-
                         }
                     } // end of category-object list
                 }
             }
-
-            // Console.WriteLine("{0}, {1}", CategoryDefinitions.Count, string.Join(",\n", CategoryDefinitions.Select(kv=>kv.Key).ToArray()));
         }
 
         /// After reading in all of the category definitions, build a tree structure based on the parent-child relationships

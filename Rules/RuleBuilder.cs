@@ -49,8 +49,6 @@ namespace InvisibleHand.Rules
 
             // var _expressions = new List<Expression<Func<T, T, int>>>();
             // get the type of the entity these rules are meant to govern (constant for each rule)
-            // var genericType = Expression.Parameter(typeof(T));
-
             var item1 = Expression.Parameter(typeof(T), "item1");
             var item2 = Expression.Parameter(typeof(T), "item2");
 
@@ -60,22 +58,12 @@ namespace InvisibleHand.Rules
                 // find the object Property specified by the predicate (i.e. the property name)
                 var prop = MemberExpression.PropertyOrField(item1, rule);
                 var prop2 = MemberExpression.PropertyOrField(item2, rule);
-                // get the Type of that property
-                // var propertyType = typeof(T).GetProperty(rule.ComparisonPredicate).PropertyType;
-
 
                 var compareExpression = Expression.Call(
                     prop,
                     prop.Type.GetMethod("CompareTo", new[] { prop2.Type }),
                     prop2);
 
-                // get the value to be checked as a member of the property's type
-                // var value = Expression.Constant(Convert.ChangeType(rule.ComparisonValue, propertyType));
-                // create the 2-sided comparison expression btw. the prop value and the supplied constant
-                // var binaryExpression = Expression.MakeBinary(rule.ComparisonOperator, prop, value);
-
-                // compile the expression and add it to the list of compiled rules
-                // compiledRules.Add(Expression.Lambda<Func<T, bool>>(binaryExpression, genericType).Compile());
                 // _expressions.Add(Expression.Lambda<Func<T, T, int>>(compareExpression, new[] {item1, item2}));
                 compiledRules.Add(Expression.Lambda<Func<T, T, int>>(compareExpression, new[] {item1, item2}).Compile());
             });

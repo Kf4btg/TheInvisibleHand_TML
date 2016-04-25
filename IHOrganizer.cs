@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-// using System.Linq.Dynamic;
 using Terraria;
 using InvisibleHand.Utils;
 
@@ -13,8 +12,6 @@ namespace InvisibleHand
         /// more specific traits. Sorting Rules defined in CategoryDef class.
         public static IEnumerable<Item> OrganizeItems(IEnumerable<Item> source, bool reverse)
         {
-            // Console.WriteLine($"OrganizeItems: {source}");
-            // ConsoleHelper.PrintList(source, "OrganizeItems: source");
             if (source == null) return null;
 
             // returns an IEnumerable<IGrouping<ItemCat,Item>>
@@ -24,34 +21,8 @@ namespace InvisibleHand
             //     orderby category.Key
             //     select category;
 
-            // IEnumerable<IGrouping<string,Item>>
-
             try
             {
-
-                // var catquery =
-                //     from item in source
-                //     let category = item.GetCategory()
-                //     orderby category.Priority, category.Name
-                //     group item by new { prio =  category.Priority, name = category.Name } into catgroup
-                //     // orderby catgroup.Key, category.Name
-                //     select new
-                //     {
-                //         Priority = catgroup.Key.prio,
-                //         Name = catgroup.Key.name,
-                //         // until we replace Dynamic Linq, just sort the categorized items by name
-                //         Members = from im in catgroup
-                //                   orderby im.name
-                //                   select im
-                //     };
-                //
-
-                // var catquery = //reverse ?
-                // var catgroup = //reverse ?
-                //     (from item in source
-                //          //  let category = item.GetCategory()
-                //      group item by item.GetCategory());
-
                 var catquery =
 
                     reverse ?
@@ -63,74 +34,12 @@ namespace InvisibleHand
                             .OrderBy(g => g.Key)
                             .SelectMany(g => g.OrderBy(i => i, g.Key))) ;
 
+                // var catlist = catquery.ToList();
+                //
+                // ConsoleHelper.PrintList(catlist, "Sorted items", true);
 
-                // var sortedcatgroup = catgroup.OrderByDescending(g => g.Key);
-
-                //  orderby catgroup.Key descending
-                //  select catgroup
-                // .OrderBy(g => g.)
-                // )
-                // ;
-                // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
-                // orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
-                // orderby category descending, category
-                // select item)
-                // select new { Category = category.QualifiedName, Priority = category.Priority, Item = item })
-                // :
-                //     (from item in source
-                //     let category = item.GetCategory()
-                //     // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
-                //     orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
-                //     select item);
-                // select new { Category = category.QualifiedName, Priority = category.Priority, Item = item });
-
-
-                var catlist = catquery.ToList();
-
-                ConsoleHelper.PrintList(catlist, "Sorted items", true);
-
-                // return catlist.Select(c => c.Item);
                 return catquery; //.Select(c => c.Item);
-                // return catquery.ToList();
 
-                // orderby category.ordinal
-                // group item by new { prio =  category.Priority, name = category.Name } into catgroup
-                // group item by category.ordinal into catgroup
-                // orderby catgroup.Key
-                // from im in catgroup
-                //     orderby im.name
-                //     select im;
-
-                // orderby catgroup.Key, category.Name
-                // select new
-                // {
-                //     // Priority = catgroup.Key.prio,
-                //     // Name = catgroup.Key.name,
-                //     // until we replace Dynamic Linq, just sort the categorized items by name
-                //     // Members =
-                //     from im in catgroup
-                //               orderby im.name
-                //               select im
-                // };
-
-
-
-                // Console.WriteLine($"OrganizeItems: {catquery}");
-                // ConsoleHelper.PrintList(catquery, "query");
-
-                // var sortedList = new List<Item>();
-
-                //
-                // foreach (var category in catquery)
-                // {
-                //     Console.WriteLine($"OrganizeItems: category_name = {category.Name}");
-                //     Console.WriteLine($"OrganizeItems: category_prio = {category.Priority}");
-                //     // Console.WriteLine($"OrganizeItems: {category.Members}");
-                //     // ConsoleHelper.PrintList(category.Members, "OrganizeItems: category_members");
-                //
-                //     sortedList.AddRange(category.Members);
-                //     }
-                //     return sortedList;
             }
 
             catch (Exception e)
@@ -139,29 +48,8 @@ namespace InvisibleHand
                 return null;
             }
 
-            // foreach (var category in catquery)
-            // {
-            //     // until we replace Dynamic Linq, just sort the categorized items by name
-            //     var result =
-            //         from item in category.Members
-            //         orderby item.name
-            //         select item;
-            //
-            //     sortedList.AddRange(result);
-            // }
-
             //  Now we can dynamically construct Queries using Dynamic LINQ
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
-            // foreach (var category in byCategory)
-            // {
-            //     // until we replace Dynamic Linq, just sort the categorized items by name
-            //
-            //     var result =
-            //         from item in category
-            //         orderby item.name
-            //         select item;
-            //
-            //     sortedList.AddRange(result);
             //
             //     // var result = category.AsQueryable().OrderBy(Func<Item, TKey> keySelector, IComparer<TKey> comparer)
             //
