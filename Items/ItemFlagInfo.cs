@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 // using System.Linq;
 using Terraria.ModLoader;
-using InvisibleHand.Definitions;
+// using InvisibleHand.Definitions;
 using InvisibleHand.Utils;
 
 
@@ -45,7 +45,7 @@ namespace InvisibleHand.Items
                     // TODO: or should "Merge" categories only matter for smart-deposit?
                     // match = category.Category;
 
-                    match = category.Category;
+                    match = category.GetCategory;
 
                     // then check all the children of the matching category (if any)
                     // for a more specific match

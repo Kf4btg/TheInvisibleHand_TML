@@ -1,13 +1,15 @@
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Collections.Generic;
 using InvisibleHand.Rules;
+using Terraria;
 
-namespace InvisibleHand.Definitions
+namespace InvisibleHand.Items
 {
-    public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>
+    // public class ItemCategory : Category<Item>
+    public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
+
         // private short _priority;
 
         /// the Child-depth of this category; 0 for top-level categories (no parents),
@@ -58,7 +60,7 @@ namespace InvisibleHand.Definitions
         /// the parent's requirements will have already been merged into
         /// this Category's requirements, so this property is really only
         /// here to help with determining sort-order.
-        public ItemCategory Parent { get; private set; }
+        public virtual ItemCategory Parent { get; private set; }
 
         /// indicates whether this Category is simply a container
         /// for the categories that were merged into it. If so, it
@@ -75,7 +77,7 @@ namespace InvisibleHand.Definitions
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
-        public ItemCategory Category => _wrapper_category ?? this;
+        public ItemCategory GetCategory => _wrapper_category ?? this;
 
 
         public ItemCategory(string name, ushort cat_id, ItemCategory parent = null, bool is_merge_wrapper = false, short priority = 0)
@@ -84,15 +86,6 @@ namespace InvisibleHand.Definitions
             Parent = parent;
             Priority = priority;
             ID = cat_id;
-
-            // short _depth = 0;
-            // while (parent != null)
-            // {
-            //     depth++;
-            //     parent = parent.Parent;
-            // }
-            //
-            // this.depth = _depth;
 
             IsMergeWrapper = is_merge_wrapper;
 
@@ -109,15 +102,6 @@ namespace InvisibleHand.Definitions
             Parent = parent;
             Priority = priority;
             ID = cat_id;
-
-            // short _depth = 0;
-            // while (parent != null)
-            // {
-            //     depth++;
-            //     parent = parent.Parent;
-            // }
-            //
-            // this.depth = _depth;
 
             IsMergeWrapper = false;
 
@@ -171,7 +155,7 @@ namespace InvisibleHand.Definitions
             // Now we return the matched category:
             // If this category has been marked as part of a merged category,
             // return that category; otherwise, return this instance.
-            return this.Category;
+            return this.GetCategory;
         }
 
         public void Merge(ItemCategory wrapper)
@@ -236,33 +220,50 @@ namespace InvisibleHand.Definitions
         #endregion
         /// this is what will be returned when an item somehow doesn't match any defined category
         public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
-    }
+    // }
 
     /// contains a list of compiled sorting rules
-    public class CategoryOf<T> : ItemCategory
-    {
+    // public class CategoryOf<T> : ItemCategory, IComparer<T>
+    // {
 
         // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
-        public IList<Func<T, T, int>> SortRules;
-
-        public List<Expression<Func<T, T, int>>> ruleExpressions;
 
 
+        private IList<Func<Item, Item, int>> _rules;
+        public IList<Func<Item, Item, int>> SortRules => _rules;
 
+        private int ruleCount = 0;
 
-        public CategoryOf(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0) : base (name, cat_id, requirements, parent, priority) {}
+        // public List<Expression<Func<T, T, int>>> ruleExpressions;
+
+        // public CategoryOf(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0) : base (name, cat_id, requirements, parent, priority) {}
 
         public void BuildSortRules(IEnumerable<string> properties)
         {
-            // List<Expression<Func<T, T, int>>> exprs;
             if (properties.Count() > 0)
             {
-                this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
-                // ruleExpressions = exprs;
-
+                // this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
+                this._rules = RuleBuilder.CompileVsRules(new List<Item>(), new List<string>(properties));
+                this.ruleCount = this._rules.Count;
             }
+        }
 
+        public void CopySortRules(ItemCategory other)
+        {
+            this._rules = other?.SortRules;
+            this.ruleCount = this._rules.Count;
+        }
 
+        public int Compare(Item t1, Item t2)
+        {
+            int res;
+            for (int i = 0; i < ruleCount; i++)
+            {
+                res = SortRules[i](t1, t2);
+                if (res != 0)
+                    return res;
+            }
+            return 0;
         }
     }
 }

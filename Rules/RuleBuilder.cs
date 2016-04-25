@@ -40,12 +40,14 @@ namespace InvisibleHand.Rules
             return compiledRules;
         }
 
-        public static List<Func<T, T, int>> CompileVsRules<T>(List<T> targetEntity, List<string> predicates, out List<Expression<Func<T, T, int>>> expressions)
+        /// compiles rules that perform a comparison operation on the properties of two objects of the same type
+        // public static List<Func<T, T, int>> CompileVsRules<T>(List<T> targetEntity, List<string> predicates, out List<Expression<Func<T, T, int>>> expressions)
+        public static List<Func<T, T, int>> CompileVsRules<T>(List<T> targetEntity, List<string> predicates)
         {
             // storage for the compiled rules
             var compiledRules = new List<Func<T, T, int>>();
 
-            var _expressions = new List<Expression<Func<T, T, int>>>();
+            // var _expressions = new List<Expression<Func<T, T, int>>>();
             // get the type of the entity these rules are meant to govern (constant for each rule)
             // var genericType = Expression.Parameter(typeof(T));
 
@@ -74,11 +76,11 @@ namespace InvisibleHand.Rules
 
                 // compile the expression and add it to the list of compiled rules
                 // compiledRules.Add(Expression.Lambda<Func<T, bool>>(binaryExpression, genericType).Compile());
-                _expressions.Add(Expression.Lambda<Func<T, T, int>>(compareExpression, new[] {item1, item2}));
+                // _expressions.Add(Expression.Lambda<Func<T, T, int>>(compareExpression, new[] {item1, item2}));
                 compiledRules.Add(Expression.Lambda<Func<T, T, int>>(compareExpression, new[] {item1, item2}).Compile());
             });
 
-            expressions = _expressions;
+            // expressions = _expressions;
 
             // Return the compiled rules to the caller
             return compiledRules;

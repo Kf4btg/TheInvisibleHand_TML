@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
-using System.Linq.Expressions;
+// using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hjson;
-using Terraria;
+// using Terraria;
 
 // using Terraria.ModLoader;
 
 using InvisibleHand.Utils;
+using InvisibleHand.Items;
 
 namespace InvisibleHand.Definitions
 {
@@ -203,7 +204,7 @@ namespace InvisibleHand.Definitions
                                     {
                                         CategoryDefinitions[wrapped].Merge(merge_wrapper);
                                     }
-                                    catch (KeyNotFoundException e)// e)
+                                    catch (KeyNotFoundException e)
                                     {
                                         //FIXME: use ErrorLogger
                                         Console.WriteLine("{0}: {1}", wrapped, e.Message);
@@ -235,65 +236,37 @@ namespace InvisibleHand.Definitions
 
                                 // if, somehow, there are no requirements, don't bother adding to list
 
-                                try {
-                                    if (reqs.Count > 0)
-                                    {
-                                        var newcategory = new CategoryOf<Item>(category_name, count++, reqs, parent, priority);
-
-                                        // get sorting rules
-                                        if (catobj.ContainsKey("sort"))
-                                        {
-                                            newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv=>jv.Qs()));
-                                        }
-                                        else if (parent != null)
-                                        {
-                                            // inherit from parent
-                                            try
-                                            {
-                                                var p = parent as CategoryOf<Item>;
-                                                newcategory.SortRules = p?.SortRules;
-                                                newcategory.ruleExpressions = p?.ruleExpressions;
-
-
-                                            }
-                                            catch (NullReferenceException e)
-                                            {
-                                                Console.WriteLine($"{parent.Name} > {category_name}: {e}");
-
-                                            }
-                                        }
-
-                                        if (newcategory.SortRules == null)
-                                            newcategory.BuildSortRules(new[] {"type"}); // default
-
-                                        if (newcategory.ruleExpressions == null)
-                                        {
-                                            Console.WriteLine($"{category_name}: ruleExpressions is null");
-                                            if (newcategory.SortRules == null)
-                                                Console.WriteLine($"{category_name}: SortRules is null");
-
-                                        }
-                                        else
-                                            ConsoleHelper.PrintList(newcategory.ruleExpressions.Select(ex=>ex.ToString()), category_name, true);
-
-                                        // foreach (var ex in newcategory.ruleExpressions)
-                                        // {
-                                        //         Console.WriteLine(ex.ToString());
-                                        //     // ex.Body.ToString();
-                                        //     // Console.WriteLine(string.Join(", ", ex.Parameters.Select(p=> p.Name)));
-                                        //
-                                        // }
-
-                                        // ConsoleHelper.PrintList(newcategory.SortRules, "Rules", true);
-
-
-                                        CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
-                                    }
-                                }
-                                catch (NullReferenceException e)
+                                if (reqs.Count > 0)
                                 {
-                                    Console.WriteLine($"{category_name}: {e}");
+                                    var newcategory = new ItemCategory(category_name, count++, reqs, parent, priority);
 
+                                    // get sorting rules
+                                    if (catobj.ContainsKey("sort"))
+                                    {
+                                        newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv=>jv.Qs()));
+                                    }
+                                    else if (parent != null)
+                                    {
+                                        // inherit from parent
+                                        newcategory.CopySortRules(parent);
+                                        // newcategory.ruleExpressions = p?.ruleExpressions;
+                                    }
+
+                                    // if the rules are still null, add a default rule of just sorting by type
+                                    if (newcategory.SortRules == null)
+                                        newcategory.BuildSortRules(new[] {"type"}); // default
+
+                                    // if (newcategory.ruleExpressions == null)
+                                    // {
+                                    //     Console.WriteLine($"{category_name}: ruleExpressions is null");
+                                    //     if (newcategory.SortRules == null)
+                                    //         Console.WriteLine($"{category_name}: SortRules is null");
+                                    //
+                                    // }
+                                    // else
+                                        // ConsoleHelper.PrintList(newcategory.ruleExpressions.Select(ex=>ex.ToString()), category_name, true);
+
+                                    CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                                 }
                             }
 

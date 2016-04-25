@@ -138,25 +138,4 @@ namespace InvisibleHand.Rules
             };
         }
     }
-
-    public class VsRule
-    {
-        public string ComparisonPredicate { get; set; }
-        public ExpressionType ComparisonOperator { get; set; }
-
-        public VsRule(string comparisonPredicate, string comparisonOperator)
-        {
-            ComparisonPredicate = comparisonPredicate;
-
-            ExpressionType compop;
-            // from the string repr, get the real ExpressionType
-            if (Rule.SymbolToOperator.TryGetValue(comparisonOperator, out compop))
-                ComparisonOperator = compop;
-            else
-                ComparisonOperator = ExpressionType.TypeEqual;
-                // TODO: throw a better exception, log an error, and/or find a better default
-
-        }
-
-    }
 }

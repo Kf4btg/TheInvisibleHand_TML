@@ -46,30 +46,51 @@ namespace InvisibleHand
                 //     };
                 //
 
-                var catquery = reverse ?
-                    (from item in source
-                    let category = item.GetCategory()
-                    // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
-                    // orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
-                    orderby category descending, item.name descending
-                    // select item;
-                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item })
-                :
-                    (from item in source
-                    let category = item.GetCategory()
-                    // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
-                    orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
-                    // select item;
-                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item });
+                // var catquery = //reverse ?
+                // var catgroup = //reverse ?
+                //     (from item in source
+                //          //  let category = item.GetCategory()
+                //      group item by item.GetCategory());
+
+                var catquery =
+
+                    reverse ?
+                            (source.GroupBy(item => item.GetCategory())
+                            .OrderByDescending(g => g.Key)
+                            .SelectMany(g => g.OrderByDescending(i => i, g.Key)))
+                        :
+                            (source.GroupBy(item => item.GetCategory())
+                            .OrderBy(g => g.Key)
+                            .SelectMany(g => g.OrderBy(i => i, g.Key))) ;
+
+
+                // var sortedcatgroup = catgroup.OrderByDescending(g => g.Key);
+
+                //  orderby catgroup.Key descending
+                //  select catgroup
+                // .OrderBy(g => g.)
+                // )
+                // ;
+                // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
+                // orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
+                // orderby category descending, category
+                // select item)
+                // select new { Category = category.QualifiedName, Priority = category.Priority, Item = item })
+                // :
+                //     (from item in source
+                //     let category = item.GetCategory()
+                //     // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
+                //     orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
+                //     select item);
+                // select new { Category = category.QualifiedName, Priority = category.Priority, Item = item });
 
 
                 var catlist = catquery.ToList();
 
-
                 ConsoleHelper.PrintList(catlist, "Sorted items", true);
 
                 // return catlist.Select(c => c.Item);
-                return catquery.Select(c => c.Item);
+                return catquery; //.Select(c => c.Item);
                 // return catquery.ToList();
 
                 // orderby category.ordinal

@@ -5,6 +5,7 @@ using Terraria;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 using InvisibleHand.Definitions;
+using InvisibleHand.Items;
 
 namespace InvisibleHand
 {
