@@ -172,7 +172,6 @@ namespace InvisibleHand.Definitions
                             }
                         }
 
-                        var reqs = new Dictionary<string, int>();
 
 
                         // an explicitly-set priority overrides default or inherited value
@@ -183,8 +182,11 @@ namespace InvisibleHand.Definitions
                             priority = (short)(catobj["priority"].Qi().Clamp(-325, 325)*100);
                         }
 
+                        // parse requirements
                         if (catobj.ContainsKey("requires"))
                         {
+                            var reqs = new Dictionary<string, int>();
+
                             foreach (var newreqs in catobj["requires"].Qo())
                             {
                                 var traitCategory = newreqs.Key;
@@ -207,22 +209,29 @@ namespace InvisibleHand.Definitions
                                 CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                             }
                         }
+                        // parse merged categories
                         else if (catobj.ContainsKey("merge"))
                         {
+                            bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
+
                             var merge_wrapper = new ItemCategory(category_name, count++, parent, is_merge_wrapper: true, priority: priority);
 
-                            foreach (var wrapped in catobj["merge"].Qa())
+                            // TODO: allow enable/disable at runtime
+                            if (is_enabled)
                             {
-                                // let each category listed under "merge"
-                                // know which wrapper it has been assigned to
-                                try
+                                foreach (var wrapped in catobj["merge"].Qa())
                                 {
-                                    CategoryDefinitions[wrapped].Merge(merge_wrapper);
-                                }
-                                catch (KeyNotFoundException e)// e)
-                                {
-                                    //FIXME: use ErrorLogger
-                                    Console.WriteLine("{0}: {1}", wrapped, e.Message);
+                                    // let each category listed under "merge"
+                                    // know which wrapper it has been assigned to
+                                    try
+                                    {
+                                        CategoryDefinitions[wrapped].Merge(merge_wrapper);
+                                    }
+                                    catch (KeyNotFoundException e)// e)
+                                    {
+                                        //FIXME: use ErrorLogger
+                                        Console.WriteLine("{0}: {1}", wrapped, e.Message);
+                                    }
                                 }
                             }
                             CategoryDefinitions[category_name] = merge_wrapper;
