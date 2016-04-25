@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 using Terraria;
 using Terraria.UI;
 using Microsoft.Xna.Framework.Input;
-using InvisibleHand.Utils;
+// using InvisibleHand.Utils;
 
 namespace InvisibleHand
 {

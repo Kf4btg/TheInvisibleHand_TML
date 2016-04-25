@@ -22,9 +22,6 @@ namespace InvisibleHand
         private static Dictionary<string, Keys> modhotkeys;
 
 
-        // private static string held_hotkey = String.Empty;
-
-
         internal static bool holding_hotkey = false;
         internal static Keys HeldHotKey { get; set; } = Keys.None;
         /// This is a tModLoader implementation detail and I know it's not safe

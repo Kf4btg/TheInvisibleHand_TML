@@ -1,5 +1,4 @@
 using Terraria.ModLoader;
-using InvisibleHand.Definitions;
 using InvisibleHand.Items;
 
 namespace InvisibleHand

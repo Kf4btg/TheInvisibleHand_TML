@@ -11,7 +11,7 @@ namespace InvisibleHand
     {
         /// this will sort the categorized items first by category, then by
         /// more specific traits. Sorting Rules defined in CategoryDef class.
-        public static IList<Item> OrganizeItems(IList<Item> source)
+        public static IEnumerable<Item> OrganizeItems(IEnumerable<Item> source, bool reverse)
         {
             // Console.WriteLine($"OrganizeItems: {source}");
             // ConsoleHelper.PrintList(source, "OrganizeItems: source");
@@ -45,19 +45,31 @@ namespace InvisibleHand
                 //                   select im
                 //     };
                 //
-                var catquery =
-                    from item in source
+
+                var catquery = reverse ?
+                    (from item in source
+                    let category = item.GetCategory()
+                    // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
+                    // orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
+                    orderby category descending, item.name descending
+                    // select item;
+                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item })
+                :
+                    (from item in source
                     let category = item.GetCategory()
                     // orderby item.GetCategory(), item.name // TODO: item-sorting needs far more detailed rules than .name
                     orderby category, item.name // TODO: item-sorting needs far more detailed rules than .name
                     // select item;
-                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item };
+                    select new { Category = category.QualifiedName, Priority = category.Priority, Item = item });
+
 
                 var catlist = catquery.ToList();
 
+
                 ConsoleHelper.PrintList(catlist, "Sorted items", true);
 
-                return catlist.Select(c => c.Item).ToList();
+                // return catlist.Select(c => c.Item);
+                return catquery.Select(c => c.Item);
                 // return catquery.ToList();
 
                 // orderby category.ordinal
@@ -193,8 +205,10 @@ namespace InvisibleHand
                 for (int i=rangeStart; i<=rangeEnd; i++)
                 {
                     if (!source_container[i].IsBlank())
+                    {
                         itemList.Add(source_container[i].Clone());
-                    count++;
+                        count++;
+                    }
                 }
             }
 
@@ -262,13 +276,13 @@ namespace InvisibleHand
 
 
             // get copies of the items and send them off to be sorted
-            var sortedItemList = OrganizeItems(GetItemCopies(container, chest, rangeStart, rangeEnd));
-            Console.WriteLine("soretedlist = {0}", sortedItemList);
+            var sortedItemList = OrganizeItems(GetItemCopies(container, chest, rangeStart, rangeEnd), reverse);
+            // Console.WriteLine("soretedlist = {0}", sortedItemList);
             if (sortedItemList == null)
                 return;
 
-            if (reverse)
-                sortedItemList.Reverse(); //reverse on user request
+            // if (reverse)
+            //     sortedItemList.Reverse(); //reverse on user request
 
             // depending on user settings, decide if we copy items to end or beginning of container
             var fillFromEnd = chest ? IHBase.ModOptions["SortToEndChest"] : IHBase.ModOptions["SortToEndPlayer"];
