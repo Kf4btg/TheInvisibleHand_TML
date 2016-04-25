@@ -134,6 +134,8 @@ namespace InvisibleHand
 
         public override void HotKeyPressed(string name)
         {
+            // do nothing if the inventory isn't shown.
+            if (!Main.playerInventory) return;
 
             // Main.Configuration.Get<string>(this.Name+"_HotKey_"+name.Replace(' ', '_'), Constants.DefaultKeys[name]);
 
