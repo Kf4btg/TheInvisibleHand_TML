@@ -109,9 +109,19 @@
     name: Wood
     parent: Block
     requires: {
-      Placeable: [ "wood" ]
+      Placeable.Block: [ "wood" ]
     }
   }
+
+  # TODO: implement an 'enabled' key for every category.
+  /*{
+    name: Dungeon Brick
+    parent: Block
+    enabled: false
+    requires: {
+      Placeable.Block: [ "dungeon_brick" ]
+    }
+  }*/
 
   # {
   #   name: Brick
