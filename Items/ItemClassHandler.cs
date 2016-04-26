@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Terraria;
 
-using System;
-using System.Linq;
+// using System;
+// using System.Linq;
 
 namespace InvisibleHand.Items
 {

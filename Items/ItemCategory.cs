@@ -6,25 +6,10 @@ using Terraria;
 
 namespace InvisibleHand.Items
 {
-    // public class ItemCategory : Category<Item>
     public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
 
         // private short _priority;
-
-        /// the Child-depth of this category; 0 for top-level categories (no parents),
-        /// +1 for each parent above this.
-        // private short depth;
-
-        /// we SUBTRACT the depth from the priority to make sure that more specific categories are
-        /// sorted first; for example, if "Weapon" has a priority of 500:
-        //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
-        // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
-        // because the weapon.melee category was created before weapon.throwing.
-        // public short Priority { get { return (short)(_priority - depth); } set { _priority = value; } }
-        /// this indicates whether the priority was explicitly specified
-        /// in a configuration file or was assigned a default value.
-        // internal bool explicit_priority = false;
 
         /// the explicitly set sort-priority for this category
         public short Priority;
@@ -60,7 +45,7 @@ namespace InvisibleHand.Items
         /// the parent's requirements will have already been merged into
         /// this Category's requirements, so this property is really only
         /// here to help with determining sort-order.
-        public virtual ItemCategory Parent { get; private set; }
+        public ItemCategory Parent { get; private set; }
 
         /// indicates whether this Category is simply a container
         /// for the categories that were merged into it. If so, it
@@ -168,14 +153,46 @@ namespace InvisibleHand.Items
             this._wrapper_category = null;
         }
 
-        #region interface implementation
+        #region internal item-sorting
+        // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
+
+        private IList<Func<Item, Item, int>> _rules;
+        public IList<Func<Item, Item, int>> SortRules => _rules;
+
+        /// saved independently in order to make iteration more efficient
+        private int ruleCount = 0;
+
+        // public List<Expression<Func<T, T, int>>> ruleExpressions;
+
+        /// Given an enumerable of Terraria.Item property names, build and compile
+        /// lambda expressions that will return the result of comparing those properties
+        /// on two distinct Item objects
+        public void BuildSortRules(IEnumerable<string> properties)
+        {
+
+            // TODO: cache the compiled rule for each property name to avoid duplicating effort and wasting
+            // memory storing identical objects
+            if (properties.Count() > 0)
+            {
+                // this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
+                this._rules = RuleBuilder.CompileVsRules(new List<Item>(), new List<string>(properties));
+                this.ruleCount = this._rules.Count;
+            }
+        }
+
+        /// copy the sorting rules from another category
+        public void CopySortRules(ItemCategory other)
+        {
+            this._rules = other?.SortRules;
+            this.ruleCount = this._rules.Count;
+        }
+
+        #endregion
+
+        #region interface implementations
         public int CompareTo(ItemCategory other)
         {
             return this.Ordinal.CompareTo(other.Ordinal);
-            // var val = this.Priority - other.Priority;
-            // if (val != 0) return val;
-            //
-            // return this.ID.CompareTo(other.ID);
         }
 
         public bool Equals(ItemCategory other)
@@ -216,44 +233,8 @@ namespace InvisibleHand.Items
             return ! (cat1.Equals(cat2));
         }
 
-
-        #endregion
-        /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
-    // }
-
-    /// contains a list of compiled sorting rules
-    // public class CategoryOf<T> : ItemCategory, IComparer<T>
-    // {
-
-        // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
-
-
-        private IList<Func<Item, Item, int>> _rules;
-        public IList<Func<Item, Item, int>> SortRules => _rules;
-
-        private int ruleCount = 0;
-
-        // public List<Expression<Func<T, T, int>>> ruleExpressions;
-
-        // public CategoryOf(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0) : base (name, cat_id, requirements, parent, priority) {}
-
-        public void BuildSortRules(IEnumerable<string> properties)
-        {
-            if (properties.Count() > 0)
-            {
-                // this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
-                this._rules = RuleBuilder.CompileVsRules(new List<Item>(), new List<string>(properties));
-                this.ruleCount = this._rules.Count;
-            }
-        }
-
-        public void CopySortRules(ItemCategory other)
-        {
-            this._rules = other?.SortRules;
-            this.ruleCount = this._rules.Count;
-        }
-
+        /// IComparer<Item> implementation
+        /// using the pre-compiled Sorting rules
         public int Compare(Item t1, Item t2)
         {
             int res;
@@ -265,5 +246,17 @@ namespace InvisibleHand.Items
             }
             return 0;
         }
+        #endregion
+
+        /// this is what will be returned when an item somehow doesn't match any defined category
+        public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
+
+
+        public override string ToString()
+        {
+            return $"{{{QualifiedName}: p{Priority}, ID#{ID}";
+        }
+
+
     }
 }

@@ -28,19 +28,11 @@ namespace InvisibleHand
             InventoryNoHBMin = 10;
         }
 
-
         /// this will sort the categorized items first by category, then by
         /// more specific traits. Sorting Rules defined in CategoryDef class.
         private static IEnumerable<Item> OrganizeItems(IEnumerable<Item> source, bool reverse)
         {
             if (source == null) return null;
-
-            // returns an IEnumerable<IGrouping<ItemCat,Item>>
-            // var byCategory =
-            //     from item in source
-            //     group item by item.GetCategory() into category
-            //     orderby category.Key
-            //     select category;
 
             try
             {
@@ -68,21 +60,6 @@ namespace InvisibleHand
                 Console.WriteLine(e);
                 return null;
             }
-
-            //  Now we can dynamically construct Queries using Dynamic LINQ
-            // expression methods with arbitrary (maybe later user-defined) sorting parameters.
-            //
-            //     // var result = category.AsQueryable().OrderBy(Func<Item, TKey> keySelector, IComparer<TKey> comparer)
-            //
-            //     //     // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
-            //     //     // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
-            //     //     var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
-            //     //
-            //     //     // execute the query and put the result in a list to return
-            //     //     foreach (var s_item in result)
-            //     //         sortedList.Add(s_item);
-            // }
-
         }
 
        /// <summary>
@@ -90,7 +67,6 @@ namespace InvisibleHand
        /// </summary>
        /// <param name="source_container">The Item[] array of the container</param>
        /// <param name="source_is_chest">Is the source container a chest? </param>
-
        /// <returns> The new list of copied items, or null if no items were
        /// applicable to be copied (NOT an empty list!).</returns>
         private static IList<Item> GetItemCopies(Item[] source_container, bool source_is_chest)
@@ -108,7 +84,6 @@ namespace InvisibleHand
         /// <param name="rangeEnd">index in source to stop looking for items </param>
         /// <returns> The new list of copied items, or null if no items were
         /// applicable to be copied (NOT an empty list!).</returns>
-        // public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
         private static IList<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
         {
 
@@ -141,8 +116,7 @@ namespace InvisibleHand
                     }
                 }
             }
-
-            Console.WriteLine($"GetItemCopies: Copied {count} items.");
+            // Console.WriteLine($"GetItemCopies: Copied {count} items.");
             // return null if no items were copied to new list
             return count > 0 ? itemList : null;
         }
@@ -156,38 +130,28 @@ namespace InvisibleHand
         */
         public static void SortPlayerInv(Player player, bool reverse=false)
         {
-            Console.WriteLine("SortPlayerInv({0}, {1})", player, reverse);
+            // Console.WriteLine("SortPlayerInv({0}, {1})", player, reverse);
             ConsolidateStacks(player.inventory, InventoryMin, InventoryMax); //include hotbar in this step
 
-            Console.WriteLine("Calling Sort -- {0}, {1}, {2}, {3}, {4}", player.inventory, false, reverse, InventoryNoHBMin, InventoryMax);
+            // Console.WriteLine("Calling Sort -- {0}, {1}, {2}, {3}, {4}", player.inventory, false, reverse, InventoryNoHBMin, InventoryMax);
             Sort(player.inventory, false, reverse, InventoryNoHBMin, InventoryMax);
         }
 
         // as above, but for the Item[] array of a chest
         public static void SortChest(Item[] chestitems, bool reverse=false)
         {
-            Console.WriteLine("SortChest");
+            // Console.WriteLine("SortChest");
             ConsolidateStacks(chestitems);
 
-            // Sort(chestitems, true, reverse);
-            Sort(chestitems, true, reverse, ChestMin, ChestMax); // cut out a step
+            Sort(chestitems, true, reverse, ChestMin, ChestMax);
         }
 
         // as above, but given the actual chest object, pull out the array
         public static void SortChest(Chest chest, bool reverse=false)
         {
-            Console.WriteLine("Calling Sortchest -- {0}, {1}", chest.item, reverse);
+            // Console.WriteLine("Calling Sortchest -- {0}, {1}", chest.item, reverse);
             SortChest(chest.item, reverse);
         }
-
-
-        /// generic sort overload (currently unused?)
-        // public static void Sort(Item[] container, bool chest, bool reverse)
-        // {
-        //     Console.WriteLine("Sort called w/o range: {0}, {1}, {2}", container, chest, reverse);
-        //
-        //     Sort(container, chest, reverse, 0, container.Length - 1);
-        // }
 
         /**
           Sort Container
@@ -207,36 +171,8 @@ namespace InvisibleHand
             Console.WriteLine("Sort(cont={0}, chest={1}, reverse={2}, rStart={3}, rEnd={4})",
              container, chest, reverse, rangeStart, rangeEnd);
 
-
             // get copies of the items and send them off to be sorted
             var sortedItemList = OrganizeItems(GetItemCopies(container, chest, rangeStart, rangeEnd), reverse);
-            // Console.WriteLine("sortedlist = {0}", sortedItemList);
-            // if (sortedItemList == null)
-            //     return false; // maybe true? This might just mean the container was empty or something
-
-            // do this in linq query instead
-            // if (reverse)
-            //     sortedItemList.Reverse(); //reverse on user request
-
-            // depending on user settings, decide if we copy items to end or beginning of container
-            // var fillFromEnd = chest ? IHBase.ModOptions["SortToEndChest"] : IHBase.ModOptions["SortToEndPlayer"];
-
-            // set up the functions that will be used in the iterators ahead
-            // Func<int, int> getIndex, getIter;
-            // Func<int, bool> getCond;
-            //
-            // if (fillFromEnd)	// use decrementing iterators
-            // {
-            //     getIndex = x => rangeEnd - x;
-            //     getIter = x => x-1;
-            //     getCond = x => x >= rangeStart;
-            // }
-            // else 	// use incrementing iterators
-            // {
-            //     getIndex = y => rangeStart + y;
-            //     getIter = y => y+1;
-            //     getCond = y => y <= rangeEnd;
-            // }
 
             return sortedItemList != null &&
                 chest ?
@@ -250,52 +186,7 @@ namespace InvisibleHand
                     IHBase.ModOptions["SortToEndPlayer"] ?
                         _doSort_Player(container, sortedItemList, x => rangeEnd - x, x => x - 1, x => x >= rangeStart) :
                         _doSort_Player(container, sortedItemList, x => rangeStart + x, x => x + 1, x => x <= rangeEnd);
-
-
-            // int filled = 0; // num of slots filled (or locked) so far
-            // if (!chest) // player inventory
-            // {
-            //     // copy the sorted items back to the original container
-            //     // (overwriting the current, unsorted contents)
-            //     foreach (var item in sortedItemList)
-            //     {
-            //         // find the first unlocked slot. this would throw an
-            //         // exception if rangeStart+filled somehow went over 49, but
-            //         // if the categorizer and favorting are functioning
-            //         // correctly, that _shouldn't_ be possible. Shouldn't.
-            //         // Probably.
-            //         while (container[getIndex(filled)].favorited)
-            //             filled++;
-            //
-            //         // now that we've found an unlocked slot, clone
-            //         // the next sorted item into it.
-            //         container[getIndex(filled++)] = item.Clone();
-            //
-            //         // Sound.ItemMoved.Play();
-            //     }
-            //     // and the rest of the slots should be empty
-            //     for (int i=getIndex(filled); getCond(i); i=getIter(i))
-            //     {
-            //         // find the first unlocked slot.
-            //         if (container[i].favorited) continue;
-            //
-            //         container[i] = new Item();
-            //     }
-            // }
-            // else // just throw 'em back in the box
-            // {
-            //     foreach (var item in sortedItemList)
-            //     {
-            //         container[getIndex(filled++)] = item.Clone();
-            //         // Sound.ItemMoved.Play();
-            //     }
-            //     // and the rest of the slots should be empty
-            //     for (int i=getIndex(filled); getCond(i); i=getIter(i))
-            //     {
-            //         container[i] = new Item();
-            //     }
-            // }
-        } // sort()
+        }
 
         /// perform the sort for the player inventory, taking favorited items into consideration.
         // The Func<> arguments will depend on the value of the "SortToEndPlayer" ModOption

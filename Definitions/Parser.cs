@@ -176,9 +176,9 @@ namespace InvisibleHand.Definitions
 
                         // an explicitly-set priority overrides default or inherited value
                         if (catobj.ContainsKey("priority"))
-                            // restrict assignable value to [-325..325] and multiply by 100
+                            // restrict assignable value to [-500..500] and shift left by 6 bits
                             // to give us some guaranteed tweaking room between the priorities
-                            priority = (short)(catobj["priority"].Qi().Clamp(-325, 325)*100);
+                            priority = (short)(catobj["priority"].Qi().Clamp(-500, 500) << 6);
 
                         // parse merged categories
                         if (catobj.ContainsKey("merge"))

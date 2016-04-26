@@ -176,20 +176,44 @@ namespace InvisibleHand.Items
                 .FlagFirst("Consumable", "food", "flask", "potion");
         }
 
-
         private static void classifyPlaceable(ItemClassificationWrapper item)
         {
             // flag blocks, walls, misc
             // TODO: separate bricks from blocks
-            if (item.Flag("Placeable", "block").FlagFirst("Placeable", "wall",
-                                                                       "banner",
-                                                                       "seed",
-                                                                       "strange_plant",
-                                                                       "track",
-                                                                       "rope",
-                                                                       "rope_coil"
-            ).Success)
+
+            item.FlagAny("Placeable", "lighted", "metal_detector");
+            if (item.TryFlag("Placeable", "block"))
+            {
+                item.FlagAny("Placeable.Block", "bouncy",
+                                                // "brick",
+                                                "dungeon_brick",
+                                                "hallow",
+                                                "crimson",
+                                                "corrupt",
+                                                "wood",
+                                                "sand",
+                                                "hardened_sand",
+                                                "sandstone",
+                                                "ice");
                 return;
+            }
+            else if (item.FlagFirst("Placeable", "wall",
+                                       "banner",
+                                       "seed",
+                                       "strange_plant",
+                                       "track",
+                                       "rope",
+                                       "rope_coil").Success) return;
+
+            // if (item.Flag("Placeable", "block").FlagFirst("Placeable", "wall",
+            //                                                            "banner",
+            //                                                            "seed",
+            //                                                            "strange_plant",
+            //                                                            "track",
+            //                                                            "rope",
+            //                                                            "rope_coil"
+            // ).Success)
+            //     return;
 
             // Wall-hangables
             if (item.TryFlag("Placeable", "wall_deco"))
@@ -200,14 +224,15 @@ namespace InvisibleHand.Items
                     // like maybe the furniture enum, or even a new enum for decorations
                     case WallDecoType.Painting:
                         item.SetFlag("Placeable", "painting");
-                        return;
+                        break;
                     case WallDecoType.Trophy:
                         item.SetFlag("Placeable", "trophy");
-                        return;
+                        break;
                     case WallDecoType.Rack:
                         item.SetFlag("Placeable", "rack");
-                        return;
+                        break;
                 }
+                return;
             }
 
             // track whether this fits any of the furniture traits

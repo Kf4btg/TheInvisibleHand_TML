@@ -37,8 +37,11 @@ Placeable:
   traits: [
     banner
     block
-    brick
+    /*brick*/
+    /*dungeon_brick*/
     furniture
+    lighted
+    metal_detector
     musicbox
     painting
     rack
@@ -52,8 +55,23 @@ Placeable:
     wall_deco
     wall
     wallpaper
-    wood
+    /*wood*/
   ]
+  Block: {
+    traits: [
+      bouncy
+      brick
+      dungeon_brick
+      hallow
+      crimson
+      corrupt
+      wood
+      sand
+      hardened_sand
+      sandstone
+      ice
+    ]
+  }
 }
 Material:
 {

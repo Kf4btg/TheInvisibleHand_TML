@@ -47,6 +47,7 @@ namespace InvisibleHand.Items
             },
             {"Placeable", new string_table
                 {
+                    {"lighted",       Binary.givesLight},
                     //~ {"furniture",  REPLACE_ME},
                     {"seed",          ByTileID.ImmatureHerb},
                     //~ {"dye_plant",     ByTileID.DyePlant},
@@ -64,6 +65,27 @@ namespace InvisibleHand.Items
                     {"track",         (i) => i.cartTrack},
                     {"rope",          Sets.Rope},
                     {"rope_coil",     Sets.RopeCoil},
+                    {"metal_detector",     Binary.showsOnMetalDetector},
+                }
+            },
+            {"Placeable.Block", new string_table
+                {
+                    // {"brick", },
+                    {"bouncy", Sets.BouncyBlock},
+                    {"dungeon_brick", Sets.DungeonBrick},
+
+                    {"hallow", Sets.HallowBlock},
+                    {"crimson", Sets.CrimsonBlock},
+                    {"corrupt", Sets.CorruptionBlock},
+
+                    {"sand", Sets.Sand},
+                    {"hardened_sand", Sets.HardenedSand},
+                    {"sandstone", Sets.Sandstone},
+
+                    {"ice", Sets.Ice},
+                    {"stone", Sets.Stone},
+
+                    {"wood", Binary.isWood},
                 }
             },
             {"Ammo", new string_table

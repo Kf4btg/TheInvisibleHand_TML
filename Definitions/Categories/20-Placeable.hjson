@@ -1,13 +1,5 @@
 [
   {
-    name: Wood
-    parent: Placeable
-    requires: {
-      Placeable: [ "wood" ]
-    }
-  }
-
-  {
     name: Banner
     parent: Placeable
     requires:  {
@@ -110,6 +102,14 @@
     parent: Placeable
     requires: {
       Placeable: ["block"]
+    }
+  }
+
+  {
+    name: Wood
+    parent: Block
+    requires: {
+      Placeable: [ "wood" ]
     }
   }
 

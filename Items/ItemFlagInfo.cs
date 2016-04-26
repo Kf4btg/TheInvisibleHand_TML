@@ -9,8 +9,8 @@ namespace InvisibleHand.Items
 {
     public class ItemFlagInfo : ItemInfo
     {
-        // FIXME: Pre-existing items (i.e. loaded w/ the player) do not get run through set-defaults,
-        // and so do not receive any flags.
+        /// Storage for this item's flags (determined by classification);
+        /// keyed by the Trait-family name (e.g. "General", "Weapon", "Consumable", etc.)
         public IDictionary<string, int> Flags { get; set; }
 
         private ItemCategory _category = null;
@@ -18,9 +18,10 @@ namespace InvisibleHand.Items
         public ItemCategory Category => _category ?? find_category();
 
         /// Conflict resolution is currently done by using the first matching category
-        // (at each tree level), as determined by the ordinal value of the categories
+        /// (at each tree level), as determined by the ordinal value of the categories
         private ItemCategory find_category()
         {
+            // create the eventual return value with a default 'unknown' category
             var match = ItemCategory.None;
             CheckTree(IHBase.CategoryTree, ref match);
 

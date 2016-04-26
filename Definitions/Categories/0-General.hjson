@@ -15,8 +15,7 @@
         # the priority that was loaded first will take precedence.
         # Excluding this field means use the default of 0 for top-level categories,
         # or the priority of the parent for child categories.
-        #### Range is [-32768, 32767].
-        # Range is [-325, 325].
+        # Range is [-500, 500]. Values outside this range will be clamped.
         priority: 1
 
         # The list (of lists) of traits required for an item
@@ -36,7 +35,6 @@
 
     {
       name: Tool
-      parent: null
       priority: 10
       requires: {
         General: [ "tool" ]
@@ -48,7 +46,6 @@
       ]
     } {
       name: Weapon
-      parent: null
       priority: 20
       requires: {
         General: [ "weapon" ]
@@ -62,7 +59,6 @@
       ]
     } {
       name: Equipable
-      parent: null
       priority: 30
       requires: {
         General: [ "equipable" ]
@@ -74,7 +70,6 @@
       ]
     } {
       name: Placeable
-      parent: null
       priority: 85
       requires: {
         General: [ "placeable" ]
@@ -121,7 +116,7 @@
       # requirements for other categories (e.g. ore is placeable, but is mainly
       # used to create bars or potions.)
       name: Material
-      priority: 90
+      priority: 110
       requires: {
         General: [ "material" ]
       }
@@ -136,7 +131,7 @@
     ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
     {
       name: Hair Dye
-      priority: 95
+      priority: 115
       requires: {
         General: [ "hair_dye" ]
       }
@@ -171,7 +166,7 @@
     }
     {
       name: Bait
-      priority: 110
+      priority: 90
       requires: {
         General: ["bait"]
       }

@@ -1,7 +1,4 @@
 [
-
-
-
   {
     name: Quest Item
     parent: null
@@ -17,7 +14,7 @@
   {
     name: Strange Plant
     parent: Placeable
-    priority: 91
+    priority: 111
     requires:  {
       Placeable: ["strange_plant"]
     }
@@ -26,13 +23,4 @@
       stack
     ]
   }
-
-  /*{
-    // FIXME: this category is awful. A catch all. Do better.
-    name: Materials
-    parent: null
-    requires: {
-      General: ["material"]
-    }
-  }*/
 ]

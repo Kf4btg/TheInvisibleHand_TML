@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System;
+// using System;
 // using System.Reflection;
 using Terraria;
 using Terraria.ID;
@@ -75,6 +75,11 @@ namespace InvisibleHand.Items
 
             /// this returns true for all the '... Rope' items (web, silk, regular, etc) AND their coil-counterparts
             public static bool makesRope(Item item) => contains(Main.tileRope, item.createTile) || TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
+
+            /// anything that produces any level of light, even a weak one
+            public static bool givesLight(Item item) => contains(Main.tileLighted, item.createTile);
+
+            public static bool showsOnMetalDetector(Item item) => item.createTile > 0 && Main.tileValue[item.createTile] > 0;
         }
 
         /// these rules are dependent on Binary.CanBePlaced()
@@ -165,9 +170,6 @@ namespace InvisibleHand.Items
 
         internal static class Sets
         {
-
-
-
             #region from Sets
 
             public static bool Furniture(Item item) => ItemSets.Furniture.Contains(item.createTile);
@@ -176,22 +178,32 @@ namespace InvisibleHand.Items
 
             #endregion
 
+            public static bool housingDoor(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsDoor.Contains(item.createTile);
+            public static bool housingTable(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsTable.Contains(item.createTile);
+            public static bool housingChair(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsChair.Contains(item.createTile);
+            public static bool housingTorch(Item item) =>
+                    TileID.Sets.RoomNeeds.CountsAsTorch.Contains(item.createTile);
+
             //TODO: consider:
             // Main.tileTable[] // seems to be things that you can walk on like a platform
-            // Main.tileHammer[] -> walls, i assume, maybe shadoworbs and tracks
+            // Main.tileHammer[] -> shadow orbs & demon altars
             // tileAxe[] // choppable things, like trees, cacti, big shrooms...
             // tileStone[] // things that look like stone, i guess (gems & active-stone)
             // tileSand // ...sand.
             // tileFlame // things what are on fire (mainly candles)
             // tileAlch[] // immatureherbs (seeds), + mature/blooming which aren't applicable here
             // tileCut[] // can be cut with weapon; e.g. grass, lifefruit, bee larva, etc.
-            // tileContainer[]
-            // tileSign[]
-            // tileLighted[]
-            // tileDungeon[]
-            // tileSpelunker[]
-            // tileBouncy[]
-            // tileValue[] ??
+            // tileContainer[] => containers! looks like it contains TileID.Container && TileID.Dresser
+            // tileSign[] => signs, tombstones
+            // tileLighted[] => tiles that produce light (of some sort, even weakly)
+            // tileDungeon[] => blue, green, & pink dungeon brick
+            // tileSpelunker[] => glows when spelunker potion active
+            // tileBouncy[] => just pinkslimeblock
+            // int[] tileValue[] => tiles shown by the metal detector are given a 'value' that determines which override which;
+            //                      contains (most) ores, hearts, pots, chests, lifefruit
             //
             // tileLargeFrames[]
             // wallLargeFrames[]
@@ -205,36 +217,33 @@ namespace InvisibleHand.Items
             //
             // bool Main.critterCage;
             //
+            // int[] anglerQuestItemNetIDs
+            //
             // public static Tile[,] tile = new Tile[Main.maxTilesX, Main.maxTilesY];
             //
             // ...
             // Maybe more!
             //
 
+            //
 
-            /// despite the name of the array using the word 'brick', this appears to hold most
-            /// items that could be considered a 'block', including bricks, but also e.g. mud, wood,
-            /// glass, etc. It also includes sands, but notably seems to missing DIRT...
             // public static bool Block(Item item) => Main.tileBrick[item.createTile];
-            public static bool Block(Item item) => contains(Main.tileBrick, item.createTile);
 
-            public static bool Rope(Item item) => contains(Main.tileRope, item.createTile);
-            public static bool RopeCoil(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
+            #region blocktypes
+            /// despite the name of the array using the word 'brick', this appears to hold most
+            /// items that could be considered a 'block', including bricks, but also e.g. mud, wood, grass-seeds,
+            /// glass, etc. It also includes sands, but notably seems to missing DIRT...
+            public static bool Block(Item item) => contains(Main.tileBrick, item.createTile) || item.createTile == 0;
+
+
 
             public static bool Sand(Item item) => contains(Main.tileSand, item.createTile);
-
-
-            public static bool housingDoor(Item item) =>
-                    TileID.Sets.RoomNeeds.CountsAsDoor.Contains(item.createTile);
-            public static bool housingTable(Item item) =>
-                    TileID.Sets.RoomNeeds.CountsAsTable.Contains(item.createTile);
-            public static bool housingChair(Item item) =>
-                    TileID.Sets.RoomNeeds.CountsAsChair.Contains(item.createTile);
-            public static bool housingTorch(Item item) =>
-                    TileID.Sets.RoomNeeds.CountsAsTorch.Contains(item.createTile);
+            public static bool DungeonBrick(Item item) => contains(Main.tileDungeon, item.createTile);
+            public static bool BouncyBlock(Item item) => contains(Main.tileBouncy, item.createTile);
 
             public static bool Ore(Item item) => contains(TileID.Sets.Ore, item.createTile);
             public static bool Ice(Item item) => contains(TileID.Sets.Ices, item.createTile);
+
 
             public static bool HallowBlock(Item item)     => contains(TileID.Sets.Hallow, item.createTile);
             public static bool CrimsonBlock(Item item)    => contains(TileID.Sets.Crimson, item.createTile);
@@ -245,8 +254,12 @@ namespace InvisibleHand.Items
             public static bool Sandstone(Item item)     => contains(TileID.Sets.Conversion.Sandstone, item.createTile);
 
             public static bool Stone(Item item) => contains(TileID.Sets.Conversion.Stone, item.createTile);
+            #endregion
 
             public static bool CanPlaceOnWall(Item item) => contains(TileID.Sets.FramesOnKillWall, item.createTile);
+
+            public static bool Rope(Item item) => contains(Main.tileRope, item.createTile);
+            public static bool RopeCoil(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
 
             public static bool StrangePlant(Item item) => contains(ItemID.Sets.ExoticPlantsForDyeTrade, item.type);
 
