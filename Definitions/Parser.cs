@@ -51,6 +51,14 @@ namespace InvisibleHand.Definitions
             BuildCategoryTree();
         }
 
+        /*
+        ██       ██████   █████  ██████      ████████ ██████   █████  ██ ████████ ███████
+        ██      ██    ██ ██   ██ ██   ██        ██    ██   ██ ██   ██ ██    ██    ██
+        ██      ██    ██ ███████ ██   ██        ██    ██████  ███████ ██    ██    ███████
+        ██      ██    ██ ██   ██ ██   ██        ██    ██   ██ ██   ██ ██    ██         ██
+        ███████  ██████  ██   ██ ██████         ██    ██   ██ ██   ██ ██    ██    ███████
+        */
+
         /// Read in Traits.hjson and organize the Traits by family name;
         /// (a trait-family is something like "General", "Consumable", "Weapon", "Weapon.Melee")
         private static void LoadTraitDefinitions(string trait_resource)
@@ -125,6 +133,15 @@ namespace InvisibleHand.Definitions
             }
         }
 
+        /*
+        ██       ██████   █████  ██████       ██████  █████  ████████ ███████  ██████   ██████  ██████  ██ ███████ ███████
+        ██      ██    ██ ██   ██ ██   ██     ██      ██   ██    ██    ██      ██       ██    ██ ██   ██ ██ ██      ██
+        ██      ██    ██ ███████ ██   ██     ██      ███████    ██    █████   ██   ███ ██    ██ ██████  ██ █████   ███████
+        ██      ██    ██ ██   ██ ██   ██     ██      ██   ██    ██    ██      ██    ██ ██    ██ ██   ██ ██ ██           ██
+        ███████  ██████  ██   ██ ██████       ██████ ██   ██    ██    ███████  ██████   ██████  ██   ██ ██ ███████ ███████
+        */
+
+
         /// After all the trait-definitions have been loaded, read in all the Category definition
         /// files and assign each Category a List of {Trait-Family: combined_flag_value} pairs
         /// using the bit-flag-values assigned in AssignFlagValues(). These family::flags maps
@@ -147,7 +164,15 @@ namespace InvisibleHand.Definitions
                     foreach (var catobj in CatObjList)
                     {
                         // name field is always required
-                        string category_name = catobj["name"].Qs();
+                        string category_name;
+                        try
+                        {
+                            category_name = catobj["name"].Qs();
+                        }
+                        catch (KeyNotFoundException knfe)
+                        {
+                            throw new HjsonFieldNotFoundException("name", nameof(catobj), knfe);
+                        }
 
                         ItemCategory parent = null;
                         short priority = 0;
@@ -160,17 +185,26 @@ namespace InvisibleHand.Definitions
                             {
                                 // TODO: don't fail on malformed categories/missing parents,
                                 // but log the error somewhere
-                                parent = CategoryDefinitions[parent_name];
 
-                                // child categories inherit the priority of their parent.
-                                // each child level decreases the initial priority by 1;
-                                // we SUBTRACT the depth from the priority to make sure that more specific categories are
-                                // sorted first; for example, if "Weapon" has a priority of 500:
-                                //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
-                                // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
-                                // because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
+                                try
+                                {
+                                    parent = CategoryDefinitions[parent_name];
 
-                                priority = (short)(parent.Priority - 1);
+                                    // child categories inherit the priority of their parent.
+                                    // each child level decreases the initial priority by 1;
+                                    // we SUBTRACT the depth from the priority to make sure that more specific categories are
+                                    // sorted first; for example, if "Weapon" has a priority of 500:
+                                    //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
+                                    // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
+                                    // because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
+                                    priority = (short)(parent.Priority - 1);
+                                }
+                                catch (KeyNotFoundException knfe)
+                                {
+                                    throw new UsefulKeyNotFoundException(parent_name, nameof(CategoryDefinitions), knfe,
+                                        "Category '" +category_name + "': The specified parent category '{0}' was not found in '{1}'."
+                                    );
+                                }
                             }
                         }
 
@@ -218,14 +252,48 @@ namespace InvisibleHand.Definitions
                                 {
                                     var traitCategory = newreqs.Key;
                                     // FlagCollection[TraitCategory][TraitName]
-                                    var flagvalues = FlagCollection[traitCategory];
+
+                                    IDictionary<string, int> flagvalues;
+
+                                    // using try-catch instead of TryGetValue because I'm not *expecting*
+                                    // the flag to be missing; therefore, under normal circumstances, the
+                                    // try block should always succeed and we don't have to worry about the
+                                    // performance difference between catch() && TryGetValue
+                                    try
+                                    {
+                                        flagvalues = FlagCollection[traitCategory];
+                                    }
+                                    catch (KeyNotFoundException knfe)
+                                    {
+                                        throw new UsefulKeyNotFoundException(
+                                            traitCategory,
+                                            nameof(FlagCollection),
+                                            knfe,
+                                            "Category '" +category_name + "': the requested Trait Category '{0}' is not present in '{1}'."
+                                        );
+                                    }
 
                                     if (!reqs.ContainsKey(traitCategory))
                                         reqs[traitCategory] = 0;
 
                                     // go through the array of traits, add the appropriate flag value
                                     foreach (string trait_name in newreqs.Value.Qa())
-                                        reqs[traitCategory] |= flagvalues[trait_name];
+                                    {
+                                        try
+                                        {
+                                            reqs[traitCategory] |= flagvalues[trait_name];
+                                        }
+                                        catch (KeyNotFoundException knfe)
+                                        {
+                                            throw new UsefulKeyNotFoundException(
+                                                trait_name,
+                                                nameof(FlagCollection)+"["+traitCategory+"]",
+                                                knfe,
+                                                "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
+                                            );
+                                        }
+
+                                    }
                                 }
 
                                 // if, somehow, there are no requirements, don't bother adding to list
@@ -264,6 +332,15 @@ namespace InvisibleHand.Definitions
                 }
             }
         }
+
+
+        /*
+        ██████  ██    ██ ██ ██      ██████      ████████ ██████  ███████ ███████
+        ██   ██ ██    ██ ██ ██      ██   ██        ██    ██   ██ ██      ██
+        ██████  ██    ██ ██ ██      ██   ██        ██    ██████  █████   █████
+        ██   ██ ██    ██ ██ ██      ██   ██        ██    ██   ██ ██      ██
+        ██████   ██████  ██ ███████ ██████         ██    ██   ██ ███████ ███████
+        */
 
         /// After reading in all of the category definitions, build a tree structure based on the parent-child relationships
         /// between the categories. Traversing the tree structure when testing an item's traits will be far more efficient than
