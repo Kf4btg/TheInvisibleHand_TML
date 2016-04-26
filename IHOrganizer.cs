@@ -36,7 +36,7 @@ namespace InvisibleHand
 
                 // var catlist = catquery.ToList();
                 //
-                // ConsoleHelper.PrintList(catlist, "Sorted items", true);
+                ConsoleHelper.PrintList(catquery.Select(i => new { Category = i.GetCategory(), i }), "Sorted items", true);
 
                 return catquery; //.Select(c => c.Item);
 
@@ -233,7 +233,8 @@ namespace InvisibleHand
                     // now that we've found an unlocked slot, clone
                     // the next sorted item into it.
                     container[getIndex(filled++)] = item.Clone();
-                    Sound.ItemMoved.Play();
+
+                    // Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -249,7 +250,7 @@ namespace InvisibleHand
                 foreach (var item in sortedItemList)
                 {
                     container[getIndex(filled++)] = item.Clone();
-                    Sound.ItemMoved.Play();
+                    // Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -298,7 +299,7 @@ namespace InvisibleHand
                     item2.stack += diff;
                     item.stack -= diff;
 
-                    Sound.ItemMoved.Play();
+                    // Sound.ItemMoved.Play();
 
                     if (item.stack == 0)
                     {
