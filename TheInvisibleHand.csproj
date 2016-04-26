@@ -112,6 +112,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IHCommandHandler.cs" />
     <Compile Include="IHEvent.cs" />
+    <Compile Include="IHExceptions.cs" />
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
     <Compile Include="IHWorld.cs" />
