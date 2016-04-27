@@ -40,8 +40,8 @@ namespace InvisibleHand.Rules
             return compiledRules;
         }
 
-        /// compiles rules that perform a comparison operation on the properties of two objects of the same type
         // public static List<Func<T, T, int>> CompileVsRules<T>(List<T> targetEntity, List<string> predicates, out List<Expression<Func<T, T, int>>> expressions)
+        /// compiles rules that perform a comparison operation on the properties of two objects of the same type
         public static List<Func<T, T, int>> CompileVsRules<T>(List<T> targetEntity, List<string> predicates)
         {
             // storage for the compiled rules
@@ -53,11 +53,11 @@ namespace InvisibleHand.Rules
             var item2 = Expression.Parameter(typeof(T), "item2");
 
             // Loop through the rules and compile them against the properties of the supplied shallow object
-            predicates.ForEach(rule =>
+            predicates.ForEach(pred =>
             {
                 // find the object Property specified by the predicate (i.e. the property name)
-                var prop = MemberExpression.PropertyOrField(item1, rule);
-                var prop2 = MemberExpression.PropertyOrField(item2, rule);
+                var prop = MemberExpression.PropertyOrField(item1, pred);
+                var prop2 = MemberExpression.PropertyOrField(item2, pred);
 
                 var compareExpression = Expression.Call(
                     prop,
@@ -72,6 +72,24 @@ namespace InvisibleHand.Rules
 
             // Return the compiled rules to the caller
             return compiledRules;
+        }
+
+        /// compile and return a single comparison rule for the given predicate string (name of a property on Type T)
+        public static Func<T, T, int> CompileVsRule<T>(List<T> targetEntity, string property)
+        {
+            var item1 = Expression.Parameter(typeof(T), "item1");
+            var item2 = Expression.Parameter(typeof(T), "item2");
+
+            var prop = MemberExpression.PropertyOrField(item1, property);
+            var prop2 = MemberExpression.PropertyOrField(item2, property);
+
+            var compareExpression = Expression.Call(
+                prop,
+                prop.Type.GetMethod("CompareTo", new[] { prop2.Type }),
+                prop2);
+
+            return Expression.Lambda<Func<T, T, int>>(compareExpression, new[] { item1, item2 }).Compile();
+
         }
     }
 
