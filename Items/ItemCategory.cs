@@ -6,6 +6,9 @@ using Terraria;
 
 namespace InvisibleHand.Items
 {
+
+    using ItemCompRule = Func<Item, Item, int>;
+
     public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
 
@@ -153,11 +156,15 @@ namespace InvisibleHand.Items
             this._wrapper_category = null;
         }
 
-        #region internal item-sorting
+        #region internal item-sorting rules
         // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
 
-        private IList<Func<Item, Item, int>> _rules;
-        public IList<Func<Item, Item, int>> SortRules => _rules;
+        /// caches the compiled rules by the name of the property being compared
+        private static IDictionary<string, ItemCompRule> RuleCache = new Dictionary<string, ItemCompRule>();
+
+
+        private IList<ItemCompRule> _rules;
+        public IList<ItemCompRule> SortRules => _rules;
 
         /// saved independently in order to make iteration more efficient
         private int ruleCount = 0;
@@ -170,12 +177,38 @@ namespace InvisibleHand.Items
         public void BuildSortRules(IEnumerable<string> properties)
         {
 
-            // TODO: cache the compiled rule for each property name to avoid duplicating effort and wasting
-            // memory storing identical objects
-            if (properties.Count() > 0)
+            // if the cache contains any of the requested properties, we'll build the rules 1by1
+            if (properties.Any(p => RuleCache.ContainsKey(p)))
             {
-                // this.SortRules = RuleBuilder.CompileVsRules(new List<T>(), new List<string>(properties), out ruleExpressions);
-                this._rules = RuleBuilder.CompileVsRules(new List<Item>(), new List<string>(properties));
+                _rules = new List<ItemCompRule>();
+
+                foreach (var prop in properties)
+                {
+                    // check the cache first
+                    ItemCompRule newrule;
+                    if (!RuleCache.TryGetValue(prop, out newrule))
+                    {
+                        // if the rule wasn't there, create it with the RuleBuilder
+                        newrule = RuleBuilder.CompileVsRule(new List<Item>(), prop);
+                        // and cache it
+                        RuleCache[prop] = newrule;
+                    }
+                    // add to list
+                    _rules.Add(newrule);
+                }
+
+                this.ruleCount = this._rules.Count;
+            }
+            else if (properties.Count() > 0) // make sure list isn't empty
+            {
+                var plist = new List<string>(properties);
+                // if all are uncached, call the multi-rule builder (for efficiency)
+                _rules = RuleBuilder.CompileVsRules(new List<Item>(), plist);
+
+                // because the rules SHOULD be in the same order as the properties given:
+                foreach (var newrule in _rules.Select((r, i) => new { rule = r, index = i }))
+                    RuleCache[plist[newrule.index]] = newrule.rule;
+
                 this.ruleCount = this._rules.Count;
             }
         }
@@ -184,7 +217,7 @@ namespace InvisibleHand.Items
         public void CopySortRules(ItemCategory other)
         {
             this._rules = other?.SortRules;
-            this.ruleCount = this._rules.Count;
+            this.ruleCount = this._rules?.Count ?? 0;
         }
 
         #endregion
