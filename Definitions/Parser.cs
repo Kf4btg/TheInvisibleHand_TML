@@ -163,8 +163,7 @@ namespace InvisibleHand.Definitions
 
                     foreach (var catobj in CatObjList)
                     {
-                        // get object bits
-
+                        // get object parts
                         var catdef = new
                         {
                             name = catobj.ContainsKey("name") ? catobj["name"].Qs() : "",
@@ -191,16 +190,16 @@ namespace InvisibleHand.Definitions
                         ItemCategory parent = null;
                         short priority;// = catdef.priority ?? 0;
 
-                        ///////////////////////////////////
+                        // /////////////////////////////////
                         // name field is always required //
-                        ///////////////////////////////////
+                        // /////////////////////////////////
 
                         if (catdef.name == String.Empty)
                             throw new HjsonFieldNotFoundException("name", nameof(catobj));
 
-                        ////////////////////////
+                        // //////////////////////
                         // get parent, if any //
-                        ////////////////////////
+                        // //////////////////////
                         if (catdef.parent_name != null)
                         {
                             try
@@ -234,6 +233,7 @@ namespace InvisibleHand.Definitions
                             priority = catdef.priority ?? 0;
                         }
 
+                        // A union category
                         if (catdef.merge != null)
                         {
                             // bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
@@ -260,96 +260,112 @@ namespace InvisibleHand.Definitions
                             }
                             CategoryDefinitions[catdef.name] = union;
                         }
-                        else
+
+                        // a 'Regular' category
+                        else if (catdef.requires != null)
                         {
-                            // parse requirements
-                            if (catobj.ContainsKey("requires"))
+                            // var reqs = new Dictionary<string, int>();
+
+                            // //////////////////////
+                            // parse requirements //
+                            // //////////////////////
+                            var reqs = parseRequirements(catdef.name, catdef.requires);
+
+                            // if, somehow, there are no requirements, don't bother adding to list
+                            if (reqs.Count > 0)
                             {
-                                var reqs = new Dictionary<string, int>();
+                                var newcategory = new RegularCategory(catdef.name, count++, reqs, parent, priority);
 
-                                foreach (var newreqs in catobj["requires"].Qo())
-                                {
-                                    var traitCategory = newreqs.Key;
-                                    // FlagCollection[TraitCategory][TraitName]
+                                // //////////////////////////////////////////////////////
+                                // Now, create/get the Sorting Rules for the category //
+                                // //////////////////////////////////////////////////////
 
-                                    IDictionary<string, int> flagvalues;
+                                if (catdef.sort_fields != null)
+                                    newcategory.BuildSortRules(catdef.sort_fields.Select(jv => jv.Qs()));
 
-                                    // using try-catch instead of TryGetValue because I'm not *expecting*
-                                    // the flag to be missing; therefore, under normal circumstances, the
-                                    // try block should always succeed and we don't have to worry about the
-                                    // performance difference between catch() && TryGetValue
-                                    try
-                                    {
-                                        flagvalues = FlagCollection[traitCategory];
-                                    }
-                                    catch (KeyNotFoundException knfe)
-                                    {
-                                        throw new UsefulKeyNotFoundException(
-                                            traitCategory,
-                                            nameof(FlagCollection),
-                                            knfe,
-                                            "Category '" +catdef.name + "': the requested Trait Category '{0}' is not present in '{1}'."
-                                        );
-                                    }
+                                else if (parent != null) // inherit from parent
+                                    newcategory.CopySortRules(parent);
+                                // newcategory.ruleExpressions = p?.ruleExpressions;
 
-                                    if (!reqs.ContainsKey(traitCategory))
-                                        reqs[traitCategory] = 0;
+                                // if the rules are still null, add a default rule of just sorting by type
+                                if (newcategory.SortRules == null)
+                                    newcategory.BuildSortRules(new[] {"type"}); // default
 
-                                    // go through the array of traits, add the appropriate flag value
-                                    foreach (string trait_name in newreqs.Value.Qa())
-                                    {
-                                        try
-                                        {
-                                            reqs[traitCategory] |= flagvalues[trait_name];
-                                        }
-                                        catch (KeyNotFoundException knfe)
-                                        {
-                                            throw new UsefulKeyNotFoundException(
-                                                trait_name,
-                                                nameof(FlagCollection)+"["+traitCategory+"]",
-                                                knfe,
-                                                "Category '" +catdef.name + "': the specified required trait '{0}' is not present in '{1}'."
-                                            );
-                                        }
+                                // if (newcategory.ruleExpressions == null)
+                                // {
+                                //     Console.WriteLine($"{category_name}: ruleExpressions is null");
+                                //     if (newcategory.SortRules == null)
+                                //         Console.WriteLine($"{category_name}: SortRules is null");
+                                //
+                                // }
+                                // else
+                                    // ConsoleHelper.PrintList(newcategory.ruleExpressions.Select(ex=>ex.ToString()), category_name, true);
 
-                                    }
-                                }
-
-                                // if, somehow, there are no requirements, don't bother adding to list
-
-                                if (reqs.Count > 0)
-                                {
-                                    var newcategory = new RegularCategory(catdef.name, count++, reqs, parent, priority);
-
-                                    // get sorting rules
-                                    if (catobj.ContainsKey("sort"))
-                                        newcategory.BuildSortRules(catobj["sort"].Qa().Select(jv => jv.Qs()));
-
-                                    else if (parent != null) // inherit from parent
-                                        newcategory.CopySortRules(parent);
-                                    // newcategory.ruleExpressions = p?.ruleExpressions;
-
-                                    // if the rules are still null, add a default rule of just sorting by type
-                                    if (newcategory.SortRules == null)
-                                        newcategory.BuildSortRules(new[] {"type"}); // default
-
-                                    // if (newcategory.ruleExpressions == null)
-                                    // {
-                                    //     Console.WriteLine($"{category_name}: ruleExpressions is null");
-                                    //     if (newcategory.SortRules == null)
-                                    //         Console.WriteLine($"{category_name}: SortRules is null");
-                                    //
-                                    // }
-                                    // else
-                                        // ConsoleHelper.PrintList(newcategory.ruleExpressions.Select(ex=>ex.ToString()), category_name, true);
-
-                                    CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
-                                }
+                                // store the new category in the collections
+                                CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
                             }
                         }
                     } // end of category-object list
                 }
             }
+        }
+
+
+
+        private static Dictionary<string, int> parseRequirements(string category_name, JsonObject requires_obj)
+        {
+            // parse requirements
+            var reqs = new Dictionary<string, int>();
+
+            foreach (var newreqs in requires_obj)
+            {
+                var traitCategory = newreqs.Key;
+                // FlagCollection[TraitCategory][TraitName]
+
+                IDictionary<string, int> flagvalues;
+
+                // using try-catch instead of TryGetValue because I'm not *expecting*
+                // the flag to be missing; therefore, under normal circumstances, the
+                // try block should always succeed and we don't have to worry about the
+                // performance difference between catch() && TryGetValue
+                try
+                {
+                    flagvalues = FlagCollection[traitCategory];
+                }
+                catch (KeyNotFoundException knfe)
+                {
+                    throw new UsefulKeyNotFoundException(
+                        traitCategory,
+                        nameof(FlagCollection),
+                        knfe,
+                        "Category '" +category_name + "': the requested Trait Category '{0}' is not present in '{1}'."
+                    );
+                }
+
+                if (!reqs.ContainsKey(traitCategory))
+                    reqs[traitCategory] = 0;
+
+                // go through the array of traits, add the appropriate flag value
+                foreach (string trait_name in newreqs.Value.Qa())
+                {
+                    try
+                    {
+                        reqs[traitCategory] |= flagvalues[trait_name];
+                    }
+                    catch (KeyNotFoundException knfe)
+                    {
+                        throw new UsefulKeyNotFoundException(
+                            trait_name,
+                            nameof(FlagCollection)+"["+traitCategory+"]",
+                            knfe,
+                            "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
+                        );
+                    }
+
+                }
+            }
+
+            return reqs;
         }
 
 
