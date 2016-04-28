@@ -48,7 +48,7 @@ namespace InvisibleHand
                             .SelectMany(g => g.OrderBy(i => i, g.Key))) ;
 
                 // var catlist = catquery.ToList();
-                //
+
                 ConsoleHelper.PrintList(catquery.Select(i => new { Category = i.GetCategory(), i }), "Sorted items", true);
 
                 return catquery; //.Select(c => c.Item);

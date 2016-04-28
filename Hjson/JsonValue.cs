@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using System.IO;
 // using System.Linq;
 // using System.Text;
 
 namespace Hjson
 {
-  using JsonPair=KeyValuePair<string, JsonValue>;
+  // using JsonPair=KeyValuePair<string, JsonValue>;
 
   /// <summary>The ToString format.</summary>
   public enum Stringify

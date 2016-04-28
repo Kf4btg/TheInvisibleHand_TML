@@ -7,8 +7,6 @@ using System.Reflection;
 using Hjson;
 // using Terraria;
 
-// using Terraria.ModLoader;
-
 using InvisibleHand.Utils;
 using InvisibleHand.Items;
 
@@ -51,6 +49,7 @@ namespace InvisibleHand.Definitions
             BuildCategoryTree();
         }
 
+        // haha this is like writing SOS on the beach with rocks so you can get rescued
         /*
         ██       ██████   █████  ██████      ████████ ██████   █████  ██ ████████ ███████
         ██      ██    ██ ██   ██ ██   ██        ██    ██   ██ ██   ██ ██    ██    ██
@@ -159,87 +158,107 @@ namespace InvisibleHand.Definitions
             {
                 using (Stream s = assembly.GetManifestResourceStream(res))
                 {
+                    // read in the file stream and turn into an array of JsonObjects where each is a Category Definition
                     var CatObjList = HjsonValue.Load(s).Qa();
 
                     foreach (var catobj in CatObjList)
                     {
-                        // name field is always required
-                        string category_name;
-                        try
-                        {
-                            category_name = catobj["name"].Qs();
-                        }
-                        catch (KeyNotFoundException knfe)
-                        {
-                            throw new HjsonFieldNotFoundException("name", nameof(catobj), knfe);
-                        }
+                        // get object bits
 
+                        var catdef = new
+                        {
+                            name = catobj.ContainsKey("name") ? catobj["name"].Qs() : "",
+                            parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() : null,
+
+                            // whether to activate this category
+                            enable = catobj.ContainsKey("enable") ? catobj["enable"].Qb() : true,
+
+                            // restrict assignable priority value to [-500..500] and shift left by 6 bits
+                            // to give us some guaranteed tweaking room between the priorities
+                            priority = catobj.ContainsKey("priority") ? (short?)(catobj["priority"].Qi().Clamp(-500, 500) << 6) : null,
+
+                            // the required traits for this category
+                            requires = catobj.ContainsKey("requires") ? catobj["requires"].Qo() : null,
+
+                            // any merged categories
+                            merge = catobj.ContainsKey("merge") ? catobj["merge"].Qa() : null,
+
+                            // ordered list of Item fields on which to sort items in this category
+                            sort_fields = catobj.ContainsKey("sort") ? catobj["sort"].Qa() : null,
+                        };
+
+                        // and placeholder values
                         ItemCategory parent = null;
-                        short priority = 0;
+                        short priority;// = catdef.priority ?? 0;
 
-                        // get parent, if any
-                        if (catobj.ContainsKey("parent"))
+                        ///////////////////////////////////
+                        // name field is always required //
+                        ///////////////////////////////////
+
+                        if (catdef.name == String.Empty)
+                            throw new HjsonFieldNotFoundException("name", nameof(catobj));
+
+                        ////////////////////////
+                        // get parent, if any //
+                        ////////////////////////
+                        if (catdef.parent_name != null)
                         {
-                            string parent_name = catobj["parent"]?.Qs();
-                            if (parent_name != null)
+                            try
                             {
-                                // TODO: don't fail on malformed categories/missing parents,
-                                // but log the error somewhere
+                                parent = CategoryDefinitions[catdef.parent_name];
 
-                                try
-                                {
-                                    parent = CategoryDefinitions[parent_name];
+                                // child categories inherit the priority of their parent.
+                                // each child level decreases the initial priority by 1;
+                                // we SUBTRACT the depth from the priority to make sure that more specific categories are
+                                // sorted first; for example, if "Weapon" has a priority of 500:
+                                //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
+                                // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
+                                // because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
+                                //
+                                // FIXME: under this scheme, sorting can go:
+                                //      Weapon.Melee.Broadsword > Weapon.Magic.Homing > Weapon.Melee > Weapon.Magic
+                                // which is neither ideal nor intuitive; seems we need some sort of depth-first approach?
 
-                                    // child categories inherit the priority of their parent.
-                                    // each child level decreases the initial priority by 1;
-                                    // we SUBTRACT the depth from the priority to make sure that more specific categories are
-                                    // sorted first; for example, if "Weapon" has a priority of 500:
-                                    //      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
-                                    // Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
-                                    // because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
-                                    priority = (short)(parent.Priority - 1);
-                                }
-                                catch (KeyNotFoundException knfe)
-                                {
-                                    throw new UsefulKeyNotFoundException(parent_name, nameof(CategoryDefinitions), knfe,
-                                        "Category '" +category_name + "': The specified parent category '{0}' was not found in '{1}'."
-                                    );
-                                }
+                                // an explicitly-set priority overrides default or inherited value
+                                priority = catdef.priority ?? (short)(parent.Priority - 1);
+                            }
+                            catch (KeyNotFoundException knfe)
+                            {
+                                throw new UsefulKeyNotFoundException(catdef.parent_name, nameof(CategoryDefinitions), knfe,
+                                    "Category '" +catdef.name + "': The specified parent category '{0}' was not found in '{1}'."
+                                );
                             }
                         }
-
-                        // an explicitly-set priority overrides default or inherited value
-                        if (catobj.ContainsKey("priority"))
-                            // restrict assignable value to [-500..500] and shift left by 6 bits
-                            // to give us some guaranteed tweaking room between the priorities
-                            priority = (short)(catobj["priority"].Qi().Clamp(-500, 500) << 6);
-
-                        // parse merged categories
-                        if (catobj.ContainsKey("merge"))
+                        else
                         {
-                            bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
+                            priority = catdef.priority ?? 0;
+                        }
 
-                            var merge_wrapper = new ItemCategory(category_name, count++, parent, is_merge_wrapper: true, priority: priority);
+                        if (catdef.merge != null)
+                        {
+                            // bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
+
+                            var union = new UnionCategory(catdef.name, count++, parent, priority: priority);
 
                             // TODO: allow enable/disable at runtime
-                            if (is_enabled)
+                            if (catdef.enable)
                             {
-                                foreach (var wrapped in catobj["merge"].Qa())
+                                foreach (var member in catdef.merge)
                                 {
                                     // let each category listed under "merge"
                                     // know which wrapper it has been assigned to
                                     try
                                     {
-                                        CategoryDefinitions[wrapped].Merge(merge_wrapper);
+                                        CategoryDefinitions[member].Merge(union);
                                     }
                                     catch (KeyNotFoundException e)
                                     {
                                         //FIXME: use ErrorLogger
-                                        Console.WriteLine("{0}: {1}", wrapped, e.Message);
+                                        Console.WriteLine("{0}: {1}", member, e.Message);
                                     }
                                 }
                             }
-                            CategoryDefinitions[category_name] = merge_wrapper;
+                            CategoryDefinitions[catdef.name] = union;
                         }
                         else
                         {
@@ -269,7 +288,7 @@ namespace InvisibleHand.Definitions
                                             traitCategory,
                                             nameof(FlagCollection),
                                             knfe,
-                                            "Category '" +category_name + "': the requested Trait Category '{0}' is not present in '{1}'."
+                                            "Category '" +catdef.name + "': the requested Trait Category '{0}' is not present in '{1}'."
                                         );
                                     }
 
@@ -289,7 +308,7 @@ namespace InvisibleHand.Definitions
                                                 trait_name,
                                                 nameof(FlagCollection)+"["+traitCategory+"]",
                                                 knfe,
-                                                "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
+                                                "Category '" +catdef.name + "': the specified required trait '{0}' is not present in '{1}'."
                                             );
                                         }
 
@@ -300,7 +319,7 @@ namespace InvisibleHand.Definitions
 
                                 if (reqs.Count > 0)
                                 {
-                                    var newcategory = new ItemCategory(category_name, count++, reqs, parent, priority);
+                                    var newcategory = new RegularCategory(catdef.name, count++, reqs, parent, priority);
 
                                     // get sorting rules
                                     if (catobj.ContainsKey("sort"))
@@ -308,7 +327,7 @@ namespace InvisibleHand.Definitions
 
                                     else if (parent != null) // inherit from parent
                                         newcategory.CopySortRules(parent);
-                                        // newcategory.ruleExpressions = p?.ruleExpressions;
+                                    // newcategory.ruleExpressions = p?.ruleExpressions;
 
                                     // if the rules are still null, add a default rule of just sorting by type
                                     if (newcategory.SortRules == null)
@@ -347,7 +366,7 @@ namespace InvisibleHand.Definitions
         /// checking each category individually.
         /// NOTE: if the ordering of the categories changes (i.e. if changing priorities is allowed at runtime),
         /// the tree will need to be rebuilt each time to reflect the changes.
-        private static void BuildCategoryTree()
+        public static void BuildCategoryTree()
         {
             // create the root of the tree; the label here is unimportant. All other labels
             // will be created automatically during autovivification, using the ordinal value of the category

@@ -41,5 +41,11 @@
       Material: ["dye_plant"]
     }
   }
-
+  {
+    name: Critter
+    parent: Material
+    requires: {
+      Material: ["critter"]
+    }
+  }
 ]

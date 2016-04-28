@@ -23,4 +23,28 @@
       stack
     ]
   }
+
+  {
+    name: Expert Items
+    parent: null
+    priority: 1
+    enabled: false
+    requires: {
+      General: ["expert"]
+    }
+    sort: [
+      accessory
+      type
+      rare
+      value
+      stack
+    ]
+  }
+  {
+    name: Butterfly
+    parent: Bait
+    requires: {
+      Material: ["butterfly"]
+    }
+  }
 ]

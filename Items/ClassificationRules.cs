@@ -284,6 +284,13 @@ namespace InvisibleHand.Items
             public static bool NebulaPickup(Item item) => contains(ItemID.Sets.NebulaPickup, item.type);
 
             public static bool GoesInExtractinator(Item item) => ItemID.Sets.ExtractinatorMode.Contains(item.type);
+
+            #region npcs
+
+            public static bool Critter(Item item) => item.makeNPC != 0;
+            public static bool Butterfly(Item item) => item.makeNPC == 356;
+
+            #endregion
         }
 
         internal static class Dyes

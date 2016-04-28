@@ -9,12 +9,10 @@ namespace InvisibleHand.Items
 
     using ItemCompRule = Func<Item, Item, int>;
 
-    public class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
+    public abstract class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
 
-        // private short _priority;
-
-        /// the explicitly set sort-priority for this category
+        /// the sort-priority for this category
         public short Priority;
 
         /// A unique identifying number for this category; usually
@@ -35,83 +33,125 @@ namespace InvisibleHand.Items
             }
         }
 
-        public IDictionary<string, int> Requirements { get; set; }
-
-
-        private ISet<string> _wrapped_cats;
-        /// this may be unnecessary; intended to hold the list of
-        /// category names that have been merged to this one if this is a
-        /// merge-container; only the names are stored because it should
-        /// not be necessary to directly access the merged categories from here.
-        public ISet<string> MergedCategories => _wrapped_cats;
-
         /// the parent's requirements will have already been merged into
         /// this Category's requirements, so this property is really only
         /// here to help with determining sort-order.
         public ItemCategory Parent { get; private set; }
 
-        /// indicates whether this Category is simply a container
-        /// for the categories that were merged into it. If so, it
-        /// cannot have Requirements, and Matches() will always return null.
-        /// When a category that has been merged into this one has its
-        /// Matches() method called, it will a reference to this instance
-        /// rather than itself.
-        public readonly bool IsMergeWrapper;
-
         /// if not null, then this is the Wrapper-Category that this
         /// category has been merged into
-        private ItemCategory _wrapper_category;
-
+        protected UnionCategory _union;
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
-        public ItemCategory GetCategory => _wrapper_category ?? this;
+        public ItemCategory GetCategory => _union ?? this;
 
 
-        public ItemCategory(string name, ushort cat_id, ItemCategory parent = null, bool is_merge_wrapper = false, short priority = 0)
+        public ItemCategory(string name, ushort cat_id, ItemCategory parent = null, short priority = 0)
         {
             Name = name;
             Parent = parent;
             Priority = priority;
             ID = cat_id;
-
-            IsMergeWrapper = is_merge_wrapper;
-
-            if (IsMergeWrapper)
-                _wrapped_cats = new HashSet<string>();
-            else
-                Requirements = new Dictionary<string, int>();
         }
 
-        /// initialize the category with a pre-created requirements dict
-        public ItemCategory(string name, ushort cat_id, IDictionary<string, int> requirements, ItemCategory parent = null, short priority = 0)
+        public abstract bool Matches(Item item);
+        public abstract bool Matches(IDictionary<string, int> item_flags);
+
+        public abstract ItemCategory Match(IDictionary<string, int> item_flags);
+
+
+        public void Merge(UnionCategory union)
         {
-            Name = name;
-            Parent = parent;
-            Priority = priority;
-            ID = cat_id;
+            this._union = union;
+            union.AddMember(this);
+        }
+        public void Unmerge()
+        {
+            this._union.RemoveMember(this);
+            this._union = null;
+        }
 
-            IsMergeWrapper = false;
+        #region interface implementations
+        public int CompareTo(ItemCategory other)
+        {
+            return this.Ordinal.CompareTo(other.Ordinal);
+        }
 
-            Requirements = requirements;
+        public bool Equals(ItemCategory other)
+        {
+            return this.ID == other?.ID;
+        }
+
+        public override bool Equals(Object other)
+        {
+            if (other == null) return false;
+
+            ItemCategory other_cat = other as ItemCategory;
+
+            return Equals(other_cat);
+        }
+
+        /// priority might change if the user modifies their preferred
+        /// sort order; ID should remain immutable throughout the lifetime
+        /// of this category.
+        public override int GetHashCode()
+        {
+            return this.ID;
+        }
+
+        public static bool operator ==(ItemCategory cat1, ItemCategory cat2)
+        {
+            if ((object)cat1 == null || (object)cat2 == null)
+                return Object.Equals(cat1, cat2);
+
+            return cat1.Equals(cat2);
+        }
+
+        public static bool operator !=(ItemCategory cat1, ItemCategory cat2)
+        {
+            if ((object)cat1 == null || (object)cat2 == null)
+                return ! Object.Equals(cat1, cat2);
+
+            return ! (cat1.Equals(cat2));
+        }
+
+
+        public abstract int Compare(Item t1, Item t2);
+
+        #endregion
+
+        /// this is what will be returned when an item somehow doesn't match any defined category
+        public static readonly ItemCategory None = new RegularCategory("Unknown", ushort.MaxValue, null, null, short.MaxValue);
+
+
+        public override string ToString()
+        {
+            return $"{{{QualifiedName}: p{Priority}, ID#{ID}";
+        }
+    }
+
+    public class RegularCategory : ItemCategory
+    {
+
+        public IDictionary<string, int> Requirements { get; set; }
+
+        public RegularCategory(string name, ushort cat_id, IDictionary<string, int> requirements = null, ItemCategory parent = null, short priority = 0)
+        : base (name, cat_id, parent, priority)
+        {
+            Requirements = requirements ?? new Dictionary<string, int>();
         }
 
         public void AddTraitRequirement(string trait_family, int flag_value)
         {
-            // TODO: throw a proper exception when attempting to add req to merge containers
-            if (IsMergeWrapper)
-                return;
-
             if (Requirements.ContainsKey(trait_family))
                 Requirements[trait_family] |= flag_value;
             else
                 Requirements[trait_family] = flag_value;
         }
 
-        public bool Matches(IDictionary<string, int> item_flags)
+        public override bool Matches(IDictionary<string, int> item_flags)
         {
-            if (this.IsMergeWrapper) return false;
-            // return this.Matches(item_flags) != null;
             foreach (var kvp in Requirements)
             {
                 var reqval = kvp.Value;
@@ -125,9 +165,14 @@ namespace InvisibleHand.Items
             return true;
         }
 
-        public ItemCategory Match(IDictionary<string, int> item_flags)
+        public override bool Matches(Item item)
         {
-            if (this.IsMergeWrapper) return null;
+            return Matches(item.GetFlagInfo().Flags);
+        }
+
+
+        public override ItemCategory Match(IDictionary<string, int> item_flags)
+        {
             foreach (var kvp in Requirements)
             {
                 var reqval = kvp.Value;
@@ -146,18 +191,7 @@ namespace InvisibleHand.Items
             return this.GetCategory;
         }
 
-        public void Merge(ItemCategory wrapper)
-        {
-            this._wrapper_category = wrapper;
-            wrapper.MergedCategories.Add(this.Name);
-        }
-        public void Unmerge()
-        {
-            this._wrapper_category = null;
-        }
-
         #region internal item-sorting rules
-        // private IList<Func<T, bool>> SortRules = new List<Func<T, bool>>();
 
         /// caches the compiled rules by the name of the property being compared
         private static IDictionary<string, ItemCompRule> RuleCache = new Dictionary<string, ItemCompRule>();
@@ -216,59 +250,18 @@ namespace InvisibleHand.Items
         /// copy the sorting rules from another category
         public void CopySortRules(ItemCategory other)
         {
-            this._rules = other?.SortRules;
+            var target = other as RegularCategory;
+
+            this._rules = target?.SortRules;
             this.ruleCount = this._rules?.Count ?? 0;
         }
 
         #endregion
 
-        #region interface implementations
-        public int CompareTo(ItemCategory other)
-        {
-            return this.Ordinal.CompareTo(other.Ordinal);
-        }
-
-        public bool Equals(ItemCategory other)
-        {
-            return this.ID == other?.ID;
-        }
-
-        public override bool Equals(Object other)
-        {
-            if (other == null) return false;
-
-            ItemCategory other_cat = other as ItemCategory;
-
-            return Equals(other_cat);
-        }
-
-        /// priority might change if the user modifies their preferred
-        /// sort order; ID should remain immutable throughout the lifetime
-        /// of this category.
-        public override int GetHashCode()
-        {
-            return this.ID;
-        }
-
-        public static bool operator ==(ItemCategory cat1, ItemCategory cat2)
-        {
-            if ((object)cat1 == null || (object)cat2 == null)
-                return Object.Equals(cat1, cat2);
-
-            return cat1.Equals(cat2);
-        }
-
-        public static bool operator !=(ItemCategory cat1, ItemCategory cat2)
-        {
-            if ((object)cat1 == null || (object)cat2 == null)
-                return ! Object.Equals(cat1, cat2);
-
-            return ! (cat1.Equals(cat2));
-        }
 
         /// IComparer<Item> implementation
         /// using the pre-compiled Sorting rules
-        public int Compare(Item t1, Item t2)
+        public override int Compare(Item t1, Item t2)
         {
             int res;
             for (int i = 0; i < ruleCount; i++)
@@ -279,17 +272,115 @@ namespace InvisibleHand.Items
             }
             return 0;
         }
-        #endregion
+    }
 
-        /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new ItemCategory("Unknown", ushort.MaxValue, null, false, short.MaxValue);
+    public class UnionCategory : ItemCategory
+    {
+
+        /// this may be unnecessary; intended to hold the list of
+        /// categories that have been merged to this one if this is a
+        /// merge-container
+        /// Item Category implements IComparable and GetHashCode, so this should be efficient
+        public ISet<ItemCategory> UnionMembers { get; private set; }
+
+        /// Returns the member category that matched the most recent Match()/Matches() check,
+        /// or null if none did
+        public ItemCategory Matched { get; private set; }
 
 
-        public override string ToString()
+        public UnionCategory(string name, ushort cat_id, ItemCategory parent = null, short priority = 0) : base(name, cat_id, parent, priority)
         {
-            return $"{{{QualifiedName}: p{Priority}, ID#{ID}";
+            // Item Category implements IComparable and GetHashCode, so this should be efficient
+            UnionMembers = new SortedSet<ItemCategory>();
+        }
+
+        public void AddMember(ItemCategory newMember)
+        {
+            this.UnionMembers.Add(newMember);
+        }
+
+        public void RemoveMember(ItemCategory member)
+        {
+            this.UnionMembers.Remove(member);
+        }
+
+        /// <summary>
+        /// Check if the given flags are a fit for this category
+        /// </summary>
+        /// <param name="item_flags"> </param>
+        /// <returns>True if the flags match any of the contained categories</returns>
+        public override bool Matches(IDictionary<string, int> item_flags)
+        {
+            foreach (var mem in UnionMembers)
+            {
+                if (mem.Matches(item_flags))
+                {
+                    Matched = mem;
+                    return true;
+                }
+            }
+            Matched = null;
+            return false;
+        }
+
+        public override bool Matches(Item item)
+        {
+            return Matches(item.GetFlagInfo().Flags);
+        }
+
+        /// <summary>
+        /// Check if the given flags are a fit for this category
+        /// </summary>
+        /// <param name="item_flags"> </param>
+        /// <returns>This category if matched, null if not</returns>
+        public override ItemCategory Match(IDictionary<string, int> item_flags)
+        {
+            return this.Matches(item_flags) ? this : null;
         }
 
 
+        /// IComparer<Item> implementation
+        /// using the sorting rules for the union members
+        public override int Compare(Item t1, Item t2)
+        {
+            ItemCategory c1, c2;
+
+            // I guess we'll just assume for now that the items actually belong in this union
+            c1 = c2 = null;
+            if (Matches(t1))
+                c1 = Matched;
+            if (Matches(t2))
+                c2 = Matched;
+            //
+            // if either or both of the items do not belong to this union:
+            if (c1 == null)
+                return (c2 == null) ? 0 : -1;
+            if (c2 == null)
+                return 1;
+
+            // get the (sub-)categories for the items; for now we're just going to assume
+            // that each item belongs to one of the UnionMembers
+            // I thought that might happen...infinite recursive oblivion!
+            // var c1 = t1.GetCategory();
+            // var c2 = t2.GetCategory();
+
+            // if the items belong to the same category:
+            if (c1 == c2)
+                return c1.Compare(t1, t2);
+
+            // or, if they're different categories, return the category order:
+            return c1.CompareTo(c2);
+        }
+
     }
+
+
+
+
+
+
+
+
+
+
 }

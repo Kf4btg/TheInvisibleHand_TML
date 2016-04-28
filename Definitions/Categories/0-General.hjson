@@ -178,6 +178,7 @@
         stack
       ]
     }
+
     {
       name: Consumable
       priority: 250

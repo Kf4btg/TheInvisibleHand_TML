@@ -304,6 +304,8 @@ namespace InvisibleHand.Items
                     {"gem",           ByTileID.Gem},
                     {"alchemy",       Sets.AlchemyIngredient},
                     {"soul",          Sets.Soul},
+                    {"critter",       Sets.Critter},
+                    {"butterfly",     Sets.Butterfly},
                 }
 
             }

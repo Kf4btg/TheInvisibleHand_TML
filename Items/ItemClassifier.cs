@@ -45,6 +45,8 @@ namespace InvisibleHand.Items
             bool _weapon, _tool;
             _weapon = _tool = false;
 
+
+            // some generic or unique traits that don't really fall under other categories
             item.FlagAny("General", "quest_item",
                                     "expert",
                                     "bait",
@@ -59,8 +61,29 @@ namespace InvisibleHand.Items
                                     "hair_dye"
             );
 
+            // Items of all types can be materials, so run them all through this check
+            if (item.TryFlag("General", "material"))
+            {
+                // But for items that are **primarily** used as materials, tag them here
+                item.FlagAny("Material", "ore",
+                                         "bar",
+                                         "gem",
+                                         "dye_plant",
+                                         "alchemy",
+                                         "soul",
+                                         "critter",
+                                         "butterfly"
+                                        );
+            }
+
+            // various weapons, tools, equipment, and placeables can have a reach-boost
             if (!item.TryFlag("General", "reach_boost"))
                 item.Flag("General", "reach_penalty");
+
+
+            /////////////
+            // weapons //
+            /////////////
 
             _weapon = item.TryFlag("General", "weapon");
             if (_weapon)
@@ -139,22 +162,6 @@ namespace InvisibleHand.Items
                                           "lunar");
             }
 
-
-            // materials
-            if (item.TryFlag("General", "material"))
-            {
-                // there's obviously many more types of materials than this, but this is a decent set
-                // of items that are **primarily** used as materials
-                item.FlagAny("Material", "ore",
-                                         "bar",
-                                         "gem",
-                                         "dye_plant",
-                                         "alchemy",
-                                         "soul"
-                                        );
-            }
-
-
             if (item.TryFlag("General", "mech"))
                 item.FlagFirst("Mech", "trap", "pressure_plate", "timer", "firework", "track");
         }
@@ -170,12 +177,17 @@ namespace InvisibleHand.Items
                 .FlagIf(!item.item.consumable, "Ammo", "endless"); // endless quiver, musket pouch, etc
         }
 
+        // FIXME: doesn't seem to work
         private static void classifyConsumable(ItemClassificationWrapper item)
         {
             item.Flag("Consumable", "buff")
                 .FlagFirst("Consumable", "food", "flask", "potion");
         }
 
+        /// <summary>
+        /// Use to add traits relating to furniture, block-type, tile properties, etc.
+        /// </summary>
+        /// <param name="item"> </param>
         private static void classifyPlaceable(ItemClassificationWrapper item)
         {
             // flag blocks, walls, misc
@@ -305,6 +317,12 @@ namespace InvisibleHand.Items
             item.FlagIf(is_furniture, "Placeable", "furniture");
         }
 
+        /// <summary>
+        /// Examine and assign traits for the weapon represented by `item`
+        /// </summary>
+        /// <param name="item"> </param>
+        /// <param name="type"> should only be "Weapon" (sanity check)</param>
+        /// <param name="flag"> should be the type of the weapon (e.g. "type_melee")</param>
         private static void classifyWeapon(ItemClassificationWrapper item, string type, string flag)
         {
             if (type != "Weapon") return;
@@ -356,11 +374,10 @@ namespace InvisibleHand.Items
 
                     break;
                 case "type_throwing":
-                    // break;
-                default:
-                    // tag as 'other' if not a throwing weapon
                     // (there are no sub-categories for thrown weapons yet,
                     // so there's no Flag Type or extra condititions for them either)
+                    // break;
+                default:
                     // item.Flag("Weapon", "type_other");
                     break;
             }

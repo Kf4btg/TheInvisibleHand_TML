@@ -11,7 +11,7 @@
 
     # here is the default value for whether this
     # grouping is performed by default
-    enabled: false
+    enable: false
 
     # and this is the merge-list; each item within
     # the list is the name of a previously-defined category
@@ -23,7 +23,7 @@
   {
     name: Manual Tools
     parent: Tool
-    enabled: false
+    enable: false
     merge: [
       Pick
       Axe
@@ -33,7 +33,7 @@
   {
     name: Power Tools
     parent: Tool
-    enabled: false
+    enable: false
     merge: [
       Drill
       Chainsaw
@@ -43,7 +43,7 @@
   {
     name: Multi Tools
     parent: Tool
-    enabled: false
+    enable: false
     merge: [
       Picksaw
       Hamaxe
@@ -52,7 +52,7 @@
   {
     name: Firearms
     parent: Ranged
-    enabled: true
+    enable: true
     merge: [
       Gun
       Automatic Gun
@@ -61,7 +61,7 @@
   {
     name: Archery
     parent: Ranged
-    enabled: true
+    enable: true
     merge: [
       Bow
       Repeater
@@ -70,7 +70,7 @@
   {
     name: Gauntlets
     parent: Accessory
-    enabled: true
+    enable: true
     merge: [
       On-Hand Gauntlet
       Off-Hand Gauntlet
@@ -79,7 +79,7 @@
   {
     name: Ropes
     parent: Placeable
-    enabled: true
+    enable: true
     merge: [
       Rope
       Rope Coil
@@ -88,7 +88,7 @@
   {
     name: Dye Stuff
     parent: Material
-    enabled: true
+    enable: true
     merge: [
       Dye Plant
       Strange Plant
