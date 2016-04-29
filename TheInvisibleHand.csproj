@@ -105,9 +105,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TheInvisibleHand.cs" />
-    <!-- <Compile Include="Category.cs" /> -->
-    <!-- <Compile Include="CategoryInit.cs" /> -->
-    <!-- <Compile Include="CategoryDef.cs" /> -->
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IHCommandHandler.cs" />
@@ -116,8 +113,22 @@
     <Compile Include="IHOrganizer.cs" />
     <Compile Include="IHPlayer.cs" />
     <Compile Include="IHWorld.cs" />
-    <Compile Include="Definitions\Parser.cs" />
     <!-- <Compile Include="Definitions\Category.cs" /> -->
+    <Compile Include="Definitions\Parser.cs" />
+
+    <Compile Include="Items\ItemCategory.cs" />
+    <Compile Include="Items\ClassificationRules.cs" />
+    <Compile Include="Items\ConditionTable.cs" />
+    <Compile Include="Items\ItemClassHandler.cs" />
+    <Compile Include="Items\ItemClassifier.cs" />
+    <Compile Include="Items\ItemFlagInfo.cs" />
+    <Compile Include="Items\ItemRuleBuilder.cs" />
+    <Compile Include="Items\Sets.cs" />
+
+    <Compile Include="Rules\Rule.cs" />
+    <Compile Include="Rules\RuleBuilder.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+
     <Compile Include="Utils\AutoDict.cs" />
     <Compile Include="Utils\CommandHelper.cs" />
     <Compile Include="Utils\ConsoleHelper.cs" />
@@ -125,23 +136,7 @@
     <Compile Include="Utils\OptionManager.cs" />
     <Compile Include="Utils\SoundManager.cs" />
     <!-- <Compile Include="Utils\IDecision.cs" /> -->
-    <!-- <Compile Include="Items\CategoryInfo.cs" /> -->
-    <Compile Include="Items\ItemCategory.cs" />
-    <!--<Compile Include="Items\CategoryMatcher.cs" />-->
-    <Compile Include="Items\ClassificationRules.cs" />
-    <!-- <Compile Include="Items\ClassifiedItem.cs" /> -->
-    <Compile Include="Items\ConditionTable.cs" />
-    <!-- <Compile Include="Items\ItemCategorizer.cs" /> -->
-    <Compile Include="Items\ItemClassHandler.cs" />
-    <Compile Include="Items\ItemClassifier.cs" />
-    <Compile Include="Items\ItemFlagInfo.cs" />
-    <!-- <Compile Include="Items\ItemFlags.cs" /> -->
-    <Compile Include="Items\Sets.cs" />
-    <Compile Include="Rules\Rule.cs" />
-    <Compile Include="Rules\RuleBuilder.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <!-- <Compile Include="DynamicQuery\Dynamic.cs" /> -->
-    <!-- <Compile Include="DynamicQuery\Properties\AssemblyInfo.cs" /> -->
+
     <Compile Include="Hjson\HjsonOptions.cs" />
     <Compile Include="Hjson\JsonValue.cs" />
     <Compile Include="Hjson\JsonWriter.cs" />
