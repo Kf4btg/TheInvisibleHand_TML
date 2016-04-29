@@ -196,6 +196,7 @@ namespace InvisibleHand.Definitions
                         // get parent, if any
                         ItemCategory parent = getParent(catdef.name, catdef.parent_name);
 
+
                         // and priority, either specific to this category or inherited from parent (or default 0)
                         short priority = getPriority(parent, catdef.priority);
 
@@ -208,11 +209,17 @@ namespace InvisibleHand.Definitions
 
                             var union = new UnionCategory(catdef.name, count++, parent, priority: priority);
 
+                            if (parent != null)
+                            {
+                                union.thisChildIndex = ++parent.childCount;
+                            }
+
                             // TODO: allow enable/disable at runtime
                             if (catdef.enable)
                                 mergeUnionMembers(union, catdef.merge);
 
-                            CategoryDefinitions[catdef.name] = union;
+                            // XXX: should we add the unions to the search tree?
+                            CategoryDefinitions[union.Name] = CategoryIDs[union.ID] = union;
                         }
 
                         // a 'Regular' category
@@ -228,6 +235,10 @@ namespace InvisibleHand.Definitions
                             {
                                 // otherwise, create the new category object
                                 var newcategory = new RegularCategory(catdef.name, count++, reqs, parent, priority);
+                                if (parent != null)
+                                {
+                                    newcategory.thisChildIndex = ++parent.childCount;
+                                }
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
@@ -330,10 +341,8 @@ namespace InvisibleHand.Definitions
                             "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
                         );
                     }
-
                 }
             }
-
             return reqs;
         }
 
@@ -392,7 +401,6 @@ namespace InvisibleHand.Definitions
         {
             // create the root of the tree; the label here is unimportant. All other labels
             // will be created automatically during autovivification, using the ordinal value of the category
-            // var cattree = new SortedAutoTree<string, ItemCategory>() { Label = "root" };
             var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
 
             foreach (var kvp in CategoryDefinitions)
@@ -417,12 +425,10 @@ namespace InvisibleHand.Definitions
                 while (catstack.Count > 0)
                 {
                     subtree = subtree[catstack.Pop().Ordinal];
-                    // subtree = subtree[catstack.Pop().Name];
                 }
 
                 // now [create the child]/[set its data if it
                 // has already been created by a previous operation]
-                // subtree[category.Name].Data = category;
                 subtree[category.Ordinal].Data = category;
             }
 

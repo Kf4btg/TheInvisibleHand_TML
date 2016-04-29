@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using InvisibleHand.Rules;
 using Terraria;
 
 namespace InvisibleHand.Items
@@ -14,6 +12,9 @@ namespace InvisibleHand.Items
 
         /// the sort-priority for this category
         public short Priority;
+
+        internal int childCount = 0;
+        internal int thisChildIndex = 0;
 
         /// A unique identifying number for this category; usually
         /// the order in which this item was loaded from the definition file;
