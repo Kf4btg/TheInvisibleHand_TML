@@ -58,7 +58,7 @@ namespace InvisibleHand.Items
         public string Name { get; private set; }
         public string QualifiedName {
             get {
-                if (Parent != null)
+                if (ParentID > 0)
                     return Parent.QualifiedName + "." + Name;
                 return Name;
             }
@@ -69,7 +69,7 @@ namespace InvisibleHand.Items
         /// here to help with determining sort-order.
         public ItemCategory Parent
         {
-            get { return Registry[this.ParentID]; }
+            get { return ParentID > 0 ? Registry[this.ParentID] : null; }
             set { this.ParentID = value?.ID ?? 0; }
         }
 

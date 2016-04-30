@@ -194,7 +194,7 @@ namespace InvisibleHand.Definitions
                         // get parent, if any
                         // ItemCategory parent = getParent(catdef.name, catdef.parent_name);
                         ushort parentID = getParentID(catdef.name, catdef.parent_name);
-                        ItemCategory parent = parentID > 0 ? ItemCategory.Registry[parentID] : null;
+                        // ItemCategory parent = parentID > 0 ? ItemCategory.Registry[parentID] : null;
 
 
                         // and priority, either specific to this category or inherited from parent (or default 0)
@@ -407,7 +407,7 @@ namespace InvisibleHand.Definitions
             assignAddresses(0, ushort.MaxValue, 0, lookup_byparentID);
 
             // TESTING
-            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Priority).Select(c=> new {name=c.Name, order=c.Priority}), "Categories in order", true);
+            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Priority).Select(c=> new {name=c.QualifiedName, order=c.Priority}), "Categories in order", true);
 
             // var bare_categories = CategoryDefinitions.Select(kvp => kvp.Value);
             // all toplevel categories
