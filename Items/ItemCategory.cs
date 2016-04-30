@@ -378,14 +378,19 @@ namespace InvisibleHand.Items
         public ItemCategory Matched { get; private set; }
 
 
-        public UnionCategory(string name, ushort cat_id, ItemCategory parent = null, short priority = 0) : base(name, cat_id, parent, priority)
+        public UnionCategory(string name, ushort cat_id, ushort parent_id = 0, short priority = 0, IEnumerable<ItemCategory> members=null) : base(name, cat_id, parent_id, priority)
         {
-            // Item Category implements IComparable and GetHashCode, so this should be efficient
-            UnionMembers = new SortedSet<ItemCategory>();
+            if (members == null)
+                UnionMembers = new SortedSet<ItemCategory>();
+            else
+                UnionMembers = new SortedSet<ItemCategory>(members);
         }
 
+        public UnionCategory(string name, ushort cat_id, ItemCategory parent = null, short priority = 0, IEnumerable<ItemCategory> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
+
+
         // Tracking member Categories
-        // ------------------
+        // ---------------------------
         public void AddMember(ItemCategory newMember)
         {
             this.UnionMembers.Add(newMember);
