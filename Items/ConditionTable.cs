@@ -6,14 +6,12 @@ namespace InvisibleHand.Items
 {
     // using static ItemFlags;
     using static ClassificationRules;
-    // using condition_table = Dictionary<int, Func<Item, bool>>;
-    using string_table = Dictionary<string, Func<Item, bool>>;
+    using condition_table = Dictionary<string, Func<Item, bool>>;
 
     internal static class ConditionTable
     {
-        private static bool REPLACE_ME(Item item) => true;
-        // public static readonly Dictionary<ItemFlags.Type, condition_table> RuleMatrix;
-        public static readonly Dictionary<string, string_table> StringMatrix = new Dictionary<string, string_table>()
+        // private static bool REPLACE_ME(Item item) => true;
+        public static readonly Dictionary<string, condition_table> RuleMatrix = new Dictionary<string, condition_table>()
         {
             /*
              ██████  ███████ ███    ██ ███████ ██████   █████  ██
@@ -22,7 +20,7 @@ namespace InvisibleHand.Items
             ██    ██ ██      ██  ██ ██ ██      ██   ██ ██   ██ ██
              ██████  ███████ ██   ████ ███████ ██   ██ ██   ██ ███████
             */
-            {"General", new string_table
+            {"General", new condition_table
                 {
                     {"quest_item",    (i) => i.questItem},
                     {"expert",        (i) => i.expert},
@@ -59,7 +57,7 @@ namespace InvisibleHand.Items
             ██      ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██
             ██      ███████ ██   ██  ██████ ███████ ██   ██ ██████  ███████ ███████
             */
-            {"Placeable", new string_table
+            {"Placeable", new condition_table
                 {
                     {"lighted",       Binary.givesLight},
                     //~ {"furniture",  REPLACE_ME},
@@ -89,7 +87,7 @@ namespace InvisibleHand.Items
             ██   ██ ██      ██    ██ ██      ██  ██
             ██████  ███████  ██████   ██████ ██   ██
             */
-            {"Placeable.Block", new string_table
+            {"Placeable.Block", new condition_table
                 {
                     // {"brick", },
                     {"bouncy", Sets.BouncyBlock},
@@ -116,7 +114,7 @@ namespace InvisibleHand.Items
             ██   ██ ██  ██  ██ ██  ██  ██ ██    ██
             ██   ██ ██      ██ ██      ██  ██████
             */
-            {"Ammo", new string_table
+            {"Ammo", new condition_table
                 {
                     {"arrow",     (i) => i.ammo == Constants.AmmoID.Arrow},
                     {"bullet",    (i) => i.ammo == Constants.AmmoID.Bullet},
@@ -135,7 +133,7 @@ namespace InvisibleHand.Items
             ██   ██    ██    ██
             ██████     ██    ███████
             */
-            {"Dye", new string_table
+            {"Dye", new condition_table
                 {
                     {"basic",    Dyes.BasicDyes},
                     {"black",    Dyes.BlackDyes},
@@ -155,7 +153,7 @@ namespace InvisibleHand.Items
             ███████  ██████   ██████  ██ ██
                         ▀▀
             */
-            {"Equip", new string_table
+            {"Equip", new condition_table
                 {
                     {"armor",        Binary.isArmor},
                     {"accessory",    (i) => i.accessory},
@@ -191,7 +189,7 @@ namespace InvisibleHand.Items
             ██ ███ ██ ██      ██   ██ ██      ██    ██ ██  ██ ██
              ███ ███  ███████ ██   ██ ██       ██████  ██   ████
             */
-            {"Weapon", new string_table
+            {"Weapon", new condition_table
                 {
                     {"automatic",       (i) => i.autoReuse},
                     {"type_melee",      (i) => i.melee},
@@ -210,7 +208,7 @@ namespace InvisibleHand.Items
             ██  ██  ██ ██      ██      ██      ██
             ██      ██ ███████ ███████ ███████ ███████
             */
-            {"Weapon.Melee", new string_table
+            {"Weapon.Melee", new condition_table
                 {
                     {"style_swing",       Weapons.Melee.Swing},
                     {"style_jab",         Weapons.Melee.Jab},
@@ -231,7 +229,7 @@ namespace InvisibleHand.Items
             ██   ██ ██   ██ ██  ██ ██ ██    ██ ██      ██   ██
             ██   ██ ██   ██ ██   ████  ██████  ███████ ██████
             */
-            {"Weapon.Ranged", new string_table
+            {"Weapon.Ranged", new condition_table
                 {
                     {"bullet_consuming", Weapons.Ranged.BulletConsuming},
                     {"arrow_consuming",  Weapons.Ranged.ArrowConsuming},
@@ -249,7 +247,7 @@ namespace InvisibleHand.Items
             ██  ██  ██ ██   ██ ██    ██ ██ ██
             ██      ██ ██   ██  ██████  ██  ██████
             */
-            {"Weapon.Magic", new string_table
+            {"Weapon.Magic", new condition_table
                 {
                     {"area",       Weapons.Magic.Area},
                     {"homing",     Weapons.Magic.Homing},
@@ -266,7 +264,7 @@ namespace InvisibleHand.Items
                  ██ ██    ██ ██  ██  ██ ██  ██  ██ ██    ██ ██  ██ ██
             ███████  ██████  ██      ██ ██      ██  ██████  ██   ████
             */
-            {"Weapon.Summon", new string_table
+            {"Weapon.Summon", new condition_table
                 {
                     {"minion", Weapons.Summon.Minion},
                     {"sentry", Weapons.Summon.Sentry},
@@ -279,7 +277,7 @@ namespace InvisibleHand.Items
                ██    ██    ██ ██    ██ ██
                ██     ██████   ██████  ███████
             */
-            {"Tool", new string_table
+            {"Tool", new condition_table
                 {
                     {"pick",         (i) => i.pick > 0},
                     {"axe",          (i) => i.axe > 0},
@@ -298,7 +296,7 @@ namespace InvisibleHand.Items
             ██      ██    ██ ██  ██ ██      ██ ██    ██ ██  ██  ██ ██   ██ ██   ██ ██      ██
              ██████  ██████  ██   ████ ███████  ██████  ██      ██ ██   ██ ██████  ███████ ███████
             */
-            {"Consumable", new string_table
+            {"Consumable", new condition_table
                 {
                     {"buff",   Binary.timedBuff},
                     {"food",   Binary.isFood},
@@ -317,7 +315,7 @@ namespace InvisibleHand.Items
             ██  ██  ██ ██      ██      ██   ██
             ██      ██ ███████  ██████ ██   ██
             */
-            {"Mech", new string_table
+            {"Mech", new condition_table
                 {
                     {"timer",          ByTileID.Timer},
                     // {mech.Switch, ByTileID.L},
@@ -335,7 +333,7 @@ namespace InvisibleHand.Items
             ██      ██    ██ ██   ██ ██  ██ ██ ██    ██    ██    ██ ██   ██ ██
             ██       ██████  ██   ██ ██   ████ ██    ██     ██████  ██   ██ ███████
             */
-            {"Furniture", new string_table
+            {"Furniture", new condition_table
                 {
                     {"valid_housing",    Sets.Furniture},
                     {"housing_door",     Sets.housingDoor},
@@ -356,7 +354,7 @@ namespace InvisibleHand.Items
             ██   ██ ██    ██ ██    ██ ██   ██      ██
             ██████   ██████   ██████  ██   ██ ███████
             */
-            {"Furniture.Doors", new string_table
+            {"Furniture.Doors", new condition_table
                 {
                     {"door",  ByTileID.Door},
                 }
@@ -368,7 +366,7 @@ namespace InvisibleHand.Items
             ██      ██ ██    ██ ██   ██    ██    ██ ██  ██ ██ ██    ██
             ███████ ██  ██████  ██   ██    ██    ██ ██   ████  ██████
             */
-            {"Furniture.Lighting", new string_table
+            {"Furniture.Lighting", new condition_table
                 {
                     {"torch",           ByTileID.Torch},
                     {"candle",          ByTileID.Candle},
@@ -386,7 +384,7 @@ namespace InvisibleHand.Items
                ██    ██   ██ ██   ██ ██      ██           ██
                ██    ██   ██ ██████  ███████ ███████ ███████
             */
-            {"Furniture.Tables", new string_table
+            {"Furniture.Tables", new condition_table
                 {
                     {"table",     ByTileID.Table},
                     {"workbench", ByTileID.WorkBench},
@@ -403,7 +401,7 @@ namespace InvisibleHand.Items
             ██      ██   ██ ██   ██ ██ ██   ██      ██
              ██████ ██   ██ ██   ██ ██ ██   ██ ███████
             */
-            {"Furniture.Chairs", new string_table
+            {"Furniture.Chairs", new condition_table
                 {
                     {"chair", ByTileID.Chair},
                     {"bed",   ByTileID.Bed},
@@ -417,7 +415,7 @@ namespace InvisibleHand.Items
             ██    ██    ██    ██   ██ ██      ██   ██
              ██████     ██    ██   ██ ███████ ██   ██
             */
-            {"Furniture.Other", new string_table
+            {"Furniture.Other", new condition_table
                 {
                     {"sink",            ByTileID.Sink},
                     {"clock",           ByTileID.GrandfatherClock},
@@ -444,7 +442,7 @@ namespace InvisibleHand.Items
             ██  ██  ██ ██   ██    ██    ██      ██   ██ ██ ██   ██ ██
             ██      ██ ██   ██    ██    ███████ ██   ██ ██ ██   ██ ███████
             */
-            {"Material", new string_table
+            {"Material", new condition_table
                 {
                     {"ore",           Sets.Ore},
                     {"dye_plant",     ByTileID.DyePlant},
@@ -463,7 +461,7 @@ namespace InvisibleHand.Items
         public static bool Check(String table, Item item, string flag)
         {
             // Console.WriteLine("{0}[{1}]", table, flag);
-            return StringMatrix[table][flag](item);
+            return RuleMatrix[table][flag](item);
         }
     }
 

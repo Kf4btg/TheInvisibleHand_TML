@@ -14,7 +14,7 @@
   {
     name: Strange Plant
     parent: Placeable
-    priority: 111
+    /*priority: 111*/
     requires:  {
       Placeable: ["strange_plant"]
     }
@@ -24,11 +24,11 @@
     ]
   }
 
-  {
+  /*{
     name: Expert Items
     parent: null
     priority: 1
-    enabled: false
+    enable: false
     requires: {
       General: ["expert"]
     }
@@ -39,7 +39,7 @@
       value
       stack
     ]
-  }
+  }*/
   {
     name: Butterfly
     parent: Bait

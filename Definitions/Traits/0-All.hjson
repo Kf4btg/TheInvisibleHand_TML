@@ -82,6 +82,8 @@ Material:
     dye_plant
     alchemy
     soul
+    critter
+    butterfly
   ]
 }
 Mech:
