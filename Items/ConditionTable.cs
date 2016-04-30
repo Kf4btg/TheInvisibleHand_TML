@@ -15,6 +15,13 @@ namespace InvisibleHand.Items
         // public static readonly Dictionary<ItemFlags.Type, condition_table> RuleMatrix;
         public static readonly Dictionary<string, string_table> StringMatrix = new Dictionary<string, string_table>()
         {
+            /*
+             ██████  ███████ ███    ██ ███████ ██████   █████  ██
+            ██       ██      ████   ██ ██      ██   ██ ██   ██ ██
+            ██   ███ █████   ██ ██  ██ █████   ██████  ███████ ██
+            ██    ██ ██      ██  ██ ██ ██      ██   ██ ██   ██ ██
+             ██████  ███████ ██   ████ ███████ ██   ██ ██   ██ ███████
+            */
             {"General", new string_table
                 {
                     {"quest_item",    (i) => i.questItem},
@@ -45,6 +52,13 @@ namespace InvisibleHand.Items
                     {"paint",         (i) => i.paint > 0},
                 }
             },
+            /*
+            ██████  ██       █████   ██████ ███████  █████  ██████  ██      ███████
+            ██   ██ ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██
+            ██████  ██      ███████ ██      █████   ███████ ██████  ██      █████
+            ██      ██      ██   ██ ██      ██      ██   ██ ██   ██ ██      ██
+            ██      ███████ ██   ██  ██████ ███████ ██   ██ ██████  ███████ ███████
+            */
             {"Placeable", new string_table
                 {
                     {"lighted",       Binary.givesLight},
@@ -68,6 +82,13 @@ namespace InvisibleHand.Items
                     {"metal_detector",     Binary.showsOnMetalDetector},
                 }
             },
+            /*
+            ██████  ██       ██████   ██████ ██   ██
+            ██   ██ ██      ██    ██ ██      ██  ██
+            ██████  ██      ██    ██ ██      █████
+            ██   ██ ██      ██    ██ ██      ██  ██
+            ██████  ███████  ██████   ██████ ██   ██
+            */
             {"Placeable.Block", new string_table
                 {
                     // {"brick", },
@@ -88,6 +109,13 @@ namespace InvisibleHand.Items
                     {"wood", Binary.isWood},
                 }
             },
+            /*
+             █████  ███    ███ ███    ███  ██████
+            ██   ██ ████  ████ ████  ████ ██    ██
+            ███████ ██ ████ ██ ██ ████ ██ ██    ██
+            ██   ██ ██  ██  ██ ██  ██  ██ ██    ██
+            ██   ██ ██      ██ ██      ██  ██████
+            */
             {"Ammo", new string_table
                 {
                     {"arrow",     (i) => i.ammo == Constants.AmmoID.Arrow},
@@ -100,6 +128,13 @@ namespace InvisibleHand.Items
                     {"endless",   (i) => i.ammo > 0 && !i.consumable},
                 }
             },
+            /*
+            ██████  ██    ██ ███████
+            ██   ██  ██  ██  ██
+            ██   ██   ████   █████
+            ██   ██    ██    ██
+            ██████     ██    ███████
+            */
             {"Dye", new string_table
                 {
                     {"basic",    Dyes.BasicDyes},
@@ -112,6 +147,14 @@ namespace InvisibleHand.Items
                     {"lunar",    Dyes.LunarDyes},
                 }
             },
+            /*
+            ███████  ██████  ██    ██ ██ ██████
+            ██      ██    ██ ██    ██ ██ ██   ██
+            █████   ██    ██ ██    ██ ██ ██████
+            ██      ██ ▄▄ ██ ██    ██ ██ ██
+            ███████  ██████   ██████  ██ ██
+                        ▀▀
+            */
             {"Equip", new string_table
                 {
                     {"armor",        Binary.isArmor},
@@ -141,6 +184,13 @@ namespace InvisibleHand.Items
                     // {"mount_cart",  REPLACE_ME},
                 }
             },
+            /*
+            ██     ██ ███████  █████  ██████   ██████  ███    ██
+            ██     ██ ██      ██   ██ ██   ██ ██    ██ ████   ██
+            ██  █  ██ █████   ███████ ██████  ██    ██ ██ ██  ██
+            ██ ███ ██ ██      ██   ██ ██      ██    ██ ██  ██ ██
+             ███ ███  ███████ ██   ██ ██       ██████  ██   ████
+            */
             {"Weapon", new string_table
                 {
                     {"automatic",       (i) => i.autoReuse},
@@ -153,6 +203,13 @@ namespace InvisibleHand.Items
                     // {"weapon_other",  REPLACE_ME},
                 }
             },
+            /*
+            ███    ███ ███████ ██      ███████ ███████
+            ████  ████ ██      ██      ██      ██
+            ██ ████ ██ █████   ██      █████   █████
+            ██  ██  ██ ██      ██      ██      ██
+            ██      ██ ███████ ███████ ███████ ███████
+            */
             {"Weapon.Melee", new string_table
                 {
                     {"style_swing",       Weapons.Melee.Swing},
@@ -167,6 +224,13 @@ namespace InvisibleHand.Items
                     {"yoyo",              Weapons.Melee.Yoyo},
                 }
             },
+            /*
+            ██████   █████  ███    ██  ██████  ███████ ██████
+            ██   ██ ██   ██ ████   ██ ██       ██      ██   ██
+            ██████  ███████ ██ ██  ██ ██   ███ █████   ██   ██
+            ██   ██ ██   ██ ██  ██ ██ ██    ██ ██      ██   ██
+            ██   ██ ██   ██ ██   ████  ██████  ███████ ██████
+            */
             {"Weapon.Ranged", new string_table
                 {
                     {"bullet_consuming", Weapons.Ranged.BulletConsuming},
@@ -178,6 +242,13 @@ namespace InvisibleHand.Items
                     {"no_ammo",          (i) => i.useAmmo < 0},
                 }
             },
+            /*
+            ███    ███  █████   ██████  ██  ██████
+            ████  ████ ██   ██ ██       ██ ██
+            ██ ████ ██ ███████ ██   ███ ██ ██
+            ██  ██  ██ ██   ██ ██    ██ ██ ██
+            ██      ██ ██   ██  ██████  ██  ██████
+            */
             {"Weapon.Magic", new string_table
                 {
                     {"area",       Weapons.Magic.Area},
@@ -188,12 +259,26 @@ namespace InvisibleHand.Items
                     {"piercing",   Weapons.Magic.Piercing},
                 }
             },
+            /*
+            ███████ ██    ██ ███    ███ ███    ███  ██████  ███    ██
+            ██      ██    ██ ████  ████ ████  ████ ██    ██ ████   ██
+            ███████ ██    ██ ██ ████ ██ ██ ████ ██ ██    ██ ██ ██  ██
+                 ██ ██    ██ ██  ██  ██ ██  ██  ██ ██    ██ ██  ██ ██
+            ███████  ██████  ██      ██ ██      ██  ██████  ██   ████
+            */
             {"Weapon.Summon", new string_table
                 {
                     {"minion", Weapons.Summon.Minion},
                     {"sentry", Weapons.Summon.Sentry},
                 }
             },
+            /*
+            ████████  ██████   ██████  ██
+               ██    ██    ██ ██    ██ ██
+               ██    ██    ██ ██    ██ ██
+               ██    ██    ██ ██    ██ ██
+               ██     ██████   ██████  ███████
+            */
             {"Tool", new string_table
                 {
                     {"pick",         (i) => i.pick > 0},
@@ -206,6 +291,13 @@ namespace InvisibleHand.Items
                     // {"other",  REPLACE_ME},
                 }
             },
+            /*
+             ██████  ██████  ███    ██ ███████ ██    ██ ███    ███  █████  ██████  ██      ███████
+            ██      ██    ██ ████   ██ ██      ██    ██ ████  ████ ██   ██ ██   ██ ██      ██
+            ██      ██    ██ ██ ██  ██ ███████ ██    ██ ██ ████ ██ ███████ ██████  ██      █████
+            ██      ██    ██ ██  ██ ██      ██ ██    ██ ██  ██  ██ ██   ██ ██   ██ ██      ██
+             ██████  ██████  ██   ████ ███████  ██████  ██      ██ ██   ██ ██████  ███████ ███████
+            */
             {"Consumable", new string_table
                 {
                     {"buff",   Binary.timedBuff},
@@ -218,6 +310,13 @@ namespace InvisibleHand.Items
                     // {"mana",  REPLACE_ME},
                 }
             },
+            /*
+            ███    ███ ███████  ██████ ██   ██
+            ████  ████ ██      ██      ██   ██
+            ██ ████ ██ █████   ██      ███████
+            ██  ██  ██ ██      ██      ██   ██
+            ██      ██ ███████  ██████ ██   ██
+            */
             {"Mech", new string_table
                 {
                     {"timer",          ByTileID.Timer},
@@ -229,6 +328,13 @@ namespace InvisibleHand.Items
                     {"pressure_plate", ByTileID.PressurePlate},
                 }
             },
+            /*
+            ███████ ██    ██ ██████  ███    ██ ██ ████████ ██    ██ ██████  ███████
+            ██      ██    ██ ██   ██ ████   ██ ██    ██    ██    ██ ██   ██ ██
+            █████   ██    ██ ██████  ██ ██  ██ ██    ██    ██    ██ ██████  █████
+            ██      ██    ██ ██   ██ ██  ██ ██ ██    ██    ██    ██ ██   ██ ██
+            ██       ██████  ██   ██ ██   ████ ██    ██     ██████  ██   ██ ███████
+            */
             {"Furniture", new string_table
                 {
                     {"valid_housing",    Sets.Furniture},
@@ -243,11 +349,25 @@ namespace InvisibleHand.Items
                     // {"decorative",  REPLACE_ME},
                 }
             },
+            /*
+            ██████   ██████   ██████  ██████  ███████
+            ██   ██ ██    ██ ██    ██ ██   ██ ██
+            ██   ██ ██    ██ ██    ██ ██████  ███████
+            ██   ██ ██    ██ ██    ██ ██   ██      ██
+            ██████   ██████   ██████  ██   ██ ███████
+            */
             {"Furniture.Doors", new string_table
                 {
                     {"door",  ByTileID.Door},
                 }
             },
+            /*
+            ██      ██  ██████  ██   ██ ████████ ██ ███    ██  ██████
+            ██      ██ ██       ██   ██    ██    ██ ████   ██ ██
+            ██      ██ ██   ███ ███████    ██    ██ ██ ██  ██ ██   ███
+            ██      ██ ██    ██ ██   ██    ██    ██ ██  ██ ██ ██    ██
+            ███████ ██  ██████  ██   ██    ██    ██ ██   ████  ██████
+            */
             {"Furniture.Lighting", new string_table
                 {
                     {"torch",           ByTileID.Torch},
@@ -259,6 +379,13 @@ namespace InvisibleHand.Items
                     {"candelabra",      ByTileID.Candelabra}
                 }
             },
+            /*
+            ████████  █████  ██████  ██      ███████ ███████
+               ██    ██   ██ ██   ██ ██      ██      ██
+               ██    ███████ ██████  ██      █████   ███████
+               ██    ██   ██ ██   ██ ██      ██           ██
+               ██    ██   ██ ██████  ███████ ███████ ███████
+            */
             {"Furniture.Tables", new string_table
                 {
                     {"table",     ByTileID.Table},
@@ -269,6 +396,13 @@ namespace InvisibleHand.Items
                     {"bathtub",   ByTileID.Bathtub},
                 }
             },
+            /*
+             ██████ ██   ██  █████  ██ ██████  ███████
+            ██      ██   ██ ██   ██ ██ ██   ██ ██
+            ██      ███████ ███████ ██ ██████  ███████
+            ██      ██   ██ ██   ██ ██ ██   ██      ██
+             ██████ ██   ██ ██   ██ ██ ██   ██ ███████
+            */
             {"Furniture.Chairs", new string_table
                 {
                     {"chair", ByTileID.Chair},
@@ -276,6 +410,13 @@ namespace InvisibleHand.Items
                     {"bench", ByTileID.Bench}
                 }
             },
+            /*
+             ██████  ████████ ██   ██ ███████ ██████
+            ██    ██    ██    ██   ██ ██      ██   ██
+            ██    ██    ██    ███████ █████   ██████
+            ██    ██    ██    ██   ██ ██      ██   ██
+             ██████     ██    ██   ██ ███████ ██   ██
+            */
             {"Furniture.Other", new string_table
                 {
                     {"sink",            ByTileID.Sink},
@@ -296,6 +437,13 @@ namespace InvisibleHand.Items
                     {"fountain",        ByTileID.WaterFountain},
                 }
             },
+            /*
+            ███    ███  █████  ████████ ███████ ██████  ██  █████  ██
+            ████  ████ ██   ██    ██    ██      ██   ██ ██ ██   ██ ██
+            ██ ████ ██ ███████    ██    █████   ██████  ██ ███████ ██
+            ██  ██  ██ ██   ██    ██    ██      ██   ██ ██ ██   ██ ██
+            ██      ██ ██   ██    ██    ███████ ██   ██ ██ ██   ██ ███████
+            */
             {"Material", new string_table
                 {
                     {"ore",           Sets.Ore},
