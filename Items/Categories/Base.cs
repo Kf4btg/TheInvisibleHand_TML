@@ -95,6 +95,11 @@ namespace InvisibleHand.Items.Categories
             ParentID = parent_id;
             Priority = priority;
             ID = category_id;
+
+            // default the ordinal to the ID; this is largely just to make sure the
+            // 'None' category doesn't have an ordinal of 0
+            Ordinal = ID;
+
             Register(this);
         }
 
@@ -204,7 +209,7 @@ namespace InvisibleHand.Items.Categories
 
         public override string ToString()
         {
-            return $"{{{QualifiedName}: p{Priority}, ID#{ID}";
+            return $"'{QualifiedName}'(ID={ID}, ord={Ordinal:X8})";
         }
     }
 }
