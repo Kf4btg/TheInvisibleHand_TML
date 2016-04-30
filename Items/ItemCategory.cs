@@ -4,15 +4,7 @@ using Terraria;
 
 namespace InvisibleHand.Items
 {
-
     using ItemCompRule = Func<Item, Item, int>;
-
-    public enum PriorityType
-    {
-        UNSET = 0,
-        DERIVED,
-        EXPLICIT,
-    }
 
     public abstract class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
@@ -20,12 +12,10 @@ namespace InvisibleHand.Items
         //------------------------------------------------------------------
         //------------------------------------------------------------------
 
-        /// static registry of all categories keyed by their unique ID
-        /// number (an unsigned short);
-        /// hopefully 65,000 categories will be enough...
+        /// static registry of all categories keyed by their unique ID (an int)
         /// Each category is registered here during construction
-        public static IDictionary<ushort, ItemCategory> Registry =
-            new Dictionary<ushort, ItemCategory>();
+        public static IDictionary<int, ItemCategory> Registry =
+            new Dictionary<int, ItemCategory>();
 
         /// <summary>
         /// Add to the static Category Register (keyed by Category ID)
@@ -38,22 +28,23 @@ namespace InvisibleHand.Items
         //------------------------------------------------------------------
         //------------------------------------------------------------------
 
-        /// the sort-priority for this category
-        // public short Priority;
-        public ushort Priority;
-        public PriorityType priority_type = PriorityType.UNSET;
-
-        internal int childCount = 0;
-        internal int thisChildIndex = 0;
+        /// the sort-priority for this category;
+        /// this is now more of a "weight", used to modify the order of a
+        /// category with regards to its siblings, thus changing the
+        /// calculated ordinal value.
+        public int Priority;
 
         /// A unique identifying number for this category; usually
         /// the order in which this item was loaded from the definition file;
         /// used to help solve conflicts in Priority.
-        public readonly ushort ID;
+        public readonly int ID;
 
         /// a combination of the priority and ID that can be used
         /// to properly sort this category amongst a list of other categories
-        public int Ordinal => (Priority << 16) | (ID);
+        // public int Ordinal => (Priority << 16) | (ID);
+        // id is now included in the creation of this number, so no need to shift anything
+        // TODO: add checks to make sure this is always unique
+        public int Ordinal { get; set; }
 
         public string Name { get; private set; }
         public string QualifiedName {
@@ -74,11 +65,11 @@ namespace InvisibleHand.Items
         }
 
         /// a parentID of 0 means this is a toplevel category
-        public ushort ParentID { get; set; } = 0;
+        public int ParentID { get; set; } = 0;
 
         /// the ID of the UnionCategory to which this category belongs.
         /// If this is 0, then the category has not joined a Union.
-        protected ushort UnionID = 0;
+        protected int UnionID = 0;
 
         /// if not null, then this is the Wrapper-Category that this
         /// category has been merged into
@@ -97,7 +88,7 @@ namespace InvisibleHand.Items
          ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██     ██████  ██   ██ ███████
         */
 
-        public ItemCategory(string name, ushort category_id, ushort parent_id = 0, ushort priority = 0)
+        public ItemCategory(string name, int category_id, int parent_id = 0, int priority = 0)
         {
             Name = name;
             ParentID = parent_id;
@@ -106,7 +97,7 @@ namespace InvisibleHand.Items
             Register(this);
         }
 
-        public ItemCategory(string name, ushort category_id, ItemCategory parent = null, ushort priority = 0)
+        public ItemCategory(string name, int category_id, ItemCategory parent = null, int priority = 0)
             : this(name, category_id, parent?.ID ?? 0, priority) { }
 
 
@@ -164,15 +155,9 @@ namespace InvisibleHand.Items
 
 
         #region interface implementations
-        public int CompareTo(ItemCategory other)
-        {
-            return this.Ordinal.CompareTo(other.Ordinal);
-        }
+        public int CompareTo(ItemCategory other) => this.Ordinal.CompareTo(other.Ordinal);
 
-        public bool Equals(ItemCategory other)
-        {
-            return this.ID == other?.ID;
-        }
+        public bool Equals(ItemCategory other) => this.ID == other?.ID;
 
         public override bool Equals(Object other)
         {
@@ -186,10 +171,7 @@ namespace InvisibleHand.Items
         /// priority might change if the user modifies their preferred
         /// sort order; ID should remain immutable throughout the lifetime
         /// of this category.
-        public override int GetHashCode()
-        {
-            return this.ID;
-        }
+        public override int GetHashCode() => this.ID;
 
         public static bool operator ==(ItemCategory cat1, ItemCategory cat2)
         {
@@ -207,14 +189,12 @@ namespace InvisibleHand.Items
             return ! (cat1.Equals(cat2));
         }
 
-
         public abstract int Compare(Item t1, Item t2);
 
         #endregion
 
         /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new RegularCategory("Unknown", ushort.MaxValue, null, null, ushort.MaxValue);
-
+        public static readonly ItemCategory None = new RegularCategory("Unknown", int.MaxValue, null, null, int.MaxValue);
 
         public override string ToString()
         {
@@ -238,17 +218,17 @@ namespace InvisibleHand.Items
 
         // constructors
         // ------------------
-        public RegularCategory(string name, ushort cat_id,
+        public RegularCategory(string name, int cat_id,
                                IDictionary<string, int> requirements = null,
-                               ushort parent_id = 0, ushort priority = 0)
+                               int parent_id = 0, int priority = 0)
                                : base (name, cat_id, parent_id, priority)
         {
             Requirements = requirements ?? new Dictionary<string, int>();
         }
 
-        public RegularCategory(string name, ushort cat_id,
+        public RegularCategory(string name, int cat_id,
                                IDictionary<string, int> requirements = null,
-                               ItemCategory parent = null, ushort priority = 0)
+                               ItemCategory parent = null, int priority = 0)
                                : this(name, cat_id, requirements,
                                       parent?.ID ?? 0, priority) {}
 
@@ -306,6 +286,14 @@ namespace InvisibleHand.Items
             return this.GetCategory;
         }
 
+        /*
+        ███████  ██████  ██████  ████████ ██ ███    ██  ██████
+        ██      ██    ██ ██   ██    ██    ██ ████   ██ ██
+        ███████ ██    ██ ██████     ██    ██ ██ ██  ██ ██   ███
+             ██ ██    ██ ██   ██    ██    ██ ██  ██ ██ ██    ██
+        ███████  ██████  ██   ██    ██    ██ ██   ████  ██████
+        */
+
         // Handle the Sorting Rules
         // ------------------
         #region internal item-sorting rules
@@ -317,7 +305,8 @@ namespace InvisibleHand.Items
         public IList<ItemCompRule> SortRules
         {
             get { return _rules; }
-            set {
+            set
+            {
                 _rules = value;
                 ruleCount = _rules?.Count ?? 0;
             }
@@ -336,7 +325,6 @@ namespace InvisibleHand.Items
         public void CopySortRules(ItemCategory other)
         {
             var target = other as RegularCategory;
-
             this.SortRules = target?.SortRules;
         }
 
@@ -358,11 +346,11 @@ namespace InvisibleHand.Items
     }
 
     /*
-    ██    ██ ███    ██ ██  ██████  ███    ██      ██████  █████  ████████ ███████  ██████   ██████  ██████  ██    ██
-    ██    ██ ████   ██ ██ ██    ██ ████   ██     ██      ██   ██    ██    ██      ██       ██    ██ ██   ██  ██  ██
-    ██    ██ ██ ██  ██ ██ ██    ██ ██ ██  ██     ██      ███████    ██    █████   ██   ███ ██    ██ ██████    ████
-    ██    ██ ██  ██ ██ ██ ██    ██ ██  ██ ██     ██      ██   ██    ██    ██      ██    ██ ██    ██ ██   ██    ██
-     ██████  ██   ████ ██  ██████  ██   ████      ██████ ██   ██    ██    ███████  ██████   ██████  ██   ██    ██
+    ██    ██ ███    ██ ██  ██████  ███    ██
+    ██    ██ ████   ██ ██ ██    ██ ████   ██
+    ██    ██ ██ ██  ██ ██ ██    ██ ██ ██  ██
+    ██    ██ ██  ██ ██ ██ ██    ██ ██  ██ ██
+     ██████  ██   ████ ██  ██████  ██   ████
     */
 
     public class UnionCategory : ItemCategory
@@ -379,15 +367,12 @@ namespace InvisibleHand.Items
         public ItemCategory Matched { get; private set; }
 
 
-        public UnionCategory(string name, ushort cat_id, ushort parent_id = 0, ushort priority = 0, IEnumerable<ItemCategory> members=null) : base(name, cat_id, parent_id, priority)
+        public UnionCategory(string name, int cat_id, int parent_id = 0, int priority = 0, IEnumerable<ItemCategory> members=null) : base(name, cat_id, parent_id, priority)
         {
-            if (members == null)
-                UnionMembers = new SortedSet<ItemCategory>();
-            else
-                UnionMembers = new SortedSet<ItemCategory>(members);
+            UnionMembers = members == null ? new SortedSet<ItemCategory>() : new SortedSet<ItemCategory>(members);
         }
 
-        public UnionCategory(string name, ushort cat_id, ItemCategory parent = null, ushort priority = 0, IEnumerable<ItemCategory> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
+        public UnionCategory(string name, int cat_id, ItemCategory parent = null, int priority = 0, IEnumerable<ItemCategory> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
 
 
         // Tracking member Categories
@@ -424,10 +409,7 @@ namespace InvisibleHand.Items
             return false;
         }
 
-        public override bool Matches(Item item)
-        {
-            return Matches(item.GetFlagInfo().Flags);
-        }
+        public override bool Matches(Item item) => Matches(item.GetFlagInfo().Flags);
 
         /// <summary>
         /// Check if the given flags are a fit for this category
@@ -439,20 +421,18 @@ namespace InvisibleHand.Items
             return this.Matches(item_flags) ? this : null;
         }
 
-
         /// IComparer<Item> implementation
         /// using the sorting rules for the union members
         public override int Compare(Item t1, Item t2)
         {
             ItemCategory c1, c2;
 
-            // I guess we'll just assume for now that the items actually belong in this union
             c1 = c2 = null;
             if (Matches(t1))
                 c1 = Matched;
             if (Matches(t2))
                 c2 = Matched;
-            //
+
             // if either or both of the items do not belong to this union:
             if (c1 == null)
                 return (c2 == null) ? 0 : -1;
@@ -472,16 +452,5 @@ namespace InvisibleHand.Items
             // or, if they're different categories, return the category order:
             return c1.CompareTo(c2);
         }
-
     }
-
-
-
-
-
-
-
-
-
-
 }

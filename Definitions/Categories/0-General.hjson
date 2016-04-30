@@ -9,6 +9,19 @@
         # If it is a top level category, set this to null (or just leave it out)
         parent: null
 
+        # The priority of a category is a way to affect how a category will be sorted with
+        regards to other categories under the same parent. This defaults to 0. Usually, sibling
+        categories will be ordered based on their position in these definition files;
+        a category in a lower position or a later file will be sorted after an earlier
+        category. Setting a value for the priority, however, can override this default behaviour:
+        When determining the category sort-order, all loaded categories are first
+        ordered by priority (low to high), then by the order in which they appear
+        in the configuration files (earlier to later). With the default priority of 0,
+        the first ordering does nothing, so only the load-order matters. But if you
+        give a category a higher priority (even 1, if all the others are still at 0),
+        then that category will be moved to end of the ordering in the first step, and
+        all its siblings will now appear before it when sorting items.
+
         # The priority of a category is how its items will be sorted relative to
         # those of other categories: lower priorities will be placed before
         # higher. When two categories have the same priority,
@@ -35,7 +48,7 @@
 
     {
       name: Tool
-      priority: 10
+      /*priority: 10*/
       requires: {
         General: [ "tool" ]
       }
@@ -44,9 +57,10 @@
         type
         value
       ]
-    } {
+    }
+    {
       name: Weapon
-      priority: 20
+      /*priority: 20*/
       requires: {
         General: [ "weapon" ]
       }
@@ -57,40 +71,10 @@
         value
         stack
       ]
-    } {
-      name: Equipable
-      priority: 30
-      requires: {
-        General: [ "equipable" ]
-      }
-      sort: [
-        rare
-        type
-        value
-      ]
-    } {
-      name: Placeable
-      priority: 85
-      requires: {
-        General: [ "placeable" ]
-      }
-      sort: [
-        type
-        stack
-      ]
-    }  {
-      name: Mech
-      priority: 75
-      requires: {
-        General: [ "mech" ]
-      }
-      sort: [
-        type
-        stack
-      ]
-    } {
+    }
+    {
       name: Ammo
-      priority: 25
+      /*priority: 25*/
       requires: {
         General: [ "ammo" ]
       }
@@ -100,9 +84,22 @@
         type
         stack
       ]
-    } {
+    }
+    {
+      name: Equipable
+      /*priority: 30*/
+      requires: {
+        General: [ "equipable" ]
+      }
+      sort: [
+        rare
+        type
+        value
+      ]
+    }
+    {
       name: Dye
-      priority: 40
+      /*priority: 40*/
       requires: {
         General: [ "dye" ]
       }
@@ -112,11 +109,59 @@
       ]
     }
     {
+      name: Mech
+      /*priority: 75*/
+      requires: {
+        General: [ "mech" ]
+      }
+      sort: [
+      type
+      stack
+      ]
+    }
+    {
+      name: Placeable
+      /*priority: 85*/
+      requires: {
+        General: [ "placeable" ]
+      }
+      sort: [
+        type
+        stack
+      ]
+    }
+    {
+      name: Paint
+      /*priority: 86*/
+      requires: {
+        General: [ "paint" ]
+      }
+      sort: [
+        value
+        type
+        stack
+      ]
+    }
+    {
+      name: Bait
+      /*priority: 90*/
+      requires: {
+        General: ["bait"]
+      }
+      sort: [
+        rare
+        bait
+        value
+        type
+        stack
+      ]
+    }
+    {
       # for items whose _primary_ use is as a material, though they may meet
       # requirements for other categories (e.g. ore is placeable, but is mainly
       # used to create bars or potions.)
       name: Material
-      priority: 110
+      /*priority: 110*/
       requires: {
         General: [ "material" ]
       }
@@ -131,7 +176,7 @@
     ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
     {
       name: Hair Dye
-      priority: 115
+      /*priority: 115*/
       requires: {
         General: [ "hair_dye" ]
       }
@@ -142,20 +187,8 @@
       ]
     }
     {
-      name: Paint
-      priority: 86
-      requires: {
-        General: [ "paint" ]
-      }
-      sort: [
-        value
-        type
-        stack
-      ]
-    }
-    {
       name: Coin
-      priority: 200
+      /*priority: 200*/
       requires: {
         General: [ "coin" ]
       }
@@ -165,23 +198,8 @@
       ]
     }
     {
-      name: Bait
-      priority: 90
-      requires: {
-        General: ["bait"]
-      }
-      sort: [
-        rare
-        bait
-        value
-        type
-        stack
-      ]
-    }
-
-    {
       name: Consumable
-      priority: 250
+      /*priority: 250*/
       requires: {
         General: [ "consumable" ]
       }

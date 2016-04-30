@@ -25,8 +25,6 @@ namespace InvisibleHand.Definitions
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
-        // public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
-
         /// uses keys based on a category's ordinal (ordering rank).
         public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
@@ -150,7 +148,7 @@ namespace InvisibleHand.Definitions
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
-            ushort count = 0; // track absolute order of added categories (this will be the unique ID for each category)
+            int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
             {
@@ -173,9 +171,10 @@ namespace InvisibleHand.Definitions
                             // whether to activate this category
                             enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
 
-                            // restrict assignable priority value to [-500..500] and shift left by 6 bits
-                            // to give us some guaranteed tweaking room between the priorities
-                            priority = catobj.ContainsKey("priority") ? (ushort?)(catobj["priority"]?.Qi().Clamp(-500, 500) << 6) : null,
+                            // priority is now just a 'weight', used to modify the order of categories with regards to
+                            // their siblings. There's no more bit shifting or anything, and the -500..500 limit is now
+                            // entirely arbitrary (though I might keep it just so people don't get...too ambitious)
+                            priority = catobj.ContainsKey("priority") ? catobj["priority"]?.Qi().Clamp(-500, 500) : null,
 
                             // the required traits for this category
                             requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
@@ -193,23 +192,13 @@ namespace InvisibleHand.Definitions
 
                         // get parent, if any
                         // ItemCategory parent = getParent(catdef.name, catdef.parent_name);
-                        ushort parentID = getParentID(catdef.name, catdef.parent_name);
+                        int parentID = getParentID(catdef.name, catdef.parent_name);
                         // ItemCategory parent = parentID > 0 ? ItemCategory.Registry[parentID] : null;
 
 
                         // and priority, either specific to this category or inherited from parent (or default 0)
-                        // short priority = getPriority(parent, catdef.priority);
-                        ushort priority = 0;
-                        PriorityType ptype;
-                        if (catdef.priority.HasValue)
-                        {
-                            priority = (ushort)catdef.priority;
-                            ptype = PriorityType.EXPLICIT;
-                        }
-                        else
-                        {
-                            ptype = PriorityType.DERIVED;
-                        }
+                        // int priority = getPriority(parent, catdef.priority);
+                        int priority = catdef.priority ?? 0;
 
                         // A union category
                         // ------------------
@@ -218,12 +207,6 @@ namespace InvisibleHand.Definitions
                             // bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
 
                             var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
-                            union.priority_type = ptype;
-
-                            // if (parentID > 0)
-                            // {
-                            //     union.thisChildIndex = ++parent.childCount;
-                            // }
 
                             // TODO: allow enable/disable at runtime
                             if (catdef.enable)
@@ -246,11 +229,6 @@ namespace InvisibleHand.Definitions
                             {
                                 // otherwise, create the new category object
                                 var newcategory = new RegularCategory(catdef.name, ++count, reqs, parentID, priority);
-                                newcategory.priority_type = ptype;
-                                // if (parentID > 0)
-                                // {
-                                //     newcategory.thisChildIndex = ++parent.childCount;
-                                // }
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
@@ -364,11 +342,11 @@ namespace InvisibleHand.Definitions
         /// <param name="category_name">Name of current category (only used in error messages if the parent name is not found) </param>
         /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
         /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
-        private static ushort getParentID(string category_name, string parent_name)
+        private static int getParentID(string category_name, string parent_name)
         {
             try
             {
-                return parent_name == "" ? (ushort)0 : CategoryDefinitions[parent_name].ID;
+                return parent_name == "" ? 0 : CategoryDefinitions[parent_name].ID;
             }
             catch (KeyNotFoundException knfe)
             {
@@ -376,23 +354,6 @@ namespace InvisibleHand.Definitions
                     "Category '" + category_name + "': The specified parent category '{0}' was not found in '{1}'."
                 );
             }
-        }
-
-        /// child categories inherit the priority of their parent.
-        /// each child level decreases the initial priority by 1;
-        /// we SUBTRACT the depth from the priority to make sure that more specific categories are
-        /// sorted first; for example, if "Weapon" has a priority of 500:
-        ///      "Weapon.Melee.Broadsword" {P=498} < "Weapon.Melee" {P=499} < "Weapon.Throwing" {P=499} < "Weapon" {P=500}
-        /// Note: weapon.melee is sorted before weapon.throwing (even though they have the same priority)
-        /// because the weapon.melee category is loaded before (has a lower ID than) weapon.throwing.
-        ///
-        /// Note: explicitly-set priority overrides default or inherited value.
-        private static short getPriority(ItemCategory parent, short? parsed_priority)
-        {
-            // FIXME: under this scheme, sorting can go:
-            //      Weapon.Melee.Broadsword > Weapon.Magic.Homing > Weapon.Melee > Weapon.Magic
-            // which is neither ideal nor intuitive; seems we need some sort of depth-first approach?
-            return parsed_priority ?? (short)((parent?.Priority - 1) ?? 0);
         }
 
         /// <summary>
@@ -404,54 +365,16 @@ namespace InvisibleHand.Definitions
             // creates a lookup of: ParentID => [collection of child categories]
             var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c=>c.ParentID, c=> c);
             // assign addresses to all the top level categories, and recursively to their children
-            assignAddresses(0, ushort.MaxValue, 0, lookup_byparentID);
+            assignAddresses(0, int.MaxValue, 0, lookup_byparentID);
 
             // TESTING
             ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Priority).Select(c=> new {name=c.QualifiedName, order=c.Priority}), "Categories in order", true);
-
-            // var bare_categories = CategoryDefinitions.Select(kvp => kvp.Value);
-            // all toplevel categories
-            // var toplevel = bare_categories.Where(cat => cat.Parent == null);
-
-            // group the rest by parentID
-            // var byparent = CategoryDefinitions.Select(kvp => kvp.Value).GroupBy(cat => cat.ParentID).OrderBy(g => g.Key);
-            // var byparent = CategoryDefinitions.Select(kvp => kvp.Value).GroupBy(cat => cat.ParentID);
-
-            // var lookup_byparentID = byparent.ToLookup(g => g.Key, g=> g.OrderBy(c=> c.Priority).ThenBy(c=> c.ID).Select(c=>c));
-
-            // get the toplevel categories
-            // var toplevel = byparent.Where(g => g.Key == 0).SelectMany(g=> g.ToList());
-            // var toplevel = from catgroup in byparent
-            //                from member in catgroup
-            //                where catgroup.Key == 0
-            //                // if an explicit priority-weight has been set for any category,
-            //                // let that determine the initial ordering, then sort matching priorities
-            //                // by id (load-order)
-            //                orderby member.Priority, member.ID
-            //                select member;
-            //
-            //
-            // var top_count = toplevel.Count();
-            // var bucket_size = ushort.MaxValue / top_count;
-
-
-            // now, for each top level category, recursively descend its children and perform the same addressing
-
-
-            // create buckets for each toplevel category, dividing up available space
-            // foreach (var top in toplevel.Select((x, i) => new { category = x, index = i }))
-            // {
-            //
-            //     top.category.Priority = (ushort)(((top.index+1) * bucket_size) - 1);
-            // }
         }
-
-        // IEnumerable<ItemCategory> recipients,
 
         /// <summary>
         /// According to their weighted loadorder, each category is assigned a range (or 'bucket')
         /// of priority numbers ('addresses') that they and their children can use. The size of
-        /// these buckets is determined by dividing the maximum addressable space (0, ushort.MaxValue]
+        /// these buckets is determined by dividing the maximum addressable space (0, int.MaxValue]
         /// by the number of items currently requiring an address,
         /// here the number of toplevel categories. Each top category is assigned an address
         /// within its respective range, and later will perform the same process for its children,
@@ -471,8 +394,8 @@ namespace InvisibleHand.Definitions
         /// In this way, we encoding a post-order tree-traversal into the priority values.
         /// </remarks>
         private static void assignAddresses(int min_address, int max_address,
-                                            ushort parent_id,
-                                            ILookup<ushort, ItemCategory> child_category_lookup)
+                                            int parent_id,
+                                            ILookup<int, ItemCategory> child_category_lookup)
         {
             // get direct children of the specified parent_id, sort by preset priority, then ID
             var recipients = child_category_lookup[parent_id].OrderBy(c => c.Priority).ThenBy(c => c.ID);
@@ -487,7 +410,7 @@ namespace InvisibleHand.Definitions
                 var range_end = range_start + bucket_size - 1;
 
                 // each category will receive an address that is just 1 below the minimum range of it's sibling.
-                r.category.Priority = (ushort)(range_end);
+                r.category.Ordinal = range_end;
 
                 // If this child is itself a parent, recursively call this function for its children
                 if (child_category_lookup.Contains(r.category.ID))
@@ -540,8 +463,7 @@ namespace InvisibleHand.Definitions
                     subtree = subtree[catstack.Pop().Ordinal];
                 }
 
-                // now [create the child]/[set its data if it
-                // has already been created by a previous operation]
+                // now create/access the child and set its data
                 subtree[category.Ordinal].Data = category;
             }
 
