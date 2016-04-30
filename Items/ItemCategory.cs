@@ -7,11 +7,40 @@ namespace InvisibleHand.Items
 
     using ItemCompRule = Func<Item, Item, int>;
 
+    public enum PriorityType
+    {
+        UNSET = 0,
+        DERIVED,
+        EXPLICIT,
+    }
+
     public abstract class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
     {
+        // Static stuff
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
+
+        /// static registry of all categories keyed by their unique ID
+        /// number (an unsigned short);
+        /// hopefully 65,000 categories will be enough...
+        /// Each category is registered here during construction
+        public static IDictionary<ushort, ItemCategory> Registry =
+            new Dictionary<ushort, ItemCategory>();
+
+        /// <summary>
+        /// Add to the static Category Register (keyed by Category ID)
+        /// </summary>
+        public static void Register(ItemCategory newcategory)
+        {
+            Registry.Add(newcategory.ID, newcategory);
+        }
+
+        //------------------------------------------------------------------
+        //------------------------------------------------------------------
 
         /// the sort-priority for this category
         public short Priority;
+        public PriorityType priority_type = PriorityType.UNSET;
 
         internal int childCount = 0;
         internal int thisChildIndex = 0;
@@ -37,41 +66,101 @@ namespace InvisibleHand.Items
         /// the parent's requirements will have already been merged into
         /// this Category's requirements, so this property is really only
         /// here to help with determining sort-order.
-        public ItemCategory Parent { get; private set; }
+        public ItemCategory Parent
+        {
+            get { return Registry[this.ParentID]; }
+            set { this.ParentID = value?.ID ?? 0; }
+        }
+
+        /// a parentID of 0 means this is a toplevel category
+        public ushort ParentID { get; set; } = 0;
+
+        /// the ID of the UnionCategory to which this category belongs.
+        /// If this is 0, then the category has not joined a Union.
+        protected ushort UnionID = 0;
 
         /// if not null, then this is the Wrapper-Category that this
         /// category has been merged into
-        protected UnionCategory _union;
+        protected UnionCategory _union => UnionID > 0 ? Registry[UnionID] as UnionCategory : null;
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
-        public ItemCategory GetCategory => _union ?? this;
+        // public ItemCategory GetCategory => _union ?? this;
+        public ItemCategory GetCategory => UnionID > 0 ? Registry[UnionID] : this;
 
+        /*
+         ██████  ██████  ███    ██ ███████ ████████ ██████  ██    ██  ██████ ████████  ██████  ██████  ███████
+        ██      ██    ██ ████   ██ ██         ██    ██   ██ ██    ██ ██         ██    ██    ██ ██   ██ ██
+        ██      ██    ██ ██ ██  ██ ███████    ██    ██████  ██    ██ ██         ██    ██    ██ ██████  ███████
+        ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██    ██ ██         ██    ██    ██ ██   ██      ██
+         ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██     ██████  ██   ██ ███████
+        */
 
-        public ItemCategory(string name, ushort cat_id, ItemCategory parent = null, short priority = 0)
+        public ItemCategory(string name, ushort category_id, ushort parent_id = 0, short priority = 0)
         {
             Name = name;
-            Parent = parent;
+            ParentID = parent_id;
             Priority = priority;
-            ID = cat_id;
+            ID = category_id;
+            Register(this);
         }
+
+        public ItemCategory(string name, ushort category_id, ItemCategory parent = null, short priority = 0)
+            : this(name, category_id, parent?.ID ?? 0, priority) { }
+
+
+        /*
+        ███    ███ ███████ ██████   ██████  ██ ███    ██  ██████
+        ████  ████ ██      ██   ██ ██       ██ ████   ██ ██
+        ██ ████ ██ █████   ██████  ██   ███ ██ ██ ██  ██ ██   ███
+        ██  ██  ██ ██      ██   ██ ██    ██ ██ ██  ██ ██ ██    ██
+        ██      ██ ███████ ██   ██  ██████  ██ ██   ████  ██████
+        */
+
+        public void Merge(UnionCategory union)
+        {
+            if (union != null)
+            {
+                // this._union = union;
+                this.UnionID = union.ID;
+                union.AddMember(this);
+            }
+        }
+        public void Merge(ushort union_id)
+        {
+            try {
+                Merge(Registry[union_id] as UnionCategory);
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                throw new UsefulKeyNotFoundException(union_id.ToString(), nameof(Registry), knfe,
+                    "The category '" + this.Name + "' could not be added to the Union with ID '{0}' because no category with that ID exists in '{1}'." );
+            }
+        }
+
+        public void Unmerge()
+        {
+            this._union?.RemoveMember(this);
+            this.UnionID = 0;
+        }
+
+        /*
+         █████  ██████  ███████ ████████ ██████   █████   ██████ ████████
+        ██   ██ ██   ██ ██         ██    ██   ██ ██   ██ ██         ██
+        ███████ ██████  ███████    ██    ██████  ███████ ██         ██
+        ██   ██ ██   ██      ██    ██    ██   ██ ██   ██ ██         ██
+        ██   ██ ██████  ███████    ██    ██   ██ ██   ██  ██████    ██
+        */
+
+        #region abstract methods
 
         public abstract bool Matches(Item item);
         public abstract bool Matches(IDictionary<string, int> item_flags);
 
         public abstract ItemCategory Match(IDictionary<string, int> item_flags);
 
+        #endregion
 
-        public void Merge(UnionCategory union)
-        {
-            this._union = union;
-            union.AddMember(this);
-        }
-        public void Unmerge()
-        {
-            this._union.RemoveMember(this);
-            this._union = null;
-        }
 
         #region interface implementations
         public int CompareTo(ItemCategory other)
@@ -132,17 +221,39 @@ namespace InvisibleHand.Items
         }
     }
 
+    /*
+    ██████  ███████  ██████  ██    ██ ██       █████  ██████
+    ██   ██ ██      ██       ██    ██ ██      ██   ██ ██   ██
+    ██████  █████   ██   ███ ██    ██ ██      ███████ ██████
+    ██   ██ ██      ██    ██ ██    ██ ██      ██   ██ ██   ██
+    ██   ██ ███████  ██████   ██████  ███████ ██   ██ ██   ██
+    */
+
     public class RegularCategory : ItemCategory
     {
 
         public IDictionary<string, int> Requirements { get; set; }
 
-        public RegularCategory(string name, ushort cat_id, IDictionary<string, int> requirements = null, ItemCategory parent = null, short priority = 0)
-        : base (name, cat_id, parent, priority)
+
+        // constructors
+        // ------------------
+        public RegularCategory(string name, ushort cat_id,
+                               IDictionary<string, int> requirements = null,
+                               ushort parent_id = 0, short priority = 0)
+                               : base (name, cat_id, parent_id, priority)
         {
             Requirements = requirements ?? new Dictionary<string, int>();
         }
 
+        public RegularCategory(string name, ushort cat_id,
+                               IDictionary<string, int> requirements = null,
+                               ItemCategory parent = null, short priority = 0)
+                               : this(name, cat_id, requirements,
+                                      parent?.ID ?? 0, priority) {}
+
+
+        // Adding a trait
+        // ------------------
         public void AddTraitRequirement(string trait_family, int flag_value)
         {
             if (Requirements.ContainsKey(trait_family))
@@ -151,6 +262,8 @@ namespace InvisibleHand.Items
                 Requirements[trait_family] = flag_value;
         }
 
+        // Abstract method overrides
+        // ---------------------------
         public override bool Matches(IDictionary<string, int> item_flags)
         {
             foreach (var kvp in Requirements)
@@ -192,6 +305,8 @@ namespace InvisibleHand.Items
             return this.GetCategory;
         }
 
+        // Handle the Sorting Rules
+        // ------------------
         #region internal item-sorting rules
 
         /// saved independently in order to make iteration more efficient
@@ -241,6 +356,14 @@ namespace InvisibleHand.Items
         }
     }
 
+    /*
+    ██    ██ ███    ██ ██  ██████  ███    ██      ██████  █████  ████████ ███████  ██████   ██████  ██████  ██    ██
+    ██    ██ ████   ██ ██ ██    ██ ████   ██     ██      ██   ██    ██    ██      ██       ██    ██ ██   ██  ██  ██
+    ██    ██ ██ ██  ██ ██ ██    ██ ██ ██  ██     ██      ███████    ██    █████   ██   ███ ██    ██ ██████    ████
+    ██    ██ ██  ██ ██ ██ ██    ██ ██  ██ ██     ██      ██   ██    ██    ██      ██    ██ ██    ██ ██   ██    ██
+     ██████  ██   ████ ██  ██████  ██   ████      ██████ ██   ██    ██    ███████  ██████   ██████  ██   ██    ██
+    */
+
     public class UnionCategory : ItemCategory
     {
 
@@ -261,6 +384,8 @@ namespace InvisibleHand.Items
             UnionMembers = new SortedSet<ItemCategory>();
         }
 
+        // Tracking member Categories
+        // ------------------
         public void AddMember(ItemCategory newMember)
         {
             this.UnionMembers.Add(newMember);
@@ -270,6 +395,9 @@ namespace InvisibleHand.Items
         {
             this.UnionMembers.Remove(member);
         }
+
+        // Abstract method overrides
+        // ------------------------
 
         /// <summary>
         /// Check if the given flags are a fit for this category
