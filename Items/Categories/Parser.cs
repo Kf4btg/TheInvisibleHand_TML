@@ -369,7 +369,7 @@ namespace InvisibleHand.Items.Categories
             assignAddresses(0, int.MaxValue, 0, lookup_byparentID);
 
             // TESTING
-            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Ordinal).Select(c=> new {name=c.QualifiedName, order=c.Ordinal}), "Categories in order", true);
+            // ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Ordinal).Select(c=> new {name=c.QualifiedName, order=c.Ordinal}), "Categories in order", true);
         }
 
         /// <summary>
@@ -487,6 +487,8 @@ namespace InvisibleHand.Items.Categories
             }
 
             CategoryTree = cattree;
+
+            // Console.WriteLine(CategoryTree.ToString());
         }
     }
 }
