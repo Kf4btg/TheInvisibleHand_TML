@@ -114,15 +114,19 @@
     <Compile Include="IHPlayer.cs" />
     <Compile Include="IHWorld.cs" />
     <!-- <Compile Include="Definitions\Category.cs" /> -->
-    <Compile Include="Definitions\Parser.cs" />
 
-    <Compile Include="Items\ItemCategory.cs" />
+    <Compile Include="Items\Categories\ICategory.cs" />
+    <Compile Include="Items\Categories\Base.cs" />
+    <Compile Include="Items\Categories\Regular.cs" />
+    <Compile Include="Items\Categories\Union.cs" />
+    <Compile Include="Items\Categories\Parser.cs" />
+    <Compile Include="Items\Categories\SortRuleBuilder.cs" />
+
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ConditionTable.cs" />
     <Compile Include="Items\ItemClassHandler.cs" />
     <Compile Include="Items\ItemClassifier.cs" />
     <Compile Include="Items\ItemFlagInfo.cs" />
-    <Compile Include="Items\ItemRuleBuilder.cs" />
     <Compile Include="Items\Sets.cs" />
 
     <Compile Include="Rules\Rule.cs" />

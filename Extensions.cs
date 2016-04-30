@@ -5,6 +5,7 @@ using Terraria;
 
 using InvisibleHand.Utils;
 using InvisibleHand.Items;
+using InvisibleHand.Items.Categories;
 
 namespace InvisibleHand
 {

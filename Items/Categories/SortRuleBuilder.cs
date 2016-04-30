@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using InvisibleHand.Rules;
 using Terraria;
 
-namespace InvisibleHand.Items
+namespace InvisibleHand.Items.Categories
 {
     using ItemCompRule = Func<Item, Item, int>;
 

@@ -8,12 +8,11 @@ using Hjson;
 // using Terraria;
 
 using InvisibleHand.Utils;
-using InvisibleHand.Items;
 
-namespace InvisibleHand.Definitions
+namespace InvisibleHand.Items.Categories
 {
     /// read in the category specs from the hjson files and convert to something useable
-    public static class CategoryParser
+    public static class Parser
     {
         private static string TraitFilePath;
         private static string CategoryDefsPath;
@@ -26,6 +25,7 @@ namespace InvisibleHand.Definitions
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
         /// uses keys based on a category's ordinal (ordering rank).
+        // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
         public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
 
@@ -130,11 +130,11 @@ namespace InvisibleHand.Definitions
         }
 
         /*
-        ██       ██████   █████  ██████       ██████  █████  ████████ ███████  ██████   ██████  ██████  ██ ███████ ███████
-        ██      ██    ██ ██   ██ ██   ██     ██      ██   ██    ██    ██      ██       ██    ██ ██   ██ ██ ██      ██
-        ██      ██    ██ ███████ ██   ██     ██      ███████    ██    █████   ██   ███ ██    ██ ██████  ██ █████   ███████
-        ██      ██    ██ ██   ██ ██   ██     ██      ██   ██    ██    ██      ██    ██ ██    ██ ██   ██ ██ ██           ██
-        ███████  ██████  ██   ██ ██████       ██████ ██   ██    ██    ███████  ██████   ██████  ██   ██ ██ ███████ ███████
+        ██       ██████   █████  ██████       ██████ ████████  ██████  ███████
+        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██       ██
+        ██      ██    ██ ███████ ██   ██     ██         ██    ██   ███ ███████
+        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██    ██      ██
+        ███████  ██████  ██   ██ ██████       ██████    ██     ██████  ███████
         */
 
 
@@ -249,7 +249,8 @@ namespace InvisibleHand.Definitions
                 category.SortRules = ItemRuleBuilder.BuildSortRules(property_names.Select(jv => jv.Qs()));
 
             else if (category.Parent != null) // inherit from parent
-                category.CopySortRules(category.Parent);
+                category.CopyParentRules();
+                // category.CopySortRules(category.Parent as RegularCategory);
                 // newcategory.ruleExpressions = p?.ruleExpressions;
 
             // if the rules are somehow *still* null, add a default single-rule list of just sorting by type
@@ -258,7 +259,7 @@ namespace InvisibleHand.Definitions
                 category.SortRules = new[] { ItemRuleBuilder.GetRule("type") }.ToList();
         }
 
-        private static void mergeUnionMembers(UnionCategory union, JsonArray member_names)
+        private static void mergeUnionMembers(IUnion<ItemCategory> union, JsonArray member_names)
         {
             foreach (var member in member_names)
             {
@@ -357,7 +358,7 @@ namespace InvisibleHand.Definitions
         }
 
         /// <summary>
-        /// Because it doesn't seem possible to assign proper priority values before all categories are loaded and
+        /// Because it doesn't seem possible to assign proper ordinal values before all categories are loaded and
         /// parent-child relationships are known, we do that afterwards when we know all the context.
         /// </summary>
         private static void CalculatePriorities()
@@ -368,7 +369,7 @@ namespace InvisibleHand.Definitions
             assignAddresses(0, int.MaxValue, 0, lookup_byparentID);
 
             // TESTING
-            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Priority).Select(c=> new {name=c.QualifiedName, order=c.Priority}), "Categories in order", true);
+            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Ordinal).Select(c=> new {name=c.QualifiedName, order=c.Ordinal}), "Categories in order", true);
         }
 
         /// <summary>
@@ -439,19 +440,34 @@ namespace InvisibleHand.Definitions
             // will be created automatically during autovivification, using the ordinal value of the category
             var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
 
-            foreach (var kvp in CategoryDefinitions)
+            var registry = ItemCategory.Registry;
+
+            // foreach (var kvp in CategoryDefinitions)
+            foreach (var kvp in registry)
             {
                 var category = kvp.Value;
 
-                var parent = category.Parent;
+                // var parent = category.Parent;
+                var parentID = category.ParentID;
 
                 // get the ancestors for the category as a stack,
                 // with the top-level category on top.
-                var catstack = new Stack<ItemCategory>();
-                while (parent != null)
+                // var catstack = new Stack<ItemCategory>();
+                // while (parentID != null)
+                    // catstack.Push(parent);
+                    // parent = parent.Parent;
+
+                // get the ordinal values (tree-keys) of the category's
+                // ancestors as a stack, with the ordinal of the top-level
+                // category at the front of the stack
+                var catstack = new Stack<int>();
+                while (parentID > 0)
                 {
-                    catstack.Push(parent);
-                    parent = parent.Parent;
+                    var parent = registry[parentID];
+                    // catstack.Push(parentID);
+                    catstack.Push(parent.Ordinal);
+                    // parentID = registry[parentID].ParentID;
+                    parentID = parent.ParentID;
                 }
                 var subtree = cattree;
 
@@ -460,7 +476,10 @@ namespace InvisibleHand.Definitions
                 // any non-existent nodes.
                 while (catstack.Count > 0)
                 {
-                    subtree = subtree[catstack.Pop().Ordinal];
+                    // subtree = subtree[catstack.Pop().Ordinal];
+                    // the stack contains the ordinal values for the hierarchy,
+                    // so we just need to pop them off
+                    subtree = subtree[catstack.Pop()];
                 }
 
                 // now create/access the child and set its data

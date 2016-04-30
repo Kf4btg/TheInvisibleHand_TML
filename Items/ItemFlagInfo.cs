@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terraria.ModLoader;
 // using InvisibleHand.Definitions;
 using InvisibleHand.Utils;
-
+using InvisibleHand.Items.Categories;
 
 namespace InvisibleHand.Items
 {
@@ -22,7 +22,7 @@ namespace InvisibleHand.Items
         private ItemCategory find_category()
         {
             // create the eventual return value with a default 'unknown' category
-            var match = ItemCategory.None;
+            var match = Categories.ItemCategory.None;
             CheckTree(IHBase.CategoryTree, ref match);
 
             // cache the value so we don't do the look up again
@@ -31,7 +31,7 @@ namespace InvisibleHand.Items
         }
 
         // private void CheckTree(SortedAutoTree<string, ItemCategory> tree, ref ItemCategory match)
-        private void CheckTree(SortedAutoTree<int, ItemCategory> tree, ref ItemCategory match)
+        private void CheckTree(SortedAutoTree<int, Categories.ItemCategory> tree, ref ItemCategory match)
         {
             // sorted by category.ordinal
             foreach (var branch in tree)
