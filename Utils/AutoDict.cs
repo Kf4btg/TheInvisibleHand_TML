@@ -141,24 +141,39 @@ namespace InvisibleHand.Utils
 
         // for debugging, mainly
         private static int depth = 0;
-        private static string indent => new string(' ', depth);
+        private static string indent => new string(' ', depth*2);
         public override string ToString()
         {
-            string s = $"{indent}{Label}:\n";
+            string s = $"{indent}{{{Label}:";
             StringBuilder sb = new StringBuilder(s);
+            if (this.HasData)
+            {
+                sb.Append(" "+Data.ToString());
+            }
 
             if (this.Count > 0)
             {
+                var c = this.Count;
+                int i = 0;
+                sb.Append("\n");
                 depth++;
                 foreach (var kvp in this)
                 {
                     sb.Append(kvp.Value.ToString());
+                    if (++i < c)
+                        sb.Append(",\n");
                 }
                 depth--;
+                sb.Append($"\n{indent}");
             }
+            // else
+                // sb.Append("\n");
+
+            // sb.Append($"{indent}}}");
+            sb.Append("}");
             return sb.ToString();
         }
-        
+
         /// Automatically assigns the Label based on the key
         public override void Add(K key, SortedAutoTree<K, V> val)
         {
