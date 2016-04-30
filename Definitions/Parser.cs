@@ -25,8 +25,6 @@ namespace InvisibleHand.Definitions
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
-        /// I hope 65,000 categories will be enough...
-        public static IDictionary<ushort, ItemCategory> CategoryIDs { get; private set; }
         // public static SortedAutoTree<string, ItemCategory> CategoryTree { get; private set; }
 
         /// uses keys based on a category's ordinal (ordering rank).
@@ -46,6 +44,7 @@ namespace InvisibleHand.Definitions
             LoadTraitDefinitions(TraitFilePath);
             AssignFlagValues();
             LoadCategoryDefinitions(CategoryDefsPath);
+            CalculatePriorities();
             BuildCategoryTree();
         }
 
@@ -151,7 +150,6 @@ namespace InvisibleHand.Definitions
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
-            CategoryIDs = new Dictionary<ushort, ItemCategory>();
             ushort count = 0; // track absolute order of added categories (this will be the unique ID for each category)
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
@@ -177,7 +175,7 @@ namespace InvisibleHand.Definitions
 
                             // restrict assignable priority value to [-500..500] and shift left by 6 bits
                             // to give us some guaranteed tweaking room between the priorities
-                            priority = catobj.ContainsKey("priority") ? (short?)(catobj["priority"]?.Qi().Clamp(-500, 500) << 6) : null,
+                            priority = catobj.ContainsKey("priority") ? (ushort?)(catobj["priority"]?.Qi().Clamp(-500, 500) << 6) : null,
 
                             // the required traits for this category
                             requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
@@ -194,12 +192,24 @@ namespace InvisibleHand.Definitions
                             throw new HjsonFieldNotFoundException("name", nameof(catobj));
 
                         // get parent, if any
-                        ItemCategory parent = getParent(catdef.name, catdef.parent_name);
+                        // ItemCategory parent = getParent(catdef.name, catdef.parent_name);
+                        ushort parentID = getParentID(catdef.name, catdef.parent_name);
+                        ItemCategory parent = parentID > 0 ? ItemCategory.Registry[parentID] : null;
 
 
                         // and priority, either specific to this category or inherited from parent (or default 0)
-                        short priority = getPriority(parent, catdef.priority);
-
+                        // short priority = getPriority(parent, catdef.priority);
+                        ushort priority = 0;
+                        PriorityType ptype;
+                        if (catdef.priority.HasValue)
+                        {
+                            priority = (ushort)catdef.priority;
+                            ptype = PriorityType.EXPLICIT;
+                        }
+                        else
+                        {
+                            ptype = PriorityType.DERIVED;
+                        }
 
                         // A union category
                         // ------------------
@@ -207,19 +217,20 @@ namespace InvisibleHand.Definitions
                         {
                             // bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
 
-                            var union = new UnionCategory(catdef.name, count++, parent, priority: priority);
+                            var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
+                            union.priority_type = ptype;
 
-                            if (parent != null)
-                            {
-                                union.thisChildIndex = ++parent.childCount;
-                            }
+                            // if (parentID > 0)
+                            // {
+                            //     union.thisChildIndex = ++parent.childCount;
+                            // }
 
                             // TODO: allow enable/disable at runtime
                             if (catdef.enable)
                                 mergeUnionMembers(union, catdef.merge);
 
                             // XXX: should we add the unions to the search tree?
-                            CategoryDefinitions[union.Name] = CategoryIDs[union.ID] = union;
+                            CategoryDefinitions[union.Name] = union;
                         }
 
                         // a 'Regular' category
@@ -234,18 +245,19 @@ namespace InvisibleHand.Definitions
                             if (reqs.Count > 0)
                             {
                                 // otherwise, create the new category object
-                                var newcategory = new RegularCategory(catdef.name, count++, reqs, parent, priority);
-                                if (parent != null)
-                                {
-                                    newcategory.thisChildIndex = ++parent.childCount;
-                                }
+                                var newcategory = new RegularCategory(catdef.name, ++count, reqs, parentID, priority);
+                                newcategory.priority_type = ptype;
+                                // if (parentID > 0)
+                                // {
+                                //     newcategory.thisChildIndex = ++parent.childCount;
+                                // }
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
                                 assignSortingRules(newcategory, catdef.sort_fields);
 
                                 // store the new category in the collections
-                                CategoryDefinitions[newcategory.Name] = CategoryIDs[newcategory.ID] = newcategory;
+                                CategoryDefinitions[newcategory.Name] = newcategory;
                             }
                         }
                     } // end of category-object list
@@ -347,16 +359,16 @@ namespace InvisibleHand.Definitions
         }
 
         /// <summary>
-        /// Get the pre-existing parent of the given category
+        /// Get the id of the pre-existing parent of the given category
         /// </summary>
         /// <param name="category_name">Name of current category (only used in error messages if the parent name is not found) </param>
         /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
         /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
-        private static ItemCategory getParent(string category_name, string parent_name)
+        private static ushort getParentID(string category_name, string parent_name)
         {
             try
             {
-                return parent_name == "" ? null : CategoryDefinitions[parent_name];
+                return parent_name == "" ? (ushort)0 : CategoryDefinitions[parent_name].ID;
             }
             catch (KeyNotFoundException knfe)
             {
@@ -381,6 +393,107 @@ namespace InvisibleHand.Definitions
             //      Weapon.Melee.Broadsword > Weapon.Magic.Homing > Weapon.Melee > Weapon.Magic
             // which is neither ideal nor intuitive; seems we need some sort of depth-first approach?
             return parsed_priority ?? (short)((parent?.Priority - 1) ?? 0);
+        }
+
+        /// <summary>
+        /// Because it doesn't seem possible to assign proper priority values before all categories are loaded and
+        /// parent-child relationships are known, we do that afterwards when we know all the context.
+        /// </summary>
+        private static void CalculatePriorities()
+        {
+            // creates a lookup of: ParentID => [collection of child categories]
+            var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c=>c.ParentID, c=> c);
+            // assign addresses to all the top level categories, and recursively to their children
+            assignAddresses(0, ushort.MaxValue, 0, lookup_byparentID);
+
+            // TESTING
+            ConsoleHelper.PrintList(CategoryDefinitions.Select(kvp=>kvp.Value).OrderBy(c=>c.Priority).Select(c=> new {name=c.Name, order=c.Priority}), "Categories in order", true);
+
+            // var bare_categories = CategoryDefinitions.Select(kvp => kvp.Value);
+            // all toplevel categories
+            // var toplevel = bare_categories.Where(cat => cat.Parent == null);
+
+            // group the rest by parentID
+            // var byparent = CategoryDefinitions.Select(kvp => kvp.Value).GroupBy(cat => cat.ParentID).OrderBy(g => g.Key);
+            // var byparent = CategoryDefinitions.Select(kvp => kvp.Value).GroupBy(cat => cat.ParentID);
+
+            // var lookup_byparentID = byparent.ToLookup(g => g.Key, g=> g.OrderBy(c=> c.Priority).ThenBy(c=> c.ID).Select(c=>c));
+
+            // get the toplevel categories
+            // var toplevel = byparent.Where(g => g.Key == 0).SelectMany(g=> g.ToList());
+            // var toplevel = from catgroup in byparent
+            //                from member in catgroup
+            //                where catgroup.Key == 0
+            //                // if an explicit priority-weight has been set for any category,
+            //                // let that determine the initial ordering, then sort matching priorities
+            //                // by id (load-order)
+            //                orderby member.Priority, member.ID
+            //                select member;
+            //
+            //
+            // var top_count = toplevel.Count();
+            // var bucket_size = ushort.MaxValue / top_count;
+
+
+            // now, for each top level category, recursively descend its children and perform the same addressing
+
+
+            // create buckets for each toplevel category, dividing up available space
+            // foreach (var top in toplevel.Select((x, i) => new { category = x, index = i }))
+            // {
+            //
+            //     top.category.Priority = (ushort)(((top.index+1) * bucket_size) - 1);
+            // }
+        }
+
+        // IEnumerable<ItemCategory> recipients,
+
+        /// <summary>
+        /// According to their weighted loadorder, each category is assigned a range (or 'bucket')
+        /// of priority numbers ('addresses') that they and their children can use. The size of
+        /// these buckets is determined by dividing the maximum addressable space (0, ushort.MaxValue]
+        /// by the number of items currently requiring an address,
+        /// here the number of toplevel categories. Each top category is assigned an address
+        /// within its respective range, and later will perform the same process for its children,
+        /// dividing its addressable space among them, and then the same will happen for those
+        /// children's children and so on and so forth. Those categories created first (with lower IDs)
+        /// will receive the lower addresses (and thus be sorted first later on), unless the user has
+        /// given preference to some categories and changed their initial priority values in the definition
+        /// files, in which case that order will be considered before creation order.
+        /// It's basic European primogeniture, but with abstract conceptualizations of directed
+        /// electrical impulses rather than scheming dukes...unless of course you have a very 'modern' view
+        /// of human conciousness; then it's exactly the same.
+        /// </summary>
+        /// <remarks>
+        /// Each category receives an address that is just 1 below the minimum range of its next sibling.
+        /// This ensures that the children of this category receive lower addresses than the category itself
+        /// and are sorted before it while still making sure that the parent is sorted before its siblings.
+        /// In this way, we encoding a post-order tree-traversal into the priority values.
+        /// </remarks>
+        private static void assignAddresses(int min_address, int max_address,
+                                            ushort parent_id,
+                                            ILookup<ushort, ItemCategory> child_category_lookup)
+        {
+            // get direct children of the specified parent_id, sort by preset priority, then ID
+            var recipients = child_category_lookup[parent_id].OrderBy(c => c.Priority).ThenBy(c => c.ID);
+
+            // divide the addressable space into equal-sized buckets
+            var bucket_size = (max_address - min_address) / recipients.Count();
+
+            // go through the children, assigning each an address within their range.
+            foreach (var r in recipients.Select((x, i) => new { category = x, index = i }))
+            {
+                var range_start = min_address + (r.index * bucket_size);
+                var range_end = range_start + bucket_size - 1;
+
+                // each category will receive an address that is just 1 below the minimum range of it's sibling.
+                r.category.Priority = (ushort)(range_end);
+
+                // If this child is itself a parent, recursively call this function for its children
+                if (child_category_lookup.Contains(r.category.ID))
+                    // subtract 1 more from the end of the range so we don't try to overwrite this category
+                    assignAddresses(range_start, range_end-1, r.category.ID, child_category_lookup);
+            }
         }
 
 
