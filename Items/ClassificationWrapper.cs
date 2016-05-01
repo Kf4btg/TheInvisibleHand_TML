@@ -1,12 +1,17 @@
 using System.Collections.Generic;
 using Terraria;
 
-// using System;
+using System;
 // using System.Linq;
 
 namespace InvisibleHand.Items
 {
-    internal class ItemClassificationWrapper
+    // save some typing in the fluent interface;
+    // StaticFlagFunction
+    using SFlagFunc = Func<ClassificationWrapper, string, string, ClassificationWrapper>;
+    using SFlagsFunc = Func<ClassificationWrapper, string, string[], ClassificationWrapper>;
+
+    public class ClassificationWrapper
     {
         public readonly Item item;
         public ItemFlagInfo info;
@@ -23,7 +28,7 @@ namespace InvisibleHand.Items
         public KeyValuePair<string, string> LastFlag { get; private set; }
 
         /// create a new wrapper around the given Item and ItemInfo
-        public ItemClassificationWrapper(Item item, ItemFlagInfo info)
+        public ClassificationWrapper(Item item, ItemFlagInfo info)
         {
             this.item = item;
             this.info = info;
@@ -33,26 +38,26 @@ namespace InvisibleHand.Items
 
         /// tag this instance with the given trait;
         /// return the modified instance
-        public ItemClassificationWrapper SetFlag(string type, string flag)
+        public ClassificationWrapper SetFlag(string type, string flag)
         {
             // try
             // {
 
-                if (this.ItemFlags.ContainsKey(type))
-                    this.ItemFlags[type] |= IHBase.FlagCollection[type][flag];
-                else
-                    this.ItemFlags[type] = IHBase.FlagCollection[type][flag];
+            if (this.ItemFlags.ContainsKey(type))
+                this.ItemFlags[type] |= IHBase.FlagCollection[type][flag];
+            else
+                this.ItemFlags[type] = IHBase.FlagCollection[type][flag];
 
-                this.Success = true;
-                this.LastFlag = new KeyValuePair<string, string>(type, flag);
+            this.Success = true;
+            this.LastFlag = new KeyValuePair<string, string>(type, flag);
             // }
             // catch (KeyNotFoundException)
             // {
 
-                // Console.WriteLine("{0}[{1}]", type, flag);
-                // Console.WriteLine(string.Join(", ", IHBase.FlagCollection.Select(kvp => kvp.Key).ToArray()));
-                // Console.WriteLine(string.Join(", ", IHBase.FlagCollection[type].Select(kvp => kvp.Key).ToArray()));
-                // throw;
+            // Console.WriteLine("{0}[{1}]", type, flag);
+            // Console.WriteLine(string.Join(", ", IHBase.FlagCollection.Select(kvp => kvp.Key).ToArray()));
+            // Console.WriteLine(string.Join(", ", IHBase.FlagCollection[type].Select(kvp => kvp.Key).ToArray()));
+            // throw;
             // }
             return this;
         }
@@ -60,7 +65,7 @@ namespace InvisibleHand.Items
         /// tag this instance with the given trait iff the condition
         /// for the trait (as found in the Condition Table) is true;
         ///return the instance, whether modified or not.
-        public ItemClassificationWrapper Flag(string type, string flag)
+        public ClassificationWrapper Flag(string type, string flag)
         {
             Success = false; // reset
             if (ConditionTable.Check(type, item, flag))
@@ -68,14 +73,12 @@ namespace InvisibleHand.Items
             return this;
         }
 
-
-
         /// goes through the list of traits in the params list, attempting to tag each one; when a tag is successful,
         /// return without checking the remaining. Should be used for mutually-exclusive traits of the same
         /// Trait type.
-        public ItemClassificationWrapper FlagFirst(string type, params string[] flags)
+        public ClassificationWrapper FlagFirst(string type, params string[] flags)
         {
-           foreach (var f in flags)
+            foreach (var f in flags)
             {
                 if (this.Flag(type, f).Success)
                     break;
@@ -87,7 +90,7 @@ namespace InvisibleHand.Items
         /// without regard to the success of each tag operation.
         /// Can be used to try tagging related but not mutually-exclusive traits
         /// of the same Trait type.
-        public ItemClassificationWrapper FlagAny(string type, params string[] flags)
+        public ClassificationWrapper FlagAny(string type, params string[] flags)
         {
             bool res = false;
             foreach (var f in flags)
@@ -98,55 +101,68 @@ namespace InvisibleHand.Items
             Success = res;
             return this;
         }
+    }
 
-        /// convenience function for checking the value of the .Success
-        /// attribute after a Flag() operation
-        public bool TryFlag(string type, string flag)
-        {
-            return Flag(type, flag).Success;
-        }
+    /// An attempt at making an API for the ClassificationWrapper that is slightly less painful
+    /// and confusing to use. See ItemClassifier for examples of its usage.
+    public static class ICWFluent
+    {
+        // Static Method Wrappers (SFLag[s]Func)
+        // ------------
+        public static ClassificationWrapper SetFlag(
+                ClassificationWrapper item, string type, string flag)
+                => item.SetFlag(type, flag);
 
-        /// tag this instance with the given trait
-        /// IFF condition is true; return the instance,
-        /// modified or not.
-        /// Mainly a shortcut for:
-        /// 	if (condition) item.SetFlag(type, flag);
-        public ItemClassificationWrapper SetFlagIf(bool condition, string type, string flag)
-        {
-            if (condition) return SetFlag(type, flag);
+        public static ClassificationWrapper Flag(
+                ClassificationWrapper item, string type, string flag)
+                => item.Flag(type, flag);
 
-            Success = false; // reset
-            return this;
-        }
+        public static ClassificationWrapper FlagFirst(
+                ClassificationWrapper item, string type, params string[] flags)
+                => item.FlagFirst(type, flags);
 
-        /// shortcut for :
-        /// 	if (condition) item.Flag(type, flag);
-        public ItemClassificationWrapper FlagIf(bool condition, string type, string flag)
-        {
-            if (condition) return Flag(type, flag);
+        public static ClassificationWrapper FlagAny(
+                ClassificationWrapper item, string type, params string[] flags)
+                => item.FlagAny(type, flags);
 
-            Success = false; // reset
-            return this;
-        }
 
-        /// shortcut for :
-        /// 	if (condition) item.FlagFirst(type, flag1, flag2, ...)
-        public ItemClassificationWrapper FlagFirstIf(bool condition, string type, params string[] flags)
-        {
-            if (condition) return FlagFirst(type, flags);
+        // ---------------------------------------
+        // Conditional Returns, Conditional Checks
+        // ---------------------------------------
+        // These are intended to be called as extension methods on an ItemClassificationWrapper instance.
+        // Combined with the static wrappers given above and the (new in C# 6)
+        // 'using static ICWFluent' statement, this should allow syntax like:
+        //      bool tool = item.Try(FlagAny, "Tool", "pick", "axe", "drill");
+        //      ...
+        //      item.If(tool, Flag, "Weapon", "type_melee");
+        // Of course the methods that return a ClassificationWrapper can be chained, as well
+        // as combined with the normal ClassificationWrapper instance methods:
+        //      item.If(...).FlagAny(...);
+        // ---------------------------------------
 
-            Success = false; // reset
-            return this;
-        }
+        public static ClassificationWrapper If(this ClassificationWrapper item, bool condition,
+                SFlagsFunc method, string type, params string[] flags)
+                => condition ? method(item, type, flags) : item;
 
-        /// shortcut for :
-        /// 	if (condition) item.FlagAny(type, flag1, flag2, ...)
-        public ItemClassificationWrapper FlagAnyIf(bool condition, string type, params string[] flags)
-        {
-            if (condition) FlagAny(type, flags);
+        public static ClassificationWrapper If(this ClassificationWrapper item, bool condition,
+                SFlagFunc method, string type, string flag)
+                => condition ? method(item, type, flag) : item;
 
-            Success = false; // reset
-            return this;
-        }
+        public static bool Try(this ClassificationWrapper item,
+                SFlagsFunc method, string type, params string[] flags)
+                => method(item, type, flags).Success;
+
+        public static bool Try(this ClassificationWrapper item,
+                SFlagFunc method, string type, string flag)
+                => method(item, type, flag).Success;
+
+        public static bool TryIf(this ClassificationWrapper item,
+                bool condition, SFlagsFunc method, string type, params string[] flags)
+                => condition && method(item, type, flags).Success;
+                // C# short-circuits its ands, right?
+
+        public static bool TryIf(this ClassificationWrapper item,
+                bool condition, SFlagFunc method, string type, string flag)
+                => condition && method(item, type, flag).Success;
     }
 }

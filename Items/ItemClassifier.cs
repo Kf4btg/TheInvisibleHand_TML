@@ -1,25 +1,22 @@
 using System.Collections.Generic;
 // using System;
-// using System.Linq;
 using Terraria;
-// using Terraria.ModLoader;
 
 namespace InvisibleHand.Items
 {
+    using static ICWFluent;
     using FlagValues = IDictionary<string, int>;
     public static class ItemClassifier
     {
 
+        /// stash known flag results here, keyed by ItemID; this way only one item of
+        /// a given type need be classified per game session.
         public static IDictionary<int, FlagValues> flag_cache = new Dictionary<int, FlagValues>();
 
-        // public static void ClassifyItem(Item item, ItemFlagInfo info)
-        // {
-        //     classifyitem(new ItemClassificationWrapper(item, info));
-        // }
-        //
+        /// analyze the given item and assign flag values based on its traits. These flags
+        /// will later be used to determine the proper category for this item.
         public static void ClassifyItem(Item item, ItemFlagInfo flag_info = null)
         {
-
             if (item.type != 0)
             {
                 var flaginfo = flag_info ?? item.GetFlagInfo();
@@ -31,20 +28,16 @@ namespace InvisibleHand.Items
                 }
                 else
                 {
-                    ClassifyItem(new ItemClassificationWrapper(item, flaginfo));
+                    ClassifyItem(new ClassificationWrapper(item, flaginfo));
                     flag_cache[item.type] = flaginfo.Flags;
                 }
             }
-
-
         }
 
-        internal static void ClassifyItem(ItemClassificationWrapper item)
+        internal static void ClassifyItem(ClassificationWrapper item)
         {
-            // var _item = item.item;
             bool _weapon, _tool;
             _weapon = _tool = false;
-
 
             // some generic or unique traits that don't really fall under other categories
             item.FlagAny("General", "quest_item",
@@ -52,8 +45,6 @@ namespace InvisibleHand.Items
                                     "bait",
                                     "explosive",
                                     "defense",
-                                    "heal_life",
-                                    "heal_mana",
                                     "boost_mana",
                                     "use_mana",
                                     "coin",
@@ -63,58 +54,54 @@ namespace InvisibleHand.Items
             );
 
             // Items of all types can be materials, so run them all through this check
-            if (item.TryFlag("General", "material"))
+            if (item.Try(Flag, "General", "material"))
             {
                 // But for items that are **primarily** used as materials, tag them here
-                if(item.FlagAny("Material", "ore",
+                item.FlagAny("Material", "ore",
                                          "bar",
                                          "gem",
                                          "dye_plant",
                                          "alchemy",
                                          "soul",
                                          "critter",
-                                         "butterfly"
-                                        ).Success)
-                                        {
-                    item.SetFlag("Material", "material_primary");
-                }
+                                         "butterfly")
+                    .If(item.Success, SetFlag, "Material", "material_primary");
+                    // if any of those materials were flagged, mark the item as primarily a material
             }
 
             // various weapons, tools, equipment, and placeables can have a reach-boost
-            if (!item.TryFlag("General", "reach_boost"))
+            if (!item.Try(Flag,"General", "reach_boost"))
                 item.Flag("General", "reach_penalty");
-
 
             //
             // weapons
             //------------
-
-            _weapon = item.TryFlag("General", "weapon");
+            _weapon = item.Try(Flag, "General", "weapon");
             if (_weapon)
             {
-                item.Flag("Weapon", "has_projectile");
-                if (item.FlagFirst("Weapon", "type_melee",
+                item.Flag("Weapon", "has_projectile")
+                    .FlagFirst("Weapon", "type_melee",
                                              "type_ranged",
                                              "type_magic",
                                              "type_summon",
-                                             "type_throwing"
-                ).Success)
-                {
+                                             "type_throwing");
+                if (item.Success)
                     classifyWeapon(item, item.LastFlag.Key, item.LastFlag.Value);
-                }
                 // else
                 //     item.SetFlag("Weapon", "type_other");
             }
 
             // equipables
             //------------
-            if (item.TryFlag("General", "equipable"))
+            if (item.Try(Flag, "General", "equipable"))
             {
-                bool vanity = item.TryFlag("General", "vanity");
+                // first, tag vanity status
+                bool vanity = item.Try(Flag, "General", "vanity");
 
-                if (item.FlagFirst("Equip", "slot_head", "slot_body", "slot_leg").Success)
-                    item.FlagIf(!vanity, "Equip", "armor");
-                else if (item.TryFlag("Equip", "accessory"))
+                // then the armor slots
+                if (item.Try(FlagFirst, "Equip", "slot_head", "slot_body", "slot_leg"))
+                    item.If(!vanity, SetFlag, "Equip", "armor");
+                else if (item.Try(Flag, "Equip", "accessory"))
                 {
                     item.Flag("Placeable", "musicbox")
                         // turns out these aren't all mutually exclusive...
@@ -130,8 +117,7 @@ namespace InvisibleHand.Items
                                             "slot_balloon",
                                             "slot_front");
                 }
-                else
-                    item.FlagFirst("Equip", "pet_light",
+                else item.FlagFirst("Equip", "pet_light",
                                             "pet_vanity",
                                             "grapple",
                                             "mount"
@@ -139,26 +125,26 @@ namespace InvisibleHand.Items
             }
             //Tools
             //------------
-            else if (item.FlagAny("Tool", "pick", "axe", "hammer").Success
-                    || item.FlagFirst("Tool", "wand", "fishing_pole", "wrench").Success)
-            {
-                _tool = item.SetFlag("General", "tool").Success;
-            }
-
+            else _tool = item.TryIf(
+                                item.Try(FlagAny, "Tool", "pick", "axe", "hammer") ||
+                                item.Try(FlagFirst, "Tool", "wand", "fishing_pole", "wrench"),
+                            SetFlag, "General", "tool");
 
             // placeables, ammo, consumables, dyes
             if (!(_weapon | _tool))
             {
-                if (item.TryFlag("General", "placeable"))
+                if (item.Try(Flag, "General", "placeable"))
                     classifyPlaceable(item);
 
-                else if (item.TryFlag("General", "ammo"))
+                // else if (item.Try(Flag,"General", "ammo"))
+                else if (item.Try(Flag, "General", "ammo"))
                     classifyAmmo(item);
 
-                else if (item.TryFlag("General", "consumable"))
+                    // else if (item.Try(Flag,"General", "consumable"))
+                else if (item.Try(Flag, "General", "consumable"))
                     classifyConsumable(item);
 
-                else if (item.TryFlag("General", "dye"))
+                else if (item.Try(Flag, "General", "dye"))
                     item.FlagFirst("Dye", "basic",
                                           "black",
                                           "flame",
@@ -169,11 +155,15 @@ namespace InvisibleHand.Items
                                           "lunar");
             }
 
-            if (item.TryFlag("General", "mech"))
-                item.FlagFirst("Mech", "trap", "pressure_plate", "timer", "firework", "track");
+            item.If(item.Try(Flag, "General", "mech"),
+                FlagFirst, "Mech", "trap",
+                                   "pressure_plate",
+                                   "timer",
+                                   "firework",
+                                   "track");
         }
 
-        private static void classifyAmmo(ItemClassificationWrapper item)
+        private static void classifyAmmo(ClassificationWrapper item)
         {
             item.FlagFirst("Ammo", "arrow",
                                    "bullet",
@@ -181,26 +171,28 @@ namespace InvisibleHand.Items
                                    "dart",
                                    "sand",
                                    "solution")
-                .FlagIf(!item.item.consumable, "Ammo", "endless"); // endless quiver, musket pouch, etc
+                .If(!item.item.consumable, SetFlag, "Ammo", "endless"); // endless quiver, musket pouch, etc
         }
 
-        private static void classifyConsumable(ItemClassificationWrapper item)
+        private static void classifyConsumable(ClassificationWrapper item)
         {
             item.Flag("Consumable", "buff")
-                .FlagFirst("Consumable", "food", "flask", "potion");
+                .FlagFirst("Consumable", "food", "flask", "potion")
+                // only flag the healing properties if the thing is a potion
+                .If(item.LastFlag.Value == "potion", FlagAny, "Consumable", "heal_life", "heal_mana");
         }
 
         /// <summary>
         /// Use to add traits relating to furniture, block-type, tile properties, etc.
         /// </summary>
         /// <param name="item"> </param>
-        private static void classifyPlaceable(ItemClassificationWrapper item)
+        private static void classifyPlaceable(ClassificationWrapper item)
         {
             // flag blocks, walls, misc
             // TODO: separate bricks from blocks
 
             item.FlagAny("Placeable", "lighted", "metal_detector");
-            if (item.TryFlag("Placeable", "block"))
+            if (item.Try(Flag, "Placeable", "block"))
             {
                 item.FlagAny("Placeable.Block", "bouncy",
                                                 // "brick",
@@ -215,26 +207,17 @@ namespace InvisibleHand.Items
                                                 "ice");
                 return;
             }
-            else if (item.FlagFirst("Placeable", "wall",
+            else if (item.Try(FlagFirst, "Placeable", "wall",
                                        "banner",
                                        "seed",
                                        "strange_plant",
                                        "track",
                                        "rope",
-                                       "rope_coil").Success) return;
+                                       "rope_coil")) return;
 
-            // if (item.Flag("Placeable", "block").FlagFirst("Placeable", "wall",
-            //                                                            "banner",
-            //                                                            "seed",
-            //                                                            "strange_plant",
-            //                                                            "track",
-            //                                                            "rope",
-            //                                                            "rope_coil"
-            // ).Success)
-            //     return;
 
             // Wall-hangables
-            if (item.TryFlag("Placeable", "wall_deco"))
+            if (item.Try(Flag, "Placeable", "wall_deco"))
             {
                 switch (ClassificationRules.Types.WallDeco(item.item))
                 {
@@ -254,16 +237,18 @@ namespace InvisibleHand.Items
             }
 
             // track whether this fits any of the furniture traits
-            bool is_furniture = item.FlagAny("Furniture", "crafting_station", "container").Success;
+            bool is_furniture = item.Try(FlagAny, "Furniture", "crafting_station", "container");
 
-            if (item.TryFlag("Furniture",  "valid_housing"))
+            if (item.Try(Flag,"Furniture",  "valid_housing"))
             {
                 is_furniture = true;
                 //break down general->specific
-                if (item.TryFlag("Furniture", "housing_door"))
+
+                if (item.Try(Flag, "Furniture", "housing_door"))
                     item.Flag("Furniture.Doors", "door");
                     // TODO: platforms, tall gate, TrapdoorClosed
-                else if (item.TryFlag("Furniture", "housing_table"))
+
+                else if (item.Try(Flag, "Furniture", "housing_table"))
                     item.FlagFirst("Furniture.Tables", "table",
                                                        "workbench",
                                                        "dresser",
@@ -273,13 +258,13 @@ namespace InvisibleHand.Items
                         // TODO: bewitching table, alchemy table, tinkerer's bench
                     );
 
-                else if (item.TryFlag("Furniture", "housing_chair"))
+                else if (item.Try(Flag, "Furniture", "housing_chair"))
                     item.FlagFirst("Furniture.Chairs", "chair",
                                                        "bed",
                                                        "bench"
                        // TODO: thrones
                     );
-                else if (item.TryFlag("Furniture", "housing_light"))
+                else if (item.Try(Flag, "Furniture", "housing_light"))
                     item.FlagFirst("Furniture.Lighting", "torch",
                                                          "candle",
                                                          "chandelier",
@@ -303,7 +288,7 @@ namespace InvisibleHand.Items
                     );
             }
             else
-                is_furniture |= item.FlagFirst("Furniture.Other", "statue",
+                is_furniture |= item.Try(FlagFirst, "Furniture.Other", "statue",
                                                                   "sink",
                                                                   "clock",
                                                                   "statue_alphabet",
@@ -318,9 +303,9 @@ namespace InvisibleHand.Items
                                                                   "beachstuff",
                                                                   "cooking_pot",
                                                                   "anvil",
-                                                                  "monolith").Success;
+                                                                  "monolith");
 
-            item.FlagIf(is_furniture, "Placeable", "furniture");
+            item.If(is_furniture, SetFlag, "Placeable", "furniture");
         }
 
         /// <summary>
@@ -329,7 +314,7 @@ namespace InvisibleHand.Items
         /// <param name="item"> </param>
         /// <param name="type"> should only be "Weapon" (sanity check)</param>
         /// <param name="flag"> should be the type of the weapon (e.g. "type_melee")</param>
-        private static void classifyWeapon(ItemClassificationWrapper item, string type, string flag)
+        private static void classifyWeapon(ClassificationWrapper item, string type, string flag)
         {
             if (type != "Weapon") return;
 
@@ -339,13 +324,13 @@ namespace InvisibleHand.Items
                 case "type_melee":
                     weaponType = "Weapon.Melee";
 
-                    if (item.TryFlag(weaponType, "style_directional"))
+                    if (item.Try(Flag, weaponType, "style_directional"))
                         item.FlagFirst(weaponType, "flail", "yoyo", "chain");
 
-                    else if (item.TryFlag(weaponType, "style_swing"))
+                    else if (item.Try(Flag, weaponType, "style_swing"))
                         item.Flag(weaponType, "broadsword");
 
-                    else if (item.TryFlag(weaponType, "style_thrown"))
+                    else if (item.Try(Flag, weaponType, "style_thrown"))
                         item.Flag(weaponType, "boomerang");
 
                     // the 'chain' weapons can be various styles, but they all
@@ -375,11 +360,12 @@ namespace InvisibleHand.Items
                     break;
                 case "type_summon":
                     weaponType = "Weapon.Summon";
-                    if (!item.TryFlag(weaponType, "minion"))
-                        item.SetFlag(weaponType, "sentry");
+
+                    item.If(!item.Try(Flag, weaponType, "minion"),
+                        SetFlag, weaponType, "sentry");
 
                     break;
-                case "type_throwing":
+                // case "type_throwing":
                     // (there are no sub-categories for thrown weapons yet,
                     // so there's no Flag Type or extra condititions for them either)
                     // break;
