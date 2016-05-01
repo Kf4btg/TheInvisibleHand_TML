@@ -124,7 +124,7 @@
 
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ConditionTable.cs" />
-    <Compile Include="Items\ItemClassHandler.cs" />
+    <Compile Include="Items\ClassificationWrapper.cs" />
     <Compile Include="Items\ItemClassifier.cs" />
     <Compile Include="Items\ItemFlagInfo.cs" />
     <Compile Include="Items\Sets.cs" />
