@@ -8,9 +8,7 @@ namespace InvisibleHand.Items.Categories
 
     public class RegularCategory : ItemCategory
     {
-
         public IDictionary<string, int> Requirements { get; set; }
-
 
         // constructors
         // ------------------
@@ -48,8 +46,8 @@ namespace InvisibleHand.Items.Categories
                 var reqval = kvp.Value;
                 int flagval;
 
-                // if ever the item does not have a required trait or it does
-                // have the correct flag value for the trait, return false to indicate no match
+                // if ever the item does not have a required trait or
+                // an incompatible flag value for the trait, return false to indicate no match
                 if (!item_flags.TryGetValue(kvp.Key, out flagval) || ((flagval & reqval) != reqval))
                     return false;
             }
@@ -61,8 +59,7 @@ namespace InvisibleHand.Items.Categories
             return Matches(item.GetFlagInfo().Flags);
         }
 
-
-        public override ItemCategory Match(IDictionary<string, int> item_flags)
+        public override ICategory<Item> Match(IDictionary<string, int> item_flags)
         {
             foreach (var kvp in Requirements)
             {
@@ -79,20 +76,12 @@ namespace InvisibleHand.Items.Categories
             // Now we return the matched category:
             // If this category has been marked as part of a merged category,
             // return that category; otherwise, return this instance.
-            return this.GetCategory;
+            // return this.GetCategory;
+            return this.Category;
         }
-
-        /*
-        ███████  ██████  ██████  ████████ ██ ███    ██  ██████
-        ██      ██    ██ ██   ██    ██    ██ ████   ██ ██
-        ███████ ██    ██ ██████     ██    ██ ██ ██  ██ ██   ███
-             ██ ██    ██ ██   ██    ██    ██ ██  ██ ██ ██    ██
-        ███████  ██████  ██   ██    ██    ██ ██   ████  ██████
-        */
 
         // Handle the Sorting Rules
         // ------------------
-        #region internal item-sorting rules
 
         /// saved independently in order to make iteration more efficient
         private int ruleCount = 0;
@@ -129,7 +118,6 @@ namespace InvisibleHand.Items.Categories
             this.SortRules = ((RegularCategory)Parent)?.SortRules;
         }
 
-        #endregion
 
         /// IComparer<Item> implementation
         /// using the pre-compiled Sorting rules

@@ -24,7 +24,7 @@ namespace InvisibleHand.Items.Categories
 
         ICategory<T> Category { get; }
 
-        // ICategory<T> Match(IDictionary<string, int> item_flags);
+        ICategory<T> Match(IDictionary<string, int> item_flags);
     }
 
     public interface IUnion<V> : ICategory

@@ -67,7 +67,7 @@ namespace InvisibleHand.Items.Categories
         /// </summary>
         /// <param name="item_flags"> </param>
         /// <returns>This category if matched, null if not</returns>
-        public override ItemCategory Match(IDictionary<string, int> item_flags)
+        public override ICategory<Item> Match(IDictionary<string, int> item_flags)
         {
             return this.Matches(item_flags) ? this : null;
         }
