@@ -31,9 +31,7 @@ namespace InvisibleHand.Items
             {"bait",          (i) => i.bait > 0},
             {"reach_boost",   (i) => i.tileBoost > 0},
             {"reach_penalty", (i) => i.tileBoost < 0},
-            {"heal_life",     (i) => i.healLife > 0},
             {"regen_life",    (i) => i.lifeRegen > 0},
-            {"heal_mana",     (i) => i.healMana > 0},
             {"boost_mana",    (i) => i.manaIncrease > 0},
             {"use_mana",      (i) => i.mana > 0},
             {"vanity",        (i) => i.vanity},
@@ -56,16 +54,12 @@ namespace InvisibleHand.Items
             {"lighted",       Binary.givesLight},
             //~ {"furniture",  REPLACE_ME},
             {"seed",          ByTileID.ImmatureHerb},
-            //~ {"dye_plant",     ByTileID.DyePlant},
             {"strange_plant", Sets.StrangePlant},
             {"block",         Sets.Block},
             // {"brick",      REPLACE_ME},
-            //~ {"ore",           Sets.Ore},
-            //~ {"bar",           ByTileID.MetalBar},
             {"wood",          Sets.Wood},
             {"wall",          (i) => i.createWall > 0},
             {"wall_deco",     Sets.WallDeco},
-            //~ {"gem",           ByTileID.Gem},
             {"musicbox",      ByTileID.MusicBox},
             {"banner",        ByTileID.Banner},
             {"track",         (i) => i.cartTrack},
@@ -218,10 +212,8 @@ namespace InvisibleHand.Items
             {"food",   Binary.isFood},
             {"potion", Binary.isPotion},
             {"flask",  Binary.isFlask},
-            // {"heal",  REPLACE_ME},
-            // {"regen",  REPLACE_ME},
-            // {"life",  REPLACE_ME},
-            // {"mana",  REPLACE_ME},
+            {"heal_life",     (i) => i.healLife > 0},
+            {"heal_mana",     (i) => i.healMana > 0},
         };
 
         public static readonly condition_table Mech = new condition_table
@@ -352,7 +344,15 @@ namespace InvisibleHand.Items
         public static bool Check(String table, Item item, string flag)
         {
             // Console.WriteLine("{0}[{1}]", table, flag);
-            return RuleMatrix(table)[flag](item);
+            try
+            {
+                return RuleMatrix(table)[flag](item);
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                throw new UsefulKeyNotFoundException(flag, table, knfe,
+                    "The trait '{0}' does not exist in table '{1}'.");
+            }
         }
     }
 

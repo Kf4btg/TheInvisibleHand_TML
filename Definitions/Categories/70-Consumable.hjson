@@ -1,5 +1,13 @@
 [
   {
+    name: Flask
+    priority: 100
+    parent: Consumable
+    requires: {
+      Consumable: ["flask"]
+    }
+  }
+  {
     name: Food
     parent: Consumable
     requires: {
@@ -14,24 +22,31 @@
     }
   }
   {
-    name: Flask
-    parent: Consumable
+    name: Restoration Potion
+    parent: Potion
     requires: {
-      Consumable: ["flask"]
+      Consumable: [
+        heal_life
+        heal_mana
+      ]
     }
   }
   {
     name: Healing Potion
     parent: Potion
     requires: {
-      General: ["heal_life"]
+      Consumable: ["heal_life"]
     }
   }
   {
     name: Mana Potion
     parent: Potion
     requires: {
-      General: ["heal_mana"]
+      Consumable: ["heal_mana"]
     }
   }
+  /* TODO: add 'Buff Potion' category?
+  Or is it fine for all the non-healing, non-mana potions
+  to just fall under "potion"?
+   */
 ]

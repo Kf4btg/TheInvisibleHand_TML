@@ -64,15 +64,21 @@ namespace InvisibleHand.Items
             public static bool CanBePlaced(Item item) => (item.createTile > -1 || item.createWall > 0) && (item.type != 213 && item.tileWand < 1);
 
             public static bool isAmmo(Item item) => /*!CanBePlaced(item) &&*/ item.ammo > 0 && !item.notAmmo;
+
+
             public static bool isConsumable(Item item) => !(isAmmo(item) || CanBePlaced(item)) && item.consumable;
-
-            public static bool isFood(Item item)    => item.buffType == BuffID.WellFed;
-
             public static bool timedBuff(Item item) => item.buffTime > 0;
+            public static bool isFood(Item item)    => item.buffType == BuffID.WellFed; //26
 
-            // maybe?
-            public static bool isPotion(Item item) => timedBuff(item) && !isFood(item); // item.potion -> not always helpful
             public static bool isFlask(Item item) => contains(Main.meleeBuff, item.buffType);
+
+            public static bool isPotion(Item item) => item.useStyle == 2 && !isFood(item) && !isFlask(item);
+            // /*timedBuff(item) && !isFood(item);*/ item.potion; // -> not always helpful
+
+            // it seems that Item.potion is actually the flag that tells the game when to enforce the potion cooldown
+            // (meaning that only consumables with a healLife effect get it)
+            public static bool HealingPotion(Item item) => item.potion;
+
 
             public static bool falling(Item item)   => contains(TileID.Sets.Falling, item.createTile);
 
@@ -110,7 +116,11 @@ namespace InvisibleHand.Items
                 // return true;
 
                 // condense the above into a single statement
-                return item.material && !(item.potion && !Sets.AlchemyIngredient(item));
+                // return item.material && !(item.potion && !Sets.AlchemyIngredient(item));
+
+                // change item.potion (only true for heal-life potions) to item.usestyle == 2
+                // (true for food, potions, and flasks, none of which we want here)
+                return item.material && !(item.useStyle == 2 && !Sets.AlchemyIngredient(item));
             }
         }
 
