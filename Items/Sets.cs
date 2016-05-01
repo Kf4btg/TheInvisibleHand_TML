@@ -7,7 +7,6 @@ using System.Linq;
 
 namespace InvisibleHand.Items
 {
-
     public class Set<T>
     {
         public string Name { get; protected set; }
@@ -89,12 +88,9 @@ namespace InvisibleHand.Items
         {
             ((HashSet<T>)this._items).TrimExcess();
         }
-
-        /// a static, baseline, "no-such-set" set
-        // public static readonly Set<T> Empty = new Set<T>(string.Empty);
-
     }
 
+    /// A set for collections of TileIDs
     public class TileIDSet : Set<int>
     {
         public TileIDSet(string name) : base(name) { }
@@ -102,6 +98,8 @@ namespace InvisibleHand.Items
         public bool Contains(Item item) => this.Contains(item.createTile);
 
     }
+
+    /// A set for collections of ItemIDs
     public class ItemIDSet : Set<int>
     {
         public ItemIDSet(string name) : base(name) { }
@@ -109,11 +107,14 @@ namespace InvisibleHand.Items
         public bool Contains(Item item) => this.Contains(item.type);
     }
 
-
     /// Various collections that will aid in identifying Items. Some of them may be sets of TileIDs
     /// (check item.createTile) and others may be sets of ItemIds (check item.type).
+    /// Both types of set have a special Set&lt;int&gt; subclass that allows one to simply call
+    /// mySet.Contains(item) where 'item' is a Terraria.Item instance and the Set will check the
+    /// appropriate item property automagically. Should save some brainwork on when building rule methods.
     public static class ItemSets
     {
+        /// a static, baseline, "no-such-set" set
         public static readonly Set<int> Empty = new Set<int>(string.Empty);
 
         public static readonly TileIDSet Furniture = new TileIDSet("Furniture");
@@ -137,22 +138,14 @@ namespace InvisibleHand.Items
             Wood.Extend(CraftGroup.Wood.Items);
             Wood.Trim();
 
-
-            // this might be a bad idea...let's see!
-            // CraftingStations = new Set("CraftingStations");
-            // AlchemyIngredients = new Set("AlchemyIngredients");
-
             int tileID;
             Recipe r;
 
             var alchemy_results = new HashSet<int>();
+            // this might be a bad idea...let's see!
             for (int n = 0; n < Recipe.numRecipes; n++)
             {
                 r = Main.recipe[n];
-                // }
-                // foreach (var r in Main.recipe)
-                // {
-                // foreach (var tileID in r.requiredTile)
 
                 // save a bit of gc-pressure
                 for (int i = 0; i < Recipe.maxRequirements; i++)
@@ -173,7 +166,7 @@ namespace InvisibleHand.Items
                     // add the item-ids for the the ingredients;
                     // this isn't technically a 'tile-set', then,
                     // but I'd rather not go through the Recipes twice
-                    AlchemyIngredients.Union(r.requiredItem.TakeWhile(i => i.type != 0).Select(i => i.type));
+                    AlchemyIngredients.Union(r.requiredItem.TakeWhile(item => item.type != 0).Select(item => item.type));
 
                     // also track the results
                     alchemy_results.Add(r.createItem.type);
@@ -189,48 +182,6 @@ namespace InvisibleHand.Items
 
             CraftingStations.Trim();
         }
-
-        // static TileSets()
-        // {
-        //     Furniture = new Set("Furniture", TileID.Sets.RoomNeeds.CountsAsDoor,
-        //     TileID.Sets.RoomNeeds.CountsAsChair, TileID.Sets.RoomNeeds.CountsAsTable, TileID.Sets.RoomNeeds.CountsAsTorch);
-        //
-        //     Furniture.Trim();
-        //
-        //     // this might be a bad idea...let's see!
-        //     CraftingStations = new Set("CraftingStations");
-        //     AlchemyIngredients = new Set("AlchemyIngredients");
-        //
-        //     int tileID;
-        //     foreach (var r in Main.recipe)
-        //     {
-        //         // foreach (var tileID in r.requiredTile)
-        //
-        //         // save a bit of gc-pressure
-        //         for (int i = 0; i < Recipe.maxRequirements; i++)
-        //         {
-        //             tileID = r.requiredTile[i];
-        //             // the requiredTile array is initialized from 0 on up;
-        //             // if we found -1 (the default value for the array entries),
-        //             // then there are no more required tiles for this recipe;
-        //             // since most recipes just have 0-1 (rarely even 2)
-        //             // required tiles, this could save us a good bit of time as the
-        //             // length of the required tile array is 15
-        //             if (tileID == -1) break;
-        //             CraftingStations.Add(tileID);
-        //         }
-        //
-        //         if (r.alchemy)
-        //         {
-        //             // add the item-ids for the the ingredients;
-        //             // this isn't technically a 'tile-set', then,
-        //             // but I'd rather not go through the Recipes twice
-        //             AlchemyIngredients.Extend(r.requiredItem.TakeWhile(i => i.type != 0).Select(i => i.type));
-        //         }
-        //     }
-        //     CraftingStations.Trim();
-        //     AlchemyIngredients.Trim();
-        // }
 
         /// return a set by name
         public static Set<int> Get(string set_name)
@@ -256,35 +207,4 @@ namespace InvisibleHand.Items
         }
 
     }
-
-    // public static class ItemSets
-    // {
-    //     public static readonly Set Wood;
-    //
-    //     static ItemSets()
-    //     {
-    //         // cache this here so we don't need to do a lookup each time we check
-    //         Wood = new Set("Wood", CraftGroup.Wood.Items);
-    //         Wood.Trim();
-    //     }
-    //
-    //
-    //
-    //     /// return a set by name
-    //     public static Set Get(string set_name)
-    //     {
-    //         // Note: if someday a large amount of sets get implemented,
-    //         // should use an actual dictionary for this...
-    //         switch (set_name)
-    //         {
-    //             case "Wood":
-    //                 return Wood;
-    //             default:
-    //                 ErrorLogger.Log($"No such set: '{set_name}'");
-    //                 break;
-    //
-    //         }
-    //         return Set.Empty;
-    //     }
-    // }
 }
