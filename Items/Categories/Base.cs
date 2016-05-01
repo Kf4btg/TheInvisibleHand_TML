@@ -25,7 +25,7 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new RegularCategory("Unknown", int.MaxValue, null, null, int.MaxValue);
+        public static readonly ItemCategory None = new RegularCategory("Unknown", int.MaxValue, 0, priority: int.MaxValue);
 
         //------------------------------------------------------------------
         //------------------------------------------------------------------

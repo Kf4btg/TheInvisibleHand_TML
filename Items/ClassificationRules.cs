@@ -64,7 +64,7 @@ namespace InvisibleHand.Items
             public static bool CanBePlaced(Item item) => (item.createTile > -1 || item.createWall > 0) && (item.type != 213 && item.tileWand < 1);
 
             public static bool isAmmo(Item item) => /*!CanBePlaced(item) &&*/ item.ammo > 0 && !item.notAmmo;
-            public static bool isConsumable(Item item) => /*!isAmmo(item) && !CanBePlaced(item) && */ item.consumable;
+            public static bool isConsumable(Item item) => !(isAmmo(item) || CanBePlaced(item)) && item.consumable;
 
             public static bool isFood(Item item)    => item.buffType == BuffID.WellFed;
 
@@ -88,6 +88,30 @@ namespace InvisibleHand.Items
             public static bool givesLight(Item item) => contains(Main.tileLighted, item.createTile);
 
             public static bool showsOnMetalDetector(Item item) => item.createTile > 0 && Main.tileValue[item.createTile] > 0;
+
+            /// due to...difficulties, we  have to special-case the Material category
+            public static bool isMaterial(Item item)
+            {
+                // if this isn't even true, get out of here
+                // if (!item.material) return false;
+
+                // any item that is a potion but NOT an alchemy ingredient will not be listed as a material;
+                // Justification:
+                //      Lesser healing potion has item.material & item.potion both set to true.
+                //      So does the common (orange) mushroom.
+                //      However, do the way we've defined AlchemyIngredients (see the ItemSets class for info on that),
+                //      only the mushroom is also an AlchemyIngredient.
+                //      Thus, with this rule in place, "mushroom" will fall into the Material category
+                //      and then be further categorized as an alchemy ingredient, while the
+                //      "lesser healing potion" will go on to be categorized elsewhere (like Consumable.Potion).
+                // Which is exactly what we want.
+                // if (item.potion && !Sets.AlchemyIngredient(item)) return false;
+
+                // return true;
+
+                // condense the above into a single statement
+                return item.material && !(item.potion && !Sets.AlchemyIngredient(item));
+            }
         }
 
         /*

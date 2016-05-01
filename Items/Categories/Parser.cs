@@ -210,13 +210,16 @@ namespace InvisibleHand.Items.Categories
                         {
                             // parse requirements
                             // ------------------
-                            var reqs = parseRequirements(catdef.name, catdef.requires);
+                            IDictionary<string, int> reqs;
+                            IDictionary<string, int> excls;
+                            // parseRequirements(catdef.name, catdef.requires);
 
                             // if, somehow, there are no requirements, don't bother adding to list
-                            if (reqs.Count > 0)
+                            // if (reqs.Count > 0)
+                            if (parseRequirements(catdef.name, catdef.requires, out reqs, out excls))
                             {
                                 // otherwise, create the new category object
-                                var newcategory = new RegularCategory(catdef.name, ++count, reqs, parentID, priority);
+                                var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
@@ -268,11 +271,16 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
-        private static Dictionary<string, int> parseRequirements(string category_name, JsonObject requires_obj)
+        private static bool parseRequirements(string category_name, JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
         {
-            // parse requirements
+            // temp containers
             var reqs = new Dictionary<string, int>();
+            var excls = new Dictionary<string, int>();
 
+            // keep track of whether any requires were even listed with the definition
+            bool requirements_found = false;
+
+            // iterate through listed traits
             foreach (var newreqs in requires_obj)
             {
                 var traitCategory = newreqs.Key;
@@ -298,28 +306,59 @@ namespace InvisibleHand.Items.Categories
                     );
                 }
 
-                if (!reqs.ContainsKey(traitCategory))
-                    reqs[traitCategory] = 0;
-
                 // go through the array of traits, add the appropriate flag value
                 foreach (string trait_name in newreqs.Value.Qa())
                 {
+                    // copy the trait name because we might be modifying it
+                    var use_name = trait_name;
+                    bool exclude = false;
+                    // check if we're inverting a value
+                    if (trait_name[0] == '!')
+                    {
+                        exclude = true;
+                        // remove the exclamation mark and any additional whitespace from the trait name
+                        use_name = trait_name.Trim(new[] { '!', ' ' });
+                    }
+
+                    int flagvalue;
                     try
                     {
-                        reqs[traitCategory] |= flagvalues[trait_name];
+                        flagvalue = flagvalues[use_name];
                     }
                     catch (KeyNotFoundException knfe)
                     {
                         throw new UsefulKeyNotFoundException(
-                            trait_name,
+                            use_name,
                             nameof(IHBase.FlagCollection)+"["+traitCategory+"]",
                             knfe,
                             "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
                         );
                     }
+                    // now OR in the required value to the appropriate container
+
+                    if (exclude) // if this is a "!trait" requirement
+                    {
+                        requirements_found = true;
+
+                        if (!excls.ContainsKey(traitCategory))
+                            excls[traitCategory] = 0;
+
+                        excls[traitCategory] |= flagvalue;
+                    }
+                    else
+                    {
+                        requirements_found = true;
+                        // initialize the value for this trait type if it has not been seen before
+                        if (!reqs.ContainsKey(traitCategory))
+                            reqs[traitCategory] = 0;
+                        reqs[traitCategory] |= flagvalue;
+                    }
                 }
             }
-            return reqs;
+            requirements = reqs.Count > 0 ? reqs : null;
+            exclusions = excls.Count > 0 ? excls : null;
+
+            return requirements_found;
         }
 
         /// <summary>

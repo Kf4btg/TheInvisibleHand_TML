@@ -16,7 +16,16 @@ namespace InvisibleHand.Items
         {
             {"quest_item",    (i) => i.questItem},
             {"expert",        (i) => i.expert},
-            {"material",      (i) => i.material},
+
+            // special case (well, actually, 'material' is the special case...);
+            // 'material_notcategory' is used to mark ANY item for which .material is true.
+            // However, not every one of those items should fall in the 'Material' category,
+            // which is why the "material" flag has a few extra conditions on it.
+            // 'material_notcategory' may be used later on for some fancy filtering features.
+            // Or it may not.
+            {"material_notcategory",      (i) => i.material},
+            {"material",      Binary.isMaterial},
+
             {"mech",          (i) => i.mech},
             {"channeled",     (i) => i.channel},
             {"bait",          (i) => i.bait > 0},
@@ -296,8 +305,8 @@ namespace InvisibleHand.Items
         public static readonly condition_table Material = new condition_table
         {
             {"ore",           Sets.Ore},
-            {"dye_plant",     ByTileID.DyePlant},
             {"bar",           ByTileID.MetalBar},
+            {"dye_plant",     ByTileID.DyePlant},
             {"gem",           ByTileID.Gem},
             {"alchemy",       Sets.AlchemyIngredient},
             {"soul",          Sets.Soul},
@@ -336,7 +345,8 @@ namespace InvisibleHand.Items
                 case "Furniture.Other": return Furniture_Other;
                 case "Material": return Material;
             }
-            throw new UsefulKeyNotFoundException(rule_category, nameof(RuleMatrix), "Invalid table name '{0}'; does not exit in {1}.");
+            throw new UsefulKeyNotFoundException(rule_category, nameof(RuleMatrix),
+                "Invalid table name '{0}'; does not exist in {1}.");
         }
 
         public static bool Check(String table, Item item, string flag)

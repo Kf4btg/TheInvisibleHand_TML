@@ -58,14 +58,15 @@ namespace InvisibleHand.Items
                                     "use_mana",
                                     "coin",
                                     "paint",
-                                    "hair_dye"
+                                    "hair_dye",
+                                    "material_notcategory"
             );
 
             // Items of all types can be materials, so run them all through this check
             if (item.TryFlag("General", "material"))
             {
                 // But for items that are **primarily** used as materials, tag them here
-                item.FlagAny("Material", "ore",
+                if(item.FlagAny("Material", "ore",
                                          "bar",
                                          "gem",
                                          "dye_plant",
@@ -73,7 +74,10 @@ namespace InvisibleHand.Items
                                          "soul",
                                          "critter",
                                          "butterfly"
-                                        );
+                                        ).Success)
+                                        {
+                    item.SetFlag("Material", "material_primary");
+                }
             }
 
             // various weapons, tools, equipment, and placeables can have a reach-boost
@@ -81,9 +85,9 @@ namespace InvisibleHand.Items
                 item.Flag("General", "reach_penalty");
 
 
-            /////////////
-            // weapons //
-            /////////////
+            //
+            // weapons
+            //------------
 
             _weapon = item.TryFlag("General", "weapon");
             if (_weapon)
@@ -103,6 +107,7 @@ namespace InvisibleHand.Items
             }
 
             // equipables
+            //------------
             if (item.TryFlag("General", "equipable"))
             {
                 bool vanity = item.TryFlag("General", "vanity");
@@ -132,6 +137,8 @@ namespace InvisibleHand.Items
                                             "mount"
                     );
             }
+            //Tools
+            //------------
             else if (item.FlagAny("Tool", "pick", "axe", "hammer").Success
                     || item.FlagFirst("Tool", "wand", "fishing_pole", "wrench").Success)
             {
@@ -177,7 +184,6 @@ namespace InvisibleHand.Items
                 .FlagIf(!item.item.consumable, "Ammo", "endless"); // endless quiver, musket pouch, etc
         }
 
-        // FIXME: doesn't seem to work
         private static void classifyConsumable(ItemClassificationWrapper item)
         {
             item.Flag("Consumable", "buff")

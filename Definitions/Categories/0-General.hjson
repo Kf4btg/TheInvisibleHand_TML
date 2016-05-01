@@ -124,6 +124,8 @@
       /*priority: 85*/
       requires: {
         General: [ "placeable" ]
+        # use a '!' before the trait name to *exclude* items with those traits
+        Material: [ "!material_primary" ]
       }
       sort: [
         type

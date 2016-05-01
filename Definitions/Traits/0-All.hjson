@@ -18,6 +18,8 @@ General:
     heal_life
     heal_mana
     material
+    # material_notcategory is a special case; don't use in category definitions (just use 'material')
+    material_notcategory
     mech
     paint
     placeable
@@ -84,6 +86,9 @@ Material:
     soul
     critter
     butterfly
+
+    # special trait used for overrides
+    material_primary
   ]
 }
 Mech:
