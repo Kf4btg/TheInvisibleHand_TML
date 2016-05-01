@@ -12,7 +12,7 @@ namespace InvisibleHand.Items
         public ItemFlagInfo info;
 
         // set the flags directly on the ItemInfo instance
-        public IDictionary<string, int> Item_Flags => info.Flags;
+        public IDictionary<string, int> ItemFlags => info.Flags;
 
         // for the multi-tag operations, this can be checked to see if the operation was successful for that given scenario.
         /// Holds whether the most recent tagging attempt was successful
@@ -38,10 +38,10 @@ namespace InvisibleHand.Items
             // try
             // {
 
-                if (this.Item_Flags.ContainsKey(type))
-                    this.Item_Flags[type] |= IHBase.FlagCollection[type][flag];
+                if (this.ItemFlags.ContainsKey(type))
+                    this.ItemFlags[type] |= IHBase.FlagCollection[type][flag];
                 else
-                    this.Item_Flags[type] = IHBase.FlagCollection[type][flag];
+                    this.ItemFlags[type] = IHBase.FlagCollection[type][flag];
 
                 this.Success = true;
                 this.LastFlag = new KeyValuePair<string, string>(type, flag);
@@ -68,15 +68,7 @@ namespace InvisibleHand.Items
             return this;
         }
 
-        /// tag this instance with the given trait
-        /// IFF condition is true; return the instance,
-        /// modified or not.
-        public ItemClassificationWrapper FlagIf(bool condition, string type, string flag)
-        {
-            Success = false; // reset
-            if (condition) SetFlag(type, flag);
-            return this;
-        }
+
 
         /// goes through the list of traits in the params list, attempting to tag each one; when a tag is successful,
         /// return without checking the remaining. Should be used for mutually-exclusive traits of the same
@@ -111,7 +103,50 @@ namespace InvisibleHand.Items
         /// attribute after a Flag() operation
         public bool TryFlag(string type, string flag)
         {
-            return this.Flag(type, flag).Success;
+            return Flag(type, flag).Success;
+        }
+
+        /// tag this instance with the given trait
+        /// IFF condition is true; return the instance,
+        /// modified or not.
+        /// Mainly a shortcut for:
+        /// 	if (condition) item.SetFlag(type, flag);
+        public ItemClassificationWrapper SetFlagIf(bool condition, string type, string flag)
+        {
+            if (condition) return SetFlag(type, flag);
+
+            Success = false; // reset
+            return this;
+        }
+
+        /// shortcut for :
+        /// 	if (condition) item.Flag(type, flag);
+        public ItemClassificationWrapper FlagIf(bool condition, string type, string flag)
+        {
+            if (condition) return Flag(type, flag);
+
+            Success = false; // reset
+            return this;
+        }
+
+        /// shortcut for :
+        /// 	if (condition) item.FlagFirst(type, flag1, flag2, ...)
+        public ItemClassificationWrapper FlagFirstIf(bool condition, string type, params string[] flags)
+        {
+            if (condition) return FlagFirst(type, flags);
+
+            Success = false; // reset
+            return this;
+        }
+
+        /// shortcut for :
+        /// 	if (condition) item.FlagAny(type, flag1, flag2, ...)
+        public ItemClassificationWrapper FlagAnyIf(bool condition, string type, params string[] flags)
+        {
+            if (condition) FlagAny(type, flags);
+
+            Success = false; // reset
+            return this;
         }
     }
 }
