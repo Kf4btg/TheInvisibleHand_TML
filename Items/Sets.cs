@@ -8,73 +8,121 @@ using System.Linq;
 namespace InvisibleHand.Items
 {
 
-    public class Set
+    public class Set<T>
     {
-        public string name { get; private set; }
+        public string Name { get; protected set; }
 
-        public readonly ISet<int> IDs;
+        /// internal storage for the contents of this Set
+        /// by default, this is a hashset
+        protected readonly ISet<T> _items;
 
-        public Set(string name, int[] ids)
-        {
-            this.name = name;
-            this.IDs = new HashSet<int>(ids);
-        }
-
-        /// create an empty set
+        /// create an empty set with the given name
         public Set(string name)
         {
-            this.name = name;
-            this.IDs = new HashSet<int>();
+            this.Name = name;
+            this._items = new HashSet<T>();
         }
 
-        /// Create the set from a union of int lists
-        public Set(string name, params IEnumerable<int>[] ids)
+        /// create a new set with the given name and initialize
+        /// it with the unique items in the given array
+        public Set(string name, T[] items)
         {
-            this.name = name;
-            var idset = new HashSet<int>();
-            foreach (var idlist in ids)
+            this.Name = name;
+            this._items = new HashSet<T>(items);
+        }
+
+        /// Create a new set with the given name, initializing it
+        /// from the union of the given collections
+        public Set(string name, params IEnumerable<T>[] items)
+        {
+            this.Name = name;
+            var itemset = new HashSet<T>();
+            foreach (var itemlist in items)
             {
-                idset.UnionWith(idlist);
+                itemset.UnionWith(itemlist);
             }
-            this.IDs = idset;
+            this._items = itemset;
         }
 
-        public void Add(int id)
+        /// Add a single item to this Set. If it is already present
+        /// in the set, it will be silently ignored.
+        public virtual void Add(T item)
         {
-            this.IDs.Add(id);
+            this._items.Add(item);
         }
 
-        public void Extend(params IEnumerable<int>[] ids)
+        /// Add the unique items from a number of collections of
+        /// of items to this set; pre-existing items will not
+        /// be duplicated and no error will be thrown.
+        public virtual void Extend(params IEnumerable<T>[] items)
         {
-            foreach (var idlist in ids)
-                this.IDs.UnionWith(idlist);
+            foreach (var itemlist in items)
+                this._items.UnionWith(itemlist);
         }
 
-        public bool Contains(int id)
+        /// Add the ids from the given collection to this set;
+        /// if an ID is already present, it will not be duplicated
+        /// and no error will be thrown.
+        public virtual void Union(IEnumerable<T> items)
         {
-            return this.IDs.Contains(id);
+            this._items.UnionWith(items);
         }
 
-        public void Trim()
+        /// Remove all items in the given collection from this Set
+        public virtual void Remove(IEnumerable<T> items)
         {
-            ((HashSet<int>)this.IDs).TrimExcess();
+            this._items.ExceptWith(items);
         }
 
-        // a static, baseline, "no-such-set" set
-        public static readonly Set Empty = new Set(string.Empty);
+        /// Return true if the given id exists in this set
+        public virtual bool Contains(T item)
+        {
+            return this._items.Contains(item);
+        }
+
+        /// Decrease the capacity of the Set's internal storage so that
+        /// it is just large enough to hold its current contents. This
+        /// should obviously only be done if all modification to the set
+        /// have been completed and it is certain that no more changes to
+        /// the set will occur during its lifetime.
+        public virtual void Trim()
+        {
+            ((HashSet<T>)this._items).TrimExcess();
+        }
+
+        /// a static, baseline, "no-such-set" set
+        // public static readonly Set<T> Empty = new Set<T>(string.Empty);
 
     }
 
+    public class TileIDSet : Set<int>
+    {
+        public TileIDSet(string name) : base(name) { }
+
+        public bool Contains(Item item) => this.Contains(item.createTile);
+
+    }
+    public class ItemIDSet : Set<int>
+    {
+        public ItemIDSet(string name) : base(name) { }
+
+        public bool Contains(Item item) => this.Contains(item.type);
+    }
+
+
+    /// Various collections that will aid in identifying Items. Some of them may be sets of TileIDs
+    /// (check item.createTile) and others may be sets of ItemIds (check item.type).
     public static class ItemSets
     {
+        public static readonly Set<int> Empty = new Set<int>(string.Empty);
 
-        public static readonly Set Furniture = new Set("Furniture");
+        public static readonly TileIDSet Furniture = new TileIDSet("Furniture");
 
-        public static readonly Set CraftingStations = new Set("CraftingStations");
+        public static readonly TileIDSet CraftingStations = new TileIDSet("CraftingStations");
 
-        public static readonly Set AlchemyIngredients = new Set("AlchemyIngredients");
+        public static readonly ItemIDSet AlchemyIngredients = new ItemIDSet("AlchemyIngredients");
 
-        public static readonly Set Wood = new Set("Wood");
+        public static readonly ItemIDSet Wood = new ItemIDSet("Wood");
 
 
         public static void Initialize()
@@ -95,8 +143,15 @@ namespace InvisibleHand.Items
             // AlchemyIngredients = new Set("AlchemyIngredients");
 
             int tileID;
-            foreach (var r in Main.recipe)
+            Recipe r;
+
+            var alchemy_results = new HashSet<int>();
+            for (int n = 0; n < Recipe.numRecipes; n++)
             {
+                r = Main.recipe[n];
+                // }
+                // foreach (var r in Main.recipe)
+                // {
                 // foreach (var tileID in r.requiredTile)
 
                 // save a bit of gc-pressure
@@ -118,11 +173,21 @@ namespace InvisibleHand.Items
                     // add the item-ids for the the ingredients;
                     // this isn't technically a 'tile-set', then,
                     // but I'd rather not go through the Recipes twice
-                    AlchemyIngredients.Extend(r.requiredItem.TakeWhile(i => i.type != 0).Select(i => i.type));
+                    AlchemyIngredients.Union(r.requiredItem.TakeWhile(i => i.type != 0).Select(i => i.type));
+
+                    // also track the results
+                    alchemy_results.Add(r.createItem.type);
                 }
             }
-            CraftingStations.Trim();
+            // after all that, remove any items from the alchemy-ingredients set that are ALSO the result of
+            // an alchemy recipe; this will prevent items such as lesser healing potions (which can be crafted
+            // with alchemy, then used as an ingredient for an upgraded potion) from showing up under the
+            // Ingredients category rather than the Potions category; will hopefully also stop mushrooms from showing
+            // up in Potions.
+            AlchemyIngredients.Remove(alchemy_results);
             AlchemyIngredients.Trim();
+
+            CraftingStations.Trim();
         }
 
         // static TileSets()
@@ -168,7 +233,7 @@ namespace InvisibleHand.Items
         // }
 
         /// return a set by name
-        public static Set Get(string set_name)
+        public static Set<int> Get(string set_name)
         {
             // Note: if someday a large amount of sets get implemented,
             // should use an actual dictionary for this...
@@ -187,7 +252,7 @@ namespace InvisibleHand.Items
                     ErrorLogger.Log($"No such set: '{set_name}'");
                     break;
             }
-            return Set.Empty;
+            return ItemSets.Empty;
         }
 
     }

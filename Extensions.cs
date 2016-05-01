@@ -82,7 +82,7 @@ namespace InvisibleHand
             return item.type == 0 || item.stack == 0;
         }
 
-        public static ItemCategory GetCategory(this Item item)
+        public static ICategory<Item> GetCategory(this Item item)
         {
             // var iteminfo = (ItemFlagInfo)(item.GetModInfo(IHBase.Instance, "ItemFlagInfo"));
             var iteminfo = item.GetFlagInfo();

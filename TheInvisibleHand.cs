@@ -9,7 +9,7 @@ using InvisibleHand.Items.Categories;
 namespace InvisibleHand
 {
 
-    using _flagCollection = IDictionary<string, IDictionary<string, int>>;
+    using _flagCollection = Dictionary<string, IDictionary<string, int>>;
 
     public class IHBase : Mod
     {
@@ -17,7 +17,7 @@ namespace InvisibleHand
 
         public static IHBase Instance { get; private set; }
 
-        public static KeyboardState lastState = Keyboard.GetState();
+        // public static KeyboardState lastState = Keyboard.GetState();
 
         private static Dictionary<string, Keys> modhotkeys;
 
@@ -32,7 +32,7 @@ namespace InvisibleHand
 
         /// Mapping of:
         /// 	Item Trait-Group Name (e.g. "Weapon") ->
-        ///				(Mapping of: Trait Name (e.g "melee") -> int flag value (power of 2))
+        ///				(Mapping of: Trait Name (e.g "melee") ->int flag value (power of 2))
         ///
         /// Examples (arbitrary values used):
         /// 	var mel_weapon = FlagCollection["Weapon"]["style_melee"] // == 4;
@@ -40,18 +40,20 @@ namespace InvisibleHand
         ///
         ///
         /// This allows such operations as (this fictional, bad idea):
-        ///		Func<Item, bool> TombSledge = (item) =>
-        ///				(item.Flags["Weapon"] &amp; mel_weapon) > 0
-        ///				&amp;&amp; (item.Flags["Furniture.Other"] &amp; tombstone) > 0;
-        public static _flagCollection FlagCollection => Parser.FlagCollection;
+        ///		Func&lt;Item, bool&gt; TombSledge = (item) =>
+        ///				(item.Flags["Weapon"] &amp; mel_weapon) != 0
+        ///				&amp;&amp; (item.Flags["Furniture.Other"] &amp; tombstone) != 0;
+        public static _flagCollection FlagCollection;
 
         /// This holds the loaded values for how to match an item to given category;
         /// It is a mapping of "Category_Name" -> {"TraitGroup": combined_value_of_flags_for_group}
-        public static IDictionary<string, ItemCategory> CategoryDefs => Parser.CategoryDefinitions;
+        // public static IDictionary<string, ItemCategory> CategoryDefs => Parser.CategoryDefinitions;
 
-        /// And this returns the traversal tree used to assign a category to an item
         // public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
-        public static SortedAutoTree<int, ItemCategory> CategoryTree => Parser.CategoryTree;
+        // public static SortedAutoTree<int, ItemCategory> CategoryTree => Parser.CategoryTree;
+        /// returns the traversal tree used to assign a category to an item.
+        /// uses keys based on a category's ordinal (ordering rank).
+        public static SortedAutoTree<int, ICategory<Item>> CategoryTree;
 
 
         // holds the game's original strings for loot-all, dep-all, quick-stack, etc;
@@ -124,6 +126,8 @@ namespace InvisibleHand
             commandHandler.Initialize();
 
             // load the item flags and category definitions
+            FlagCollection = new _flagCollection();
+            CategoryTree = new SortedAutoTree<int, ICategory<Item>>() {Label=0};
             Parser.Parse();
         }
 

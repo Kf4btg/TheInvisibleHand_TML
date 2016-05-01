@@ -12,7 +12,8 @@ namespace InvisibleHand.Items
     public static class ClassificationRules
     {
 
-        static bool contains(IEnumerable<int> idlist, int id) => id > 0 && idlist.Contains(id);
+        // static bool contains(IEnumerable<int> idlist, int id) => id > 0 && idlist.Contains(id);
+        /// helper method to avoid index out of range exceptions
         static bool contains(IList<bool> idlist, int id) => id > 0 && idlist[id];
 
         /// prevents attempting to index Main.projectile w/ -1
@@ -20,6 +21,14 @@ namespace InvisibleHand.Items
         {
             return projid > 0 && Main.projectile[projid].aiStyle == otherid;
         }
+
+        /*
+        ██████  ██ ███    ██  █████  ██████  ██    ██
+        ██   ██ ██ ████   ██ ██   ██ ██   ██  ██  ██
+        ██████  ██ ██ ██  ██ ███████ ██████    ████
+        ██   ██ ██ ██  ██ ██ ██   ██ ██   ██    ██
+        ██████  ██ ██   ████ ██   ██ ██   ██    ██
+        */
 
         /// Every method/property in Rules.Binary is a simple yes/no (boolean) query
         internal static class Binary
@@ -71,7 +80,6 @@ namespace InvisibleHand.Items
 
             public static bool oneDropYoyo(Item item) => new[] { 3315, 3316, 3317, 3262, 3282, 3283, 3284, 3285, 3286, 3389 }.Contains(item.type);
 
-            public static bool isWood(Item item) => ItemSets.Wood.Contains(item.type);
 
             /// this returns true for all the '... Rope' items (web, silk, regular, etc) AND their coil-counterparts
             public static bool makesRope(Item item) => contains(Main.tileRope, item.createTile) || TestProjectileAI(item.shoot, Constants.ProjectileAI.RopeCoil);
@@ -81,6 +89,14 @@ namespace InvisibleHand.Items
 
             public static bool showsOnMetalDetector(Item item) => item.createTile > 0 && Main.tileValue[item.createTile] > 0;
         }
+
+        /*
+        ██████  ██    ██ ████████ ██ ██      ███████ ██ ██████
+        ██   ██  ██  ██     ██    ██ ██      ██      ██ ██   ██
+        ██████    ████      ██    ██ ██      █████   ██ ██   ██
+        ██   ██    ██       ██    ██ ██      ██      ██ ██   ██
+        ██████     ██       ██    ██ ███████ ███████ ██ ██████
+        */
 
         /// these rules are dependent on Binary.CanBePlaced()
         internal static class ByTileID
@@ -168,13 +184,25 @@ namespace InvisibleHand.Items
             public static bool LunarMonolith(Item item)  => item.createTile == TileID.LunarMonolith;
         }
 
+        /*
+        ███████ ███████ ████████ ███████
+        ██      ██         ██    ██
+        ███████ █████      ██    ███████
+             ██ ██         ██         ██
+        ███████ ███████    ██    ███████
+        */
+
         internal static class Sets
         {
             #region from Sets
 
-            public static bool Furniture(Item item) => ItemSets.Furniture.Contains(item.createTile);
-            public static bool CraftingStation(Item item) => ItemSets.CraftingStations.Contains(item.createTile);
-            public static bool AlchemyIngredient(Item item) => ItemSets.AlchemyIngredients.Contains(item.type);
+            /// These contain an overloaded Contains() method that checks the appropriate Item property
+            /// (either item.createTile or item.type, depending on whether it's a set of TileIDs or ItemIDs)
+            public static bool Furniture(Item item) => ItemSets.Furniture.Contains(item);
+            public static bool CraftingStation(Item item) => ItemSets.CraftingStations.Contains(item);
+            public static bool AlchemyIngredient(Item item) => ItemSets.AlchemyIngredients.Contains(item);
+            public static bool Wood(Item item) => ItemSets.Wood.Contains(item);
+
 
             #endregion
 
@@ -292,6 +320,14 @@ namespace InvisibleHand.Items
 
             #endregion
         }
+
+        /*
+        ██████  ██    ██ ███████ ███████
+        ██   ██  ██  ██  ██      ██
+        ██   ██   ████   █████   ███████
+        ██   ██    ██    ██           ██
+        ██████     ██    ███████ ███████
+        */
 
         internal static class Dyes
         {
@@ -417,6 +453,14 @@ namespace InvisibleHand.Items
             }
         }
 
+        /*
+        ██     ██ ███████  █████  ██████   ██████  ███    ██ ███████
+        ██     ██ ██      ██   ██ ██   ██ ██    ██ ████   ██ ██
+        ██  █  ██ █████   ███████ ██████  ██    ██ ██ ██  ██ ███████
+        ██ ███ ██ ██      ██   ██ ██      ██    ██ ██  ██ ██      ██
+         ███ ███  ███████ ██   ██ ██       ██████  ██   ████ ███████
+        */
+
         internal static class Weapons
         {
             internal static class Melee
@@ -451,7 +495,7 @@ namespace InvisibleHand.Items
                 //Dependent on Swing()==true
                 //***
                 /// also includes some things like Purple Clubberfish, slap hand, etc., that aren't
-                /// technically swords, but are swung overhead & there's really no way to tell them apart...
+                /// technically swords, but are swung overhead &amp; there's really no way to tell them apart...
                 // the !noUseGraphic check is for excluding things like chain guillotines, flairon;
                 public static bool BroadSword(Item item) => /*Swing(item) &&*/ !(isTool(item) || item.noUseGraphic);
 

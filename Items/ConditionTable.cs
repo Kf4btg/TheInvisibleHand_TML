@@ -4,13 +4,13 @@ using Terraria;
 
 namespace InvisibleHand.Items
 {
-    // using static ItemFlags;
     using static ClassificationRules;
     using condition_table = Dictionary<string, Func<Item, bool>>;
 
     internal static class ConditionTable
     {
         // private static bool REPLACE_ME(Item item) => true;
+        // TODO: maybe use 'nameof()' through here?
         public static readonly Dictionary<string, condition_table> RuleMatrix = new Dictionary<string, condition_table>()
         {
             /*
@@ -68,7 +68,7 @@ namespace InvisibleHand.Items
                     // {"brick",      REPLACE_ME},
                     //~ {"ore",           Sets.Ore},
                     //~ {"bar",           ByTileID.MetalBar},
-                    {"wood",          Binary.isWood},
+                    {"wood",          Sets.Wood},
                     {"wall",          (i) => i.createWall > 0},
                     {"wall_deco",     Sets.WallDeco},
                     //~ {"gem",           ByTileID.Gem},
@@ -104,7 +104,7 @@ namespace InvisibleHand.Items
                     {"ice", Sets.Ice},
                     {"stone", Sets.Stone},
 
-                    {"wood", Binary.isWood},
+                    {"wood", Sets.Wood},
                 }
             },
             /*
@@ -409,11 +409,11 @@ namespace InvisibleHand.Items
                 }
             },
             /*
-             ██████  ████████ ██   ██ ███████ ██████
-            ██    ██    ██    ██   ██ ██      ██   ██
-            ██    ██    ██    ███████ █████   ██████
-            ██    ██    ██    ██   ██ ██      ██   ██
-             ██████     ██    ██   ██ ███████ ██   ██
+             ██████  ████████ ██   ██ ███████ ██████      ███████ ██    ██ ██████  ███    ██
+            ██    ██    ██    ██   ██ ██      ██   ██     ██      ██    ██ ██   ██ ████   ██
+            ██    ██    ██    ███████ █████   ██████      █████   ██    ██ ██████  ██ ██  ██
+            ██    ██    ██    ██   ██ ██      ██   ██     ██      ██    ██ ██   ██ ██  ██ ██
+             ██████     ██    ██   ██ ███████ ██   ██     ██       ██████  ██   ██ ██   ████
             */
             {"Furniture.Other", new condition_table
                 {
@@ -457,6 +457,21 @@ namespace InvisibleHand.Items
             }
 
         };
+
+        public static bool CheckRule(String rule_category, Item item, string flag)
+        {
+            switch (rule_category)
+            {
+                case "Furniture.Other":
+                    return true;
+                case "Material":
+                    return true;
+                default:
+                    break;
+
+            }
+            return true;
+        }
 
         public static bool Check(String table, Item item, string flag)
         {

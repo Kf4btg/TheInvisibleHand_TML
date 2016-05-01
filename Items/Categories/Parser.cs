@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Hjson;
-// using Terraria;
-
-using InvisibleHand.Utils;
 
 namespace InvisibleHand.Items.Categories
 {
@@ -20,14 +17,11 @@ namespace InvisibleHand.Items.Categories
         private static Assembly assembly;
 
         public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
-        public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
+        // public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
-        /// uses keys based on a category's ordinal (ordering rank).
         // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
-        public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
-
 
         /// Call this method to run all the other class methods
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
@@ -112,7 +106,7 @@ namespace InvisibleHand.Items.Categories
             if (TraitDefinitions == null)
                 LoadTraitDefinitions(TraitFilePath);
 
-            FlagCollection = new Dictionary<string, IDictionary<string, int>>();
+            // FlagCollection = new Dictionary<string, IDictionary<string, int>>();
 
             foreach (var tgroup in TraitDefinitions)
             {
@@ -125,7 +119,7 @@ namespace InvisibleHand.Items.Categories
                     flagGroup[trait] = 1 << (flagGroup.Count - 1);
 
                 // add flag group to collection
-                FlagCollection[tgroup.Key] = flagGroup;
+                IHBase.FlagCollection[tgroup.Key] = flagGroup;
             }
         }
 
@@ -191,21 +185,15 @@ namespace InvisibleHand.Items.Categories
                             throw new HjsonFieldNotFoundException("name", nameof(catobj));
 
                         // get parent, if any
-                        // ItemCategory parent = getParent(catdef.name, catdef.parent_name);
                         int parentID = getParentID(catdef.name, catdef.parent_name);
-                        // ItemCategory parent = parentID > 0 ? ItemCategory.Registry[parentID] : null;
 
-
-                        // and priority, either specific to this category or inherited from parent (or default 0)
-                        // int priority = getPriority(parent, catdef.priority);
+                        // and priority, either specific to this category (or default 0)
                         int priority = catdef.priority ?? 0;
 
                         // A union category
                         // ------------------
                         if (catdef.merge != null)
                         {
-                            // bool is_enabled = catobj.ContainsKey("enabled") ? catobj["enabled"].Qb() : true;
-
                             var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
 
                             // TODO: allow enable/disable at runtime
@@ -250,7 +238,6 @@ namespace InvisibleHand.Items.Categories
 
             else if (category.Parent != null) // inherit from parent
                 category.CopyParentRules();
-                // category.CopySortRules(category.Parent as RegularCategory);
                 // newcategory.ruleExpressions = p?.ruleExpressions;
 
             // if the rules are somehow *still* null, add a default single-rule list of just sorting by type
@@ -277,8 +264,6 @@ namespace InvisibleHand.Items.Categories
                         knfe,
                         "UnionCategory '" +union.Name + "': member category '{0}' could not be found in '{1}' for inclusion."
                     );
-                    //FIXME: use ErrorLogger
-                    // Console.WriteLine("{0}: {1}", member, e.Message);
                 }
             }
         }
@@ -301,13 +286,13 @@ namespace InvisibleHand.Items.Categories
                 // performance difference between catch() && TryGetValue
                 try
                 {
-                    flagvalues = FlagCollection[traitCategory];
+                    flagvalues = IHBase.FlagCollection[traitCategory];
                 }
                 catch (KeyNotFoundException knfe)
                 {
                     throw new UsefulKeyNotFoundException(
                         traitCategory,
-                        nameof(FlagCollection),
+                        nameof(IHBase.FlagCollection),
                         knfe,
                         "Category '" +category_name + "': the requested Trait Category '{0}' is not present in '{1}'."
                     );
@@ -327,7 +312,7 @@ namespace InvisibleHand.Items.Categories
                     {
                         throw new UsefulKeyNotFoundException(
                             trait_name,
-                            nameof(FlagCollection)+"["+traitCategory+"]",
+                            nameof(IHBase.FlagCollection)+"["+traitCategory+"]",
                             knfe,
                             "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
                         );
@@ -438,24 +423,15 @@ namespace InvisibleHand.Items.Categories
         {
             // create the root of the tree; the label here is unimportant. All other labels
             // will be created automatically during autovivification, using the ordinal value of the category
-            var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
+            // var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
 
             var registry = ItemCategory.Registry;
 
-            // foreach (var kvp in CategoryDefinitions)
             foreach (var kvp in registry)
             {
                 var category = kvp.Value;
 
-                // var parent = category.Parent;
                 var parentID = category.ParentID;
-
-                // get the ancestors for the category as a stack,
-                // with the top-level category on top.
-                // var catstack = new Stack<ItemCategory>();
-                // while (parentID != null)
-                    // catstack.Push(parent);
-                    // parent = parent.Parent;
 
                 // get the ordinal values (tree-keys) of the category's
                 // ancestors as a stack, with the ordinal of the top-level
@@ -464,31 +440,25 @@ namespace InvisibleHand.Items.Categories
                 while (parentID > 0)
                 {
                     var parent = registry[parentID];
-                    // catstack.Push(parentID);
                     catstack.Push(parent.Ordinal);
-                    // parentID = registry[parentID].ParentID;
                     parentID = parent.ParentID;
                 }
-                var subtree = cattree;
+                var subtree = IHBase.CategoryTree;
 
                 // descend from the root down the parent-stack to the
                 // proper depth of the child, auto-creating(vivifying!)
                 // any non-existent nodes.
                 while (catstack.Count > 0)
                 {
-                    // subtree = subtree[catstack.Pop().Ordinal];
                     // the stack contains the ordinal values for the hierarchy,
                     // so we just need to pop them off
                     subtree = subtree[catstack.Pop()];
                 }
-
                 // now create/access the child and set its data
                 subtree[category.Ordinal].Data = category;
             }
 
-            CategoryTree = cattree;
-
-            // Console.WriteLine(CategoryTree.ToString());
+            // Console.WriteLine(HBase.CategoryTree.ToString());
         }
     }
 }
