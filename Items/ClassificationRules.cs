@@ -17,9 +17,20 @@ namespace InvisibleHand.Items
         static bool contains(IList<bool> idlist, int id) => id > 0 && idlist[id];
 
         /// prevents attempting to index Main.projectile w/ -1
-        public static bool TestProjectileAI(int projid, int otherid)
+        /// Also, it seems that a projectile doesn't actually HAVE an aiStyle (or much else)
+        /// until it exists; thus, this will always return false (because aiStyle will be 0)
+        /// unless the given projectile...
+        /// I don't know if it just has to have its defaults set once? or if every time a new
+        /// proj of this type is created it gets run through setdefaults. But either way, we
+        /// need a populated projectile to make this work.
+        public static bool TestProjectileAI(int projid, int style_id)
         {
-            return projid > 0 && Main.projectile[projid].aiStyle == otherid;
+            if (projid < 1) return false;
+
+            var proj = Main.projectile[projid];
+
+            proj.SetDefaults(projid);
+            return proj.aiStyle == style_id;
         }
 
         /*
