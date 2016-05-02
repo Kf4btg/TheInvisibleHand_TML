@@ -202,6 +202,12 @@ namespace InvisibleHand.Items
             {"fishing_pole", (i) => i.fishingPole > 0},
             {"wand",         (i) => i.tileWand > 0},
             {"wrench",       Binary.isWrench},
+            {"bucket",       NameMatch.Bucket},
+            {"recall",       MiscTools.Recall},
+            {"bug_net",       MiscTools.BugNet},
+            {"overhead",       MiscTools.OverheadThings},
+            {"hand_light",       MiscTools.HandLights},
+            {"painting",     MiscTools.PaintingTools},
             // {"recall",  REPLACE_ME},
             // {"other",  REPLACE_ME},
         };
@@ -306,6 +312,21 @@ namespace InvisibleHand.Items
             {"butterfly",     Sets.Butterfly},
         };
 
+        /// IDEA: new category: supplies? Resources? Spelunking/Climbing/Camping Equipment?
+        /// this would include Rope, torches, glowsticks, breathing reed, magic mirror, maybe bombs
+        /// and even food?
+        /// Actually all of those (other than the mirror and reed) are consumables, hmm...
+        public static readonly condition_table Supplies = new condition_table
+        {
+            {"rope",          Sets.Rope},
+            {"rope_coil",     Sets.RopeCoil},
+            {"overhead",       MiscTools.OverheadThings},
+            {"hand_light",       MiscTools.HandLights},
+            {"recall",       MiscTools.Recall},
+            {"demolitions",       MiscTools.Demolitions},
+
+        };
+
         /// retrieve the appropriate table by name
         private static condition_table RuleMatrix(string rule_category)
         {
@@ -336,6 +357,7 @@ namespace InvisibleHand.Items
                 case "Furniture.Chairs": return Furniture_Chairs;
                 case "Furniture.Other": return Furniture_Other;
                 case "Material": return Material;
+                case "Supplies": return Supplies;
             }
             throw new UsefulKeyNotFoundException(rule_category, nameof(RuleMatrix),
                 "Invalid table name '{0}'; does not exist in {1}.");

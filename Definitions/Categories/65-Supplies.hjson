@@ -1,0 +1,95 @@
+[
+  /*
+    These items are what I consider "Adventuring Gear" or "Survival Supplies" or something like that.
+    Rope, light sources, Umbrellas, Magic Mirrors...everyday stuff you might find at the sporting goods store.
+    Don't leave home without them!
+   */
+
+  {
+    name: Hand Light
+    parent: Supplies
+    requires:  {
+      Supplies: [ "hand_light" ]
+    }
+    sort: [
+      shoot
+      value
+      type
+      stack
+    ]
+  }
+  {
+    name: Rope
+    parent: Supplies
+    requires: {
+      Supplies: ["rope"]
+    }
+    sort: [
+      type
+      stack
+    ]
+  }
+  {
+    name: Rope Coil
+    parent: Supplies
+    requires: {
+      Supplies: ["rope_coil"]
+    }
+    sort: [
+      type
+      stack
+    ]
+  }
+  {
+    name: Bucket
+    parent: Supplies
+    requires: {
+      Supplies: ["bucket"]
+    }
+    sort: [
+      rare
+      maxStack
+      type
+    ]
+  }
+  {
+    name: Demolitions
+    parent: Supplies
+    requires:  {
+      Supplies: [ "demolitions" ]
+    }
+    sort: [
+      value
+      type
+      stack
+    ]
+  }
+  {
+    // Ooh, I like that name...might
+    // need to steal it and use it for something
+    // more important...Like the entire Section,
+    // instead of "Supplies". hmm...
+    name: Exploration Aids
+    parent: Supplies
+    requires: {
+      Supplies: [ "exploration" ]
+    }
+    sort: [
+      type
+    ]
+
+  }
+  {
+    // Maybe this should be in the Tools category...
+    name: Recall
+    parent: Supplies
+    requires:  {
+      Supplies: [ "recall" ]
+    }
+    sort: [
+      rare
+      type
+      stack
+    ]
+  }
+]

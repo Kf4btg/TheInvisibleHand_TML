@@ -180,6 +180,7 @@
     <EmbeddedResource Include="Definitions\Categories\51-Ammo.hjson" />
     <EmbeddedResource Include="Definitions\Categories\52-Dye.hjson" />
     <EmbeddedResource Include="Definitions\Categories\60-Mech.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\65-Supplies.hjson" />
     <EmbeddedResource Include="Definitions\Categories\70-Consumable.hjson" />
     <EmbeddedResource Include="Definitions\Categories\80-Material.hjson" />
     <EmbeddedResource Include="Definitions\Categories\90-Misc.hjson" />

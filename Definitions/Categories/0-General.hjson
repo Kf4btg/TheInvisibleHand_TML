@@ -59,6 +59,17 @@
       ]
     }
     {
+      name: Supplies
+      requires: {
+        General: ["supplies"]
+      }
+      sort: [
+        rare
+        type
+        stack
+      ]
+    }
+    {
       name: Weapon
       /*priority: 20*/
       requires: {

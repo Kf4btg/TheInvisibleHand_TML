@@ -78,7 +78,8 @@
   }
   {
     name: Ropes
-    parent: Placeable
+    /*parent: Placeable*/
+    parent: Supplies
     enable: true
     merge: [
       Rope

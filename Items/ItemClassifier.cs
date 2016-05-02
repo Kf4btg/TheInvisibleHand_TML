@@ -130,10 +130,26 @@ namespace InvisibleHand.Items
                                 item.Try(FlagFirst, "Tool", "wand", "fishing_pole", "wrench"),
                             SetFlag, "General", "tool");
 
+
+
             // placeables, ammo, consumables, dyes
-            if (!(_weapon | _tool))
+            if (!(_weapon || _tool))
             {
-                if (item.Try(Flag, "General", "placeable"))
+                if (item.Try(FlagFirst, "Supplies", "hand_light",
+                                                    "rope",
+                                                    "rope_coil",
+                                                    "bucket",
+                                                    "demolitions",
+                                                    "exploration",
+                                                    "recall"
+                ))
+                    // like "Tool", there's not much these items have in common
+                    // other than the abstraction of their purpose, so their parent
+                    // is created after they are, only if they exist. I'm sure
+                    // there's some sort of Grand Lesson in that.
+                    item.SetFlag("General", "supplies");
+
+                else if (item.Try(Flag, "General", "placeable"))
                     classifyPlaceable(item);
 
                 // else if (item.Try(Flag,"General", "ammo"))

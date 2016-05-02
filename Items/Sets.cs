@@ -1,3 +1,4 @@
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
@@ -123,6 +124,8 @@ namespace InvisibleHand.Items
 
         public static readonly ItemIDSet AlchemyIngredients = new ItemIDSet("AlchemyIngredients");
 
+        public static readonly ItemIDSet AlchemyResults = new ItemIDSet("AlchemyResults");
+
         public static readonly ItemIDSet Wood = new ItemIDSet("Wood");
 
 
@@ -169,6 +172,7 @@ namespace InvisibleHand.Items
                     AlchemyIngredients.Union(r.requiredItem.TakeWhile(item => item.type != 0).Select(item => item.type));
 
                     // also track the results
+                    Console.WriteLine($"alch result: {r.createItem.name}");
                     alchemy_results.Add(r.createItem.type);
                 }
             }

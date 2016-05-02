@@ -26,6 +26,7 @@ General:
     reach_boost
     reach_penalty
     regen_life
+    supplies
     tool
     use_mana
     vanity
@@ -226,6 +227,21 @@ Tool:
     recall
     wand
     wrench
+    painting
+    bug_net
+  ]
+}
+Supplies:
+{
+  traits: [
+    hand_light
+    demolitions
+    rope
+    rope_coil
+    bucket
+    // maneuvering? terrain? terrain traversal?
+    // things-so-you-don't-die-from-gravity/not-being-a-fish?
+    exploration
   ]
 }
 Consumable:

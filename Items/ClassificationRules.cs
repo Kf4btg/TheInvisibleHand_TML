@@ -135,6 +135,28 @@ namespace InvisibleHand.Items
             }
         }
 
+        /// For when there's just about no other way to do it...(except for matching type ids,
+        /// but I'd rather not do that, either)
+        internal static class NameMatch
+        {
+            internal static bool match(Item item, string pattern)
+            {
+                return Regex.Match(item.name, pattern).Success;
+            }
+
+            internal static bool match_end(Item item, string substr)
+            {
+                return item.name.EndsWith(substr);
+            }
+
+            // include the Super Absorbant sponge
+            public static bool Bucket(Item item) => match(item, @"(Bucket|Sponge)$");
+
+            // these seems to match "Paintbrush" and "Paint [Scraper|Roller]", including "Spectre Paint..."
+            // but not "Painting" or "<Color> Paint". Excellent.
+            public static bool PaintTool(Item item) => match(item, @"(Paint(\s|brush))");
+        }
+
         /*
         ██████  ██    ██ ████████ ██ ██      ███████ ██ ██████
         ██   ██  ██  ██     ██    ██ ██      ██      ██ ██   ██
@@ -625,7 +647,42 @@ namespace InvisibleHand.Items
                 // there's nothing like a 'sentry' field, but that's all that's left after taking
                 // out the 'minion' weapons, so...
                 public static bool Sentry(Item item) => !Minion(item);
+
             }
+
+        }
+
+        internal static class MiscTools
+        {
+            // bugnet.useanimation == 25; golden bugnet.useanuimation == 18
+            // this is ridiculous...
+            public static bool BugNet(Item item) => (new[] { 25, 18 }).Contains(item.useAnimation) && item.useStyle == 1 && item.useSound == 1 && item.shoot < 1 && item.damage < 1 && !item.noMelee;
+
+            /// TODO: get some sleep and come up with a better name than this...
+            /// This is intended to cover the umbrella and breathing reed
+            public static bool OverheadThings(Item item) => item.holdStyle == 2;
+
+            /// the name thing will hopefully be enough, but let's add the consumable check just to make sure.
+            // For reference, also:
+            // useStyle = 1, useTurn = True, useAnimation = 15,
+            // useTime = 10, autoReuse = True, value=10000
+            public static bool PaintingTools(Item item) => NameMatch.PaintTool(item) && !item.consumable;
+
+            // torches, candles, glowsticks, flare gun...unicorn on a stick...marshmallow on a stick...
+            // nebula arcanum...
+            // more features: glowstick/flare gun have a 'shoot' value; torches, candles, gsticks are consumable;
+            // torches, candles & glowstich have useanimation of 15; flare is 18;
+            //
+            // // for now, just includes glowsticks and flare gun. Maybe torches should go here too?
+            public static bool HandLights(Item item) => item.holdStyle == 1 && item.shoot > 0 && !item.magic;
+
+            /// magic mirrors, cell phone
+            /// note: the mirrors, phone, and other items that teleport the player
+            /// have useSound=6;
+            public static bool Recall(Item item) => item.useAnimation == 90;
+
+            /// Bombs, Dynamite...
+            public static bool Demolitions(Item item) => Binary.Explosive(item) && item.consumable && !item.thrown;
 
         }
 

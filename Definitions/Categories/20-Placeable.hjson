@@ -79,7 +79,7 @@
     }
   }
 
-  {
+  /*{
     name: Rope
     parent: Placeable
     requires: {
@@ -92,7 +92,7 @@
     requires: {
       Placeable: ["rope_coil"]
     }
-  }
+  }*/
 
   # note: this catches a lot of items that also match the above
   # categories, so it should be checked after those to ensure the most

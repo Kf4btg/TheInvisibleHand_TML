@@ -127,4 +127,26 @@
       type
     ]
   }
+  {
+    name: Bug Net
+    parent: Tool
+    requires:  {
+      Tool: [ "bug_net" ]
+    }
+    sort: [
+      rare
+      type
+    ]
+  }
+  {
+    name: Painting Supplies
+    parent: Tool
+    requires:  {
+      Tool: [ "painting" ]
+    }
+    sort: [
+      rare
+      type
+    ]
+  }
 ]
