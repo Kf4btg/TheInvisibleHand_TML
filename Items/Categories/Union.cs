@@ -17,6 +17,30 @@ namespace InvisibleHand.Items.Categories
         /// or null if none did
         public ItemCategory Matched { get; private set; }
 
+        // private bool _enabled = true;
+        public override bool Enabled {
+            // get { return _enabled; }
+            set
+            {
+                // if we're disabling this union,
+                // unmerge all the merged categories
+                if (_enabled && !value)
+                {
+                    foreach (var mem in UnionMembers)
+                        mem.Unmerge();
+                }
+                // or if we're [re]enabling it, activate the members
+                else if (value && !_enabled)
+                {
+                    foreach (var mem in UnionMembers)
+                        mem.Merge(this);
+                }
+                // don't call base.Enabled=... because we don't want
+                // to add UnionCategories to the ActiveCategories list
+                _enabled = value;
+            }
+        }
+
 
         public UnionCategory(string name, int cat_id, int parent_id = 0, int priority = 0, IEnumerable<ItemCategory> members=null) : base(name, cat_id, parent_id, priority)
         {
@@ -48,14 +72,14 @@ namespace InvisibleHand.Items.Categories
         /// <returns>True if the flags match any of the contained categories</returns>
         public override bool Matches(IDictionary<string, int> item_flags)
         {
-            foreach (var mem in UnionMembers)
-            {
-                if (mem.Matches(item_flags))
-                {
-                    Matched = mem;
-                    return true;
-                }
-            }
+            if (Enabled)
+                foreach (var mem in UnionMembers)
+                    if (mem.Matches(item_flags))
+                    {
+                        Matched = mem;
+                        return true;
+                    }
+
             Matched = null;
             return false;
         }
@@ -69,39 +93,48 @@ namespace InvisibleHand.Items.Categories
         /// <returns>This category if matched, null if not</returns>
         public override ICategory<Item> Match(IDictionary<string, int> item_flags)
         {
-            return this.Matches(item_flags) ? this : null;
+            return this.Matches(item_flags) ? this.Category : null;
         }
 
         /// IComparer<Item> implementation
         /// using the sorting rules for the union members
         public override int Compare(Item t1, Item t2)
         {
-            ItemCategory c1, c2;
-
-            c1 = c2 = null;
-            if (Matches(t1))
-                c1 = Matched;
-            if (Matches(t2))
-                c2 = Matched;
-
-            // if either or both of the items do not belong to this union:
-            if (c1 == null)
-                return (c2 == null) ? 0 : -1;
-            if (c2 == null)
-                return 1;
+            // ItemCategory c1, c2;
+            //
+            // c1 = c2 = null;
+            // if (Matches(t1))
+            //     c1 = Matched;
+            // if (Matches(t2))
+            //     c2 = Matched;
+            //
+            // // if either or both of the items do not belong to this union:
+            // if (c1 == null)
+            //     return (c2 == null) ? 0 : -1;
+            // if (c2 == null)
+            //     return 1;
 
             // get the (sub-)categories for the items; for now we're just going to assume
             // that each item belongs to one of the UnionMembers
             // I thought that might happen...infinite recursive oblivion!
-            // var c1 = t1.GetCategory();
-            // var c2 = t2.GetCategory();
+
+
+            // Ok, since the Unions are no longer in the Category Tree, it should
+            // be safe to do this:
+            var c1 = t1.GetCategory();
+            var c2 = t2.GetCategory();
+
+            // if the items belong to the same category, get the comparison value from that category;
+            // if they're different categories, just return the category order:
+            return c1 == c2 ? c1.Compare(t1, t2) : c1.CompareTo(c2);
+
 
             // if the items belong to the same category:
-            if (c1 == c2)
-                return c1.Compare(t1, t2);
-
+            // if (c1 == c2)
+            //     return c1.Compare(t1, t2);
             // or, if they're different categories, return the category order:
-            return c1.CompareTo(c2);
+
+            // return c1.CompareTo(c2);
         }
     }
 

@@ -16,6 +16,9 @@ namespace InvisibleHand.Items.Categories
         public static IDictionary<int, ItemCategory> Registry =
             new Dictionary<int, ItemCategory>();
 
+        public static ISet<int> ActiveCategories { get; private set; } = new HashSet<int>();
+
+
         /// <summary>
         /// Add `newcategory` to the static Category Register (keyed by Category ID)
         /// </summary>
@@ -63,6 +66,24 @@ namespace InvisibleHand.Items.Categories
         // public int Ordinal => (Priority << 16) | (ID);
         // id is now involved in the creation of this number, so no need to shift anything
 
+        /// TODO: this will likely need to trigger a tree rebuild. If we can find a way to just rebuild
+        /// a part of the tree rather than the whole thing, that would be preferable.
+        protected bool _enabled = true;
+        public virtual bool Enabled
+        {
+            get { return _enabled; }
+            set {
+                if (value && !_enabled)
+                    ActiveCategories.Add(this.ID);
+                else if (_enabled && !value)
+                    ActiveCategories.Remove(this.ID);
+
+                _enabled = value;
+            }
+        }
+
+        public void ToggleEnabled() { Enabled ^= true; }
+
         /// The simple name of this category, not including any parent qualifiers.
         /// e.g.: 'Broadswords'
         public string Name { get; private set; }
@@ -99,7 +120,10 @@ namespace InvisibleHand.Items.Categories
         /// instance depending on whether this category has been merged or not.
         // public ItemCategory GetCategory => _union ?? this;
         // public ItemCategory GetCategory => UnionID > 0 ? Registry[UnionID] : this;
-        public ICategory<Item> Category => UnionID > 0 ? Registry[UnionID] : this;
+
+        public ICategory<Item> Category => UnionID > 0
+                                        ? Registry[UnionID].Category // pass the 'Category' call up.
+                                        : this;
 
         /*
          ██████  ██████  ███    ██ ███████ ████████ ██████  ██    ██  ██████ ████████  ██████  ██████  ███████

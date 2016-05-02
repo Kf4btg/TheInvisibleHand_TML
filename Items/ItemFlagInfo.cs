@@ -16,7 +16,10 @@ namespace InvisibleHand.Items
 
         private ICategory<Item> _category = null;
         /// The category for an item is looked up the first time it is queried, then cached.
-        public ICategory<Item> Category => _category ?? find_category();
+        public ICategory<Item> Category => _category?.Category ?? find_category().Category;
+
+        /// if something really needs access to the REAL category, use this.
+        public ICategory<Item> ActualCategory => _category ?? find_category();
 
         /// Conflict resolution is currently done by using the first matching category
         /// (at each tree level), as determined by the ordinal value of the categories
@@ -47,7 +50,9 @@ namespace InvisibleHand.Items
                     // TODO: or should "Merge" categories only matter for smart-deposit?
                     // match = category.Category;
 
-                    match = category.Category;
+                    // match = category.Category;
+                    // actually, store the REAL category, but report the wrapper, if any
+                    match = category;
 
                     // then check all the children of the matching category (if any)
                     // for a more specific match

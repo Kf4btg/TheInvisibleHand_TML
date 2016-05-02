@@ -11,8 +11,12 @@ namespace InvisibleHand.Items.Categories
         int Ordinal { get; }
         int ParentID { get; set; }
 
+        bool Enabled { get; }
+
         string Name { get; }
         string QualifiedName { get; }
+
+        void ToggleEnabled();
     }
 
     public interface ICategory<T> : ICategory, IComparable<ICategory<T>>, IEquatable<ICategory<T>>, IComparer<T>

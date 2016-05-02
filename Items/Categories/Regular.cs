@@ -63,13 +63,14 @@ namespace InvisibleHand.Items.Categories
         // ---------------------------
         public override bool Matches(IDictionary<string, int> item_flags)
         {
+            // if (!Enabled) return false;
 
             foreach (var kvp in Requirements)
             {
                 var req_val = kvp.Value;
                 int flagval;
 
-                // if ever the item does not have a required trait or
+                // if ever the item does not have a required trait OR has
                 // an incompatible flag value for the trait, return false to indicate no match
                 if (!item_flags.TryGetValue(kvp.Key, out flagval) || ((flagval & req_val) != req_val))
                     return false;

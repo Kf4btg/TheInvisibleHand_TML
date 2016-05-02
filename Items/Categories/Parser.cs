@@ -21,6 +21,9 @@ namespace InvisibleHand.Items.Categories
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
+        /// stores the ids of enabled, non-union categories
+        public static ISet<int> ActiveCategories { get; private set; }
+
         // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
         /// Call this method to run all the other class methods
@@ -36,7 +39,7 @@ namespace InvisibleHand.Items.Categories
             LoadTraitDefinitions(TraitFilePath);
             AssignFlagValues();
             LoadCategoryDefinitions(CategoryDefsPath);
-            CalculatePriorities();
+            CalculateOrdinals();
             BuildCategoryTree();
         }
 
@@ -124,13 +127,12 @@ namespace InvisibleHand.Items.Categories
         }
 
         /*
-        ██       ██████   █████  ██████       ██████ ████████  ██████  ███████
-        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██       ██
-        ██      ██    ██ ███████ ██   ██     ██         ██    ██   ███ ███████
-        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██    ██      ██
-        ███████  ██████  ██   ██ ██████       ██████    ██     ██████  ███████
+        ██       ██████   █████  ██████       ██████ ████████  ██████ ██    ██ ███████
+        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██       ██  ██  ██
+        ██      ██    ██ ███████ ██   ██     ██         ██    ██   ███  ████   ███████
+        ██      ██    ██ ██   ██ ██   ██     ██         ██    ██    ██   ██         ██
+        ███████  ██████  ██   ██ ██████       ██████    ██     ██████    ██    ███████
         */
-
 
         /// After all the trait-definitions have been loaded, read in all the Category definition
         /// files and assign each Category a List of {Trait-Family: combined_flag_value} pairs
@@ -142,6 +144,7 @@ namespace InvisibleHand.Items.Categories
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
+            ActiveCategories = new HashSet<int>();
             int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
@@ -162,7 +165,7 @@ namespace InvisibleHand.Items.Categories
                             name = catobj.ContainsKey("name") ? catobj["name"]?.Qs() ?? "" : "",
                             parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() ?? "" : "",
 
-                            // whether to activate this category
+                            // whether to activate this category (DEFAULT: true)
                             enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
 
                             // priority is now just a 'weight', used to modify the order of categories with regards to
@@ -200,8 +203,10 @@ namespace InvisibleHand.Items.Categories
                             if (catdef.enable)
                                 mergeUnionMembers(union, catdef.merge);
 
-                            // XXX: should we add the unions to the search tree?
                             CategoryDefinitions[union.Name] = union;
+                            // XXX: should we add the unions to the search tree?
+                            // ANSWER: No.
+                            // if (catdef.enable) ActiveCategories.Add(union.ID);
                         }
 
                         // a 'Regular' category
@@ -212,14 +217,15 @@ namespace InvisibleHand.Items.Categories
                             // ------------------
                             IDictionary<string, int> reqs;
                             IDictionary<string, int> excls;
-                            // parseRequirements(catdef.name, catdef.requires);
 
                             // if, somehow, there are no requirements, don't bother adding to list
-                            // if (reqs.Count > 0)
                             if (parseRequirements(catdef.name, catdef.requires, out reqs, out excls))
                             {
                                 // otherwise, create the new category object
                                 var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
+
+                                newcategory.Enabled = catdef.enable;
+
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
@@ -227,12 +233,23 @@ namespace InvisibleHand.Items.Categories
 
                                 // store the new category in the collections
                                 CategoryDefinitions[newcategory.Name] = newcategory;
+                                if (catdef.enable) ActiveCategories.Add(newcategory.ID);
+
                             }
                         }
                     } // end of category-object list
                 }
             }
         }
+
+
+        /*
+        ███████  ██████  ██████  ████████     ██████  ██    ██ ██      ███████ ███████
+        ██      ██    ██ ██   ██    ██        ██   ██ ██    ██ ██      ██      ██
+        ███████ ██    ██ ██████     ██        ██████  ██    ██ ██      █████   ███████
+             ██ ██    ██ ██   ██    ██        ██   ██ ██    ██ ██      ██           ██
+        ███████  ██████  ██   ██    ██        ██   ██  ██████  ███████ ███████ ███████
+        */
 
         private static void assignSortingRules(RegularCategory category, JsonArray property_names)
         {
@@ -248,6 +265,14 @@ namespace InvisibleHand.Items.Categories
                 // (should just pull the rule from its cache in the vast majority of cases)
                 category.SortRules = new[] { ItemRuleBuilder.GetRule("type") }.ToList();
         }
+
+        /*
+        ███    ███ ███████ ██████   ██████  ███████
+        ████  ████ ██      ██   ██ ██       ██
+        ██ ████ ██ █████   ██████  ██   ███ █████
+        ██  ██  ██ ██      ██   ██ ██    ██ ██
+        ██      ██ ███████ ██   ██  ██████  ███████
+        */
 
         private static void mergeUnionMembers(IUnion<ItemCategory> union, JsonArray member_names)
         {
@@ -270,6 +295,15 @@ namespace InvisibleHand.Items.Categories
                 }
             }
         }
+
+        /*
+        ██████  ███████  ██████  ██    ██ ██ ██████  ███████ ███████
+        ██   ██ ██      ██    ██ ██    ██ ██ ██   ██ ██      ██
+        ██████  █████   ██    ██ ██    ██ ██ ██████  █████   ███████
+        ██   ██ ██      ██ ▄▄ ██ ██    ██ ██ ██   ██ ██           ██
+        ██   ██ ███████  ██████   ██████  ██ ██   ██ ███████ ███████
+                            ▀▀
+        */
 
         private static bool parseRequirements(string category_name, JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
         {
@@ -369,9 +403,11 @@ namespace InvisibleHand.Items.Categories
         /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
         private static int getParentID(string category_name, string parent_name)
         {
+            int pid = 0;
             try
             {
-                return parent_name == "" ? 0 : CategoryDefinitions[parent_name].ID;
+                pid = parent_name == String.Empty ? 0 : CategoryDefinitions[parent_name].ID;
+
             }
             catch (KeyNotFoundException knfe)
             {
@@ -379,13 +415,33 @@ namespace InvisibleHand.Items.Categories
                     "Category '" + category_name + "': The specified parent category '{0}' was not found in '{1}'."
                 );
             }
+
+            while (pid > 0 && !ActiveCategories.Contains(pid))
+            {
+                // the parent of this category has been deactivated, so we need to 'reparent':
+                // keep moving the child up a level until it has an active parent or becomes
+                // a toplevel category
+                pid = ItemCategory.Registry[pid].ParentID;
+            }
+
+            // return parent_name == "" ? 0 : CategoryDefinitions[parent_name].ID;
+
+            return pid;
         }
+
+        /*
+         ██████  ██████  ██████  ██ ███    ██  █████  ██      ███████
+        ██    ██ ██   ██ ██   ██ ██ ████   ██ ██   ██ ██      ██
+        ██    ██ ██████  ██   ██ ██ ██ ██  ██ ███████ ██      ███████
+        ██    ██ ██   ██ ██   ██ ██ ██  ██ ██ ██   ██ ██           ██
+         ██████  ██   ██ ██████  ██ ██   ████ ██   ██ ███████ ███████
+        */
 
         /// <summary>
         /// Because it doesn't seem possible to assign proper ordinal values before all categories are loaded and
         /// parent-child relationships are known, we do that afterwards when we know all the context.
         /// </summary>
-        private static void CalculatePriorities()
+        private static void CalculateOrdinals()
         {
             // creates a lookup of: ParentID => [collection of child categories]
             var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c=>c.ParentID, c=> c);
@@ -466,9 +522,13 @@ namespace InvisibleHand.Items.Categories
 
             var registry = ItemCategory.Registry;
 
-            foreach (var kvp in registry)
+            // foreach (var kvp in registry)
+
+            // only add enabled categories to the tree
+            foreach (var active_id in ItemCategory.ActiveCategories)
             {
-                var category = kvp.Value;
+                // var category = kvp.Value;
+                var category = registry[active_id];
 
                 var parentID = category.ParentID;
 
