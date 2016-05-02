@@ -24,10 +24,11 @@
     ]
   }
 
-  /*{
+  {
     name: Expert Items
     parent: null
-    priority: 1
+    # if this category is enabled, sort it before everything else
+    priority: -1
     enable: false
     requires: {
       General: ["expert"]
@@ -39,7 +40,7 @@
       value
       stack
     ]
-  }*/
+  }
   {
     name: Butterfly
     parent: Bait

@@ -325,18 +325,27 @@ namespace InvisibleHand.Items
                     weaponType = "Weapon.Melee";
 
                     if (item.Try(Flag, weaponType, "style_directional"))
-                        item.FlagFirst(weaponType, "flail", "yoyo", "chain");
-
+                    {
+                        if (item.Try(FlagFirst, weaponType, "flail", "yoyo", "spear"))
+                            break;
+                    }
                     else if (item.Try(Flag, weaponType, "style_swing"))
-                        item.Flag(weaponType, "broadsword");
-
+                    {
+                        if (item.Try(Flag, weaponType, "broadsword"))
+                            break;
+                    }
                     else if (item.Try(Flag, weaponType, "style_thrown"))
-                        item.Flag(weaponType, "boomerang");
+                    {
+                        if (item.Try(Flag, weaponType, "boomerang"))
+                            break;
+                    }
+                    else item.Flag(weaponType, "style_jab");
+
 
                     // the 'chain' weapons can be various styles, but they all
-                    // have the same item.shoot projectileAI value
+                    // have the same item.shoot projectileAI value. So check for
+                    // that if all the other specific-weapon checks failed.
                     item.Flag(weaponType, "chain");
-
                     break;
 
                 case "type_ranged":
