@@ -43,4 +43,9 @@ namespace InvisibleHand
             : base (key, object_name, inner, "The field '{0}' was not found in the JsonValue object '{1}'.")
         { }
     }
+
+    public class NoDualUnionsException : Exception
+    {
+        public NoDualUnionsException(string message) : base(message) {}
+    }
 }

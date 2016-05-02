@@ -200,8 +200,10 @@ namespace InvisibleHand.Items.Categories
                             var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
 
                             // TODO: allow enable/disable at runtime
-                            if (catdef.enable)
-                                mergeUnionMembers(union, catdef.merge);
+                            // if (catdef.enable)
+                            addUnionMembers(union, catdef.merge);
+
+                            union.Enabled = catdef.enable;
 
                             CategoryDefinitions[union.Name] = union;
                             // XXX: should we add the unions to the search tree?
@@ -233,7 +235,7 @@ namespace InvisibleHand.Items.Categories
 
                                 // store the new category in the collections
                                 CategoryDefinitions[newcategory.Name] = newcategory;
-                                if (catdef.enable) ActiveCategories.Add(newcategory.ID);
+                                // if (catdef.enable) ActiveCategories.Add(newcategory.ID);
 
                             }
                         }
@@ -274,15 +276,16 @@ namespace InvisibleHand.Items.Categories
         ██      ██ ███████ ██   ██  ██████  ███████
         */
 
-        private static void mergeUnionMembers(IUnion<ItemCategory> union, JsonArray member_names)
+        private static void addUnionMembers(IUnion<ItemCategory> union, JsonArray member_names)
         {
             foreach (var member in member_names)
             {
-                // let each category listed under "merge"
-                // know which wrapper it has been assigned to
+                // add each category listed under "merge"
+                // to the union. When the union is enabled,
+                // these categories will be notified.
                 try
                 {
-                    CategoryDefinitions[member].Merge(union);
+                    union.AddMember(CategoryDefinitions[member]);
                 }
                 catch (KeyNotFoundException knfe)
                 {
@@ -416,7 +419,7 @@ namespace InvisibleHand.Items.Categories
                 );
             }
 
-            while (pid > 0 && !ActiveCategories.Contains(pid))
+            while (pid > 0 && !ItemCategory.ActiveCategories.Contains(pid))
             {
                 // the parent of this category has been deactivated, so we need to 'reparent':
                 // keep moving the child up a level until it has an active parent or becomes

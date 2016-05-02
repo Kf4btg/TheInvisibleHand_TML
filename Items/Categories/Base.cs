@@ -68,7 +68,7 @@ namespace InvisibleHand.Items.Categories
 
         /// TODO: this will likely need to trigger a tree rebuild. If we can find a way to just rebuild
         /// a part of the tree rather than the whole thing, that would be preferable.
-        protected bool _enabled = true;
+        protected bool _enabled = false;
         public virtual bool Enabled
         {
             get { return _enabled; }
@@ -114,7 +114,7 @@ namespace InvisibleHand.Items.Categories
 
         /// if not null, then this is the Wrapper-Category that this
         /// category has been merged into
-        protected UnionCategory current_union => UnionID > 0 ? Registry[UnionID] as UnionCategory : null;
+        public UnionCategory CurrentUnion => UnionID > 0 ? Registry[UnionID] as UnionCategory : null;
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
@@ -164,31 +164,29 @@ namespace InvisibleHand.Items.Categories
         /// one union at a time, though Unions themselves can belong to other unions.
         public void Merge(IUnion<ItemCategory> union)
         {
-            if (union != null && union.ID != this.UnionID)
-            {
-                // remove from current union, if necessary
-                if (UnionID > 0) Unmerge();
-
-                this.UnionID = union.ID;
-                union.AddMember(this);
-            }
+            Merge(union?.ID ?? 0);
         }
         public void Merge(int union_id)
         {
-            try {
-                Merge(Registry[union_id] as UnionCategory);
-            }
-            catch (KeyNotFoundException knfe)
+            if (union_id > 0) // && this.UnionID != union_id)
             {
-                throw new UsefulKeyNotFoundException(union_id.ToString(), nameof(Registry), knfe,
-                    "The category '" + this.Name + "' could not be added to the Union with ID '{0}' because no category with that ID exists in '{1}'." );
+                this.UnionID = union_id;
             }
+
+            // try {
+            //     Merge(Registry[union_id] as UnionCategory);
+            // }
+            // catch (KeyNotFoundException knfe)
+            // {
+            //     throw new UsefulKeyNotFoundException(union_id.ToString(), nameof(Registry), knfe,
+            //         "The category '" + this.Name + "' could not be added to the Union with ID '{0}' because no category with that ID exists in '{1}'." );
+            // }
         }
 
         /// Remove this Category from its Union
         public void Unmerge()
         {
-            this.current_union?.RemoveMember(this);
+            // this.current_union?.RemoveMember(this);
             this.UnionID = 0;
         }
 
@@ -251,7 +249,7 @@ namespace InvisibleHand.Items.Categories
         #region interface implementations
 
         // public int CompareTo(ItemCategory other) => this.Ordinal.CompareTo(other.Ordinal);
-        public int CompareTo(ICategory<Item> other) => this.Ordinal.CompareTo(other.Ordinal);
+        public int CompareTo(ICategory<Item> other) => this.Ordinal.CompareTo(other?.Ordinal);
 
         // public bool Equals(ItemCategory other) => this.ID == other?.ID;
         public bool Equals(ICategory<Item> other) => this.ID == other?.ID;

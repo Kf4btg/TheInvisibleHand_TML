@@ -52,11 +52,30 @@ namespace InvisibleHand.Items.Categories
 
         // Tracking member Categories
         // ---------------------------
-        public void AddMember(ItemCategory newMember)
+        // public void AddMember(ItemCategory new_member)
+        // {
+        //     this.UnionMembers.Add(new_member);
+        // }
+
+        /// Add a category as a member of this union. If the given category is already in a different
+        /// union, an exception will be thrown unless `force_replace` is true, in which case
+        /// the category will be removed from the memberset of its current union before being added
+        /// to this one.
+        public void AddMember(ItemCategory new_member, bool force_replace = false)
         {
-            this.UnionMembers.Add(newMember);
+            if (new_member.UnionID > 0 && new_member.UnionID != this.ID)
+            {
+                if (force_replace)
+                    new_member.CurrentUnion.RemoveMember(new_member);
+                else
+                    throw new NoDualUnionsException($"The category {new_member.Name} already belongs to a union and cannot join another.");
+            }
+            this.UnionMembers.Add(new_member);
+
         }
 
+        /// remove a category from the memberset of this Union. No error will be thrown
+        /// if the category is not a member.
         public void RemoveMember(ItemCategory member)
         {
             this.UnionMembers.Remove(member);
@@ -121,8 +140,8 @@ namespace InvisibleHand.Items.Categories
 
             // Ok, since the Unions are no longer in the Category Tree, it should
             // be safe to do this:
-            var c1 = t1.GetCategory();
-            var c2 = t2.GetCategory();
+            var c1 = t1.GetFlagInfo().ActualCategory;
+            var c2 = t2.GetFlagInfo().ActualCategory;
 
             // if the items belong to the same category, get the comparison value from that category;
             // if they're different categories, just return the category order:

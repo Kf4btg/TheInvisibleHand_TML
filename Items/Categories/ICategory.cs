@@ -36,7 +36,7 @@ namespace InvisibleHand.Items.Categories
     {
         ISet<V> UnionMembers { get; }
 
-        void AddMember(V member);
+        void AddMember(V member, bool force_replace=false);
         void RemoveMember(V member);
     }
 
