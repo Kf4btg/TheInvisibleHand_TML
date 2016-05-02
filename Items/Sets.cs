@@ -3,12 +3,13 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 
 
 namespace InvisibleHand.Items
 {
-    public class Set<T>
+    public class Set<T>: IEnumerable<T>
     {
         public string Name { get; protected set; }
 
@@ -46,7 +47,7 @@ namespace InvisibleHand.Items
 
         /// Add a single item to this Set. If it is already present
         /// in the set, it will be silently ignored.
-        public virtual void Add(T item)
+        public void Add(T item)
         {
             this._items.Add(item);
         }
@@ -54,7 +55,7 @@ namespace InvisibleHand.Items
         /// Add the unique items from a number of collections of
         /// of items to this set; pre-existing items will not
         /// be duplicated and no error will be thrown.
-        public virtual void Extend(params IEnumerable<T>[] items)
+        public void Extend(params IEnumerable<T>[] items)
         {
             foreach (var itemlist in items)
                 this._items.UnionWith(itemlist);
@@ -63,19 +64,19 @@ namespace InvisibleHand.Items
         /// Add the ids from the given collection to this set;
         /// if an ID is already present, it will not be duplicated
         /// and no error will be thrown.
-        public virtual void Union(IEnumerable<T> items)
+        public void Union(IEnumerable<T> items)
         {
             this._items.UnionWith(items);
         }
 
         /// Remove all items in the given collection from this Set
-        public virtual void Remove(IEnumerable<T> items)
+        public void Remove(IEnumerable<T> items)
         {
             this._items.ExceptWith(items);
         }
 
         /// Return true if the given id exists in this set
-        public virtual bool Contains(T item)
+        public bool Contains(T item)
         {
             return this._items.Contains(item);
         }
@@ -85,10 +86,23 @@ namespace InvisibleHand.Items
         /// should obviously only be done if all modification to the set
         /// have been completed and it is certain that no more changes to
         /// the set will occur during its lifetime.
-        public virtual void Trim()
+        public void Trim()
         {
             ((HashSet<T>)this._items).TrimExcess();
         }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+
+
     }
 
     /// A set for collections of TileIDs
@@ -144,7 +158,6 @@ namespace InvisibleHand.Items
             int tileID;
             Recipe r;
 
-            var alchemy_results = new HashSet<int>();
             // this might be a bad idea...let's see!
             for (int n = 0; n < Recipe.numRecipes; n++)
             {
@@ -173,15 +186,18 @@ namespace InvisibleHand.Items
 
                     // also track the results
                     Console.WriteLine($"alch result: {r.createItem.name}");
-                    alchemy_results.Add(r.createItem.type);
+
+                    // TODO: see about removing the Vicious/Vile Powder from this set
+                    AlchemyResults.Add(r.createItem.type);
                 }
             }
+            AlchemyResults.Trim();
             // after all that, remove any items from the alchemy-ingredients set that are ALSO the result of
             // an alchemy recipe; this will prevent items such as lesser healing potions (which can be crafted
             // with alchemy, then used as an ingredient for an upgraded potion) from showing up under the
             // Ingredients category rather than the Potions category; will hopefully also stop mushrooms from showing
             // up in Potions.
-            AlchemyIngredients.Remove(alchemy_results);
+            AlchemyIngredients.Remove(AlchemyResults);
             AlchemyIngredients.Trim();
 
             CraftingStations.Trim();

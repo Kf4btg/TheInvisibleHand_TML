@@ -224,7 +224,7 @@ Tool:
     fishing_pole
     hammer
     pick
-    recall
+    /*recall*/
     wand
     wrench
     painting
@@ -242,6 +242,7 @@ Supplies:
     // maneuvering? terrain? terrain traversal?
     // things-so-you-don't-die-from-gravity/not-being-a-fish?
     exploration
+    recall
   ]
 }
 Consumable:

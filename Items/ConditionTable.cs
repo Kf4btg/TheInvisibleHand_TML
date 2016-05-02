@@ -7,6 +7,17 @@ namespace InvisibleHand.Items
     using static ClassificationRules;
     using condition_table = Dictionary<string, Func<Item, bool>>;
 
+
+    // NOTE TO SELF:
+    // When adding new traits, categories, unions, etc. make sure that everything is properly updated:
+    //      1) The Category Hjson files have definitions for the new categories/use the new traits
+    //      2) the Traits hjson has any new traits used by new categories
+    //      3) The Condition tables below are updated with the same traits added to the Traits hjson file
+    //      4) A method is created in ClassificationRules, if need be, along with any new Sets
+    //      5) The traits are referenced and assigned appropriately in the ItemClassifier
+    //
+    //      *) And, eventually, try to clean out any old, unused, or obsolete code left lying around by the changes
+
     internal static class ConditionTable
     {
         // private static bool REPLACE_ME(Item item) => true;
@@ -320,10 +331,12 @@ namespace InvisibleHand.Items
         {
             {"rope",          Sets.Rope},
             {"rope_coil",     Sets.RopeCoil},
-            {"overhead",       MiscTools.OverheadThings},
+            {"exploration",       MiscTools.OverheadThings},
             {"hand_light",       MiscTools.HandLights},
             {"recall",       MiscTools.Recall},
             {"demolitions",       MiscTools.Demolitions},
+            {"bucket",       NameMatch.Bucket},
+
 
         };
 
