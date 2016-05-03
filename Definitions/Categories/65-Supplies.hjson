@@ -4,12 +4,23 @@
     Rope, light sources, Umbrellas, Magic Mirrors...everyday stuff you might find at the sporting goods store.
     Don't leave home without them!
    */
+  {
+    name: Exploration
+    parent: Tool
+    requires: {
+      Tool: ["exploration_aid"]
+    }
+    sort: [
+      type
+      stack
+    ]
+  }
 
   {
     name: Hand Light
-    parent: Supplies
+    parent: Exploration
     requires:  {
-      Supplies: [ "hand_light" ]
+      Exploration: [ "hand_light" ]
     }
     sort: [
       shoot
@@ -20,9 +31,9 @@
   }
   {
     name: Rope
-    parent: Supplies
+    parent: Exploration
     requires: {
-      Supplies: ["rope"]
+      Exploration: ["rope"]
     }
     sort: [
       type
@@ -31,9 +42,9 @@
   }
   {
     name: Rope Coil
-    parent: Supplies
+    parent: Exploration
     requires: {
-      Supplies: ["rope_coil"]
+      Exploration: ["rope_coil"]
     }
     sort: [
       type
@@ -41,22 +52,10 @@
     ]
   }
   {
-    name: Bucket
-    parent: Supplies
-    requires: {
-      Supplies: ["bucket"]
-    }
-    sort: [
-      rare
-      maxStack
-      type
-    ]
-  }
-  {
     name: Demolitions
-    parent: Supplies
+    parent: Exploration
     requires:  {
-      Supplies: [ "demolitions" ]
+      Exploration: [ "demolitions" ]
     }
     sort: [
       value
@@ -69,10 +68,11 @@
     // need to steal it and use it for something
     // more important...Like the entire Section,
     // instead of "Supplies". hmm...
-    name: Exploration Aids
-    parent: Supplies
+    /*name: Exploration Aids*/
+    name: Terrain Survival
+    parent: Exploration
     requires: {
-      Supplies: [ "exploration" ]
+      Exploration: [ "survival" ]
     }
     sort: [
       type
@@ -80,11 +80,10 @@
 
   }
   {
-    // Maybe this should be in the Tools category...
     name: Recall
-    parent: Supplies
+    parent: Exploration
     requires:  {
-      Supplies: [ "recall" ]
+      Exploration: [ "recall" ]
     }
     sort: [
       rare

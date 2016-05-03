@@ -125,31 +125,57 @@ namespace InvisibleHand.Items
             }
             //Tools
             //------------
-            else _tool = item.TryIf(
-                                item.Try(FlagAny, "Tool", "pick", "axe", "hammer") ||
-                                item.Try(FlagFirst, "Tool", "wand", "fishing_pole", "wrench"),
-                            SetFlag, "General", "tool");
+            else
+            {
+                // is this too dense?
+                // anyway:
+                // IF the item is [pick/axe/hammer]
+                // OR
+                // the item is a (wand|fishingpole|wrench|bucket|painting-tool)
+                // OR
+                // the item is an Exploration aid (in which case it shall be marked as such)
+                // THEN
+                // flag the item as a Tool.
+                _tool = item.TryIf(
+                            item.Try(FlagAny, "Tool", "pick", "axe", "hammer")
+                            ||
+                            item.Try(FlagFirst, "Tool", "wand", "fishing_pole", "wrench", "bucket", "painting")
+                            ||
+                            item.TryIf(
+                                item.Try(FlagFirst, "Tool.Exploration", "hand_light",
+                                                               "rope",
+                                                               "rope_coil",
+                                                               "demolitions",
+                                                               "survival",
+                                                               "recall"
+                                ), SetFlag, "Tool", "exploration_aid"
+                        ), SetFlag, "General", "tool");
+
+                // if (!_tool &&
+                //     item.Try(FlagFirst, "Supplies", "hand_light",
+                //     "rope",
+                //     "rope_coil",
+                //     "bucket",
+                //     "demolitions",
+                //     "exploration",
+                //     "recall"
+                //     )
+                // {
+                //     // like "Tool", there's not much these items have in common
+                //     // other than the abstraction of their purpose, so their parent
+                //     // is created after they are, only if they exist. I'm sure
+                //     // there's some sort of Grand Lesson in that.
+                //     item.SetFlag("General", "supplies");
+                //
+                // }
+            }
 
 
 
             // placeables, ammo, consumables, dyes
             if (!(_weapon || _tool))
             {
-                if (item.Try(FlagFirst, "Supplies", "hand_light",
-                                                    "rope",
-                                                    "rope_coil",
-                                                    "bucket",
-                                                    "demolitions",
-                                                    "exploration",
-                                                    "recall"
-                ))
-                    // like "Tool", there's not much these items have in common
-                    // other than the abstraction of their purpose, so their parent
-                    // is created after they are, only if they exist. I'm sure
-                    // there's some sort of Grand Lesson in that.
-                    item.SetFlag("General", "supplies");
-
-                else if (item.Try(Flag, "General", "placeable"))
+                if (item.Try(Flag, "General", "placeable"))
                     classifyPlaceable(item);
 
                 // else if (item.Try(Flag,"General", "ammo"))

@@ -149,4 +149,16 @@
       type
     ]
   }
+  {
+    name: Bucket
+    parent: Tool
+    requires: {
+      Tool: ["bucket"]
+    }
+    sort: [
+      rare
+      maxStack
+      type
+    ]
+  }
 ]
