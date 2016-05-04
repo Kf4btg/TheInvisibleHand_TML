@@ -54,8 +54,8 @@ Placeable:
     musicbox
     painting
     rack
-    rope
-    rope_coil
+    /*rope*/
+    /*rope_coil*/
     /*chain -- is this different than rope? */
     seed
     strange_plant
@@ -280,21 +280,21 @@ Tool:
     wrench
 
     // this is a "grouping" trait;
-    // just serves to indicate items that are under "Tools.Exploration"
+    // just serves to indicate items that are under "Tool.Exploration"
     exploration_aid
   ]
   Exploration:
   {
     traits: [
-    hand_light
-    demolitions
-    rope
-    rope_coil
-    // maneuvering? terrain? terrain traversal?
-    // things-so-you-don't-die-from-gravity/not-being-a-fish?
-    survival
-    /*exploration*/
-    recall
+      hand_light
+      demolition
+      recall
+      rope
+      rope_coil
+      // maneuvering? terrain? terrain traversal?
+      // things-so-you-don't-die-from-gravity/not-being-a-fish?
+      survival
+      /*exploration*/
     ]
   }
 }

@@ -1,226 +1,216 @@
 [
-    /*{
-        # start a category definition by giving it a meaningful name
-        name: Template
+  /*{
+      # start a category definition by giving it a meaningful name
+      name: Template
 
-        # if it is a nested category (e.g. Weapon > Melee),
-        # put the name of its parent here. Only items that meet the
-        # requirements of the parent will considered for the nested category.
-        # If it is a top level category, set this to null (or just leave it out)
-        parent: null
+      # if it is a nested category (e.g. Weapon > Melee),
+      # put the name of its parent here. Only items that meet the
+      # requirements of the parent will considered for the nested category.
+      # If it is a top level category, set this to null (or just leave it out)
+      parent: null
 
-        # The priority of a category is a way to affect how a category will be sorted with
-        regards to other categories under the same parent. This defaults to 0. Usually, sibling
-        categories will be ordered based on their position in these definition files;
-        a category in a lower position or a later file will be sorted after an earlier
-        category. Setting a value for the priority, however, can override this default behaviour:
-        When determining the category sort-order, all loaded categories are first
-        ordered by priority (low to high), then by the order in which they appear
-        in the configuration files (earlier to later). With the default priority of 0,
-        the first ordering does nothing, so only the load-order matters. But if you
-        give a category a higher priority (even 1, if all the others are still at 0),
-        then that category will be moved to end of the ordering in the first step, and
-        all its siblings will now appear before it when sorting items.
+      # The priority of a category is a way to affect how a category will be sorted with
+      regards to other categories under the same parent. This defaults to 0. Usually, sibling
+      categories will be ordered based on their position in these definition files;
+      a category in a lower position or a later file will be sorted after an earlier
+      category. Setting a value for the priority, however, can override this default behaviour:
+      When determining the category sort-order, all loaded categories are first
+      ordered by priority (low to high), then by the order in which they appear
+      in the configuration files (earlier to later). With the default priority of 0,
+      the first ordering does nothing, so only the load-order matters. But if you
+      give a category a higher priority (even 1, if all the others are still at 0),
+      then that category will be moved to end of the ordering in the first step, and
+      all its siblings will now appear before it when sorting items.
 
-        # The priority of a category is how its items will be sorted relative to
-        # those of other categories: lower priorities will be placed before
-        # higher. When two categories have the same priority,
-        # the priority that was loaded first will take precedence.
-        # Excluding this field means use the default of 0 for top-level categories,
-        # or the priority of the parent for child categories.
-        # Range is [-500, 500]. Values outside this range will be clamped.
-        priority: 1
+      # The priority of a category is how its items will be sorted relative to
+      # those of other categories: lower priorities will be placed before
+      # higher. When two categories have the same priority,
+      # the priority that was loaded first will take precedence.
+      # Excluding this field means use the default of 0 for top-level categories,
+      # or the priority of the parent for child categories.
+      # Range is [-500, 500]. Values outside this range will be clamped.
+      priority: 1
 
-        # The list (of lists) of traits required for an item
-        # to match this category. For a top-level category, a General
-        # trait entry will likely always be included. For sub-categories,
-        # the parent will fulfill the General requirements, so only
-        # traits from more specific families are needed.
-        requires: {
-            General: [ "trait1", ... ]
-        }
-    }*/
+      # The list (of lists) of traits required for an item
+      # to match this category. For a top-level category, a General
+      # trait entry will likely always be included. For sub-categories,
+      # the parent will fulfill the General requirements, so only
+      # traits from more specific families are needed.
+      requires: {
+          General: [ "trait1", ... ]
+      }
+  }*/
 
-    /*
-    Some broad, generic categories. Most are probably a 1:1 mapping of
-    a trait to a category
-    */
+  /*
+  Some broad, generic categories. Most are probably a 1:1 mapping of
+  a trait to a category
+  */
 
-    {
-      name: Tool
-      /*priority: 10*/
-      requires: {
-        General: [ "tool" ]
-      }
-      sort: [
-        rare
-        type
-        value
-      ]
+  {
+    name: Tool
+    /*priority: 10*/
+    requires: {
+      General: [ "tool" ]
     }
-    {
-      name: Supplies
-      requires: {
-        General: ["supplies"]
-      }
-      sort: [
-        rare
-        type
-        stack
-      ]
+    sort: [
+      rare
+      type
+      value
+    ]
+  }
+  {
+    name: Weapon
+    /*priority: 20*/
+    requires: {
+      General: [ "weapon" ]
     }
-    {
-      name: Weapon
-      /*priority: 20*/
-      requires: {
-        General: [ "weapon" ]
-      }
-      sort: [
-        damage
-        type
-        rare
-        value
-        stack
-      ]
+    sort: [
+      damage
+      type
+      rare
+      value
+      stack
+    ]
+  }
+  {
+    name: Ammo
+    /*priority: 25*/
+    requires: {
+      General: [ "ammo" ]
     }
-    {
-      name: Ammo
-      /*priority: 25*/
-      requires: {
-        General: [ "ammo" ]
-      }
-      sort: [
-        ammo
-        damage
-        type
-        stack
-      ]
-    }
-    {
-      name: Equipable
-      /*priority: 30*/
-      requires: {
-        General: [ "equipable" ]
-      }
-      sort: [
-        rare
-        type
-        value
-      ]
-    }
-    {
-      name: Dye
-      /*priority: 40*/
-      requires: {
-        General: [ "dye" ]
-      }
-      sort: [
-        type
-        stack
-      ]
-    }
-    {
-      name: Mech
-      /*priority: 75*/
-      requires: {
-        General: [ "mech" ]
-      }
-      sort: [
+    sort: [
+      ammo
+      damage
       type
       stack
-      ]
+    ]
+  }
+  {
+    name: Equipable
+    /*priority: 30*/
+    requires: {
+      General: [ "equipable" ]
     }
-    {
-      name: Placeable
-      /*priority: 85*/
-      requires: {
-        General: [ "placeable" ]
-        # use a '!' before the trait name to *exclude* items with those traits
-        Material: [ "!material_primary" ]
-      }
-      sort: [
-        type
-        stack
-      ]
+    sort: [
+      rare
+      type
+      value
+    ]
+  }
+  {
+    name: Dye
+    /*priority: 40*/
+    requires: {
+      General: [ "dye" ]
     }
-    {
-      name: Paint
-      /*priority: 86*/
-      requires: {
-        General: [ "paint" ]
-      }
-      sort: [
-        value
-        type
-        stack
-      ]
+    sort: [
+      type
+      stack
+    ]
+  }
+  {
+    name: Mech
+    /*priority: 75*/
+    requires: {
+      General: [ "mech" ]
     }
-    {
-      name: Bait
-      /*priority: 90*/
-      requires: {
-        General: ["bait"]
-      }
-      sort: [
-        rare
-        bait
-        value
-        type
-        stack
-      ]
+    sort: [
+    type
+    stack
+    ]
+  }
+  {
+    name: Placeable
+    /*priority: 85*/
+    requires: {
+      General: [ "placeable" ]
+      # use a '!' before the trait name to *exclude* items with those traits
+      Material: [ "!material_primary" ]
     }
-    {
-      # for items whose _primary_ use is as a material, though they may meet
-      # requirements for other categories (e.g. ore is placeable, but is mainly
-      # used to create bars or potions.)
-      name: Material
-      /*priority: 110*/
-      requires: {
-        General: [ "material" ]
-      }
-      sort: [
-        rare
-        value
-        type
-        stack
-      ]
+    sort: [
+      type
+      stack
+    ]
+  }
+  {
+    name: Paint
+    /*priority: 86*/
+    requires: {
+      General: [ "paint" ]
     }
+    sort: [
+      value
+      type
+      stack
+    ]
+  }
+  {
+    name: Bait
+    /*priority: 90*/
+    requires: {
+      General: ["bait"]
+    }
+    sort: [
+      rare
+      bait
+      value
+      type
+      stack
+    ]
+  }
+  {
+    # for items whose _primary_ use is as a material, though they may meet
+    # requirements for other categories (e.g. ore is placeable, but is mainly
+    # used to create bars or potions.)
+    name: Material
+    /*priority: 110*/
+    requires: {
+      General: [ "material" ]
+    }
+    sort: [
+      rare
+      value
+      type
+      stack
+    ]
+  }
 
-    ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
-    {
-      name: Hair Dye
-      /*priority: 115*/
-      requires: {
-        General: [ "hair_dye" ]
-      }
-      sort: [
-        value
-        type
-        stack
-      ]
+  ## I just...don't know where to put all these. So they're here forever/until I find a more appropriate spot
+  {
+    //maybe should be under consumable?
+    name: Hair Dye
+    /*priority: 115*/
+    requires: {
+      General: [ "hair_dye" ]
     }
-    {
-      name: Coin
-      /*priority: 200*/
-      requires: {
-        General: [ "coin" ]
-      }
-      sort: [
-        type
-        stack
-      ]
+    sort: [
+      value
+      type
+      stack
+    ]
+  }
+  {
+    name: Consumable
+    /*priority: 250*/
+    requires: {
+      General: [ "consumable" ]
     }
-    {
-      name: Consumable
-      /*priority: 250*/
-      requires: {
-        General: [ "consumable" ]
-      }
-      sort: [
-        buffType
-        maxStack
-        type
-        stack
-      ]
+    sort: [
+      buffType
+      maxStack
+      type
+      stack
+    ]
+  }
+  {
+    name: Coin
+    /*priority: 200*/
+    requires: {
+      General: [ "coin" ]
     }
+    sort: [
+      type
+      stack
+    ]
+  }
 ]

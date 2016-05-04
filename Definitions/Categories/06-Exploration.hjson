@@ -55,7 +55,12 @@
     name: Demolitions
     parent: Exploration
     requires:  {
-      Exploration: [ "demolitions" ]
+      General: ["explosive", "consumable"]
+
+      //This may not be necessary due to check order:
+      /*Weapon: ["!type_throwing"]*/
+
+      /*Exploration: [ "demolitions" ]*/
     }
     sort: [
       value
@@ -64,10 +69,6 @@
     ]
   }
   {
-    // Ooh, I like that name...might
-    // need to steal it and use it for something
-    // more important...Like the entire Section,
-    // instead of "Supplies". hmm...
     /*name: Exploration Aids*/
     name: Terrain Survival
     parent: Exploration

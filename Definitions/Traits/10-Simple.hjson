@@ -1,0 +1,197 @@
+/*
+  Property: "consumable"
+  "Property.channel"
+  Property.Equipable.Slot.head
+  Property.Equipable.Slot: ["head"]
+
+  The concept of a class is similar to the concept of a set defined by its members. Here, the class is extensional. If, however, a set is defined intensionally, then it is a set of things that meet some requirement to be a member. Thus, such a set can be seen as creating a type.
+
+   an intensional definition gives the meaning of a term by specifying all the properties required to come to that definition.
+   This is the opposite approach to the extensional definition, which defines by listing everything that falls under that definition
+
+   A property may be classified as either determinate or determinable. A determinable property is one that can get more specific. For example, color is a determinable property because it can be restricted to redness, blueness, etc. A determinate property is one that cannot become more specific. This distinction may be useful in dealing with issues of identity.
+
+   a property p defined for all elements of a set X is usually defined as a function p: X → {true, false}, that is true whenever the property holds; or equivalently, as the subset of X for which p holds; i.e. the set {x| p(x) = true}
+
+   attributes are ascribable, whereas properties are possessable
+
+
+
+    Attribute is a quality or object that we attribute to someone or something. For example, the scepter is an attribute of power and statehood.
+
+    Property is a quality that exists without any attribution. For example, clay has adhesive qualities; or, one of the properties of metals is electrical conductivity. Properties demonstrate themselves though physical phenomena without the need attribute them to someone or something. By the same token, saying that someone has masculine attributes is self-evident. In effect, you could say that a property is owned by someone or something.
+
+    fingerprint
+    signature
+    identifier
+
+ */
+
+Property:
+{
+  # "1-property" traits
+  traits: [
+    ammunition
+    auto_reuse
+    /*boost_mana*/
+    channel
+    consumable
+    damage
+    defense
+    /*equipable*/
+    expert
+    explosive
+    buff
+    timed_buff
+    stackable
+    projectile
+
+    material
+    mech
+    /*placeable*/
+    quest_item
+    unique_stack
+    reach_boost
+    reach_penalty
+    /*regen_life*/
+    supplies
+    /*tool*/
+    use_mana
+    vanity
+    /*weapon*/
+    create_tile
+    create_wall
+    create_npc
+    value
+
+  ]
+  // "1-property" type definition
+  Type: {
+    traits: [
+    ammo
+    bait
+    dye
+    hair_dye
+    paint
+    coin
+    fishing_pole
+    pick
+    hammer
+    axe
+    wand
+    cart_track
+    accessory
+    ]
+  }
+  Equipable: {
+    traits: [
+    /*accessory*/
+    ]
+    Slot: {
+      traits: [
+      // Should these be separate?
+      light_pet
+      pet
+      minecart
+      grapple
+      mount
+
+      // clothing/armor
+      head
+      body
+      leg
+
+      // accys
+      back
+      balloon
+      face
+      front
+      neck
+      shield
+      shoe
+      waist
+      wings
+      main_hand
+      off_hand
+      ]
+    }
+  }
+  Weapon: {
+    traits: [
+      crit
+
+      melee
+      ranged
+      magic
+      summon
+      throwing
+    ]
+  }
+  # This is the base unmodified use time of the item
+  UseTime:
+  {
+    traits: [
+      "insanely_fast" // <= 8
+      "very_fast"     // 9-20
+      "fast"          // 21-25
+      "average"       // 26-30
+      "slow"          // 31-35
+      "very_slow"     // 36-45
+      "extremely_slow" // 46-55
+      "snail"         // >= 56
+    ]
+  }
+  Rarity: {
+    # Arranged by tiers in pairs; each member of a pair
+    # can be used as an alias for the tier
+    traits: [
+      # "tier negative one"
+      tier-1
+      gray
+
+      tier0
+      white
+
+      tier1
+      blue
+
+      tier2
+      green
+
+      tier3
+      orange
+
+      tier4
+      light_red
+
+      tier5
+      pink
+
+      tier6
+      light_purple
+
+      tier7
+      lime
+
+      tier8
+      yellow
+
+      tier9
+      cyan
+
+      tier10
+      red
+
+      tier11
+      purple
+
+      # NOTE: that's "tier negative twelve"
+      tier-12
+      rainbow
+
+      # "tier negative eleven" -- quest fish, strange plants
+      tier-11
+      amber
+    ]
+  }
+}

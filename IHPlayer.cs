@@ -135,6 +135,9 @@ namespace InvisibleHand
         // internal static KeyboardState prevState = Keyboard.GetState();
 
 
+        // NOTE: bool Player.ItemSpace(item) => is there room in the player's inventory for them to pick up this item
+        // NOTE: Player.QuickStackAllChests()
+
         public override void PostUpdate()
         {
             // reset the "holding-key" state, if needed

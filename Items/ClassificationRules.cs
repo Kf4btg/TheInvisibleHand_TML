@@ -660,7 +660,7 @@ namespace InvisibleHand.Items
 
             /// TODO: get some sleep and come up with a better name than this...
             /// This is intended to cover the umbrella and breathing reed
-            public static bool OverheadThings(Item item) => item.holdStyle == 2;
+            public static bool TerrainSurvival(Item item) => item.holdStyle == 2;
 
             /// the name thing will hopefully be enough, but let's add the consumable check just to make sure.
             // For reference, also:

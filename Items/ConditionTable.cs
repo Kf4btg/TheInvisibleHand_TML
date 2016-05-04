@@ -329,8 +329,8 @@ namespace InvisibleHand.Items
         {
             {"rope",          Sets.Rope},
             {"rope_coil",     Sets.RopeCoil},
-            {"exploration",       MiscTools.OverheadThings},
-            {"survival",       MiscTools.OverheadThings}, // terrain survival
+            // {"exploration",       MiscTools.TerrainSurvival},
+            {"survival",       MiscTools.TerrainSurvival},
             {"hand_light",       MiscTools.HandLights},
             {"recall",       MiscTools.Recall},
             {"demolitions",       MiscTools.Demolitions},

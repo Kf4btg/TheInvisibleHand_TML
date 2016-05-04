@@ -1,0 +1,237 @@
+/*
+  This holds the "simple" traits, i.e. traits that are a base property of an item,
+  both conceptually and literally. These traits describe what an item is or does--
+  though perhaps quite broadly--and can usually be derived from a single attribute
+  of an Item object in the game (things like "melee", "damage", "vanity").
+
+  These base building blocks can be combined to define some of the basic categories.
+  For example:
+ */
+Property:
+{
+  Generic:
+  {
+    // misc properties an item might have
+    traits: [
+      mech
+      # Desc: anything marked as "mech" will cause placed wires to show when held by the player;
+      # e.g. wrenches, pressure plates, more wire, etc.
+      explosive
+      # Desc: anything that explodes, whether or not it's a weapon
+      ammunition
+      # Desc: anything with this trait is used as ammunition for...something. There are some surprising things here.
+      # This is different than the "ammo" trait uner "Types", which only includes the (mostly) expected stuff.
+      consumable
+      # Desc: items that, once they're used, they're gone. Things like potions, shurikens, and squirrels.
+      expert
+      # items that can only be obtained in expert mode
+      stackable
+      # items that have a maximum stack > 1
+      damage
+      # Desc: the thing deals damage. An item with this trait is almost always a weapon--almost.
+      # Also note that that some things that do damage (like bombs and dynamite) do NOT have a damage value
+      # and thus will not match this trait. It seems their damage is calculated at runtime.
+      defense
+      # Desc: this item modifies the player's defense value by some amount. I'm fairly certain that only
+      # equipable items (armor & accys) have this attribute; temporary sources of defense like ironskin potion do not.
+      knockback
+      # desc: this item applies knockback to a target when used. Mostly found on weapons and ammo. Also on grappling hooks...
+
+      buff
+      # Desc: the item gives a buff of some sort. It could be activated and timed like a buff-potion,
+      # related to proximity like a campfire, or passive when the item is equipped, like a light-pet
+      timed_buff
+      # Desc: you can narrow it down a bit with this; these items provide a buff that wears off eventually
+
+      projectile
+      # items that create a projectile; honestly this trait may not be all that useful, since almost
+      # EVERYTHING is considered to create a projectile of some sort, even if you'd never think it
+      # (including things like spears, chainsaws, yoyos, glowsticks, and billions more, in addition
+      # the expected items like ranged or magic weapons)
+
+      auto_reuse
+      # Desc: items where you don't have to click again to continue using it. Beyond things like auto-swing
+      # swords or automatic guns, all picks, hammers, & axes and placeable blocks/tiles have this, as do most consumables
+      channel
+      # Desc: things that continue to activate as long as you hold the mouse down. Note that this is different than auto_reuse:
+      # you're not RE-using the item, you're CONTINUING to use the item. If that makes sense. If not, try to imagine
+      # what yoyos, flails, drills, chainsaws, magic missile, and the piranha gun have in common
+
+      quest_item
+      unique_stack
+      # Desc: "quest_item" indicates anything that fulfills the requirements of a quest. I believe this
+      # property is used when the quest-giver (e.g. the Angler) checks your inventory to see if you
+      # have the item he asked for. It also causes the unique border color.
+      # "unique_stack" is when you can only have 1 stack of the item type in your inventory at a time
+      # (i.e. only one of your item slots can contain an item with this ItemID).
+      # Like how you can only carry 1 of any specific quest fish. I don't think
+      # that having a max-stack of 1 is enforced on this though; it just so happens that the fish have a max-stack of 1.
+      #
+      # Desc: In vanilla, both of these properties are used only for the Angler quest-fish,
+      # but in theory they could be applied separately.
+
+      create_tile
+      # Desc: when used, this item will place a tile, usually consuming the item in the process.
+      # This includes blocks, furniture, torches, seeds...pretty much anything that says "Can be placed."
+      # Some other items like the various wands (Living Wood, Leaf, Bone, etc.) also have this.
+      # However, wands are marked as such (see below under "Types"), so they can be differentiated that way
+      create_wall
+      # Desc: just like create_tile, but for walls. I think only actual walls have this; there are no "wall wands"
+
+      create_npc
+      # Desc: when used, this item will place an NPC in the world. This is for things like
+      # caught critters; when you "use" one, you release it back into the world
+
+      material
+      # Desc: this item can be used to create something else. So far as trying to narrow down a category goes,
+      # this property is not likely to be all that useful.
+
+      value
+      # Desc: sell price > 0
+    ]
+  }
+  Type:
+  {
+    # these traits are similar to the generic properties above, but differ in the respect
+    # that the presence of one of these traits is generally enough to identify the
+    # main type of the item
+    traits:
+    [
+      accessory
+      ammo
+      pick
+      hammer
+      axe
+      wand
+      fishing_pole
+      bait
+      dye
+      hair_dye
+      paint
+      mount
+      grapple
+      //cartTrack
+    ]
+  }
+
+  Equipable:
+  {
+    traits: [
+      vanity
+      /*armor*/
+      accessory
+      grapple
+      mount
+      light
+      pet
+      minecart
+    ]
+    Slot:
+    {
+      # slot taken up by the accy/armor (not all accys have this)
+      traits: [
+        head
+        body
+        leg
+        back
+        balloon
+        face
+        front
+        neck
+        shield
+        shoe
+        waist
+        wings
+
+        # note: there's no meaningful difference between these two, other than that
+        # when two items for the "same" hand are equipped, only one will be shown
+        # on the player sprite
+        main_hand
+        off_hand
+      ]
+    }
+  }
+  Weapon:
+  {
+    traits: [
+      crit
+      # desc: the weapon has an intrinsic bonus to critical hits.
+
+      melee
+      ranged
+      magic
+      summon
+      throwing
+    ]
+  }
+  # This is the base unmodified use time of the item
+  UseTime:
+  {
+    traits:
+    [
+      "insanely_fast" // <= 8
+      "very_fast"     // 9-20
+      "fast"          // 21-25
+      "average"       // 26-30
+      "slow"          // 31-35
+      "very_slow"     // 36-45
+      "extremely_slow" // 46-55
+      "snail"         // >= 56
+    ]
+  }
+  Rarity:
+  {
+    # Arranged by tiers in pairs; each member of a pair
+    # can be used as an alias for the tier
+    traits: [
+      # "tier negative one"
+      tier-1
+      gray
+
+      tier0
+      white
+
+      tier1
+      blue
+
+      tier2
+      green
+
+      tier3
+      orange
+
+      tier4
+      light_red
+
+      tier5
+      pink
+
+      tier6
+      light_purple
+
+      tier7
+      lime
+
+      tier8
+      yellow
+
+      tier9
+      cyan
+
+      tier10
+      red
+
+      tier11
+      purple
+
+      # NOTE: that's "tier negative twelve"
+      tier-12
+      rainbow
+
+      # "tier negative eleven" -- quest fish, strange plants
+      tier-11
+      amber
+
+    ]
+  }
+}
