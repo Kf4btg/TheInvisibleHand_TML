@@ -334,8 +334,6 @@ namespace InvisibleHand.Items
             {"hand_light",       MiscTools.HandLights},
             {"recall",       MiscTools.Recall},
             {"demolitions",       MiscTools.Demolitions},
-
-
         };
 
         /// retrieve the appropriate table by name
@@ -359,6 +357,7 @@ namespace InvisibleHand.Items
                 case "Weapon.Magic": return Weapon_Magic;
                 case "Weapon.Summon": return Weapon_Summon;
                 case "Tool": return Tool;
+                case "Tool.Exploration": return Tool_Exploration;
                 case "Consumable": return Consumable;
                 case "Mech": return Mech;
                 case "Furniture": return Furniture;
@@ -368,7 +367,6 @@ namespace InvisibleHand.Items
                 case "Furniture.Chairs": return Furniture_Chairs;
                 case "Furniture.Other": return Furniture_Other;
                 case "Material": return Material;
-                case "Tool.Exploration": return Tool_Exploration;
             }
             throw new UsefulKeyNotFoundException(rule_category, nameof(RuleMatrix),
                 "Invalid table name '{0}'; does not exist in {1}.");
