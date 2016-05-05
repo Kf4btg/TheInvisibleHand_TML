@@ -1,0 +1,11 @@
+[
+  {
+    name: Placeable
+    requires: {
+      Property: [
+        create_tile | create_wall
+      ]
+      Property.Ident: [ "!wand" ]
+    }
+  }
+]

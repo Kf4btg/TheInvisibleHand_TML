@@ -1,0 +1,123 @@
+CreateTile:
+{
+  traits: [
+    dye_plant
+    strange_plant
+    herb
+    gem
+    metal_bar
+    music_box
+    rope
+
+    wall_placeable
+
+    extractinator_valid
+    metal_detector_valid
+
+    gravity_works
+    lighted
+  ]
+  Furniture: {
+    traits: [
+      room_needs_door
+      room_needs_table
+      room_needs_chair
+      room_needs_light
+
+      container
+      crafting_station
+      banner
+      wall_decoration
+    ]
+    Door: {
+      traits: [
+        door
+        platform
+      ]
+    }
+    Table: {
+      traits: [
+        work_bench
+        table
+        piano
+        dresser
+        bookcase
+        bathtub
+      ]
+    }
+    Chair: {
+      traits: [
+        chair
+        bed
+        bench
+      ]
+    }
+    Lighting: {
+      traits: [
+        torch
+        candle
+        chandelier
+        hanging_lantern
+        lamp
+        candelabra
+        holiday
+      ]
+    }
+    Misc: {
+      traits: [
+        anvil
+        cooking_pot
+        sink
+        grandfather_clock
+        campfire
+        cannon
+        bottle
+        bowl
+        beach_pile
+        statue
+        tombstone
+        water_fountain
+        alphabet_statue
+        crate
+        planter
+        monolith
+      ]
+    }
+    Wall_Deco: {
+      traits: [
+        trophy
+        rack
+        painting
+      ]
+    }
+  }
+  Mech: {
+    traits: [
+      trap
+      pressure_plate
+      timer
+      firework
+    ]
+  }
+  Block: {
+    traits: [
+      tile_brick
+
+      wood
+
+      dirt
+      sand
+      hardened_sand
+      sandstone
+      dungeon_brick
+      bouncy
+      ore
+      ice
+      stone
+
+      hallow
+      corrupt
+      crimson
+    ]
+  }
+}

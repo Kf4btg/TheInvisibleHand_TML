@@ -1,0 +1,41 @@
+[
+  {
+    name: Placeable
+    requires: [
+      Property.create_tile | Property.create_wall
+      !Property.Ident.wand
+    ]
+  }
+
+  {
+    name: Weapon
+    requires: [
+      Property.damage
+      !Property.not_ammo | Property.UseStyle.any
+    ]
+  }
+
+  {
+    name: Armor
+    requires: [
+      !Property.vanity
+      EquipSlot.head | EquipSlot.body | EquipSlot.leg
+    ]
+  }
+
+  {
+    name: Tool
+    enabled: false
+    display: true
+    requires: [
+      Tool.any
+    ]
+  }
+
+  {
+    name: Ammo
+    requires: [
+      Property.Ident.ammo
+    ]
+  }
+]

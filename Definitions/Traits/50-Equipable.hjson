@@ -1,0 +1,36 @@
+Equipable:
+{
+  traits: [
+    "any" // a shortcut trait for any equipable item
+    accessory
+    // Should these be separate?
+    light_pet
+    pet
+    minecart
+    grapple
+    mount
+  ]
+}
+EquipSlot:
+{
+  traits: [
+
+    // clothing/armor
+    head
+    body
+    leg
+
+    // accys
+    back
+    balloon
+    face
+    front
+    neck
+    shield
+    shoe
+    waist
+    wings
+    main_hand
+    off_hand
+  ]
+}

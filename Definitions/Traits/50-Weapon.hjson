@@ -1,0 +1,54 @@
+Weapon:
+{
+  Melee: {
+    traits: [
+      # based on useStyle
+      swing
+      stab
+      throw
+      directional
+
+      # based on projectile type
+      boomerang
+      chain
+      spear
+      flail
+      yoyo
+    ]
+  }
+  Ranged: {
+    traits: [
+      ammo_arrows
+      ammo_bullets
+      ammo_rockets
+      ammo_darts
+      ammo_gel
+      ammo_sand
+      ammo_stars
+
+      ammo_none
+
+      # probably redundant w/ ammo_gel, but not necessarily
+      flame_thrower
+    ]
+    Magic: {
+      traits: [
+        #based on projectile type
+        homing
+        area
+        controllable
+        bounce_hyper
+        bounce_heavy
+        stream
+        pierce
+
+        vilethorn_ai
+      ]
+    }
+    Summon: {
+      traits: [
+        minion
+      ]
+    }
+  }
+}

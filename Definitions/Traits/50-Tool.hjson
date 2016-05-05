@@ -1,0 +1,21 @@
+Tool:
+{
+  traits: [
+    "any"
+    axe
+    hammer
+    pick
+    fishing_pole
+
+    bucket
+    bug_net
+    paint_tool
+    wrench
+    hand_light
+    terrain_survival
+    recall
+
+    rope
+    rope_coil
+  ]
+}

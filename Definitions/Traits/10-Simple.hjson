@@ -30,40 +30,73 @@ The concept of a class is similar to the concept of a set defined by its members
 Property:
 {
   # "1-property" traits
+#  traits: [
+  #  ammunition
+  #  auto_reuse
+  #  /*boost_mana*/
+  #  channel
+  #  consumable
+  #  damage
+  #  defense
+  #  /*equipable*/
+  #  expert
+  #  explosive
+  #  buff
+  #  timed_buff
+  #  stackable
+  #  projectile
+
+  #  material
+  #  mech
+  #  /*placeable*/
+  #  quest_item
+  #  unique_stack
+  #  reach_boost
+  #  reach_penalty
+  #  /*regen_life*/
+  #  /*supplies*/
+  #  /*tool*/
+  #  use_mana
+  #  vanity
+  #  /*weapon*/
+  #  create_tile
+  #  create_wall
+  #  create_npc
+  #  value
+#  ]
+
   traits: [
     ammunition
     auto_reuse
-    /*boost_mana*/
     channel
     consumable
-    damage
-    defense
-    /*equipable*/
     expert
-    explosive
-    buff
-    timed_buff
-    stackable
-    projectile
-
     material
     mech
-    /*placeable*/
     quest_item
     unique_stack
+    vanity
+    accessory
+    stackable
+    no_use_graphic
+    no_melee
+    not_ammo
+
+    damage
+    defense
+    knockback
+    buff
+    buff_time
+    projectile
     reach_boost
     reach_penalty
-    /*regen_life*/
-    /*supplies*/
-    /*tool*/
-    use_mana
-    vanity
-    /*weapon*/
     create_tile
     create_wall
     create_npc
     value
-
+    mana_cost
+    heal_life
+    heal_mana
   ]
   // "1-property" type identifiers
   Bool: {
@@ -81,6 +114,8 @@ Property:
       vanity
       accessory
       stackable
+      no_use_graphic
+      no_melee
     ]
   }
   Value: {
@@ -119,48 +154,27 @@ Property:
       cart_track
     ]
   }
-  Equipable: {
-    traits: [
-    /*accessory*/
-    ]
-    Slot: {
-      traits: [
-        // Should these be separate?
-        light_pet
-        pet
-        minecart
-        grapple
-        mount
 
-        // clothing/armor
-        head
-        body
-        leg
-
-        // accys
-        back
-        balloon
-        face
-        front
-        neck
-        shield
-        shoe
-        waist
-        wings
-        main_hand
-        off_hand
-      ]
-    }
-  }
   Weapon: {
     traits: [
       crit
+      no_melee
 
       melee
       ranged
       magic
       summon
       throwing
+    ]
+  }
+  UseStyle: {
+    traits: [
+      "any" # i.e. > 0
+      use_style1
+      use_style2
+      use_style3
+      use_style4
+      use_style5
     ]
   }
   # This is the base unmodified use time of the item

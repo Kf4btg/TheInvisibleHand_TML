@@ -1,0 +1,16 @@
+Dye:
+{
+  # these had to be based on itemIDs and thus will not
+  # contain any mod-added dyes (though those should still
+  # match the generic "item.dye" check)
+  traits: [
+    basic
+    black
+    bright
+    flame
+    gradient
+    lunar
+    silver
+    strange
+  ]
+}

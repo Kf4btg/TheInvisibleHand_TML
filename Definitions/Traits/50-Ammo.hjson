@@ -1,0 +1,14 @@
+Ammo:
+{
+  traits: [
+    arrow
+    bomb
+    bullet
+    coin
+    dart
+    endless
+    rocket
+    sand
+    solution
+  ]
+}

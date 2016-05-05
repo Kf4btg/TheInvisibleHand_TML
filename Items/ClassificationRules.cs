@@ -168,6 +168,8 @@ namespace InvisibleHand.Items
         /// these rules are dependent on Binary.CanBePlaced()
         internal static class ByTileID
         {
+            public static bool Dirt(Item item) => item.createTile == TileID.Dirt;
+
             #region roomneeds doors
             public static bool Door(Item item)     => item.createTile == TileID.ClosedDoor;
             public static bool Platform(Item item) => item.createTile == TileID.Platforms;
@@ -331,7 +333,6 @@ namespace InvisibleHand.Items
             public static bool Block(Item item) => contains(Main.tileBrick, item.createTile) || item.createTile == 0;
 
 
-
             public static bool Sand(Item item) => contains(Main.tileSand, item.createTile);
             public static bool DungeonBrick(Item item) => contains(Main.tileDungeon, item.createTile);
             public static bool BouncyBlock(Item item) => contains(Main.tileBouncy, item.createTile);
@@ -345,7 +346,7 @@ namespace InvisibleHand.Items
             public static bool CorruptionBlock(Item item) => contains(TileID.Sets.Corrupt, item.createTile);
 
             // public static bool Sand(Item item)          => contains(TileID.Sets.Conversion.Sand, item.createTile);
-            public static bool HardenedSand (Item item) => contains(TileID.Sets.Conversion.HardenedSand, item.createTile);
+            public static bool HardenedSand(Item item) => contains(TileID.Sets.Conversion.HardenedSand, item.createTile);
             public static bool Sandstone(Item item)     => contains(TileID.Sets.Conversion.Sandstone, item.createTile);
 
             public static bool Stone(Item item) => contains(TileID.Sets.Conversion.Stone, item.createTile);

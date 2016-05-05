@@ -1,40 +1,40 @@
 [
   {
     name: Dye
-    /*parent: null*/
-    requires: {
-      Property.Ident: ["dye"]
-    }
+    requires: [
+      Property.Ident.dye
+    ]
   }
   {
     name: Paint
-    requires: {
-      Property.Ident: ["paint"]
-    }
+    requires: [
+      Property.Ident.paint
+    ]
   }
-  {
+  /*{
     name: Fishing Pole
     requires: {
       Property.Ident: ["fishing_pole"]
     }
-  }
+  }*/
   {
     name: Bait
-    requires: {
-      Property.Ident: ["bait"]
-    }
+    requires: [
+      Property.Ident.bait
+    ]
   }
+
   {
-    name: Accessory
-    enabled: false
-    requires: {
-      Property.Equipable: ["accessory"]
-    }
+    name: Coin
+    requires: [
+      Property.Ident.coin
+    ]
   }
+
   {
     name: Quest Item
-    requires: {
-      Property.Generic: ["quest_item"]
-    }
+    requires: [
+      Property.quest_item
+    ]
   }
 ]

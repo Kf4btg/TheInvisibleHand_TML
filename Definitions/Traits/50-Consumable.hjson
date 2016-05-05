@@ -1,0 +1,10 @@
+Consumable:
+{
+  traits: [
+    any
+    food
+    flask
+
+    trigger_cooldown
+  ]
+}
