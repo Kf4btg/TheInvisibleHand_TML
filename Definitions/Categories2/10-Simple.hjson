@@ -3,25 +3,25 @@
     name: Dye
     /*parent: null*/
     requires: {
-      Property.Type: ["dye"]
+      Property.Ident: ["dye"]
     }
   }
   {
     name: Paint
     requires: {
-      Property.Type: ["paint"]
+      Property.Ident: ["paint"]
     }
   }
   {
     name: Fishing Pole
     requires: {
-      Property.Type: ["fishing_pole"]
+      Property.Ident: ["fishing_pole"]
     }
   }
   {
     name: Bait
     requires: {
-      Property.Type: ["bait"]
+      Property.Ident: ["bait"]
     }
   }
   {
