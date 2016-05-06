@@ -135,27 +135,37 @@ namespace InvisibleHand.Items
             }
         }
 
+        internal static bool name_match(Item item, string pattern)
+        {
+            return Regex.Match(item.name, pattern).Success;
+        }
+
+        internal static bool name_match_end(Item item, string substr)
+        {
+            return item.name.EndsWith(substr);
+        }
+
         /// For when there's just about no other way to do it...(except for matching type ids,
         /// but I'd rather not do that, either)
-        internal static class NameMatch
-        {
-            internal static bool match(Item item, string pattern)
-            {
-                return Regex.Match(item.name, pattern).Success;
-            }
-
-            internal static bool match_end(Item item, string substr)
-            {
-                return item.name.EndsWith(substr);
-            }
-
-            // include the Super Absorbant sponge
-            public static bool Bucket(Item item) => match(item, @"(Bucket|Sponge)$");
-
-            // these seems to match "Paintbrush" and "Paint [Scraper|Roller]", including "Spectre Paint..."
-            // but not "Painting" or "<Color> Paint". Excellent.
-            public static bool PaintTool(Item item) => match(item, @"(Paint(\s|brush))");
-        }
+        // internal static class NameMatch
+        // {
+        //     internal static bool match(Item item, string pattern)
+        //     {
+        //         return Regex.Match(item.name, pattern).Success;
+        //     }
+        //
+        //     internal static bool match_end(Item item, string substr)
+        //     {
+        //         return item.name.EndsWith(substr);
+        //     }
+        //
+        //     // include the Super Absorbant sponge
+        //     public static bool Bucket(Item item) => match(item, @"(Bucket|Sponge)$");
+        //
+        //     // these seems to match "Paintbrush" and "Paint [Scraper|Roller]", including "Spectre Paint..."
+        //     // but not "Painting" or "<Color> Paint". Excellent.
+        //     public static bool PaintTool(Item item) => match(item, @"(Paint(\s|brush))");
+        // }
 
         /*
         ██████  ██    ██ ████████ ██ ██      ███████ ██ ██████
@@ -616,8 +626,12 @@ namespace InvisibleHand.Items
 
                 public static bool Area(Item item)
                 {
-                    if (item.shoot < 1) return false;
-                    var projectile = Main.projectile[item.shoot];
+                    var projid = item.shoot;
+                    if (projid < 1) return false;
+
+                    var projectile = Main.projectile[projid];
+                    projectile.SetDefaults(projid);
+
                     return projectile.maxPenetrate < 0 && !projectile.tileCollide;
                 }
 
@@ -637,13 +651,36 @@ namespace InvisibleHand.Items
                 // e.g. a lot of things; anything that passes through at least one enemy
                 public static bool Piercing(Item item) => item.shoot > 0 && Main.projectile[item.shoot].maxPenetrate > 1;
 
+                public static bool Pierce(Item item)
+                {
+                    var projid = item.shoot;
+                    if (projid < 1) return false;
+
+                    var proj = Main.projectile[projid];
+
+                    proj.SetDefaults(projid);
+                    return proj.maxPenetrate > 1;
+                }
+
                 // i.e. straight(ish) line that passes through blocks
                 public static bool VilethornAI(Item item) => TestProjectileAI(item.shoot, Constants.ProjectileAI.Vilethorn);
             }
 
             internal static class Summon
             {
-                public static bool Minion(Item item) => item.shoot > 0 && Main.projectile[item.shoot].minion;
+                //~ public static bool Minion(Item item) => item.shoot > 0 && Main.projectile[item.shoot].minion;
+
+                public static bool Minion(Item item)
+                {
+                    var projid = item.shoot;
+                    if (projid < 1) return false;
+
+                    var proj = Main.projectile[projid];
+
+                    proj.SetDefaults(projid);
+                    return proj.minion;
+                }
+
 
                 // there's nothing like a 'sentry' field, but that's all that's left after taking
                 // out the 'minion' weapons, so...
@@ -667,7 +704,9 @@ namespace InvisibleHand.Items
             // For reference, also:
             // useStyle = 1, useTurn = True, useAnimation = 15,
             // useTime = 10, autoReuse = True, value=10000
-            public static bool PaintingTools(Item item) => NameMatch.PaintTool(item) && !item.consumable;
+            //~ public static bool PaintingTools(Item item) => NameMatch.PaintTool(item) && !item.consumable;
+
+            public static bool PaintingTools(Item item) => name_match(item, @"(Paint(\s|brush))") && !item.consumable;
 
             // torches, candles, glowsticks, flare gun...unicorn on a stick...marshmallow on a stick...
             // nebula arcanum...
@@ -684,6 +723,11 @@ namespace InvisibleHand.Items
 
             /// Bombs, Dynamite...
             public static bool Demolitions(Item item) => Binary.Explosive(item) && item.consumable && !item.thrown;
+
+             // include the Super Absorbant sponge
+            public static bool Bucket(Item item) => name_match(item, @"(Bucket|Sponge)$");
+
+
 
         }
 

@@ -222,7 +222,9 @@ namespace InvisibleHand
         {
             public const int Arrow  = 1;
             public const int Bullet = 14;
+            public const int Star   = 15;
             public const int Gel    = 23;
+            public const int Sand   = 42;
             public const int Dart   = 51;
             public const int Coin   = 71;
             public const int Rocket = 771;

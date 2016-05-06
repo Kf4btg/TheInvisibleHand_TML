@@ -1,14 +1,13 @@
 Ammo:
 {
   traits: [
-    arrow
-    bomb
-    bullet
-    coin
-    dart
-    endless
-    rocket
-    sand
-    solution
+    ammo_arrow
+    ammo_bullet
+    ammo_coin
+    ammo_dart
+    ammo_endless
+    ammo_rocket
+    ammo_sand
+    ammo_solution
   ]
 }

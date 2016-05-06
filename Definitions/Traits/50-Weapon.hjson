@@ -18,17 +18,17 @@ Weapon:
   }
   Ranged: {
     traits: [
-      ammo_arrows
-      ammo_bullets
-      ammo_rockets
-      ammo_darts
-      ammo_gel
-      ammo_sand
-      ammo_stars
+      use_ammo_arrow
+      use_ammo_bullet
+      use_ammo_rocket
+      use_ammo_dart
+      use_ammo_gel
+      use_ammo_sand
+      use_ammo_star
 
-      ammo_none
+      use_ammo_none
 
-      # probably redundant w/ ammo_gel, but not necessarily
+      # probably redundant w/ use_ammo_gel, but not necessarily
       flame_thrower
     ]
     Magic: {

@@ -47,32 +47,43 @@ namespace InvisibleHand.Items
 
         /// Add a single item to this Set. If it is already present
         /// in the set, it will be silently ignored.
-        public void Add(T item)
+        public Set<T> Add(T item)
         {
             this._items.Add(item);
+            return this;
         }
 
         /// Add the unique items from a number of collections of
         /// of items to this set; pre-existing items will not
         /// be duplicated and no error will be thrown.
-        public void Extend(params IEnumerable<T>[] items)
+        public Set<T> Extend(params IEnumerable<T>[] items)
         {
             foreach (var itemlist in items)
                 this._items.UnionWith(itemlist);
+            return this;
         }
 
         /// Add the ids from the given collection to this set;
         /// if an ID is already present, it will not be duplicated
         /// and no error will be thrown.
-        public void Union(IEnumerable<T> items)
+        public Set<T> Union(IEnumerable<T> items)
         {
             this._items.UnionWith(items);
+            return this;
+        }
+
+        /// Add each unique specified item to the Set
+        public Set<T> Union(params T[] items)
+        {
+            this._items.UnionWith(items);
+            return this;
         }
 
         /// Remove all items in the given collection from this Set
-        public void Remove(IEnumerable<T> items)
+        public Set<T> Remove(IEnumerable<T> items)
         {
             this._items.ExceptWith(items);
+            return this;
         }
 
         /// Return true if the given id exists in this set
@@ -136,11 +147,22 @@ namespace InvisibleHand.Items
 
         public static readonly TileIDSet CraftingStations = new TileIDSet("CraftingStations");
 
+        public static readonly TileIDSet WallDecor = new TileIDSet("WallDecor");
+
         public static readonly ItemIDSet AlchemyIngredients = new ItemIDSet("AlchemyIngredients");
 
         public static readonly ItemIDSet AlchemyResults = new ItemIDSet("AlchemyResults");
 
         public static readonly ItemIDSet Wood = new ItemIDSet("Wood");
+
+        public static readonly ItemIDSet BasicDyes    = new ItemIDSet("BasicDyes");
+        public static readonly ItemIDSet BlackDyes    = new ItemIDSet("BlackDyes");
+        public static readonly ItemIDSet BrightDyes   = new ItemIDSet("BrightDyes");
+        public static readonly ItemIDSet SilverDyes   = new ItemIDSet("SilverDyes");
+        public static readonly ItemIDSet GradientDyes = new ItemIDSet("GradientDyes");
+        public static readonly ItemIDSet FlameDyes    = new ItemIDSet("FlameDyes");
+        public static readonly ItemIDSet StrangeDyes  = new ItemIDSet("StrangeDyes");
+        public static readonly ItemIDSet LunarDyes    = new ItemIDSet("LunarDyes");
 
 
         public static void Initialize()
@@ -148,12 +170,15 @@ namespace InvisibleHand.Items
             Furniture.Extend(TileID.Sets.RoomNeeds.CountsAsDoor,
                              TileID.Sets.RoomNeeds.CountsAsChair,
                              TileID.Sets.RoomNeeds.CountsAsTable,
-                             TileID.Sets.RoomNeeds.CountsAsTorch);
+                             TileID.Sets.RoomNeeds.CountsAsTorch).Trim();
 
-            Furniture.Trim();
+            WallDecor.Union(TileID.Painting3X3,
+                            TileID.Painting4X3,
+                            TileID.Painting6X4,
+                            TileID.Painting2X3,
+                            TileID.Painting3X2).Trim();
 
-            Wood.Extend(CraftGroup.Wood.Items);
-            Wood.Trim();
+            Wood.Extend(CraftGroup.Wood.Items).Trim();
 
             int tileID;
             Recipe r;
@@ -197,10 +222,48 @@ namespace InvisibleHand.Items
             // with alchemy, then used as an ingredient for an upgraded potion) from showing up under the
             // Ingredients category rather than the Potions category; will hopefully also stop mushrooms from showing
             // up in Potions.
-            AlchemyIngredients.Remove(AlchemyResults);
-            AlchemyIngredients.Trim();
+            AlchemyIngredients.Remove(AlchemyResults).Trim();
 
             CraftingStations.Trim();
+
+            getDyeSets();
+        }
+
+        private static void getDyeSets()
+        {
+            var base_dye_start = 1007; // ItemID.RedDye
+            var base_dye_end = 1018; // ItemID.PinkDye
+            var dye_range_length = base_dye_end - base_dye_start + 1;
+
+            BasicDyes.Extend(Enumerable.Range(base_dye_start, dye_range_length))
+                     .Union(ItemID.BrownDye, ItemID.BlackDye, ItemID.SilverDye).Trim();
+
+            BlackDyes.Extend(Enumerable.Range(base_dye_start + 12, dye_range_length))
+                     .Union(ItemID.BrownDye + 1, ItemID.BlackAndWhiteDye).Trim();
+
+            BrightDyes.Extend(Enumerable.Range(base_dye_start + 31, dye_range_length))
+                      .Union(ItemID.BrownDye + 2, ItemID.BrightSilverDye).Trim();
+
+            SilverDyes.Extend(Enumerable.Range(base_dye_start + 44, dye_range_length))
+                      .Union(ItemID.BrownDye + 3, ItemID.SilverAndBlackDye).Trim();
+
+            GradientDyes.Extend(Enumerable.Range(1066, 1070 - 1066 + 1)).Trim();
+
+            FlameDyes.Extend(Enumerable.Range(1031, 1036 - 1031 + 1),
+                Enumerable.Range(1063, 1065 - 1063 + 1),
+                Enumerable.Range(3550, 3552 - 3550 + 1)).Trim();
+
+            StrangeDyes.Extend(Enumerable.Range(2869, 2873 - 2869 + 1),
+                Enumerable.Range(2883, 2885 - 2883 + 1),
+                Enumerable.Range(3024, 3028 - 3024 + 1),
+                Enumerable.Range(3038, 3042 - 3038 + 1),
+                Enumerable.Range(3533, 3535 - 3533 + 1),
+                Enumerable.Range(3553, 3556 - 3553 + 1),
+                Enumerable.Range(3560, 3562 - 3560 + 1),
+                Enumerable.Range(3597, 3600 - 3597 + 1),
+                new[] { 2878, 2879, 3190, 3530 }).Trim();
+
+            LunarDyes.Extend(Enumerable.Range(3526, 3529 - 3526 + 1)).Trim();
         }
 
         /// return a set by name
