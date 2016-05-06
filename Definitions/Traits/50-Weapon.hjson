@@ -1,5 +1,15 @@
 Weapon:
 {
+  traits: [
+    crit
+    no_melee
+
+    melee
+    ranged
+    magic
+    summon
+    throwing
+  ]
   Melee: {
     traits: [
       # based on useStyle
@@ -10,7 +20,7 @@ Weapon:
 
       # based on projectile type
       boomerang
-      chain
+      chained
       spear
       flail
       yoyo

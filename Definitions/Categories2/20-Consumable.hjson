@@ -1,0 +1,78 @@
+[
+  {
+    name: Consumable
+    # this is what the game considers a "proper" consumable:
+    requires: [
+      !Property.ammunition
+      !Property.create_tile
+      !Property.create_wall
+      !Property.Ident.wand
+      Property.consumable
+    ]
+  }
+
+  {
+    name: Food
+    # if parent is given but inherits is null,
+    # then the parent is used only for organization
+    # and not for trait checking. By default, a child
+    # category will inherit the requirements of its parent
+    # unless 'inherits' is null or a different category
+    parent: Consumable
+    inherits: null
+    requires: [
+      Consumable.food
+    ]
+  }
+
+  {
+    name: Flask
+    parent: Consumable
+    inherits: null
+    requires: [
+      Consumable.flask
+    ]
+  }
+
+  {
+    name: Potion
+    parent: Consumable
+    inherits: null
+    requires: [
+      Property.UseStyle.use_style_2
+      !Consumable.food
+      !Consumable.flask
+      # alchemy_result // there are some non-potions here
+    ]
+  }
+  {
+    name: Restoration Potion
+    parent: Potion
+    # without 'inherits' explicitly set, this category will
+    # inherit the requirements of its parent by default
+    # (Potion in this case). Those requirements will
+    # be checked before continuing to check the requirements
+    # listed below
+    requires: [
+      # these are not | (or'd) together because we want this
+      # category to match items that are BOTH, not EITHER
+      Property.heal_life
+      Property.heal_mana
+    ]
+  }
+  {
+    name: Healing Potion
+    parent: Potion
+    /*inherits: Potion*/ // redundant
+    requires: [
+      Property.heal_life
+    ]
+  }
+  {
+    name: Mana Potion
+    parent: Potion
+    requires: [
+      Property.heal_mana
+    ]
+  }
+]

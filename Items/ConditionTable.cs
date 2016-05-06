@@ -409,51 +409,49 @@ namespace InvisibleHand.Items
             // var this_is_stupid = TraitTable;
             var tt = TraitTable;
             //bool
+            tt["accessory"]      = (i) => i.accessory;
             tt["ammunition"]     = (i) => i.ammo > 0;
             tt["auto_reuse"]     = (i) => i.autoReuse;
+            tt["cart_track"]     = (i) => i.cartTrack;
             tt["channel"]        = (i) => i.channel;
             tt["consumable"]     = (i) => i.consumable;
             tt["expert"]         = (i) => i.expert;
             tt["material"]       = (i) => i.material;
             tt["mech"]           = (i) => i.mech;
+            tt["no_melee"]       = (i) => i.noMelee;
+            tt["no_use_graphic"] = (i) => i.noUseGraphic;
+            tt["not_ammo"]       = (i) => i.notAmmo;
             tt["quest_item"]     = (i) => i.questItem;
+            tt["stackable"]      = (i) => i.maxStack > 1;
             tt["unique_stack"]   = (i) => i.uniqueStack;
             tt["vanity"]         = (i) => i.vanity;
-            tt["accessory"]      = (i) => i.accessory;
-            tt["stackable"]      = (i) => i.maxStack > 1;
-            tt["no_use_graphic"] = (i) => i.noUseGraphic;
-            tt["no_melee"]       = (i) => i.noMelee;
-            tt["not_ammo"]       = (i) => i.notAmmo;
-            tt["cart_track"]     = (i) => i.cartTrack;
 
             //valued
+            tt["buff_time"]     = (i) => i.buffTime > 0;
+            tt["buff"]          = (i) => i.buffType != -1;
+            tt["create_npc"]    = (i) => i.makeNPC != 0;
+            tt["create_tile"]   = (i) => i.createTile != -1;
+            tt["create_wall"]   = (i) => i.createWall != -1;
             tt["damage"]        = (i) => i.damage > 0;
             tt["defense"]       = (i) => i.defense > 0;
+            tt["heal_life"]     = (i) => i.healLife > 0;
+            tt["heal_mana"]     = (i) => i.healMana > 0;
             tt["knockback"]     = (i) => i.knockBack > 0;
-            tt["buff"]          = (i) => i.buffType != -1;
-            tt["buff_time"]     = (i) => i.buffTime > 0;
+            tt["mana_cost"]     = (i) => i.mana > 0;
             tt["projectile"]    = (i) => i.shoot > 0;
             tt["reach_boost"]   = (i) => i.tileBoost > 0;
             tt["reach_penalty"] = (i) => i.tileBoost < 0;
-            tt["create_tile"]   = (i) => i.createTile != -1;
-            tt["create_wall"]   = (i) => i.createWall != -1;
-            tt["create_npc"]    = (i) => i.makeNPC != 0;
             tt["value"]         = (i) => i.value > 0;
-            tt["mana_cost"]     = (i) => i.mana > 0;
-            tt["heal_life"]     = (i) => i.healLife > 0;
-            tt["heal_mana"]     = (i) => i.healMana > 0;
 
             //ident
             tt["ammo"]         = (i) => i.ammo > 0 && !i.notAmmo;
             tt["bait"]         = (i) => i.bait > 0;
-            tt["hair_dye"]     = (i) => i.hairDye > 0;
-            tt["dye"]          = (i) => i.dye > 0;
-            tt["paint"]        = (i) => i.paint > 0;
             tt["coin"]         = (i) => i.ammo == Constants.AmmoID.Coin;
+            tt["dye"]          = (i) => i.dye > 0;
             tt["fishing_pole"] = (i) => i.fishingPole > 0;
+            tt["hair_dye"]     = (i) => i.hairDye > 0;
+            tt["paint"]        = (i) => i.paint > 0;
             tt["wand"]         = (i) => i.tileWand > 0;
-
-
 
             // ammo
             tt["arrow"]     = (i) => i.ammo == Constants.AmmoID.Arrow;
@@ -746,7 +744,9 @@ namespace InvisibleHand.Items
             tt["recall"]     = (i) => i.useAnimation == 90;
             tt["bucket"]     = MiscTools.Bucket;
             // also includes wire-cutter
-            tt["wrench"]     = (i) => i.mech && i.tileBoost == 20;
+            tt["wrench"] = (i) => i.mech && i.tileBoost == 20;
+
+            tt["tool_any"] = Binary.AnyTool;
 
             // item-ids
             tt["soul"]               = (i) => contains(ItemID.Sets.AnimatesAsSoul, i.type);

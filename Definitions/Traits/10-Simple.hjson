@@ -76,10 +76,8 @@ Property:
     quest_item
     unique_stack
     vanity
-    accessory
     stackable
     no_use_graphic
-    no_melee
     not_ammo
 
     damage
@@ -99,7 +97,7 @@ Property:
     heal_mana
   ]
   // "1-property" type identifiers
-  Bool: {
+  /*Bool: {
     # "Item is..."
     traits: [
       ammunition
@@ -137,7 +135,7 @@ Property:
       heal_life
       heal_mana
     ]
-  }
+  }*/
   Ident: {
     traits: [
       ammo
@@ -155,26 +153,14 @@ Property:
     ]
   }
 
-  Weapon: {
-    traits: [
-      crit
-      no_melee
-
-      melee
-      ranged
-      magic
-      summon
-      throwing
-    ]
-  }
   UseStyle: {
     traits: [
-      "any" # i.e. > 0
-      use_style1
-      use_style2
-      use_style3
-      use_style4
-      use_style5
+      "use_style_any" # i.e. > 0
+      use_style_1
+      use_style_2
+      use_style_3
+      use_style_4
+      use_style_5
     ]
   }
   # This is the base unmodified use time of the item
@@ -243,4 +229,21 @@ Property:
       amber
     ]
   }
+}
+
+// I'm not sure about this...have to put this stuff somewhere, though
+Material:
+{
+  traits: [
+    alchemy_ingredient
+
+    // not actually a material, is it...
+    alchemy_result
+
+    soul
+    ore
+    gem
+    metal_bar
+    dye_plant
+  ]
 }

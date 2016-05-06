@@ -45,7 +45,9 @@ namespace InvisibleHand.Items
         internal static class Binary
         {
             public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
-            public static bool isArmor(Item item)  => !item.vanity && (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0);
+            public static bool isArmor(Item item) => !item.vanity && (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0);
+
+            public static bool AnyTool(Item item) => item.pick > 0 || item.axe > 0 || item.hammer > 0 || item.fishingPole > 0 || item.holdStyle == 2 || item.useAnimation == 90 || makesRope(item) || MiscTools.Bucket(item) || MiscTools.HandLights(item) || MiscTools.Demolitions(item) || MiscTools.PaintingTools(item) || isWrench(item);
 
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;
