@@ -639,8 +639,9 @@ namespace InvisibleHand.Items
             tt["trigger_cooldown"] = (i) => i.potion;
 
             // equipable
+            tt["any_equipable"] = Binary.isEquipable;
             tt["light_pet"] = (i) => contains(Main.lightPet, i.buffType);
-            tt["pet"]       = (i) => contains(Main.vanityPet, i.buffType);
+            tt["vanity_pet"]= (i) => contains(Main.vanityPet, i.buffType);
             tt["mount"]     = (i) => i.mountType != -1 && !contains(MountID.Sets.Cart, i.mountType);
             tt["minecart"]  = (i) => contains(MountID.Sets.Cart, i.mountType);
 

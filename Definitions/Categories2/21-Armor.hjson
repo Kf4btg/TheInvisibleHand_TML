@@ -1,0 +1,23 @@
+[
+  {
+    name: Helm
+    parent: Armor
+    requires: [
+      EquipSlot head
+    ]
+  }
+  {
+    name: Cuirass
+    parent: Armor
+    requires: [
+      EquipSlot body
+    ]
+  }
+  {
+    name: Greaves
+    parent: Armor
+    requires: [
+      EquipSlot leg
+    ]
+  }
+]

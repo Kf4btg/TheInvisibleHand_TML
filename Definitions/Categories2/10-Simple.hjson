@@ -2,13 +2,13 @@
   {
     name: Dye
     requires: [
-      Property.Ident.dye
+      Property.Ident dye
     ]
   }
   {
     name: Paint
     requires: [
-      Property.Ident.paint
+      Property.Ident paint
     ]
   }
   /*{
@@ -20,21 +20,21 @@
   {
     name: Bait
     requires: [
-      Property.Ident.bait
+      Property.Ident bait
     ]
   }
 
   {
     name: Coin
     requires: [
-      Property.Ident.coin
+      Property.Ident coin
     ]
   }
 
   {
     name: Quest Item
     requires: [
-      Property.quest_item
+      Property quest_item
     ]
   }
 ]

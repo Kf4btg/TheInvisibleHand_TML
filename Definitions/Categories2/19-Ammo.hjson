@@ -1,0 +1,49 @@
+[
+  {
+    name: Arrows
+    parent: Ammo
+    requires: [
+      Ammo arrow
+    ]
+  }
+  {
+    name: Bullets
+    parent: Ammo
+    requires: [
+      Ammo bullet
+    ]
+  }
+  {
+    name: Rockets
+    parent: Ammo
+    requires: [
+      Ammo rocket
+    ]
+  }
+  {
+    name: Darts
+    parent: Ammo
+    requires: [
+      Ammo dart
+    ]
+  }
+
+  {
+    name: Solution
+    parent: Ammo
+    requires: [
+      Ammo solution
+    ]
+  }
+
+  {
+    name: Endless
+    # experiment: @Category means "Any child of Category":
+    # this creates a sub-category within each of those child-categories
+    # for items that also match the requirements given below
+    parent: @Ammo
+    requires: [
+      Property !consumable
+    ]
+  }
+]

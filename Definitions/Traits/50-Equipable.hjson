@@ -1,11 +1,11 @@
 Equipable:
 {
   traits: [
-    "any" // a shortcut trait for any equipable item
+    "any_equipable" // a shortcut trait for any equipable item
     accessory
     // Should these be separate?
     light_pet
-    pet
+    vanity_pet
     minecart
     grapple
     mount

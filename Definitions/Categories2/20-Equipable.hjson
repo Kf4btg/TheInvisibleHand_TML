@@ -1,0 +1,90 @@
+[
+  {
+    name: Equipable
+    requires: [
+      # this is pretty much just a wrapper around all of the more specific checks below.
+      # without the "any_equipable" shortcut, this would be a fairly complicated rule...
+      # this is also the reason this category should not be inherited (it can still be a parent)
+      Equipable any_equipable
+    ]
+  }
+
+  {
+    name: Grappling Hook
+    parent: Equipable
+    inherits: null
+    requires: [
+      Equipable grapple
+    ]
+  }
+
+  {
+    name: Mount
+    parent: Equipable
+    inherits: null
+    requires: [
+      Equipable mount
+    ]
+  }
+
+  {
+    name: Mine Cart
+    parent: Equipable
+    inherits: null
+    requires: [
+      Equipable minecart
+    ]
+  }
+
+  {
+    name: Light Pet
+    parent: Equipable
+    inherits: null
+    requires: [
+      Equipable light_pet
+    ]
+  }
+
+  {
+    name: Pet
+    parent: Equipable
+    inherits: null
+    requires: [
+      Equipable vanity_pet
+    ]
+  }
+
+  {
+    # This is a utility-category; not meant to be shown or even used to organize,
+    # just intended to be inherited by other categories
+    name: notvanity
+    enabled: false
+    display: false
+    requires: [
+      Property !vanity
+    ]
+  }
+
+  {
+    name: Armor
+    parent: Equipable
+    # inheriting from Equipable would lead to some redundancy
+    inherits: notvanity
+    # armor doesn't necessarily need to give defense
+    requires: [
+      EquipSlot head | body | leg
+    ]
+  }
+
+  {
+    name: Accessory
+    parent: Equipable
+    # the large check of Equipable is not necessary here.
+    # vanity accys go elsewhere
+    inherits: notvanity
+    requires: [
+      Property accessory
+    ]
+  }
+
+]

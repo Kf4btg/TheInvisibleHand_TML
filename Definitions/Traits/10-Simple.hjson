@@ -152,83 +152,86 @@ Property:
       cart_track
     ]
   }
+}
 
-  UseStyle: {
-    traits: [
-      "use_style_any" # i.e. > 0
-      use_style_1
-      use_style_2
-      use_style_3
-      use_style_4
-      use_style_5
-    ]
-  }
-  # This is the base unmodified use time of the item
-  UseTime: {
-    traits: [
-      "insanely_fast" // <= 8
-      "very_fast"     // 9-20
-      "fast"          // 21-25
-      "average"       // 26-30
-      "slow"          // 31-35
-      "very_slow"     // 36-45
-      "extremely_slow" // 46-55
-      "snail"         // >= 56
-    ]
-  }
-  Rarity: {
-    # Arranged by tiers in pairs; each member of a pair
-    # can be used as an alias for the tier
-    traits: [
-      # "tier negative one"
-      tier-1
-      gray
+UseStyle:
+{
+  traits: [
+    "use_style_any" # i.e. > 0
+    use_style_1
+    use_style_2
+    use_style_3
+    use_style_4
+    use_style_5
+  ]
+}
+# This is the base unmodified use time of the item
+UseTime:
+{
+  traits: [
+    "insanely_fast" // <= 8
+    "very_fast"     // 9-20
+    "fast"          // 21-25
+    "average"       // 26-30
+    "slow"          // 31-35
+    "very_slow"     // 36-45
+    "extremely_slow" // 46-55
+    "snail"         // >= 56
+  ]
+}
+Rarity:
+{
+  # Arranged by tiers in pairs; each member of a pair
+  # can be used as an alias for the tier
+  traits: [
+    # "tier negative one"
+    tier-1
+    gray
 
-      tier0
-      white
+    tier0
+    white
 
-      tier1
-      blue
+    tier1
+    blue
 
-      tier2
-      green
+    tier2
+    green
 
-      tier3
-      orange
+    tier3
+    orange
 
-      tier4
-      light_red
+    tier4
+    light_red
 
-      tier5
-      pink
+    tier5
+    pink
 
-      tier6
-      light_purple
+    tier6
+    light_purple
 
-      tier7
-      lime
+    tier7
+    lime
 
-      tier8
-      yellow
+    tier8
+    yellow
 
-      tier9
-      cyan
+    tier9
+    cyan
 
-      tier10
-      red
+    tier10
+    red
 
-      tier11
-      purple
+    tier11
+    purple
 
-      # NOTE: that's "tier negative twelve"
-      tier-12
-      rainbow
+    # NOTE: that's "tier negative twelve"
+    tier-12
+    rainbow
 
-      # "tier negative eleven" -- quest fish, strange plants
-      tier-11
-      amber
-    ]
-  }
+    # "tier negative eleven" -- quest fish, strange plants
+    tier-11
+    amber
+  ]
 }
 
 // I'm not sure about this...have to put this stuff somewhere, though

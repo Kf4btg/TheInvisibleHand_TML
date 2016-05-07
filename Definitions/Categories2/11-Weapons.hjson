@@ -3,8 +3,8 @@
     name: Weapon
     // this is how the game decides an item is a "weapon"
     requires: [
-      Property.damage
-      !Property.not_ammo | Property.UseStyle.use_style_any
+      Property damage
+      Property !not_ammo | UseStyle use_style_any
     ]
   }
 
@@ -12,7 +12,7 @@
     name: Melee
     parent: Weapon
     requires: [
-      Weapon.melee
+      Weapon melee
     ]
   }
 
@@ -20,7 +20,7 @@
     name: Ranged
     parent: Weapon
     requires: [
-      Weapon.ranged
+      Weapon ranged
     ]
   }
 
@@ -28,7 +28,7 @@
     name: Magic
     parent: Weapon
     requires: [
-      Weapon.magic
+      Weapon magic
     ]
   }
 
@@ -36,14 +36,14 @@
     name: Summon
     parent: Weapon
     requires: [
-      Weapon.summon
+      Weapon summon
     ]
   }
   {
     name: Throwing
     parent: Weapon
     requires: [
-      Weapon.throwing
+      Weapon throwing
     ]
   }
 ]

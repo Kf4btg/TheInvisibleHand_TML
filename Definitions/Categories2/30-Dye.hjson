@@ -1,0 +1,58 @@
+[
+  {
+    name: Basic Dyes
+    parent: Dye
+    requires: [
+      Dye basic
+    ]
+  }
+  {
+    name: Black Compound
+    parent: Dye
+    requires: [
+      Dye black
+    ]
+  }
+  {
+    name: Silver Compound
+    parent: Dye
+    requires: [
+      Dye silver
+    ]
+  }
+  {
+    name: Gradient
+    parent: Dye
+    requires: [
+      Dye gradient
+    ]
+  }
+  {
+    name: Flame
+    parent: Dye
+    requires: [
+      Dye flame
+    ]
+  }
+  {
+    name: Bright
+    parent: Dye
+    requires: [
+      Dye bright
+    ]
+  }
+  {
+    name: Strange
+    parent: Dye
+    requires: [
+      Dye strange
+    ]
+  }
+  {
+    name: Lunar
+    parent: Dye
+    requires: [
+      Dye lunar
+    ]
+  }
+]

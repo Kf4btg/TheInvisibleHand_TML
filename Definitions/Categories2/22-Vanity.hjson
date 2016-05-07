@@ -1,0 +1,139 @@
+[
+  {
+    name: Vanity Item
+    parent: Equipable
+    inherits: null
+    requires: [
+      Property vanity
+    ]
+  }
+  {
+    name: Headwear
+    parent: Vanity Item
+    requires: [
+      EquipSlot head
+    ]
+  }
+  {
+    name: Shirts
+    parent: Vanity Item
+    requires: [
+      EquipSlot body
+    ]
+  }
+  {
+    name: Pants
+    parent: Vanity Item
+    requires: [
+      EquipSlot leg
+    ]
+  }
+  {
+    name: Facewear
+    parent: Vanity Item
+    requires: [
+      EquipSlot face
+    ]
+  }
+
+  {
+    name: Gloves
+    parent: Vanity Item
+    # there's barely a difference, esp. for vanity items
+    requires: [
+      EquipSlot main_hand | off_hand
+    ]
+  }
+  /*{
+    name: Main-Hand Glove
+    parent: Vanity Item
+    requires: [
+      EquipSlot main_hand
+    ]
+  }
+  {
+    name: Off-Hand Glove
+    parent: Vanity Item
+    requires: [
+      EquipSlot off_hand
+    ]
+  }*/
+  {
+    name: Shoes
+    parent: Vanity Item
+    requires: [
+      EquipSlot shoe
+    ]
+  }
+  {
+    name: Capes
+    parent: Vanity Item
+    requires: [
+      // Note about capes/cloaks:
+      // Theyre the ONLY vanilla items that have a value for 'frontSlot',
+      // but they're also the only vanilla VANITY items that have a value for
+      // 'backSlot'. So...yeah.
+      EquipSlot front
+      EquipSlot back
+    ]
+  }
+
+  {
+    name: Vanity Wings
+    parent: Vanity Item
+    requires: [
+      EquipSlot wings
+    ]
+  }
+  {
+    # NOTE: there are none* of these in Vanilla
+    # *see not above about Capes
+    name: Front Vanity Slot
+    parent: Vanity Item
+    requires: [
+      EquipSlot front
+    ]
+  }
+  {
+    # NOTE: there are none* of these in Vanilla
+    # *see not above about Capes
+    name: Back Vanity Slot
+    parent: Vanity Item
+    requires: [
+      EquipSlot back
+    ]
+  }
+  {
+    # NOTE: there are none of these in Vanilla
+    name: Vanity Neckwear
+    parent: Vanity Item
+    requires: [
+      EquipSlot neck
+    ]
+  }
+  {
+    # NOTE: there are none of these in Vanilla
+    name: Vanity Belt
+    parent: Vanity Item
+    requires: [
+      EquipSlot waist
+    ]
+  }
+  {
+    # NOTE: there are none of these in Vanilla
+    name: Vanity Balloon
+    parent: Vanity Item
+    requires: [
+      EquipSlot balloon
+    ]
+  }
+  {
+    # NOTE: there are none of these in Vanilla,
+    # because a vanity Shield would be silly
+    name: Vanity Shield
+    parent: Vanity Item
+    requires: [
+      EquipSlot shield
+    ]
+  }
+]

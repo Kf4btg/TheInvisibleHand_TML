@@ -3,11 +3,13 @@
     name: Consumable
     # this is what the game considers a "proper" consumable:
     requires: [
-      !Property.ammunition
-      !Property.create_tile
-      !Property.create_wall
-      !Property.Ident.wand
-      Property.consumable
+      Property !(ammunition | create_tile | create_wall)
+      Property.Ident !wand
+      /*!Property.ammunition*/
+      /*!Property.create_tile*/
+      /*!Property.create_wall*/
+      /*!Property.Ident.wand*/
+      Property consumable
     ]
   }
 
@@ -21,7 +23,7 @@
     parent: Consumable
     inherits: null
     requires: [
-      Consumable.food
+      Consumable food
     ]
   }
 
@@ -30,7 +32,7 @@
     parent: Consumable
     inherits: null
     requires: [
-      Consumable.flask
+      Consumable flask
     ]
   }
 
@@ -39,9 +41,9 @@
     parent: Consumable
     inherits: null
     requires: [
-      Property.UseStyle.use_style_2
-      !Consumable.food
-      !Consumable.flask
+      UseStyle use_style_2
+      Consumable !(food | flask)
+      /*!Consumable.flask*/
       # alchemy_result // there are some non-potions here
     ]
   }
@@ -56,8 +58,8 @@
     requires: [
       # these are not | (or'd) together because we want this
       # category to match items that are BOTH, not EITHER
-      Property.heal_life
-      Property.heal_mana
+      Property heal_life heal_mana
+      /*Property heal_mana*/
     ]
   }
   {
@@ -65,14 +67,14 @@
     parent: Potion
     /*inherits: Potion*/ // redundant
     requires: [
-      Property.heal_life
+      Property heal_life
     ]
   }
   {
     name: Mana Potion
     parent: Potion
     requires: [
-      Property.heal_mana
+      Property heal_mana
     ]
   }
 ]

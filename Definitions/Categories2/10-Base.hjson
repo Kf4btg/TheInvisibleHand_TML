@@ -2,24 +2,24 @@
   {
     name: Placeable
     requires: [
-      Property.create_tile | Property.create_wall
-      !Property.Ident.wand
+      Property create_tile | create_wall
+      Property.Ident !wand
     ]
   }
 
   {
     name: Weapon
     requires: [
-      Property.damage
-      !Property.not_ammo | Property.UseStyle.any
+      Property damage
+      Property !not_ammo | UseStyle use_style_any
     ]
   }
 
   {
     name: Armor
     requires: [
-      !Property.vanity
-      EquipSlot.head | EquipSlot.body | EquipSlot.leg
+      Property !vanity
+      EquipSlot head | body | leg
     ]
   }
 
@@ -28,14 +28,14 @@
     enabled: false
     display: true
     requires: [
-      Tool.any
+      Tool tool_any
     ]
   }
 
   {
     name: Ammo
     requires: [
-      Property.Ident.ammo
+      Property.Ident ammo
     ]
   }
 ]
