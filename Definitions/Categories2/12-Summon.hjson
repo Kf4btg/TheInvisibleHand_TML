@@ -1,0 +1,18 @@
+[
+  {
+    name: Minion
+    parent: Summon
+    requires: [
+      Weapon.Summon minion
+    ]
+  }
+
+  {
+    name: Sentry
+    parent: Summon
+    requires: [
+      # seriously...that's about the only way to tell them apart
+      Weapon.Summon !minion
+    ]
+  }
+]

@@ -8,6 +8,7 @@ CreateTile:
     metal_bar
     music_box
     rope
+    banner
 
     wall_placeable
 
@@ -19,6 +20,8 @@ CreateTile:
   ]
   Furniture: {
     traits: [
+      # a catch-all for the others
+      room_needs
       room_needs_door
       room_needs_table
       room_needs_chair
@@ -26,7 +29,6 @@ CreateTile:
 
       container
       crafting_station
-      banner
       wall_decoration
     ]
     Door: {
@@ -83,7 +85,7 @@ CreateTile:
         monolith
       ]
     }
-    Wall_Deco: {
+    WallDecor: {
       traits: [
         trophy
         rack

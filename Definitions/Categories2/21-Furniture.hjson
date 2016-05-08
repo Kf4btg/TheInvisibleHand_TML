@@ -1,0 +1,94 @@
+[
+  {
+    name: Crafting Station
+    parent: Furniture
+    requires: [
+      CreateTile.Furniture crafting_station
+    ]
+  }
+
+  {
+    name: Container
+    parent: Furniture
+    requires: [
+      CreateTile.Furniture container
+    ]
+  }
+
+  {
+    name: Room Needs
+    parent: Furniture
+    /*requires: [
+      CreateTile.Furniture room_needs_door | room_needs_table | room_needs_chair | room_needs_light
+    ]*/
+    # use 'include:' to quickly add child categories with
+    # simple requirements. The Child will have this category
+    # as its parent.
+    # Key is the child name. Value is a either
+    #   a) a string that is the single item comprising the child's requirements list
+    #   b) a simplified Category object that can only contain the "requires" and "include" key.
+    # If the child has more than one requirement, you will
+    # need to use option b to include the list. With option b,
+    # using "include" on a child allows convenient
+    # creation of simple hierarchies of nested categories.
+    # Note that having spaces in the category name
+    # necessitates using quotes.
+    include: {
+      Lighting: {
+        requires: ["CreateTile.Furniture room_needs_light"]
+        include: {
+          Torch: Furniture.Lighting torch
+          Candelabra: Furniture.Lighting candelabra
+          Candle: Furniture.Lighting candle
+          Chandelier: Furniture.Lighting chandelier
+          "Hanging Lantern": Furniture.Lighting hanging_lantern
+          Lamp: Furniture.Lighting lamp
+          "Holiday Light": Furniture.Lighting holiday_light
+        } }
+      Tables: {
+        requires: ["CreateTile.Furniture room_needs_table"]
+        include: {
+          Table: Furniture.Tables table
+          Bathtub: Furniture.Tables bathtub
+          Bookcase: Furniture.Tables bookcase
+          Dresser: Furniture.Tables dresser
+          Piano: Furniture.Tables piano
+          "Work Bench": Furniture.Tables workbench
+        } }
+      Doors: {
+        requires: ["CreateTile.Furniture room_needs_door"]
+        include: {
+          Door: Furniture.Doors door
+          Platform: Furniture.Doors platform
+        } }
+      Chairs: {
+        requires: ["CreateTile.Furniture room_needs_chair"]
+        include: {
+          Chair: Furniture.Chairs chair
+          Bench: Furniture.Chairs bench
+          Bed: Furniture.Chairs bed
+        } }
+    } }
+]
+
+/*
+  Use the above "Room Needs" category as an example. This will
+  create a category-tree w/ the following (partial) structure:
+
+    Furniture
+     |--Room Needs
+         |--Lighting
+         |   |--Torch
+         |   |--Candelabra
+         |   |--Chandelier
+         |   |--Hanging Lantern
+         |   |--Lamp
+         |   |--Holiday Light
+         |
+         |--Tables
+      ...    |--Table
+             |--Bookcase
+             |--Dresser
+             ...
+      ...
+ */

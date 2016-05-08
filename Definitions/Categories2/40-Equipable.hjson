@@ -10,6 +10,15 @@
   }
 
   {
+    name: Vanity Item
+    parent: Equipable
+    inherits: null
+    requires: [
+      Property vanity
+    ]
+  }
+
+  {
     name: Grappling Hook
     parent: Equipable
     inherits: null
@@ -55,23 +64,13 @@
   }
 
   {
-    # This is a utility-category; not meant to be shown or even used to organize,
-    # just intended to be inherited by other categories
-    name: notvanity
-    enabled: false
-    display: false
-    requires: [
-      Property !vanity
-    ]
-  }
-
-  {
     name: Armor
     parent: Equipable
     # inheriting from Equipable would lead to some redundancy
-    inherits: notvanity
+    inherits: null
     # armor doesn't necessarily need to give defense
     requires: [
+      Property !vanity
       EquipSlot head | body | leg
     ]
   }
@@ -80,9 +79,10 @@
     name: Accessory
     parent: Equipable
     # the large check of Equipable is not necessary here.
-    # vanity accys go elsewhere
-    inherits: notvanity
+    inherits: null
     requires: [
+      # vanity accys go elsewhere
+      Property !vanity
       Property accessory
     ]
   }

@@ -77,4 +77,12 @@
       Property heal_mana
     ]
   }
+
+  {
+    name: Buff Potion
+    parent: Potion
+    requires: [
+      Property buff_time
+    ]
+  }
 ]

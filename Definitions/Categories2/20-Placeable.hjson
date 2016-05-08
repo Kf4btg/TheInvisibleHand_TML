@@ -1,0 +1,115 @@
+[
+  {
+    name: Banner
+    parent: Placeable
+    requires: [
+      CreateTile banner
+    ]
+  }
+
+
+
+  {
+    name: Herb Seed
+    parent: Placeable
+    requires: [
+      CreateTile herb
+    ]
+  }
+
+  {
+    name: Wall
+    parent: Placeable
+    requires: [
+      Property create_wall
+    ]
+  }
+
+  /*{
+    name: Wallpaper
+    parent: Wall
+    requires: [
+      Placeable wallpaper
+    ]
+  }*/
+
+  {
+    name: Music Box
+    parent: Placeable
+    requires: [
+      CreateTile music_box
+    ]
+  }
+
+  {
+    name: Furniture
+    parent: Placeable
+    inheritable: false
+    requires: [ ]
+    # @include other-category:
+    #   means if it matches that category, it also
+    #   matches this one. Can be used to merge categories
+    #   or create a parent w/ no requirements of its own
+    /*requires: [
+      @include Room Needs
+      @include Container
+      @include Crafting Station
+    ]*/
+  }
+
+
+
+  /*{
+    name: Rope
+    parent: Placeable
+    requires: [
+      Placeable rope
+    ]
+  }
+  {
+    name: Rope Coil
+    parent: Placeable
+    requires: [
+      Placeable rope_coil
+    ]
+  }*/
+
+  # note: this catches a lot of items that also match the above
+  # categories, so it should be checked after those to ensure the most
+  # useful categorization
+  {
+    name: Block
+    parent: Placeable
+    inheritable: false
+    requires: [
+      // FIXME: this is not the best choice for this
+      CreateTile.Block tile_brick
+    ]
+  }
+
+  {
+    name: Wood
+    parent: Block
+    requires: [
+      CreateTile.Block wood
+    ]
+  }
+
+  # TODO: implement an 'enabled' key for every category.
+  /*{
+    name: Dungeon Brick
+    parent: Block
+    enabled: false
+    requires: [
+      Placeable.Block dungeon_brick
+    ]
+  }*/
+
+  # {
+  #   name: Brick
+  #   parent: Placeable
+  #   requires: [
+  #     Placeable brick
+  #  }
+  # }
+]

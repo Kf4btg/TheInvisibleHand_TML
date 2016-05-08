@@ -1,0 +1,28 @@
+[
+  {
+    name: Misc Furniture
+    parent: Furniture
+    include:
+    {
+      # functional
+      Anvil: anvil
+      Bottle: bottle
+      "Grandfather Clock": grandfather_clock
+      Campfire: campfire
+      "Cooking Pot": cooking_pot
+      Cannon: cannon
+      "Lunar Monolith": monolith
+      Sink: sink
+      "Water Fountain": water_fountain
+      "Planter Box": planter
+
+      # decorative (mostly)
+      Beachstuff: beachstuff
+      Bowl: bowl
+      Crate: crate
+      "Alphabet Statue": alphabet_statue
+      Statue: statue
+      Tombstone: tombstone
+    }
+  }
+]

@@ -1,12 +1,5 @@
 [
-  {
-    name: Vanity Item
-    parent: Equipable
-    inherits: null
-    requires: [
-      Property vanity
-    ]
-  }
+
   {
     name: Headwear
     parent: Vanity Item
