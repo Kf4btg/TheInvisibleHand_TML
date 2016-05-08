@@ -73,6 +73,24 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
+        private static void LoadFromTraitDefinitions(string traits_dir)
+        {
+            TraitDefinitions = new Dictionary<string, IList<string>>();
+
+            // get file list
+            foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(traits_dir)).OrderBy(n => n))
+            {
+                // for each file
+                using (Stream s = assembly.GetManifestResourceStream(res))
+                {
+                    var traitGroups = HjsonValue.Load(s).Qo();
+
+                    foreach (var tgroup in traitGroups)
+                        LoadGroup(tgroup);
+                }
+            }
+        }
+
         /// Extract and store the defined Traits for each Group. Some groups may contain nested groups
         /// (e.g. Weapon > Melee); in this case, LoadGroup will be called recursively with the name
         /// of the parent group(s) supplied for the name_prefix. The name of the nested group will
@@ -164,6 +182,7 @@ namespace InvisibleHand.Items.Categories
 
                             name = catobj.ContainsKey("name") ? catobj["name"]?.Qs() ?? "" : "",
                             parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() ?? "" : "",
+                            inherits = catobj.ContainsKey("inherit") ? catobj["inherit"]?.Qs() ?? "" : "",
 
                             // whether to activate this category (DEFAULT: true)
                             enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
@@ -178,6 +197,9 @@ namespace InvisibleHand.Items.Categories
 
                             // any merged categories
                             merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
+
+                            // any include child categories
+                            include = catobj.ContainsKey("include") ? catobj["include"]?.Qo() : null,
 
                             // ordered list of Item fields on which to sort items in this category
                             sort_fields = catobj.ContainsKey("sort") ? catobj["sort"]?.Qa() : null,
@@ -242,6 +264,39 @@ namespace InvisibleHand.Items.Categories
                     } // end of category-object list
                 }
             }
+        }
+
+        /// for parsing the "mini" categories inside an include: block
+        private static void parseMiniCategories(JsonObject include)
+        {
+            foreach (var minicat in include)
+            {
+                var cat_name = minicat.Key;
+
+                Dictionary<string, int> requires;
+                if (minicat.Value.JsonType == JsonType.String)
+                {
+                    // category requirements are held in the single string value for the key
+                    requires = new Dictionary<string, int>();
+                }
+                else if (minicat.Value.JsonType == JsonType.Object)
+                {
+
+                }
+
+                // requires = minicat.Value.JsonType == JsonType.String ? minicat.Value.Qs() : "";
+
+                var catdef = new
+                {
+                    name = minicat.Key,
+                    requires = minicat.Value.JsonType == JsonType.String ? minicat.Value.Qs() : "",
+                };
+            }
+        }
+
+        private static void parseRequirementString(string requirements)
+        {
+            
         }
 
 
