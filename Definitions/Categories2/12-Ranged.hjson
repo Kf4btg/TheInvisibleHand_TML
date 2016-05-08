@@ -5,15 +5,18 @@
     requires: [
       Weapon.Ranged use_ammo_bullet
     ]
+    include: {
+      "Automatic Gun": Property auto_reuse
+    }
   }
 
-  {
+  /*{
     name: Automatic Gun
     parent: Gun
     requires: [
       Property auto_reuse
     ]
-  }
+  }*/
 
   {
     name: Bow
@@ -21,9 +24,14 @@
     requires: [
       Weapon.Ranged use_ammo_arrow
     ]
+    include: {
+      # this will obviously include some of the high-level "bows", too
+      # ...oh well
+      "Repeater": Property auto_reuse
+    }
   }
 
-  {
+  /*{
     name: Repeater
     parent: Bow
     # this will obviously include some of the high-level "bows", too
@@ -31,7 +39,7 @@
     requires: [
       Property auto_reuse
     ]
-  }
+  }*/
 
   {
     name: Launcher

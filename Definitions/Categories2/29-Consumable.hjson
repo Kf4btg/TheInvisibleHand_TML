@@ -65,7 +65,7 @@
   {
     name: Healing Potion
     parent: Potion
-    /*inherits: Potion*/ // redundant
+    //inherits: "Potion" // redundant
     requires: [
       Property heal_life
     ]

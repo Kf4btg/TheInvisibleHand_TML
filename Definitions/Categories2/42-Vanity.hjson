@@ -1,6 +1,6 @@
 [
 
-  {
+  /*{
     name: Headwear
     parent: Vanity Item
     requires: [
@@ -20,7 +20,54 @@
     requires: [
       EquipSlot leg
     ]
+  }*/
+  {
+    name: Vanity Clothing
+    parent: Vanity Item
+    includes:
+    {
+      Headwear: EquipSlot head
+      Shirts: EquipSlot body
+      Pants: EquipSlot leg
+    }
   }
+
+  {
+    name: Vanity Accessory
+    parent: Vanity Item
+    requires: [
+      accessory
+    ]
+    include:
+    {
+      "Vanity Wings": EquipSlot wings
+      "Fashion Facewear": EquipSlot face
+      "Vanity Neckwear": EquipSlot neck
+      "Vanity Shields": EquipSlot shield
+      "Vanity Boots": EquipSlot shoe
+
+      # Note about capes/cloaks:
+      # Theyre the ONLY vanilla items that have a value for 'frontSlot',
+      # but they're also the only vanilla VANITY items that have a value for
+      # 'backSlot'. So...yeah.
+      "Capes": EquipSlot front back
+
+      # NOTE: there are none of these in Vanilla
+      "Vanity Balloon": EquipSlot balloon
+      "Vanity Belt": EquipSlot waist
+
+      # NOTE: there are none* of these in Vanilla
+      # *see not above about Capes
+      "Back Vanity Slot": EquipSlot back
+      "Front Vanity Slot": EquipSlot front
+
+      Gloves: EquipSlot main_hand | off_hand
+
+      /*"Main-Hand Gauntlet": EquipSlot main_hand
+      "Off-Hand Gauntlet": EquipSlot off_hand*/
+    }
+  }
+/*
   {
     name: Facewear
     parent: Vanity Item
@@ -36,7 +83,7 @@
     requires: [
       EquipSlot main_hand | off_hand
     ]
-  }
+  }*/
   /*{
     name: Main-Hand Glove
     parent: Vanity Item
@@ -51,7 +98,7 @@
       EquipSlot off_hand
     ]
   }*/
-  {
+  /*{
     name: Shoes
     parent: Vanity Item
     requires: [
@@ -128,5 +175,5 @@
     requires: [
       EquipSlot shield
     ]
-  }
+  }*/
 ]

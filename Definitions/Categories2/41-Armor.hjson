@@ -1,23 +1,17 @@
-[
+{
+  name: Armor
+  parent: Equipable
+  # inheriting from Equipable would lead to some redundancy
+  inherits: null
+  # armor doesn't necessarily need to give defense
+  requires: [
+    Property !vanity
+    EquipSlot head | body | leg
+  ]
+  include:
   {
-    name: Helm
-    parent: Armor
-    requires: [
-      EquipSlot head
-    ]
+    Helm: EquipSlot head
+    Cuirass: EquipSlot body
+    Greaves: EquipSlot leg
   }
-  {
-    name: Cuirass
-    parent: Armor
-    requires: [
-      EquipSlot body
-    ]
-  }
-  {
-    name: Greaves
-    parent: Armor
-    requires: [
-      EquipSlot leg
-    ]
-  }
-]
+}

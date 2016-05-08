@@ -2,6 +2,32 @@
   // TODO: figure out how to handle some of the corner-cases
   // where a single accy fills multiple slots: e.g. Master Ninja Gear
   {
+    name: Accessory
+    parent: Equipable
+    inherit: null
+    requires: [
+      !vanity
+      accessory
+    ]
+    include:
+    {
+      Wings: EquipSlot wings
+      Balloon: EquipSlot balloon
+      "Face Accessory": EquipSlot face
+      Neckwear: EquipSlot neck
+      Shields: EquipSlot shield
+      Boots: EquipSlot shoe
+      "Belt Accessory": EquipSlot waist
+      "Back Accessory": EquipSlot back
+
+      "Main-Hand Gauntlet": EquipSlot main_hand
+      "Off-Hand Gauntlet": EquipSlot off_hand
+      # Note: there are none of these in Vanilla
+      "Front Accessory": EquipSlot front
+    }
+  }
+
+  /*{
     name: Wings
     parent: Accessory
     requires: [
@@ -83,6 +109,6 @@
     requires: [
       EquipSlot front
     ]
-  }
+  }*/
 
 ]

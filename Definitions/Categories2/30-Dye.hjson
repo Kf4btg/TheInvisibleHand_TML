@@ -1,5 +1,23 @@
 [
   {
+    name: Dye
+    requires: [
+      Property.Ident dye
+    ]
+    include:
+    {
+      "Basic Dyes": Dye basic
+      "Black Compound": Dye black
+      "Silver Compound": Dye silver
+      Gradient: Dye gradient
+      Flame: Dye flame
+      Bright: Dye bright
+      Strange: Dye strange
+      Lunar: Dye lunar
+    }
+  }
+
+  /*{
     name: Basic Dyes
     parent: Dye
     requires: [
@@ -54,5 +72,5 @@
     requires: [
       Dye lunar
     ]
-  }
+  }*/
 ]

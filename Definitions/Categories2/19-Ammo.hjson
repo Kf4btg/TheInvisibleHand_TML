@@ -1,5 +1,20 @@
 [
   {
+    name: Ammo
+    requires: [
+      Property.Ident ammo
+    ]
+    include:
+    {
+      Arrows: Ammo arrow
+      Bullets: Ammo bullet
+      Rockets: Ammo rocket
+      Darts: Ammo dart
+      Solution: Ammo solution
+    }
+  }
+
+  /*{
     name: Arrows
     parent: Ammo
     requires: [
@@ -34,7 +49,7 @@
     requires: [
       Ammo solution
     ]
-  }
+  }*/
 
   {
     name: Endless
