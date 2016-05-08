@@ -30,6 +30,14 @@
     requires: [
       Weapon magic
     ]
+    include: {
+      Area: Weapon.Magic area
+      Bouncing: Weapon.Magic bounce_heavy | bounce_hyper
+      Controlled: Weapon.Magic controllable
+      Homing: Weapon.Magic homing
+      Piercing: Weapon.Magic pierce
+      Stream: Weapon.Magic stream
+    }
   }
 
   {
@@ -38,6 +46,10 @@
     requires: [
       Weapon summon
     ]
+    include: {
+      Minion: Weapon.Summon minion
+      Sentry: Weapon.Summon !minion
+    }
   }
   {
     name: Throwing

@@ -1,5 +1,5 @@
 [
-  {
+  /*{
     name: Area
     parent: Magic
     requires: [
@@ -45,5 +45,5 @@
     requires: [
       Weapon.Magic stream
     ]
-  }
+  }*/
 ]
