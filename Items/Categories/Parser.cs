@@ -242,6 +242,8 @@ namespace InvisibleHand.Items.Categories
 
                             union.Enabled = catdef.enable;
 
+                            union.MergeItems = catdef.merge;
+
                             CategoryDefinitions[union.Name] = union;
                             // XXX: should we add the unions to the search tree?
                             // ANSWER: No.

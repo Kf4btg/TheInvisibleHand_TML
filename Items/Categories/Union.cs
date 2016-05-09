@@ -13,6 +13,10 @@ namespace InvisibleHand.Items.Categories
         /// Item Category implements IComparable and GetHashCode, so this should be efficient
         public ISet<ItemCategory> UnionMembers { get; private set; }
 
+        /// treat Items in members as a single pool to be sorted (true)?
+        /// Or still have them sorted within their respective sub-categories (false)?
+        public bool MergeItems { get; set; } = false;
+
         /// Returns the member category that matched the most recent Match()/Matches() check,
         /// or null if none did
         public ItemCategory Matched { get; private set; }
