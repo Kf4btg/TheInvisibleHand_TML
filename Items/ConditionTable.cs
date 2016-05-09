@@ -489,49 +489,49 @@ namespace InvisibleHand.Items
 
             // rarity
             tt["tier-1"]       = (i) => i.rare == -1;
-            tt["gray"]         = (i) => i.rare == -1;
+            tt["gray"]         = tt["tier-1"];// = (i) => i.rare == -1;
 
             tt["tier0"]        = (i) => i.rare == 0;
-            tt["white"]        = (i) => i.rare == 0;
+            tt["white"]        = tt["tier0"]; // = (i) => i.rare == 0;
 
             tt["tier1"]        = (i) => i.rare == 1;
-            tt["blue"]         = (i) => i.rare == 1;
+            tt["blue"]         = tt["tier1"]; // = (i) => i.rare == 1;
 
             tt["tier2"]        = (i) => i.rare == 2;
-            tt["green"]        = (i) => i.rare == 2;
+            tt["green"]        = tt["tier2"]; // = (i) => i.rare == 2;
 
             tt["tier3"]        = (i) => i.rare == 3;
-            tt["orange"]       = (i) => i.rare == 3;
+            tt["orange"]       = tt["tier3"]; // = (i) => i.rare == 3;
 
             tt["tier4"]        = (i) => i.rare == 4;
-            tt["light_red"]    = (i) => i.rare == 4;
+            tt["light_red"]    = tt["tier4"]; // = (i) => i.rare == 4;
 
             tt["tier5"]        = (i) => i.rare == 5;
-            tt["pink"]         = (i) => i.rare == 5;
+            tt["pink"]         = tt["tier5"]; // = (i) => i.rare == 5;
 
             tt["tier6"]        = (i) => i.rare == 6;
-            tt["light_purple"] = (i) => i.rare == 6;
+            tt["light_purple"] = tt["tier6"]; // = (i) => i.rare == 6;
 
             tt["tier7"]        = (i) => i.rare == 7;
-            tt["lime"]         = (i) => i.rare == 7;
+            tt["lime"]         = tt["tier7"]; // = (i) => i.rare == 7;
 
             tt["tier8"]        = (i) => i.rare == 8;
-            tt["yellow"]       = (i) => i.rare == 8;
+            tt["yellow"]       = tt["tier8"]; // = (i) => i.rare == 8;
 
             tt["tier9"]        = (i) => i.rare == 9;
-            tt["cyan"]         = (i) => i.rare == 9;
+            tt["cyan"]         = tt["tier9"]; // = (i) => i.rare == 9;
 
             tt["tier10"]       = (i) => i.rare == 10;
-            tt["red"]          = (i) => i.rare == 10;
+            tt["red"]          = tt["tier10"]; // = (i) => i.rare == 10;
 
             tt["tier11"]       = (i) => i.rare == 11;
-            tt["purple"]       = (i) => i.rare == 11;
+            tt["purple"]       = tt["tier11"]; // = (i) => i.rare == 11;
 
             tt["tier-11"]      = (i) => i.rare == -11;
-            tt["amber"]        = (i) => i.rare == -11;
+            tt["amber"]        = tt["tier-11"]; // = (i) => i.rare == -11;
 
             tt["tier-12"]      = (i) => i.rare == -12;
-            tt["rainbow"]      = (i) => i.rare == -12;
+            tt["rainbow"]      = tt["tier-12"]; // = (i) => i.rare == -12;
 
             // tileids
             tt["dirt"] = (i) => i.createTile == TileID.Dirt;
