@@ -24,6 +24,9 @@ namespace InvisibleHand.Items.Categories
         /// stores the ids of enabled, non-union categories
         public static ISet<int> ActiveCategories { get; private set; }
 
+        /// track category currently being parsed
+        private static string _currentCategory;
+
         // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
         /// Call this method to run all the other class methods
@@ -186,6 +189,7 @@ namespace InvisibleHand.Items.Categories
 
                             // whether to activate this category (DEFAULT: true)
                             enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
+                            display = catobj.ContainsKey("display") ? catobj["display"]?.Qb() ?? true : true,
 
                             // priority is now just a 'weight', used to modify the order of categories with regards to
                             // their siblings. There's no more bit shifting or anything, and the -500..500 limit is now
@@ -193,10 +197,14 @@ namespace InvisibleHand.Items.Categories
                             priority = catobj.ContainsKey("priority") ? catobj["priority"]?.Qi().Clamp(-500, 500) : null,
 
                             // the required traits for this category
-                            requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
+                            // requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
+                            requires = catobj.ContainsKey("requires") ? catobj["requires"] : null,
+
+                            union = catobj.ContainsKey("union") ? catobj["union"]?.Qa() : null,
 
                             // any merged categories
-                            merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
+                            // merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
+                            merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qb() ?? false : false,
 
                             // any include child categories
                             include = catobj.ContainsKey("include") ? catobj["include"]?.Qo() : null,
@@ -208,22 +216,26 @@ namespace InvisibleHand.Items.Categories
                         // name field is always required
                         if (catdef.name == String.Empty)
                             throw new HjsonFieldNotFoundException("name", nameof(catobj));
+                        _currentCategory = catdef.name;
 
                         // get parent, if any
-                        int parentID = getParentID(catdef.name, catdef.parent_name);
+                        int parentID = getParentID(catdef.parent_name);
+                        int inheritsID = getCategoryID(catdef.inherits);
 
                         // and priority, either specific to this category (or default 0)
                         int priority = catdef.priority ?? 0;
 
                         // A union category
                         // ------------------
-                        if (catdef.merge != null)
+                        // if (catdef.merge != null)
+                        if (catdef.union != null)
                         {
                             var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
 
                             // TODO: allow enable/disable at runtime
                             // if (catdef.enable)
-                            addUnionMembers(union, catdef.merge);
+                            // addUnionMembers(union, catdef.merge);
+                            addUnionMembers(union, catdef.union);
 
                             union.Enabled = catdef.enable;
 
@@ -242,14 +254,13 @@ namespace InvisibleHand.Items.Categories
                             IDictionary<string, int> reqs;
                             IDictionary<string, int> excls;
 
-                            // if, somehow, there are no requirements, don't bother adding to list
-                            if (parseRequirements(catdef.name, catdef.requires, out reqs, out excls))
+                            // var reqlist = getRequirementLines(catdef.requires);
+
+                            // if there are requirements, create new reqular category
+                            if (parseRequirements2(getRequirementLines(catdef.requires), out reqs, out excls))
                             {
-                                // otherwise, create the new category object
                                 var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
-
                                 newcategory.Enabled = catdef.enable;
-
 
                                 // create/get the Sorting Rules for the category
                                 // ---------------------------------------------
@@ -257,13 +268,48 @@ namespace InvisibleHand.Items.Categories
 
                                 // store the new category in the collections
                                 CategoryDefinitions[newcategory.Name] = newcategory;
-                                // if (catdef.enable) ActiveCategories.Add(newcategory.ID);
-
+                                return;
                             }
+
+
+                            // if, somehow, there are no requirements, don't bother adding to list
+                            // if (parseRequirements(catdef.name, catdef.requires, out reqs, out excls))
+                            // {
+                            //     // otherwise, create the new category object
+                            //     var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
+                            //
+                            //     newcategory.Enabled = catdef.enable;
+                            //
+                            //
+                            //     // create/get the Sorting Rules for the category
+                            //     // ---------------------------------------------
+                            //     assignSortingRules(newcategory, catdef.sort_fields);
+                            //
+                            //     // store the new category in the collections
+                            //     CategoryDefinitions[newcategory.Name] = newcategory;
+                            //     // if (catdef.enable) ActiveCategories.Add(newcategory.ID);
+                            //
+                            // }
                         }
+
+                        // if "requires" was null or empty:
+                        // TODO: what now?
+
+
                     } // end of category-object list
                 }
             }
+        }
+
+        private static IList<string> getRequirementLines(JsonValue requires)
+        {
+            // if the requires "list" is just a single string
+            if (requires.JsonType == JsonType.String)
+                return new List<string>() { requires.Qs() };
+            // otherwise it should be a list of strings
+            else if (requires.JsonType == JsonType.Array)
+                return requires.Qa().Select(r => r.Qs()).ToList();
+            throw new MalformedFieldError();
         }
 
         /// for parsing the "mini" categories inside an include: block
@@ -292,11 +338,6 @@ namespace InvisibleHand.Items.Categories
                     requires = minicat.Value.JsonType == JsonType.String ? minicat.Value.Qs() : "",
                 };
             }
-        }
-
-        private static void parseRequirementString(string requirements)
-        {
-            
         }
 
 
@@ -363,7 +404,80 @@ namespace InvisibleHand.Items.Categories
                             ▀▀
         */
 
-        private static bool parseRequirements(string category_name, JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
+        private static bool parseRequirements2(IEnumerable<string> requires_list, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
+        {
+            // temp containers
+            var reqs = new Dictionary<string, int>();
+            var excls = new Dictionary<string, int>();
+
+            foreach (var line in requires_list)
+            {
+                try
+                {
+                    var entry = Tokenizer.ParseRequirementLine(line);
+
+                    var trait_group = entry.TraitGroup;
+
+                    foreach (var trait in entry.includes)
+                        reqs.Add(trait, getValueForFlag(trait_group, trait));
+
+                    foreach (var trait in entry.excludes)
+                        excls.Add(trait, getValueForFlag(trait_group, trait));
+
+
+                }
+                catch (TokenizerException e)
+                {
+                    throw new MalformedFieldError($"Could not parse requirement entry '{e.Line}' for category '{_currentCategory}'");
+                }
+            }
+
+            requirements = reqs.Count > 0 ? reqs : null;
+            exclusions = excls.Count > 0 ? excls : null;
+
+            return (reqs.Count + excls.Count) > 0;
+        }
+
+        private static IDictionary<string, int> getFlagValues(string trait_group)
+        {
+            // using try-catch instead of TryGetValue because I'm not *expecting*
+            // the flag to be missing; therefore, under normal circumstances, the
+            // try block should always succeed and we don't have to worry about the
+            // performance difference between catch() && TryGetValue
+            try
+            {
+                return  IHBase.FlagCollection[trait_group];
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                throw new UsefulKeyNotFoundException(
+                    trait_group,
+                    nameof(IHBase.FlagCollection),
+                    knfe,
+                    "Category '" + _currentCategory + "': the requested Trait Group '{0}' is not present in '{1}'."
+                );
+            }
+        }
+
+
+        private static int getValueForFlag(string trait_group, string flag_name)
+        {
+            try
+            {
+                return getFlagValues(trait_group)[flag_name];
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                throw new UsefulKeyNotFoundException(
+                    flag_name,
+                    nameof(IHBase.FlagCollection)+"["+trait_group+"]",
+                    knfe,
+                    "Category '" + _currentCategory + "': the specified required trait '{0}' is not present in '{1}'."
+                );
+            }
+        }
+
+        private static bool parseRequirements(JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
         {
             // temp containers
             var reqs = new Dictionary<string, int>();
@@ -378,25 +492,8 @@ namespace InvisibleHand.Items.Categories
                 var traitCategory = newreqs.Key;
                 // FlagCollection[TraitCategory][TraitName]
 
-                IDictionary<string, int> flagvalues;
+                // var flagvalues = getFlagValues(category_name, traitCategory);
 
-                // using try-catch instead of TryGetValue because I'm not *expecting*
-                // the flag to be missing; therefore, under normal circumstances, the
-                // try block should always succeed and we don't have to worry about the
-                // performance difference between catch() && TryGetValue
-                try
-                {
-                    flagvalues = IHBase.FlagCollection[traitCategory];
-                }
-                catch (KeyNotFoundException knfe)
-                {
-                    throw new UsefulKeyNotFoundException(
-                        traitCategory,
-                        nameof(IHBase.FlagCollection),
-                        knfe,
-                        "Category '" +category_name + "': the requested Trait Category '{0}' is not present in '{1}'."
-                    );
-                }
 
                 // go through the array of traits, add the appropriate flag value
                 foreach (string trait_name in newreqs.Value.Qa())
@@ -412,20 +509,8 @@ namespace InvisibleHand.Items.Categories
                         use_name = trait_name.Trim(new[] { '!', ' ' });
                     }
 
-                    int flagvalue;
-                    try
-                    {
-                        flagvalue = flagvalues[use_name];
-                    }
-                    catch (KeyNotFoundException knfe)
-                    {
-                        throw new UsefulKeyNotFoundException(
-                            use_name,
-                            nameof(IHBase.FlagCollection)+"["+traitCategory+"]",
-                            knfe,
-                            "Category '" +category_name + "': the specified required trait '{0}' is not present in '{1}'."
-                        );
-                    }
+                    int flagvalue = getValueForFlag(traitCategory, use_name);
+
                     // now OR in the required value to the appropriate container
 
                     if (exclude) // if this is a "!trait" requirement
@@ -459,20 +544,20 @@ namespace InvisibleHand.Items.Categories
         /// <param name="category_name">Name of current category (only used in error messages if the parent name is not found) </param>
         /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
         /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
-        private static int getParentID(string category_name, string parent_name)
+        private static int getParentID(string parent_name)
         {
-            int pid = 0;
-            try
-            {
-                pid = parent_name == String.Empty ? 0 : CategoryDefinitions[parent_name].ID;
-
-            }
-            catch (KeyNotFoundException knfe)
-            {
-                throw new UsefulKeyNotFoundException(parent_name, nameof(CategoryDefinitions), knfe,
-                    "Category '" + category_name + "': The specified parent category '{0}' was not found in '{1}'."
-                );
-            }
+            int pid = getCategoryID(parent_name);
+            // try
+            // {
+            //     pid = parent_name == String.Empty ? 0 : CategoryDefinitions[parent_name].ID;
+            //
+            // }
+            // catch (KeyNotFoundException knfe)
+            // {
+            //     throw new UsefulKeyNotFoundException(parent_name, nameof(CategoryDefinitions), knfe,
+            //         "Category '" + category_name + "': The specified parent category '{0}' was not found in '{1}'."
+            //     );
+            // }
 
             while (pid > 0 && !ItemCategory.ActiveCategories.Contains(pid))
             {
@@ -485,6 +570,21 @@ namespace InvisibleHand.Items.Categories
             // return parent_name == "" ? 0 : CategoryDefinitions[parent_name].ID;
 
             return pid;
+        }
+
+        private static int getCategoryID(string category_name)
+        {
+            try
+            {
+                return category_name == String.Empty ? 0 : CategoryDefinitions[category_name].ID;
+
+            }
+            catch (KeyNotFoundException knfe)
+            {
+                throw new UsefulKeyNotFoundException(category_name, nameof(CategoryDefinitions), knfe,
+                    "Could not get ID of category '{0}': category not found in '{1}'."
+                );
+            }
         }
 
         /*

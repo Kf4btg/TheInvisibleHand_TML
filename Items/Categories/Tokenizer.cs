@@ -1,4 +1,4 @@
-using System;
+// using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,15 +7,8 @@ using System.Text.RegularExpressions;
 
 namespace InvisibleHand.Items.Categories
 {
-    public enum ReqType
-    {
-        None,   // all traits in this requirements are to be excluded from the category
-        All,    // all traits in this requirement must be present
-        Any,    // at least one of the traits in this req. must be present
-        One     // Only one of the traits in this req. may be present
-    }
 
-    public struct RequirementEntry
+    public class RequirementEntry
     {
         // public ReqType Type;
 
@@ -25,48 +18,31 @@ namespace InvisibleHand.Items.Categories
 
         public RequirementEntry(string trait_group, IEnumerable<string> exclude = null, IEnumerable<string> include = null)
         {
-            // this.Type = type;
-            // this.Traits = traits ?? new string[5];
             TraitGroup = trait_group;
             this.includes = include?.ToList() ?? new List<string>();// ?? new string[5];
             this.excludes = exclude?.ToList() ?? new List<string>();// ?? new string[5];
         }
 
-        // public void Add(string trait)
-        // {
-        //     this.Traits.Add(trait);
-        // }
-
-        public void Include(string trait)
+        public void AddInclude(string trait)
         {
-            if (this.includes == null)
-                this.includes = new List<string>();
             this.includes.Add(trait);
         }
 
-        public void Include(IEnumerable<string> traits)
+        public void AddInclude(IEnumerable<string> traits)
         {
-            if (this.includes == null)
-                this.includes = traits.ToList();
-            else
-                foreach (var t in traits)
-                    this.includes.Add(t);
+            foreach (var t in traits)
+                this.includes.Add(t);
         }
 
-        public void Exclude(string trait)
+        public void AddExclude(string trait)
         {
-            if (this.excludes == null)
-                this.excludes = new List<string>();
             this.excludes.Add(trait);
         }
 
-        public void Exclude(IEnumerable<string> traits)
+        public void AddExclude(IEnumerable<string> traits)
         {
-            if (this.excludes == null)
-                this.excludes = traits.ToList();
-            else
-                foreach (var t in traits)
-                    this.excludes.Add(t);
+            foreach (var t in traits)
+                this.excludes.Add(t);
         }
     }
 
@@ -81,7 +57,7 @@ namespace InvisibleHand.Items.Categories
         // e.g. "Placeable.Furniture.Tables"
         // This checks that any period is followed by an uppercase letter.
         // --Captured in group named 'TGroup'
-        private const string TRAIT_GROUP = @"(?<TGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
+        private const string TRAIT_GROUP = @"(?<TraitGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
 
         // trait names are always lowercase, may contain underscores and numbers
         // eg:"yellow"
@@ -91,7 +67,6 @@ namespace InvisibleHand.Items.Categories
 
         // private const string TRAIT_NEGATED_NAME = @"(?<NegTraitName>!" + TRAIT_SIMPLE_NAME + @")"; // eg:"yellow"
         // eg:"yellow" or "!trophy_2"
-        // --Captured in group named 'TName'
         // private const string TRAIT_OPTION = @"(?(!)(?<TraitOption>!" + TRAIT_SIMPLE_NAME + @")|" + TRAIT_SIMPLE_NAME + @")";
         private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_SIMPLE_NAME + @")";
         // private const string TRAIT_OPTION = @"(?(!)" + TRAIT_NEGATED_NAME + @"|" + TRAIT_SIMPLE_NAME_GROUP + @")";
@@ -104,44 +79,12 @@ namespace InvisibleHand.Items.Categories
         // e.g. "purple !green !blue spiked"
         private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
 
-        // Or traits together by separating with "|"
-        // e.g. "bird | rock", "blue|yellow|now"
-        // private const string SIMPLE_TRAIT_OR_LIST = @"(?<OrList>" + TRAIT_SIMPLE_NAME_GROUP + @"(\s*\|\s*" + TRAIT_SIMPLE_NAME_GROUP + @")+)";
-
-        // exclude several traits at once by negating an or'd list;
-        // the internal traits must be simple (not negated, no full spec name)
-        // e,g, "!(happy | sad | mellow)"
-        // private const string NEGATE_OR_LIST = @"(?<NotOrList>!\(" + SIMPLE_TRAIT_OR_LIST + @"\))";
-
-        // private const string OR_LIST = @"(?<OrList>" + NEGATE_OR_LIST + @"|" + SIMPLE_TRAIT_OR_LIST + @")";
-        // private const string OR_LIST = NEGATE_OR_LIST + @"|" + SIMPLE_TRAIT_OR_LIST;
-
         // optionally include the trait group for full specification
         // e.g. "Property.Ident !wand" or "create_tile"
         // private const string TRAIT_SPEC = @"(?<TraitSpec>" + TRAIT_GROUP + @"\s+" + TRAIT_OPTION + @")";
-        // private const string TRAIT_SPEC_LIST = @"(?<TraitSpec>" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @")";
-
-
-        // defines an entry that begins with the trait group then uses only simple name-constructs for the rest of the entry.
-        // e.g. "Property create_tile | create_wall", "Property.Ident !(pick | axe | hammer)",
-        // "Property heal_life heal_mana", "UseStyle use_style_2"
-        // private const string GROUP_TRAIT_ENTRY = @"(?<SingleGroupEntry>" + TRAIT_GROUP + @"\s+(" + TRAIT_LIST + @"|" + OR_LIST + @"))";
-
-        // entry that starts with  a trait group name and may include a "|" with a trait from an entirely different group
-        // e.g. "Property !not_ammo | UseStyle use_style_any"
-        // private const string MULTIGROUP_OR_ENTRY = @"(?<MultiGroupOr>"+TRAIT_SPEC + @"(\s*\|\s*" + TRAIT_SPEC + @")+)";
-
-        // private const string TRAIT_OR_LIST = TRAIT_SIMPLE_NAME + @"(\s*\|\s*"+TRAIT_SIMPLE_NAME + @")+";
-        // private const string TRAIT_SPEC = @"((" + TRAIT_GROUP + @")\s+)?" + TRAIT_NAME_LIST;
 
         // put it all together
-        // private const string REQUIREMENTS_LINE = @"^(" + GROUP_TRAIT_ENTRY + @"|" + MULTIGROUP_OR_ENTRY + @")$";
         private const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
-
-        // So far not allowed:
-        //  Group trait1 !trait2  # 1-line and-ing w/ a negation
-        //  Group !trait3 | trait4 # 1-line or-ing w/ a negation within the same group
-        //  Group1 trait1 | Group2 trait2 | trait3 # not specifying the Group name each time when or-ing traits from different groups
 
         public static RequirementEntry ParseRequirementLine(string line)
         {
@@ -154,7 +97,7 @@ namespace InvisibleHand.Items.Categories
                 // Console.WriteLine();
                 // Console.WriteLine(line);
 
-                var trait_group = match.Groups["TGroup"].Captures[0].Value;
+                var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
                 var tnames = match.Groups["TraitName"].Captures;
                 var req = new RequirementEntry(trait_group);
                 for (int i = 0; i < tnames.Count; i++)
@@ -162,9 +105,9 @@ namespace InvisibleHand.Items.Categories
                     string trait = tnames[i].Value;
 
                     if (trait[0] == '!')
-                        req.Exclude(trait.Substring(1));
+                        req.AddExclude(trait.Substring(1));
                     else
-                        req.Include(trait);
+                        req.AddInclude(trait);
                 }
 
                 // Console.WriteLine("Trait Group: {0}", req.TraitGroup);
@@ -182,7 +125,7 @@ namespace InvisibleHand.Items.Categories
 
         }
 
-        /// testing
+        // testing
         // static void Main()
         // {
         //     Console.WriteLine(REQUIREMENTS_LINE);
