@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using Terraria;
 
-namespace InvisibleHand.Items.Categories
+namespace InvisibleHand.Items.Categories.Types
 {
     // public class UnionCategory : ItemCategory
-    public class UnionCategory : ItemCategory, IUnion<ItemCategory>
+    public class UnionCategory : ItemCategory, IUnion<Item>
     {
 
         /// this may be unnecessary; intended to hold the list of
         /// categories that have been merged to this one if this is a
         /// merge-container
         /// Item Category implements IComparable and GetHashCode, so this should be efficient
-        public ISet<ItemCategory> UnionMembers { get; private set; }
+        public ISet<IMergeable<Item>> UnionMembers { get; private set; }
 
         /// treat Items in members as a single pool to be sorted (true)?
         /// Or still have them sorted within their respective sub-categories (false)?
@@ -19,7 +19,7 @@ namespace InvisibleHand.Items.Categories
 
         /// Returns the member category that matched the most recent Match()/Matches() check,
         /// or null if none did
-        public ItemCategory Matched { get; private set; }
+        public IMergeable<Item> Matched { get; private set; }
 
         // private bool _enabled = true;
         public override bool Enabled {
@@ -46,12 +46,12 @@ namespace InvisibleHand.Items.Categories
         }
 
 
-        public UnionCategory(string name, int cat_id, int parent_id = 0, int priority = 0, IEnumerable<ItemCategory> members=null) : base(name, cat_id, parent_id, priority)
+        public UnionCategory(string name, int cat_id, int parent_id = 0, int priority = 0, IEnumerable<IMergeable<Item>> members=null) : base(name, cat_id, parent_id, priority)
         {
-            UnionMembers = members == null ? new SortedSet<ItemCategory>() : new SortedSet<ItemCategory>(members);
+            UnionMembers = members == null ? new SortedSet<IMergeable<Item>>() : new SortedSet<IMergeable<Item>>(members);
         }
 
-        public UnionCategory(string name, int cat_id, ItemCategory parent = null, int priority = 0, IEnumerable<ItemCategory> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
+        public UnionCategory(string name, int cat_id, ItemCategory parent = null, int priority = 0, IEnumerable<IMergeable<Item>> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
 
 
         // Tracking member Categories
@@ -65,7 +65,7 @@ namespace InvisibleHand.Items.Categories
         /// union, an exception will be thrown unless `force_replace` is true, in which case
         /// the category will be removed from the memberset of its current union before being added
         /// to this one.
-        public void AddMember(ItemCategory new_member, bool force_replace = false)
+        public void AddMember(IMergeable<Item> new_member, bool force_replace = false)
         {
             if (new_member.UnionID > 0 && new_member.UnionID != this.ID)
             {
@@ -80,7 +80,7 @@ namespace InvisibleHand.Items.Categories
 
         /// remove a category from the memberset of this Union. No error will be thrown
         /// if the category is not a member.
-        public void RemoveMember(ItemCategory member)
+        public void RemoveMember(IMergeable<Item> member)
         {
             this.UnionMembers.Remove(member);
         }

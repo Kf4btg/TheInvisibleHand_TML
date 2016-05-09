@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 
-namespace InvisibleHand.Items.Categories
+namespace InvisibleHand.Items.Categories.Types
 {
     // public abstract class ItemCategory : IComparable<ItemCategory>, IEquatable<ItemCategory>, IComparer<Item>
-    public abstract class ItemCategory : ICategory<Item>, IMergeable<IUnion<ItemCategory>, ItemCategory>
+    public abstract class ItemCategory : IMergeable<Item>
     {
         // Static stuff
         //------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace InvisibleHand.Items.Categories
 
         /// if not null, then this is the Wrapper-Category that this
         /// category has been merged into
-        public UnionCategory CurrentUnion => UnionID > 0 ? Registry[UnionID] as UnionCategory : null;
+        public IUnion<Item> CurrentUnion => UnionID > 0 ? Registry[UnionID] as UnionCategory : null;
 
         /// this is what should be used to get "this" category; will return the proper
         /// instance depending on whether this category has been merged or not.
@@ -162,7 +162,7 @@ namespace InvisibleHand.Items.Categories
         // public void Merge(UnionCategory union)
         /// Add this Category to a new Union. A category can only belong to
         /// one union at a time, though Unions themselves can belong to other unions.
-        public void Merge(IUnion<ItemCategory> union)
+        public void Merge(IUnion<Item> union)
         {
             Merge(union?.ID ?? 0);
         }

@@ -11,7 +11,8 @@ namespace InvisibleHand.Items.Categories
     /// read in the category specs from the hjson files and convert to something useable
     public static class Parser
     {
-        private static string TraitFilePath;
+        // private static string TraitFilePath;
+        private static string TraitDefsPath;
         private static string CategoryDefsPath;
 
         private static Assembly assembly;
@@ -33,15 +34,17 @@ namespace InvisibleHand.Items.Categories
 
         /// Call this method to run all the other class methods
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
-        public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits.0-All.hjson")
+        // public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits.0-All.hjson")
+        public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits")
         {
             assembly = Assembly.GetExecutingAssembly();
 
             CategoryDefsPath = "InvisibleHand." + category_path;
-            TraitFilePath = "InvisibleHand." + trait_path;
+            TraitDefsPath = "InvisibleHand." + trait_path;
 
             // the order is important here
-            LoadTraitDefinitions(TraitFilePath);
+            // LoadTraitDefinitions(TraitFilePath);
+            LoadFromTraitDefinitions(TraitDefsPath);
             AssignFlagValues();
             LoadCategoryDefinitions(CategoryDefsPath);
             CalculateOrdinals();
@@ -130,7 +133,8 @@ namespace InvisibleHand.Items.Categories
         {
             // make sure trait-defs were loaded
             if (TraitDefinitions == null)
-                LoadTraitDefinitions(TraitFilePath);
+                // LoadTraitDefinitions(TraitFilePath);
+                LoadFromTraitDefinitions(TraitDefsPath);
 
             // FlagCollection = new Dictionary<string, IDictionary<string, int>>();
 

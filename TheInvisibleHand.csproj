@@ -115,13 +115,15 @@
     <Compile Include="IHWorld.cs" />
     <!-- <Compile Include="Definitions\Category.cs" /> -->
 
-    <Compile Include="Items\Categories\ICategory.cs" />
-    <Compile Include="Items\Categories\Base.cs" />
-    <Compile Include="Items\Categories\Regular.cs" />
-    <Compile Include="Items\Categories\Union.cs" />
     <Compile Include="Items\Categories\Parser.cs" />
     <Compile Include="Items\Categories\SortRuleBuilder.cs" />
     <Compile Include="Items\Categories\Tokenizer.cs" />
+
+    <Compile Include="Items\Categories\Types\ICategory.cs" />
+    <Compile Include="Items\Categories\Types\Base.cs" />
+    <Compile Include="Items\Categories\Types\Container.cs" />
+    <Compile Include="Items\Categories\Types\Regular.cs" />
+    <Compile Include="Items\Categories\Types\Union.cs" />
 
     <Compile Include="Items\ClassificationRules.cs" />
     <Compile Include="Items\ConditionTable.cs" />
