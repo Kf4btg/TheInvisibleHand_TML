@@ -44,10 +44,24 @@ namespace InvisibleHand.Items
         /// Every method/property in Rules.Binary is a simple yes/no (boolean) query
         internal static class Binary
         {
-            public static bool isWeapon(Item item) => (item.damage > 0 && (!item.notAmmo || item.useStyle > 0));
+            public static bool isWeapon(Item item) => item.damage > 0 && (!item.notAmmo || item.useStyle > 0);
             public static bool isArmor(Item item) => !item.vanity && (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0);
 
-            public static bool AnyTool(Item item) => item.pick > 0 || item.axe > 0 || item.hammer > 0 || item.fishingPole > 0 || item.holdStyle == 2 || item.useAnimation == 90 || makesRope(item) || MiscTools.Bucket(item) || MiscTools.HandLights(item) || MiscTools.Demolitions(item) || MiscTools.PaintingTools(item) || isWrench(item);
+            public static bool isPlaceable(Item item) => (item.createTile > -1 || item.createWall > 0) && (item.type != 213 && item.tileWand < 1);
+            public static bool isConsumable(Item item) => item.consumable && !(isAmmo(item) || item.createTile > -1 || item.createWall > 0);
+
+
+            public static bool AnyTool(Item item)
+                => item.pick > 0 || item.axe > 0 || item.hammer > 0
+                || item.fishingPole > 0
+                || item.holdStyle == 2          // umbrella, breathing reed
+                || item.useAnimation == 90      //recall
+                || makesRope(item)
+                || MiscTools.Bucket(item)
+                || MiscTools.HandLights(item)
+                || MiscTools.Demolitions(item)
+                || MiscTools.PaintingTools(item)
+                || isWrench(item);
 
             // also includes the wire cutter
             public static bool isWrench(Item item) => item.mech && item.tileBoost == 20;
@@ -58,7 +72,12 @@ namespace InvisibleHand.Items
 
             public static bool isVanityPet(Item item) => contains(Main.vanityPet, item.buffType);
 
-            public static bool isEquipable(Item item) => (item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0 || item.accessory || contains(Main.projHook, item.shoot) || item.mountType != -1 || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType])));
+            public static bool isEquipable(Item item)
+                => item.headSlot > 0 || item.bodySlot > 0 || item.legSlot > 0
+                || item.accessory
+                || contains(Main.projHook, item.shoot)
+                || item.mountType != -1
+                || (item.buffType > 0 && (Main.lightPet[item.buffType] || Main.vanityPet[item.buffType]));
 
             /// NOTE: not everything that has a "placeStyle" has a "createTile" (the noteable
             /// exceptions are the butterflies, which have a "createNPC" instead), and
@@ -79,7 +98,6 @@ namespace InvisibleHand.Items
             public static bool isAmmo(Item item) => /*!CanBePlaced(item) &&*/ item.ammo > 0 && !item.notAmmo;
 
 
-            public static bool isConsumable(Item item) => !(isAmmo(item) || CanBePlaced(item)) && item.consumable;
             public static bool timedBuff(Item item) => item.buffTime > 0;
             public static bool isFood(Item item)    => item.buffType == BuffID.WellFed; //26
 

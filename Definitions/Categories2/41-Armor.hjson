@@ -5,8 +5,9 @@
   inherits: null
   # armor doesn't necessarily need to give defense
   requires: [
-    Property !vanity
-    EquipSlot head | body | leg
+    Types armor
+  /*Property !vanity*/
+    /*EquipSlot head | body | leg*/
   ]
   include:
   {

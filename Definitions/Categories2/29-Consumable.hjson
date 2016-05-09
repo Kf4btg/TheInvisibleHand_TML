@@ -1,15 +1,24 @@
 [
+  //{
+  //  name: Consumable
+  //  # this is what the game considers a "proper" consumable:
+  //  requires: [
+  //    Property consumable !ammunition !create_tile !create_wall
+  //    Property.Ident !wand
+  //    /*Property consumable
+  //    Property !ammunition !create_tile !create_wall*/
+  //    /*!Property.ammunition*/
+  //    /*!Property.create_tile*/
+  //    /*!Property.create_wall*/
+  //    /*!Property.Ident.wand*/
+  //  ]
+  //}
+
   {
     name: Consumable
-    # this is what the game considers a "proper" consumable:
     requires: [
-      Property !(ammunition | create_tile | create_wall)
-      Property.Ident !wand
-      /*!Property.ammunition*/
-      /*!Property.create_tile*/
-      /*!Property.create_wall*/
-      /*!Property.Ident.wand*/
-      Property consumable
+      // shortcut
+      Types consumable
     ]
   }
 
@@ -42,7 +51,7 @@
     inherits: null
     requires: [
       UseStyle use_style_2
-      Consumable !(food | flask)
+      Consumable !food !flask
       /*!Consumable.flask*/
       # alchemy_result // there are some non-potions here
     ]

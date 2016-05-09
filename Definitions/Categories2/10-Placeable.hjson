@@ -8,8 +8,9 @@
       Property.Ident: [ "!wand" ]
     }*/
     requires: [
-      Property create_tile | create_wall
-      Property.Ident !wand
+      Types placeable
+      /*Property create_tile | create_wall
+      Property.Ident !wand*/
     ]
   }
 ]

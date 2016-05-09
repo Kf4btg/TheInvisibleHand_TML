@@ -61,12 +61,26 @@
       "Back Vanity Slot": EquipSlot back
       "Front Vanity Slot": EquipSlot front
 
-      Gloves: EquipSlot main_hand | off_hand
+      "Main-Hand Glove": EquipSlot main_hand
+      "Off-Hand Glove": EquipSlot off_hand
+
 
       /*"Main-Hand Gauntlet": EquipSlot main_hand
       "Off-Hand Gauntlet": EquipSlot off_hand*/
     }
   }
+
+  // union for the gloves
+  {
+    name: Gloves
+    parent: Vanity Accessory
+    union: [
+      Main-Hand Glove
+      Off-Hand Glove
+    ]
+    merge: true
+  }
+
 /*
   {
     name: Facewear

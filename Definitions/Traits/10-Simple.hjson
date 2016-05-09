@@ -234,6 +234,22 @@ Rarity:
   ]
 }
 
+# this is for some of the more complicated identifications that can't really
+# be constructed by listing item properties. I've implemented the checks for them
+# the same way vanilla checks to see if an item is of this type
+Types:
+{
+  traits: [
+    placeable
+    consumable
+    equipable
+    armor
+    weapon
+    /*"pickaxeham" # matches pick | axe | hammer*/
+    tool
+  ]
+}
+
 // I'm not sure about this...have to put this stuff somewhere, though
 Material:
 {

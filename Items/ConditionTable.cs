@@ -414,7 +414,7 @@ namespace InvisibleHand.Items
             tt["auto_reuse"]     = (i) => i.autoReuse;
             tt["cart_track"]     = (i) => i.cartTrack;
             tt["channel"]        = (i) => i.channel;
-            tt["consumable"]     = (i) => i.consumable;
+            tt["consume"]     = (i) => i.consumable;
             tt["expert"]         = (i) => i.expert;
             tt["material"]       = (i) => i.material;
             tt["mech"]           = (i) => i.mech;
@@ -640,6 +640,10 @@ namespace InvisibleHand.Items
 
             // equipable
             tt["any_equipable"] = Binary.isEquipable;
+            tt["equipable"] = Binary.isEquipable;
+
+            tt["armor"] = Binary.isArmor;
+
             tt["light_pet"] = (i) => contains(Main.lightPet, i.buffType);
             tt["vanity_pet"]= (i) => contains(Main.vanityPet, i.buffType);
             tt["mount"]     = (i) => i.mountType != -1 && !contains(MountID.Sets.Cart, i.mountType);
@@ -674,7 +678,10 @@ namespace InvisibleHand.Items
             tt["lunar_dye"]    = ItemSets.LunarDyes.Contains;
 
             // weapon
-            tt["crit"]     = (i) => i.crit > 0;
+            tt["weapon"] = Binary.isWeapon;
+
+            tt["crit"] = (i) => i.crit > 0;
+
             tt["melee"]    = (i) => i.melee;
             tt["ranged"]   = (i) => i.ranged;
             tt["magic"]    = (i) => i.magic;
@@ -685,7 +692,7 @@ namespace InvisibleHand.Items
             // ---------------
 
             // misc
-            tt["rope_coile"] = (i) => TestProjectileAI(i, Constants.ProjectileAI.RopeCoil);
+            tt["rope_coil"] = (i) => TestProjectileAI(i, Constants.ProjectileAI.RopeCoil);
 
             // melee
             tt["boomerang"] = (i) => TestProjectileAI(i, Constants.ProjectileAI.Boomerang);
@@ -748,12 +755,16 @@ namespace InvisibleHand.Items
             tt["wrench"] = (i) => i.mech && i.tileBoost == 20;
 
             tt["tool_any"] = Binary.AnyTool;
+            tt["tool"] = Binary.AnyTool;
 
             // item-ids
             tt["soul"]               = (i) => contains(ItemID.Sets.AnimatesAsSoul, i.type);
             tt["nebula_pickup"]      = (i) => contains(ItemID.Sets.NebulaPickup, i.type);
             tt["alchemy_ingredient"] = ItemSets.AlchemyIngredients.Contains;
-            tt["alchemy_result"]     = ItemSets.AlchemyResults.Contains;
+            tt["alchemy_result"] = ItemSets.AlchemyResults.Contains;
+
+            // types
+            tt["consumable"]     = Binary.isConsumable;
 
 
             // let's just see

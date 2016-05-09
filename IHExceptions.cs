@@ -48,4 +48,14 @@ namespace InvisibleHand
     {
         public NoDualUnionsException(string message) : base(message) {}
     }
+
+    public class TokenizerException : Exception
+    {
+        /// The line that failed to tokenize correctly
+        public readonly string Line;
+        public TokenizerException(string line, string msg) : base(msg)
+        {
+            Line = line;
+        }
+    }
 }

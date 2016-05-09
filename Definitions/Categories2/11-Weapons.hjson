@@ -1,12 +1,15 @@
 [
-  {
+  /*{
     name: Weapon
     // this is how the game decides an item is a "weapon"
     requires: [
       Property damage
       Property !not_ammo | UseStyle use_style_any
     ]
-  }
+  }*/
+  ######################
+  # Melee
+  ######################
 
   {
     name: Melee
@@ -16,6 +19,10 @@
     ]
   }
 
+  ######################
+  # Ranged
+  ######################
+
   {
     name: Ranged
     parent: Weapon
@@ -23,6 +30,10 @@
       Weapon ranged
     ]
   }
+
+  ######################
+  # Magic
+  ######################
 
   {
     name: Magic
@@ -32,7 +43,7 @@
     ]
     include: {
       Area: Weapon.Magic area
-      Bouncing: Weapon.Magic bounce_heavy | bounce_hyper
+      /*Bouncing: Weapon.Magic bounce_heavy | bounce_hyper*/
       Controlled: Weapon.Magic controllable
       Homing: Weapon.Magic homing
       Piercing: Weapon.Magic pierce
@@ -40,6 +51,39 @@
     }
   }
 
+  //merge 2 smaller categories into one
+  {
+    name: Bounce (Heavy)
+    parent: Magic
+    requires: [
+      Weapon.Magic bounce_heavy
+    ]
+  }
+  {
+    name: Bounce (Hyper)
+    parent: Magic
+    requires: [
+      Weapon.Magic bounce_hyper
+    ]
+  }
+
+  // A union category
+  {
+    name: Bouncing
+    parent: Magic
+    union: [
+      Bounce (Heavy)
+      Bounce (Hyper)
+    ]
+    # "merge" is whether items matching the union members will still be sorted
+    # within their actual category or if the items from all the members will be
+    # merged into one sorting pool.
+    merge: true
+  }
+
+  ######################
+  # Summon
+  ######################
   {
     name: Summon
     parent: Weapon
@@ -52,6 +96,10 @@
       Sentry: Weapon.Summon !minion
     }
   }
+
+  ######################
+  # Throwing
+  ######################
   {
     name: Throwing
     parent: Weapon

@@ -6,10 +6,7 @@
       # this includes items swung overhead
       Weapon.Melee swing
       # we don't want tools here
-      Property.Ident !(pick | axe | hammer)
-      /*Property.Ident !pick*/
-      /*Property.Ident !axe*/
-      /*Property.Ident !hammer*/
+      Property.Ident !pick !axe !hammer
       # helps exclude some unrelated weapons
       Property !no_use_graphic
     ]

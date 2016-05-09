@@ -5,7 +5,8 @@
       # this is pretty much just a wrapper around all of the more specific checks below.
       # without the "any_equipable" shortcut, this would be a fairly complicated rule...
       # this is also the reason this category should not be inherited (it can still be a parent)
-      Equipable any_equipable
+      /*Equipable any_equipable*/
+      Types equipable
     ]
   }
 
