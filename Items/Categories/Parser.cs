@@ -19,20 +19,20 @@ namespace InvisibleHand.Items.Categories
 
         private static Assembly assembly;
 
-        public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
-        // public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
-
-        public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
-
-        /// stores the ids of enabled, non-union categories
-        public static ISet<int> ActiveCategories { get; private set; }
-
         /// track category currently being parsed
         private static string _currentCategory;
         /// and how many have been created so far
         private static int _currentCount = 0;
 
-        // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
+
+
+        public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
+        // public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
+
+        public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
+
+
+
 
         /// Call this method to run all the other class methods
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
@@ -173,54 +173,73 @@ namespace InvisibleHand.Items.Categories
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
-            ActiveCategories = new HashSet<int>();
+            // ActiveCategories = new HashSet<int>();
             // int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
             _currentCount = 0;
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
-            {
                 using (Stream s = assembly.GetManifestResourceStream(res))
                 {
                     // read in the file stream and turn into an array of JsonObjects where each is a Category Definition
-                    var CatObjList = HjsonValue.Load(s).Qa();
-
-                    foreach (var catobj in CatObjList)
-                    {
+                    // var CatObjList = HjsonValue.Load(s).Qa();
+                    foreach (var catobj in HjsonValue.Load(s).Qa())
                         // get object parts
                         // ------------------
-                        var catdef = new
-                        {
+                        buildCategory(
                             // each part contains a null? check to avoid breakage at this step
-
-                            name = catobj.ContainsKey("name") ? catobj["name"]?.Qs() ?? "" : "",
-                            parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() ?? "" : "",
-                            inherits = catobj.ContainsKey("inherit") ? catobj["inherit"]?.Qs() ?? "" : "",
-
-                            // whether to activate this category (DEFAULT: true)
-                            enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
-                            display = catobj.ContainsKey("display") ? catobj["display"]?.Qb() ?? true : true,
-
-                            // priority is now just a 'weight', used to modify the order of categories with regards to
-                            // their siblings. There's no more bit shifting or anything, and the -500..500 limit is now
-                            // entirely arbitrary (though I might keep it just so people don't get...too ambitious)
-                            priority = catobj.ContainsKey("priority") ? catobj["priority"]?.Qi().Clamp(-500, 500) : null,
-
-                            // the required traits for this category
-                            // requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
-                            requires = catobj.ContainsKey("requires") ? catobj["requires"] : null,
-
-                            union = catobj.ContainsKey("union") ? catobj["union"]?.Qa() : null,
-
-                            // any merged categories
-                            // merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
-                            merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qb() ?? false : false,
-
-                            // any include child categories
-                            include = catobj.ContainsKey("include") ? catobj["include"]?.Qo() : null,
-
-                            // ordered list of Item fields on which to sort items in this category
-                            sort_fields = catobj.ContainsKey("sort") ? catobj["sort"]?.Qa() : null,
-                        };
+                            name         : catobj.ContainsKey("name")     ? catobj["name"]    ?.Qs() ?? ""    : "",
+                            parent       : catobj.ContainsKey("parent")   ? catobj["parent"]  ?.Qs() ?? ""    : "",
+                            // TODO: actually use this:
+                            inherit      : catobj.ContainsKey("inherit")  ? catobj["inherit"] ?.Qs() ?? ""    : "",
+                            enable       : catobj.ContainsKey("display")  ? catobj["display"] ?.Qb() ?? true  : true,
+                            // TODO: actually use this:
+                            display      : catobj.ContainsKey("display")  ? catobj["display"] ?.Qb() ?? true  : true,
+                            prio         : catobj.ContainsKey("priority") ? catobj["priority"]?.Qi()          : null,
+                            requires     : catobj.ContainsKey("requires") ? catobj["requires"]                : null,
+                            union_members: catobj.ContainsKey("union")    ? catobj["union"]   ?.Qa()          : null,
+                            // TODO: actually use this:
+                            merge        : catobj.ContainsKey("merge")    ? catobj["merge"]   ?.Qb() ?? false : false,
+                            include      : catobj.ContainsKey("include")  ? catobj["include"] ?.Qo()          : null,
+                            sort_fields  : catobj.ContainsKey("sort")     ? catobj["sort"]    ?.Qa()          : null
+                        );
+                }
+        }
+        /*
+                        // get object parts
+                        // ------------------
+                        // var catdef = new
+                        // {
+                        //     // each part contains a null? check to avoid breakage at this step
+                        //
+                        //     name = catobj.ContainsKey("name") ? catobj["name"]?.Qs() ?? "" : "",
+                        //     parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() ?? "" : "",
+                        //     inherits = catobj.ContainsKey("inherit") ? catobj["inherit"]?.Qs() ?? "" : "",
+                        //
+                        //     // whether to activate this category (DEFAULT: true)
+                        //     enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
+                        //     display = catobj.ContainsKey("display") ? catobj["display"]?.Qb() ?? true : true,
+                        //
+                        //     // priority is now just a 'weight', used to modify the order of categories with regards to
+                        //     // their siblings. There's no more bit shifting or anything, and the -500..500 limit is now
+                        //     // entirely arbitrary (though I might keep it just so people don't get...too ambitious)
+                        //     priority = catobj.ContainsKey("priority") ? catobj["priority"]?.Qi().Clamp(-500, 500) : null,
+                        //
+                        //     // the required traits for this category
+                        //     // requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
+                        //     requires = catobj.ContainsKey("requires") ? catobj["requires"] : null,
+                        //
+                        //     union = catobj.ContainsKey("union") ? catobj["union"]?.Qa() : null,
+                        //
+                        //     // any merged categories
+                        //     // merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
+                        //     merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qb() ?? false : false,
+                        //
+                        //     // any include child categories
+                        //     include = catobj.ContainsKey("include") ? catobj["include"]?.Qo() : null,
+                        //
+                        //     // ordered list of Item fields on which to sort items in this category
+                        //     sort_fields = catobj.ContainsKey("sort") ? catobj["sort"]?.Qa() : null,
+                        // };
 
                         // name field is always required
                         if (catdef.name == String.Empty)
@@ -244,17 +263,18 @@ namespace InvisibleHand.Items.Categories
                             // TODO: allow enable/disable at runtime
                             // if (catdef.enable)
                             // addUnionMembers(union, catdef.merge);
-                            addUnionMembers(union, catdef.union);
+                            //
 
-                            union.Enabled = catdef.enable;
-
-                            union.MergeItems = catdef.merge;
-
-                            CategoryDefinitions[union.Name] = union;
-                            return;
-                            // XXX: should we add the unions to the search tree?
-                            // ANSWER: No.
-                            // if (catdef.enable) ActiveCategories.Add(union.ID);
+                            // if "union" is not an empty array:
+                            // if (addUnionMembers(union, catdef.union))
+                            // {
+                            //     union.Enabled = catdef.enable;
+                            //
+                            //     union.MergeItems = catdef.merge;
+                            //
+                            //     CategoryDefinitions[union.Name] = union;
+                            //     continue;
+                            // }
                         }
 
                         // a 'Regular' category
@@ -279,7 +299,7 @@ namespace InvisibleHand.Items.Categories
 
                                 // store the new category in the collections
                                 CategoryDefinitions[newcategory.Name] = newcategory;
-                                return;
+                                continue;
                             }
 
 
@@ -303,88 +323,197 @@ namespace InvisibleHand.Items.Categories
                             // }
                         }
 
-                        // if "requires" was null or empty:
+                        // if "requires" and "union" were null or empty:
                         // consider this a "Container" category
                         var new_container = new ContainerCategory(catdef.name, ++_currentCount, parentID, priority);
                         new_container.Enabled = catdef.enable;
                         assignSortingRules(new_container, catdef.sort_fields);
 
+                        CategoryDefinitions[new_container.Name] = new_container;
 
                     } // end of category-object list
                 }
             }
         }
+        */
 
-        private static IEnumerable<string> getRequirementLines(JsonValue requires)
-        {
-            // if the requires list is null, return an empty list
-            if (requires == null)
-                return new string[0];
+        /*
+        ██████  ██    ██ ██ ██      ██████       ██████ ████████  ██████  ██████  ██    ██
+        ██   ██ ██    ██ ██ ██      ██   ██     ██         ██    ██       ██   ██  ██  ██
+        ██████  ██    ██ ██ ██      ██   ██     ██         ██    ██   ███ ██████    ████
+        ██   ██ ██    ██ ██ ██      ██   ██     ██         ██    ██    ██ ██   ██    ██
+        ██████   ██████  ██ ███████ ██████       ██████    ██     ██████  ██   ██    ██
+        */
+
+        /// we have to return an enumerable of categories because of the option that causes multiple subcategories to be created
+        private static void buildCategory(string name, string parent, string inherit, bool enable, bool display, int? prio, JsonValue requires, JsonArray union_members, bool merge, JsonObject include, JsonArray sort_fields)
+         {
+            if (name == String.Empty)
+                throw new HjsonFieldNotFoundException("name", "Category Object");
+            _currentCategory = name;
 
 
-            // if the requires "list" is just a single string
-            if (requires.JsonType == JsonType.String)
-                return new[] { requires.Qs() };
+            // get parent, if any
 
-            // otherwise it should be a list of strings
-            else if (requires.JsonType == JsonType.Array)
-                return requires.Qa().Select(r => r.Qs());
+            // if inherit is different than parent
+            // TODO: actually use this
 
-            // if it is some other format, throw exception
-            throw new MalformedFieldError();
+            // and priority, either specific to this category (or default 0)
+
+            ItemCategory new_category = null;
+            var parent_name = parent != String.Empty && parent[0] == '@' ? parent.Substring(1) : parent;
+            var parentID    = getParentID(parent_name);
+            var inheritsID  = getCategoryID(inherit);
+            var priority    = prio ?? 0;
+
+            // A union category
+            // ------------------
+            if (union_members != null && union_members.Count > 0)
+            {
+                var union = new UnionCategory(name, ++_currentCount, parentID, priority: priority);
+
+                // TODO: allow enable/disable at runtime
+
+                addUnionMembers(union, union_members);
+                union.MergeItems = merge;
+
+                union.Enabled = enable;
+                new_category = union;
+                CategoryDefinitions[union.Name] = union;
+            }
+
+            // a 'Regular' category
+            // ------------------
+            else if (requires != null)
+            {
+                IDictionary<string, int> reqs;
+                IDictionary<string, int> excls;
+
+                // if there are requirements, create new reqular category
+                if (parseRequirements(getRequirementLines(requires), out reqs, out excls))
+                {
+                    // if the parent's name starts with '@', this is the special case where we
+                    // generate subcategories for every child
+                    if (parent_name != parent) // check will succeed if we removed the '@'
+                    {
+                        foreach (var child in ItemCategory.Registry.Values.Where(cat => cat.ParentID == parentID))
+                        {
+                            // set name to "ParentName - ThisName"
+                            // e.g. "Arrows - Endless"
+                            var subcat = new RegularCategory($"{child.Name} - {name}", ++_currentCount, child.ID, priority, reqs, excls);
+                            subcat.Enabled = enable;
+
+                            assignSortingRules(subcat, sort_fields);
+                            CategoryDefinitions[subcat.Name] = subcat;
+                        }
+                        // no "include" allowed for this type
+                        return;
+                    }
+
+                    var newcategory = new RegularCategory(name, ++_currentCount, parentID, priority, reqs, excls);
+                    newcategory.Enabled = enable;
+
+                    // create/get the Sorting Rules for the category
+                    assignSortingRules(newcategory, sort_fields);
+
+                    // store the new category in the collections
+                    CategoryDefinitions[newcategory.Name] = newcategory;
+                    new_category = newcategory;
+                }
+            }
+            else
+            {
+                // if "requires" and "union" were null or empty, consider this
+                // a "Container" category
+                // ------------------
+                var new_container = new ContainerCategory(name, ++_currentCount, parentID, priority);
+                new_container.Enabled = enable;
+                assignSortingRules(new_container, sort_fields);
+
+                CategoryDefinitions[new_container.Name] = new_container;
+
+                new_category = new_container;
+            }
+
+            // now handle the "include" entry
+            if (new_category != null && include != null)
+            {
+                foreach (var minicat in include)
+                    parseMiniCategory(new_category.ID, minicat.Key, minicat.Value);
+            }
         }
 
-        /// for parsing the "mini" categories inside an include: block
-        /// parent_id is the id number of the category containing the include: block
-        private static void parseMiniCategories(int parent_id, JsonObject include)
+
+        /*
+        ██ ███    ██  ██████ ██      ██    ██ ██████  ███████ ███████
+        ██ ████   ██ ██      ██      ██    ██ ██   ██ ██      ██
+        ██ ██ ██  ██ ██      ██      ██    ██ ██   ██ █████   ███████
+        ██ ██  ██ ██ ██      ██      ██    ██ ██   ██ ██           ██
+        ██ ██   ████  ██████ ███████  ██████  ██████  ███████ ███████
+        */
+
+        private static void parseInclude(int parent_id, JsonObject include)
         {
             if (include == null) return;
 
             foreach (var minicat in include)
             {
-                var cat_name = minicat.Key;
+                parseMiniCategory(parent_id, minicat.Key, minicat.Value);
+            }
+        }
 
-                IDictionary<string, int> requirements;
-                IDictionary<string, int> exclusions;
+        /// for parsing the "mini" categories inside an include: block
+        /// parent_id is the id number of the category containing the include: block
+        private static void parseMiniCategory(int parent_id, string category_name, JsonValue value)
+        {
+            IDictionary<string, int> requirements;
+            IDictionary<string, int> exclusions;
 
-                if (minicat.Value.JsonType == JsonType.String)
+            if (value.JsonType == JsonType.String)
+            {
+                // category requirements are held in the single string value for the key
+                if (parseRequirements(new[] { value.Qs() }, out requirements, out exclusions))
                 {
-                    // category requirements are held in the single string value for the key
-                    if (parseRequirements(new[] { minicat.Value.Qs() }, out requirements, out exclusions))
-                    {
-                        var newcategory = new RegularCategory(cat_name, ++_currentCount, parent_id, 0, requirements, exclusions);
-                        newcategory.Enabled = true;
+                    var newcategory = new RegularCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                    newcategory.Enabled = true;
 
-                        // assign sorting rules from parent
-                        newcategory.CopyParentRules();
+                    // assign sorting rules from parent
+                    newcategory.CopyParentRules();
 
-                        CategoryDefinitions[newcategory.Name] = newcategory;
-                    }
+                    CategoryDefinitions[newcategory.Name] = newcategory;
                 }
+            }
 
-                // if it's an object, could contain "requires" list and/or nested "include"
-                else if (minicat.Value.JsonType == JsonType.Object)
+            // if it's an object, could contain "requires" list and/or nested "include"
+            else if (value.JsonType == JsonType.Object)
+            {
+                var minicatobj = value.Qo();
+
+                Sorter newcategory;
+                if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
                 {
-                    var minicatobj = minicat.Value.Qo();
+                    newcategory = new RegularCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                    newcategory.Enabled = true;
 
-                    if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
-                    {
-                        var newcategory = new RegularCategory(cat_name, ++_currentCount, parent_id, 0, requirements, exclusions);
-                        newcategory.Enabled = true;
+                    // assign sorting rules from parent
+                    newcategory.CopyParentRules();
 
-                        // assign sorting rules from parent
-                        newcategory.CopyParentRules();
-
-                        CategoryDefinitions[newcategory.Name] = newcategory;
-
-                        // recursively perform this same process for any members of a nested "include" block
-                        if (minicatobj.ContainsKey("include"))
-                            parseMiniCategories(newcategory.ID, minicatobj["include"]?.Qo());
-                    }
+                    CategoryDefinitions[newcategory.Name] = newcategory;
                 }
                 else
-                    throw new MalformedFieldError($"Could not parse 'include' entry '{cat_name}' for category '{_currentCategory}'");
+                {
+                    newcategory = new ContainerCategory(category_name, ++_currentCount, parent_id);
+                    newcategory.Enabled = true;
+                    // assign sorting rules from parent
+                    newcategory.CopyParentRules();
+                    CategoryDefinitions[newcategory.Name] = newcategory;
+                }
+                // recursively perform this same process for any members of a nested "include" block
+                if (minicatobj.ContainsKey("include"))
+                    parseInclude(newcategory.ID, minicatobj["include"]?.Qo());
             }
+            else
+                throw new MalformedFieldError($"Could not parse 'include' entry '{category_name}' for category '{_currentCategory}'");
         }
 
 
@@ -451,9 +580,30 @@ namespace InvisibleHand.Items.Categories
                             ▀▀
         */
 
+        /// if the requires list is null, return an empty list;
+        /// if the requires "list" is just a single string, return a list containing that string.
+        /// otherwise return the list of strings found in the array.
+        /// If the "requires" value is neither null, string, nor array, throw MalformedFieldError
+        private static IEnumerable<string> getRequirementLines(JsonValue requires)
+        {
+            if (requires == null)
+                return new string[0];
+
+            if (requires.JsonType == JsonType.String)
+                return new[] { requires.Qs() };
+
+            else if (requires.JsonType == JsonType.Array)
+                return requires.Qa().Select(r => r.Qs());
+
+            throw new MalformedFieldError();
+        }
+
+        /// Get the tokenizer to analyze each line in the requires_list and return an object containing any found
+        /// requirements or exclusions. The values for each line are accumulated and placed into the out parameters
+        /// as appropriate. Returns true if any requirements or exclusions were found, false if for some reason none
+        /// were (e.g. the requires_list was empty)
         private static bool parseRequirements(IEnumerable<string> requires_list, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
         {
-            // temp containers
             var reqs = new Dictionary<string, int>();
             var excls = new Dictionary<string, int>();
 
@@ -492,7 +642,7 @@ namespace InvisibleHand.Items.Categories
             // performance difference between catch() && TryGetValue
             try
             {
-                return  IHBase.FlagCollection[trait_group];
+                return IHBase.FlagCollection[trait_group];
             }
             catch (KeyNotFoundException knfe)
             {
@@ -585,9 +735,8 @@ namespace InvisibleHand.Items.Categories
         // }
 
         /// <summary>
-        /// Get the id of the pre-existing parent of the given category
-        /// </summary>
-        /// <param name="category_name">Name of current category (only used in error messages if the parent name is not found) </param>
+        /// Get the id of the pre-existing parent with the given name. If that parent is disabled, will walk up the parent
+        /// hierarchy until an enabled parent (or the root) is found.
         /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
         /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
         private static int getParentID(string parent_name)
@@ -607,6 +756,9 @@ namespace InvisibleHand.Items.Categories
             return pid;
         }
 
+        /// <summary>
+        /// Get the id of the pre-existing category with the given name
+        /// </summary>
         private static int getCategoryID(string category_name)
         {
             try
@@ -636,7 +788,7 @@ namespace InvisibleHand.Items.Categories
         private static void CalculateOrdinals()
         {
             // creates a lookup of: ParentID => [collection of child categories]
-            var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c=>c.ParentID, c=> c);
+            var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c => c.ParentID, c => c);
             // assign addresses to all the top level categories, and recursively to their children
             assignAddresses(0, int.MaxValue, 0, lookup_byparentID);
 
@@ -688,7 +840,7 @@ namespace InvisibleHand.Items.Categories
                 // If this child is itself a parent, recursively call this function for its children
                 if (child_category_lookup.Contains(r.category.ID))
                     // subtract 1 more from the end of the range so we don't try to overwrite this category
-                    assignAddresses(range_start, range_end-1, r.category.ID, child_category_lookup);
+                    assignAddresses(range_start, range_end - 1, r.category.ID, child_category_lookup);
             }
         }
 
