@@ -26,6 +26,8 @@ namespace InvisibleHand.Items.Categories
 
         /// track category currently being parsed
         private static string _currentCategory;
+        /// and how many have been created so far
+        private static int _currentCount = 0;
 
         // public static SortedAutoTree<int, ItemCategory> CategoryTree { get; private set; }
 
@@ -166,7 +168,8 @@ namespace InvisibleHand.Items.Categories
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
             ActiveCategories = new HashSet<int>();
-            int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
+            // int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
+            _currentCount = 0;
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
             {
@@ -230,7 +233,7 @@ namespace InvisibleHand.Items.Categories
                         // if (catdef.merge != null)
                         if (catdef.union != null)
                         {
-                            var union = new UnionCategory(catdef.name, ++count, parentID, priority: priority);
+                            var union = new UnionCategory(catdef.name, ++_currentCount, parentID, priority: priority);
 
                             // TODO: allow enable/disable at runtime
                             // if (catdef.enable)
@@ -254,12 +257,11 @@ namespace InvisibleHand.Items.Categories
                             IDictionary<string, int> reqs;
                             IDictionary<string, int> excls;
 
-                            // var reqlist = getRequirementLines(catdef.requires);
 
                             // if there are requirements, create new reqular category
-                            if (parseRequirements2(getRequirementLines(catdef.requires), out reqs, out excls))
+                            if (parseRequirements(getRequirementLines(catdef.requires), out reqs, out excls))
                             {
-                                var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
+                                var newcategory = new RegularCategory(catdef.name, ++_currentCount, parentID, priority, reqs, excls);
                                 newcategory.Enabled = catdef.enable;
 
                                 // create/get the Sorting Rules for the category
@@ -301,42 +303,75 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
-        private static IList<string> getRequirementLines(JsonValue requires)
+        private static IEnumerable<string> getRequirementLines(JsonValue requires)
         {
+            // if the requires list is null, return an empty list
+            if (requires == null)
+                return new string[0];
+
+
             // if the requires "list" is just a single string
             if (requires.JsonType == JsonType.String)
-                return new List<string>() { requires.Qs() };
+                return new[] { requires.Qs() };
+
             // otherwise it should be a list of strings
             else if (requires.JsonType == JsonType.Array)
-                return requires.Qa().Select(r => r.Qs()).ToList();
+                return requires.Qa().Select(r => r.Qs());
+
+            // if it is some other format, throw exception
             throw new MalformedFieldError();
         }
 
         /// for parsing the "mini" categories inside an include: block
-        private static void parseMiniCategories(JsonObject include)
+        /// parent_id is the id number of the category containing the include: block
+        private static void parseMiniCategories(int parent_id, JsonObject include)
         {
+            if (include == null) return;
+
             foreach (var minicat in include)
             {
                 var cat_name = minicat.Key;
 
-                Dictionary<string, int> requires;
+                IDictionary<string, int> requirements;
+                IDictionary<string, int> exclusions;
+
                 if (minicat.Value.JsonType == JsonType.String)
                 {
                     // category requirements are held in the single string value for the key
-                    requires = new Dictionary<string, int>();
+                    if (parseRequirements(new[] { minicat.Value.Qs() }, out requirements, out exclusions))
+                    {
+                        var newcategory = new RegularCategory(cat_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                        newcategory.Enabled = true;
+
+                        // assign sorting rules from parent
+                        newcategory.CopyParentRules();
+
+                        CategoryDefinitions[newcategory.Name] = newcategory;
+                    }
                 }
+
+                // if it's an object, could contain "requires" list and/or nested "include"
                 else if (minicat.Value.JsonType == JsonType.Object)
                 {
+                    var minicatobj = minicat.Value.Qo();
 
+                    if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
+                    {
+                        var newcategory = new RegularCategory(cat_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                        newcategory.Enabled = true;
+
+                        // assign sorting rules from parent
+                        newcategory.CopyParentRules();
+
+                        CategoryDefinitions[newcategory.Name] = newcategory;
+
+                        // recursively perform this same process for any members of a nested "include" block
+                        if (minicatobj.ContainsKey("include"))
+                            parseMiniCategories(newcategory.ID, minicatobj["include"]?.Qo());
+                    }
                 }
-
-                // requires = minicat.Value.JsonType == JsonType.String ? minicat.Value.Qs() : "";
-
-                var catdef = new
-                {
-                    name = minicat.Key,
-                    requires = minicat.Value.JsonType == JsonType.String ? minicat.Value.Qs() : "",
-                };
+                else
+                    throw new MalformedFieldError($"Could not parse 'include' entry '{cat_name}' for category '{_currentCategory}'");
             }
         }
 
@@ -404,7 +439,7 @@ namespace InvisibleHand.Items.Categories
                             ▀▀
         */
 
-        private static bool parseRequirements2(IEnumerable<string> requires_list, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
+        private static bool parseRequirements(IEnumerable<string> requires_list, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
         {
             // temp containers
             var reqs = new Dictionary<string, int>();
@@ -423,7 +458,6 @@ namespace InvisibleHand.Items.Categories
 
                     foreach (var trait in entry.excludes)
                         excls.Add(trait, getValueForFlag(trait_group, trait));
-
 
                 }
                 catch (TokenizerException e)
@@ -477,66 +511,66 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
-        private static bool parseRequirements(JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
-        {
-            // temp containers
-            var reqs = new Dictionary<string, int>();
-            var excls = new Dictionary<string, int>();
-
-            // keep track of whether any requires were even listed with the definition
-            bool requirements_found = false;
-
-            // iterate through listed traits
-            foreach (var newreqs in requires_obj)
-            {
-                var traitCategory = newreqs.Key;
-                // FlagCollection[TraitCategory][TraitName]
-
-                // var flagvalues = getFlagValues(category_name, traitCategory);
-
-
-                // go through the array of traits, add the appropriate flag value
-                foreach (string trait_name in newreqs.Value.Qa())
-                {
-                    // copy the trait name because we might be modifying it
-                    var use_name = trait_name;
-                    bool exclude = false;
-                    // check if we're inverting a value
-                    if (trait_name[0] == '!')
-                    {
-                        exclude = true;
-                        // remove the exclamation mark and any additional whitespace from the trait name
-                        use_name = trait_name.Trim(new[] { '!', ' ' });
-                    }
-
-                    int flagvalue = getValueForFlag(traitCategory, use_name);
-
-                    // now OR in the required value to the appropriate container
-
-                    if (exclude) // if this is a "!trait" requirement
-                    {
-                        requirements_found = true;
-
-                        if (!excls.ContainsKey(traitCategory))
-                            excls[traitCategory] = 0;
-
-                        excls[traitCategory] |= flagvalue;
-                    }
-                    else
-                    {
-                        requirements_found = true;
-                        // initialize the value for this trait type if it has not been seen before
-                        if (!reqs.ContainsKey(traitCategory))
-                            reqs[traitCategory] = 0;
-                        reqs[traitCategory] |= flagvalue;
-                    }
-                }
-            }
-            requirements = reqs.Count > 0 ? reqs : null;
-            exclusions = excls.Count > 0 ? excls : null;
-
-            return requirements_found;
-        }
+        // private static bool parseRequirements(JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
+        // {
+        //     // temp containers
+        //     var reqs = new Dictionary<string, int>();
+        //     var excls = new Dictionary<string, int>();
+        //
+        //     // keep track of whether any requires were even listed with the definition
+        //     bool requirements_found = false;
+        //
+        //     // iterate through listed traits
+        //     foreach (var newreqs in requires_obj)
+        //     {
+        //         var traitCategory = newreqs.Key;
+        //         // FlagCollection[TraitCategory][TraitName]
+        //
+        //         // var flagvalues = getFlagValues(category_name, traitCategory);
+        //
+        //
+        //         // go through the array of traits, add the appropriate flag value
+        //         foreach (string trait_name in newreqs.Value.Qa())
+        //         {
+        //             // copy the trait name because we might be modifying it
+        //             var use_name = trait_name;
+        //             bool exclude = false;
+        //             // check if we're inverting a value
+        //             if (trait_name[0] == '!')
+        //             {
+        //                 exclude = true;
+        //                 // remove the exclamation mark and any additional whitespace from the trait name
+        //                 use_name = trait_name.Trim(new[] { '!', ' ' });
+        //             }
+        //
+        //             int flagvalue = getValueForFlag(traitCategory, use_name);
+        //
+        //             // now OR in the required value to the appropriate container
+        //
+        //             if (exclude) // if this is a "!trait" requirement
+        //             {
+        //                 requirements_found = true;
+        //
+        //                 if (!excls.ContainsKey(traitCategory))
+        //                     excls[traitCategory] = 0;
+        //
+        //                 excls[traitCategory] |= flagvalue;
+        //             }
+        //             else
+        //             {
+        //                 requirements_found = true;
+        //                 // initialize the value for this trait type if it has not been seen before
+        //                 if (!reqs.ContainsKey(traitCategory))
+        //                     reqs[traitCategory] = 0;
+        //                 reqs[traitCategory] |= flagvalue;
+        //             }
+        //         }
+        //     }
+        //     requirements = reqs.Count > 0 ? reqs : null;
+        //     exclusions = excls.Count > 0 ? excls : null;
+        //
+        //     return requirements_found;
+        // }
 
         /// <summary>
         /// Get the id of the pre-existing parent of the given category
@@ -577,7 +611,6 @@ namespace InvisibleHand.Items.Categories
             try
             {
                 return category_name == String.Empty ? 0 : CategoryDefinitions[category_name].ID;
-
             }
             catch (KeyNotFoundException knfe)
             {
