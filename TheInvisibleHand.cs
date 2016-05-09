@@ -50,8 +50,6 @@ namespace InvisibleHand
         /// It is a mapping of "Category_Name" -> {"TraitGroup": combined_value_of_flags_for_group}
         // public static IDictionary<string, ItemCategory> CategoryDefs => Parser.CategoryDefinitions;
 
-        // public static SortedAutoTree<string, ItemCategory> CategoryTree => CategoryParser.CategoryTree;
-        // public static SortedAutoTree<int, ItemCategory> CategoryTree => Parser.CategoryTree;
         /// returns the traversal tree used to assign a category to an item.
         /// uses keys based on a category's ordinal (ordering rank).
         public static SortedAutoTree<int, ItemCategory> CategoryTree;
@@ -129,10 +127,17 @@ namespace InvisibleHand
 
             // load the item flags and category definitions
             FlagCollection = new _flagCollection();
-            CategoryTree = new SortedAutoTree<int, ItemCategory>() {Label=0};
+
+            // create the root of the tree; the label here is unimportant. All other labels
+            // will be created automatically during autovivification, using the ordinal value of the category
+            CategoryTree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
+
+            // Read all the definition files for traits and categories and load them into their
+            // appropriate container structures.
             Parser.Parse();
         }
 
+        /// determine when to do alternate action
         internal static bool ShiftHeld() => Keys.LeftShift.Down() || Keys.RightShift.Down();
 
         public override void HotKeyPressed(string name)

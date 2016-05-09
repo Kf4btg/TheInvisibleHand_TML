@@ -27,11 +27,8 @@ namespace InvisibleHand.Items.Categories
 
 
         public static IDictionary<string, IList<string>> TraitDefinitions { get; private set; }
-        // public static IDictionary<string, IDictionary<string, int>> FlagCollection { get; private set; }
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
-
-
 
 
         /// Call this method to run all the other class methods
@@ -95,6 +92,16 @@ namespace InvisibleHand.Items.Categories
                 {
                     var traitGroups = HjsonValue.Load(s).Qo();
 
+                    // Trait Group object:
+                    // {
+                    //    "traits": [
+                    //        list of strings defining the names of traits in this group
+                    //                Note: there should not be more than 32 traits in any single group
+                    //    ]
+                    //    optional Subobjects: in same form
+                    //
+                    // }  (object name = object.Key)
+
                     foreach (var tgroup in traitGroups)
                         LoadGroup(tgroup);
                 }
@@ -138,8 +145,6 @@ namespace InvisibleHand.Items.Categories
                 // LoadTraitDefinitions(TraitFilePath);
                 LoadFromTraitDefinitions(TraitDefsPath);
 
-            // FlagCollection = new Dictionary<string, IDictionary<string, int>>();
-
             foreach (var tgroup in TraitDefinitions)
             {
                 var flagGroup = new Dictionary<string, int>();
@@ -173,18 +178,14 @@ namespace InvisibleHand.Items.Categories
         private static void LoadCategoryDefinitions(string category_resources_path)
         {
             CategoryDefinitions = new Dictionary<string, ItemCategory>();
-            // ActiveCategories = new HashSet<int>();
-            // int count = 0; // track absolute order of added categories (this will be the unique ID for each category)
-            _currentCount = 0;
+            _currentCount = 0; // track absolute order of added categories (this will be the unique ID for each category)
 
             foreach (var res in assembly.GetManifestResourceNames().Where(n => n.StartsWith(category_resources_path)).OrderBy(n => n))
                 using (Stream s = assembly.GetManifestResourceStream(res))
                 {
                     // read in the file stream and turn into an array of JsonObjects where each is a Category Definition
-                    // var CatObjList = HjsonValue.Load(s).Qa();
                     foreach (var catobj in HjsonValue.Load(s).Qa())
                         // get object parts
-                        // ------------------
                         buildCategory(
                             // each part contains a null? check to avoid breakage at this step
                             name         : catobj.ContainsKey("name")     ? catobj["name"]    ?.Qs() ?? ""    : "",
@@ -204,138 +205,6 @@ namespace InvisibleHand.Items.Categories
                         );
                 }
         }
-        /*
-                        // get object parts
-                        // ------------------
-                        // var catdef = new
-                        // {
-                        //     // each part contains a null? check to avoid breakage at this step
-                        //
-                        //     name = catobj.ContainsKey("name") ? catobj["name"]?.Qs() ?? "" : "",
-                        //     parent_name = catobj.ContainsKey("parent") ? catobj["parent"]?.Qs() ?? "" : "",
-                        //     inherits = catobj.ContainsKey("inherit") ? catobj["inherit"]?.Qs() ?? "" : "",
-                        //
-                        //     // whether to activate this category (DEFAULT: true)
-                        //     enable = catobj.ContainsKey("enable") ? catobj["enable"]?.Qb() ?? true : true,
-                        //     display = catobj.ContainsKey("display") ? catobj["display"]?.Qb() ?? true : true,
-                        //
-                        //     // priority is now just a 'weight', used to modify the order of categories with regards to
-                        //     // their siblings. There's no more bit shifting or anything, and the -500..500 limit is now
-                        //     // entirely arbitrary (though I might keep it just so people don't get...too ambitious)
-                        //     priority = catobj.ContainsKey("priority") ? catobj["priority"]?.Qi().Clamp(-500, 500) : null,
-                        //
-                        //     // the required traits for this category
-                        //     // requires = catobj.ContainsKey("requires") ? catobj["requires"]?.Qo() : null,
-                        //     requires = catobj.ContainsKey("requires") ? catobj["requires"] : null,
-                        //
-                        //     union = catobj.ContainsKey("union") ? catobj["union"]?.Qa() : null,
-                        //
-                        //     // any merged categories
-                        //     // merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qa() : null,
-                        //     merge = catobj.ContainsKey("merge") ? catobj["merge"]?.Qb() ?? false : false,
-                        //
-                        //     // any include child categories
-                        //     include = catobj.ContainsKey("include") ? catobj["include"]?.Qo() : null,
-                        //
-                        //     // ordered list of Item fields on which to sort items in this category
-                        //     sort_fields = catobj.ContainsKey("sort") ? catobj["sort"]?.Qa() : null,
-                        // };
-
-                        // name field is always required
-                        if (catdef.name == String.Empty)
-                            throw new HjsonFieldNotFoundException("name", nameof(catobj));
-                        _currentCategory = catdef.name;
-
-                        // get parent, if any
-                        int parentID = getParentID(catdef.parent_name);
-                        int inheritsID = getCategoryID(catdef.inherits);
-
-                        // and priority, either specific to this category (or default 0)
-                        int priority = catdef.priority ?? 0;
-
-                        // A union category
-                        // ------------------
-                        // if (catdef.merge != null)
-                        if (catdef.union != null)
-                        {
-                            var union = new UnionCategory(catdef.name, ++_currentCount, parentID, priority: priority);
-
-                            // TODO: allow enable/disable at runtime
-                            // if (catdef.enable)
-                            // addUnionMembers(union, catdef.merge);
-                            //
-
-                            // if "union" is not an empty array:
-                            // if (addUnionMembers(union, catdef.union))
-                            // {
-                            //     union.Enabled = catdef.enable;
-                            //
-                            //     union.MergeItems = catdef.merge;
-                            //
-                            //     CategoryDefinitions[union.Name] = union;
-                            //     continue;
-                            // }
-                        }
-
-                        // a 'Regular' category
-                        // ------------------
-                        if (catdef.requires != null)
-                        {
-                            // parse requirements
-                            // ------------------
-                            IDictionary<string, int> reqs;
-                            IDictionary<string, int> excls;
-
-
-                            // if there are requirements, create new reqular category
-                            if (parseRequirements(getRequirementLines(catdef.requires), out reqs, out excls))
-                            {
-                                var newcategory = new RegularCategory(catdef.name, ++_currentCount, parentID, priority, reqs, excls);
-                                newcategory.Enabled = catdef.enable;
-
-                                // create/get the Sorting Rules for the category
-                                // ---------------------------------------------
-                                assignSortingRules(newcategory, catdef.sort_fields);
-
-                                // store the new category in the collections
-                                CategoryDefinitions[newcategory.Name] = newcategory;
-                                continue;
-                            }
-
-
-                            // if, somehow, there are no requirements, don't bother adding to list
-                            // if (parseRequirements(catdef.name, catdef.requires, out reqs, out excls))
-                            // {
-                            //     // otherwise, create the new category object
-                            //     var newcategory = new RegularCategory(catdef.name, ++count, parentID, priority, reqs, excls);
-                            //
-                            //     newcategory.Enabled = catdef.enable;
-                            //
-                            //
-                            //     // create/get the Sorting Rules for the category
-                            //     // ---------------------------------------------
-                            //     assignSortingRules(newcategory, catdef.sort_fields);
-                            //
-                            //     // store the new category in the collections
-                            //     CategoryDefinitions[newcategory.Name] = newcategory;
-                            //     // if (catdef.enable) ActiveCategories.Add(newcategory.ID);
-                            //
-                            // }
-                        }
-
-                        // if "requires" and "union" were null or empty:
-                        // consider this a "Container" category
-                        var new_container = new ContainerCategory(catdef.name, ++_currentCount, parentID, priority);
-                        new_container.Enabled = catdef.enable;
-                        assignSortingRules(new_container, catdef.sort_fields);
-
-                        CategoryDefinitions[new_container.Name] = new_container;
-
-                    } // end of category-object list
-                }
-            }
-        }
-        */
 
         /*
         ██████  ██    ██ ██ ██      ██████       ██████ ████████  ██████  ██████  ██    ██
@@ -351,7 +220,6 @@ namespace InvisibleHand.Items.Categories
             if (name == String.Empty)
                 throw new HjsonFieldNotFoundException("name", "Category Object");
             _currentCategory = name;
-
 
             // get parent, if any
 
@@ -425,7 +293,6 @@ namespace InvisibleHand.Items.Categories
             {
                 // if "requires" and "union" were null or empty, consider this
                 // a "Container" category
-                // ------------------
                 var new_container = new ContainerCategory(name, ++_currentCount, parentID, priority);
                 new_container.Enabled = enable;
                 assignSortingRules(new_container, sort_fields);
@@ -435,7 +302,7 @@ namespace InvisibleHand.Items.Categories
                 new_category = new_container;
             }
 
-            // now handle the "include" entry
+            // finally handle the "include" entry
             if (new_category != null && include != null)
             {
                 foreach (var minicat in include)
@@ -457,9 +324,7 @@ namespace InvisibleHand.Items.Categories
             if (include == null) return;
 
             foreach (var minicat in include)
-            {
                 parseMiniCategory(parent_id, minicat.Key, minicat.Value);
-            }
         }
 
         /// for parsing the "mini" categories inside an include: block
@@ -655,7 +520,6 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
-
         private static int getValueForFlag(string trait_group, string flag_name)
         {
             try
@@ -673,67 +537,6 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
-        // private static bool parseRequirements(JsonObject requires_obj, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
-        // {
-        //     // temp containers
-        //     var reqs = new Dictionary<string, int>();
-        //     var excls = new Dictionary<string, int>();
-        //
-        //     // keep track of whether any requires were even listed with the definition
-        //     bool requirements_found = false;
-        //
-        //     // iterate through listed traits
-        //     foreach (var newreqs in requires_obj)
-        //     {
-        //         var traitCategory = newreqs.Key;
-        //         // FlagCollection[TraitCategory][TraitName]
-        //
-        //         // var flagvalues = getFlagValues(category_name, traitCategory);
-        //
-        //
-        //         // go through the array of traits, add the appropriate flag value
-        //         foreach (string trait_name in newreqs.Value.Qa())
-        //         {
-        //             // copy the trait name because we might be modifying it
-        //             var use_name = trait_name;
-        //             bool exclude = false;
-        //             // check if we're inverting a value
-        //             if (trait_name[0] == '!')
-        //             {
-        //                 exclude = true;
-        //                 // remove the exclamation mark and any additional whitespace from the trait name
-        //                 use_name = trait_name.Trim(new[] { '!', ' ' });
-        //             }
-        //
-        //             int flagvalue = getValueForFlag(traitCategory, use_name);
-        //
-        //             // now OR in the required value to the appropriate container
-        //
-        //             if (exclude) // if this is a "!trait" requirement
-        //             {
-        //                 requirements_found = true;
-        //
-        //                 if (!excls.ContainsKey(traitCategory))
-        //                     excls[traitCategory] = 0;
-        //
-        //                 excls[traitCategory] |= flagvalue;
-        //             }
-        //             else
-        //             {
-        //                 requirements_found = true;
-        //                 // initialize the value for this trait type if it has not been seen before
-        //                 if (!reqs.ContainsKey(traitCategory))
-        //                     reqs[traitCategory] = 0;
-        //                 reqs[traitCategory] |= flagvalue;
-        //             }
-        //         }
-        //     }
-        //     requirements = reqs.Count > 0 ? reqs : null;
-        //     exclusions = excls.Count > 0 ? excls : null;
-        //
-        //     return requirements_found;
-        // }
-
         /// <summary>
         /// Get the id of the pre-existing parent with the given name. If that parent is disabled, will walk up the parent
         /// hierarchy until an enabled parent (or the root) is found.
@@ -750,8 +553,6 @@ namespace InvisibleHand.Items.Categories
                 // a toplevel category
                 pid = ItemCategory.Registry[pid].ParentID;
             }
-
-            // return parent_name == "" ? 0 : CategoryDefinitions[parent_name].ID;
 
             return pid;
         }
@@ -788,7 +589,8 @@ namespace InvisibleHand.Items.Categories
         private static void CalculateOrdinals()
         {
             // creates a lookup of: ParentID => [collection of child categories]
-            var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c => c.ParentID, c => c);
+            // var lookup_byparentID = CategoryDefinitions.Select(kvp => kvp.Value).ToLookup(c => c.ParentID, c => c);
+            var lookup_byparentID = ItemCategory.Registry.Values.ToLookup(c => c.ParentID, c => c);
             // assign addresses to all the top level categories, and recursively to their children
             assignAddresses(0, int.MaxValue, 0, lookup_byparentID);
 
@@ -829,7 +631,7 @@ namespace InvisibleHand.Items.Categories
             var bucket_size = (max_address - min_address) / recipients.Count();
 
             // go through the children, assigning each an address within their range.
-            foreach (var r in recipients.Select((x, i) => new { category = x, index = i }))
+            foreach (var r in recipients.Select((c, i) => new { category = c, index = i }))
             {
                 var range_start = min_address + (r.index * bucket_size);
                 var range_end = range_start + bucket_size - 1;
@@ -860,18 +662,11 @@ namespace InvisibleHand.Items.Categories
         /// the tree will need to be rebuilt each time to reflect the changes.
         public static void BuildCategoryTree()
         {
-            // create the root of the tree; the label here is unimportant. All other labels
-            // will be created automatically during autovivification, using the ordinal value of the category
-            // var cattree = new SortedAutoTree<int, ItemCategory>() { Label = 0 };
-
             var registry = ItemCategory.Registry;
-
-            // foreach (var kvp in registry)
 
             // only add enabled categories to the tree
             foreach (var active_id in ItemCategory.ActiveCategories)
             {
-                // var category = kvp.Value;
                 var category = registry[active_id];
 
                 var parentID = category.ParentID;
