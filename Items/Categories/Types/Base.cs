@@ -28,7 +28,7 @@ namespace InvisibleHand.Items.Categories.Types
         }
 
         /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new RegularCategory("Unknown", int.MaxValue, 0, priority: int.MaxValue);
+        public static readonly ItemCategory None = new ContainerCategory("Unknown", int.MaxValue, 0, priority: int.MaxValue);
 
         //------------------------------------------------------------------
         //------------------------------------------------------------------
@@ -121,7 +121,7 @@ namespace InvisibleHand.Items.Categories.Types
         // public ItemCategory GetCategory => _union ?? this;
         // public ItemCategory GetCategory => UnionID > 0 ? Registry[UnionID] : this;
 
-        public ICategory<Item> Category => UnionID > 0
+        public ItemCategory Category => UnionID > 0
                                         ? Registry[UnionID].Category // pass the 'Category' call up.
                                         : this;
 
@@ -298,6 +298,42 @@ namespace InvisibleHand.Items.Categories.Types
         public override string ToString()
         {
             return $"'{QualifiedName}'(ID={ID}, ord={Ordinal:X8})";
+        }
+    }
+
+    public abstract class Sorter : ItemCategory, ISorter<Item>
+    {
+
+        protected int ruleCount = 0;
+        protected IList<Func<Item, Item, int>> _rules;
+        public virtual IList<Func<Item, Item, int>> SortRules
+        {
+            get { return _rules; }
+            set
+            {
+                _rules = value;
+                ruleCount = _rules?.Count ?? 0;
+            }
+        }
+
+        public Sorter(string name, int category_id, int parent_id = 0, int priority = 0) : base (name, category_id, parent_id, priority)
+        {
+        }
+
+        public virtual void BuildSortRules(IEnumerable<string> properties)
+        {
+            this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
+        }
+
+        public virtual void CopySortRules(ISorter<Item> other)
+        {
+            // var target = other as RegularCategory;
+            this.SortRules = other?.SortRules;
+        }
+
+        public virtual void CopyParentRules()
+        {
+            this.SortRules = ((ISorter<Item>)Parent)?.SortRules;
         }
     }
 }

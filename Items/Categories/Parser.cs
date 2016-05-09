@@ -6,6 +6,8 @@ using System.IO;
 using System.Reflection;
 using Hjson;
 
+using InvisibleHand.Items.Categories.Types;
+
 namespace InvisibleHand.Items.Categories
 {
     /// read in the category specs from the hjson files and convert to something useable
@@ -249,6 +251,7 @@ namespace InvisibleHand.Items.Categories
                             union.MergeItems = catdef.merge;
 
                             CategoryDefinitions[union.Name] = union;
+                            return;
                             // XXX: should we add the unions to the search tree?
                             // ANSWER: No.
                             // if (catdef.enable) ActiveCategories.Add(union.ID);
@@ -256,7 +259,7 @@ namespace InvisibleHand.Items.Categories
 
                         // a 'Regular' category
                         // ------------------
-                        else if (catdef.requires != null)
+                        if (catdef.requires != null)
                         {
                             // parse requirements
                             // ------------------
@@ -301,7 +304,10 @@ namespace InvisibleHand.Items.Categories
                         }
 
                         // if "requires" was null or empty:
-                        // TODO: what now?
+                        // consider this a "Container" category
+                        var new_container = new ContainerCategory(catdef.name, ++_currentCount, parentID, priority);
+                        new_container.Enabled = catdef.enable;
+                        assignSortingRules(new_container, catdef.sort_fields);
 
 
                     } // end of category-object list
@@ -390,7 +396,7 @@ namespace InvisibleHand.Items.Categories
         ███████  ██████  ██   ██    ██        ██   ██  ██████  ███████ ███████ ███████
         */
 
-        private static void assignSortingRules(RegularCategory category, JsonArray property_names)
+        private static void assignSortingRules(Sorter category, JsonArray property_names)
         {
             if (property_names != null)
                 category.SortRules = ItemRuleBuilder.BuildSortRules(property_names.Select(jv => jv.Qs()));
@@ -413,7 +419,7 @@ namespace InvisibleHand.Items.Categories
         ██      ██ ███████ ██   ██  ██████  ███████
         */
 
-        private static void addUnionMembers(IUnion<ItemCategory> union, JsonArray member_names)
+        private static void addUnionMembers(UnionCategory union, JsonArray member_names)
         {
             foreach (var member in member_names)
             {
@@ -587,17 +593,6 @@ namespace InvisibleHand.Items.Categories
         private static int getParentID(string parent_name)
         {
             int pid = getCategoryID(parent_name);
-            // try
-            // {
-            //     pid = parent_name == String.Empty ? 0 : CategoryDefinitions[parent_name].ID;
-            //
-            // }
-            // catch (KeyNotFoundException knfe)
-            // {
-            //     throw new UsefulKeyNotFoundException(parent_name, nameof(CategoryDefinitions), knfe,
-            //         "Category '" + category_name + "': The specified parent category '{0}' was not found in '{1}'."
-            //     );
-            // }
 
             while (pid > 0 && !ItemCategory.ActiveCategories.Contains(pid))
             {

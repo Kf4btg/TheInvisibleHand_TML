@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 // using System.Linq;
 using Terraria.ModLoader;
-using Terraria;
+// using Terraria;
 // using InvisibleHand.Definitions;
 using InvisibleHand.Utils;
-using InvisibleHand.Items.Categories;
+using InvisibleHand.Items.Categories.Types;
 
 namespace InvisibleHand.Items
 {
@@ -14,19 +14,19 @@ namespace InvisibleHand.Items
         /// keyed by the Trait-family name (e.g. "General", "Weapon", "Consumable", etc.)
         public IDictionary<string, int> Flags { get; set; }
 
-        private ICategory<Item> _category = null;
+        private ItemCategory _category = null;
         /// The category for an item is looked up the first time it is queried, then cached.
-        public ICategory<Item> Category => _category?.Category ?? find_category().Category;
+        public ItemCategory Category => _category?.Category ?? find_category().Category;
 
         /// if something really needs access to the REAL category, use this.
-        public ICategory<Item> ActualCategory => _category ?? find_category();
+        public ItemCategory ActualCategory => _category ?? find_category();
 
         /// Conflict resolution is currently done by using the first matching category
         /// (at each tree level), as determined by the ordinal value of the categories
-        private ICategory<Item> find_category()
+        private ItemCategory find_category()
         {
             // create the eventual return value with a default 'unknown' category
-            ICategory<Item> match = ItemCategory.None;
+            ItemCategory match = ItemCategory.None;
             CheckTree(IHBase.CategoryTree, ref match);
 
             // cache the value so we don't do the look up again
@@ -35,7 +35,7 @@ namespace InvisibleHand.Items
         }
 
         // private void CheckTree(SortedAutoTree<string, ItemCategory> tree, ref ItemCategory match)
-        private void CheckTree(SortedAutoTree<int, ICategory<Item>> tree, ref ICategory<Item> match)
+        private void CheckTree(SortedAutoTree<int, ItemCategory> tree, ref ItemCategory match)
         {
             // sorted by category.ordinal
             foreach (var branch in tree)

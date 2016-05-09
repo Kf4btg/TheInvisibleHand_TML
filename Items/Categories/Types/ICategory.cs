@@ -29,19 +29,6 @@ namespace InvisibleHand.Items.Categories.Types
         void RemoveMember(IMergeable<T> member);
     }
 
-    //  where U : IUnion<V>
-    // public interface IMergeable<T> : ICategory
-    // {
-    //
-    //     IUnion<T> CurrentUnion { get; }
-    //     int UnionID { get; }
-    //
-    //     void Merge(IUnion<T> union);
-    //     void Merge(int union_id);
-    //
-    //     void Unmerge();
-    // }
-
     public interface ICategory<T> : ICategory, IComparable<ICategory<T>>, IEquatable<ICategory<T>>, IComparer<T>
     {
         ICategory<T> Parent { get; }
@@ -49,7 +36,7 @@ namespace InvisibleHand.Items.Categories.Types
         bool Matches(T item);
         bool Matches(IDictionary<string, int> flags);
 
-        ICategory<T> Category { get; }
+        // ICategory<T> Category { get; }
 
         ICategory<T> Match(IDictionary<string, int> item_flags);
     }
@@ -63,5 +50,15 @@ namespace InvisibleHand.Items.Categories.Types
         void Merge(int union_id);
 
         void Unmerge();
+    }
+
+    public interface ISorter<T> : ICategory<T>
+    {
+        IList<Func<T, T, int>> SortRules { get; set; }
+
+        void BuildSortRules(IEnumerable<string> properties);
+        void CopySortRules(ISorter<T> other);
+        void CopyParentRules();
+
     }
 }

@@ -5,6 +5,7 @@ using Terraria;
 using Microsoft.Xna.Framework.Input;
 using InvisibleHand.Utils;
 using InvisibleHand.Items.Categories;
+using InvisibleHand.Items.Categories.Types;
 
 namespace InvisibleHand
 {
@@ -53,7 +54,8 @@ namespace InvisibleHand
         // public static SortedAutoTree<int, ItemCategory> CategoryTree => Parser.CategoryTree;
         /// returns the traversal tree used to assign a category to an item.
         /// uses keys based on a category's ordinal (ordering rank).
-        public static SortedAutoTree<int, ICategory<Item>> CategoryTree;
+        public static SortedAutoTree<int, ItemCategory> CategoryTree;
+        // public static SortedAutoTree<int, ICategory<Item>> CategoryTree;
 
 
         // holds the game's original strings for loot-all, dep-all, quick-stack, etc;
@@ -127,7 +129,7 @@ namespace InvisibleHand
 
             // load the item flags and category definitions
             FlagCollection = new _flagCollection();
-            CategoryTree = new SortedAutoTree<int, ICategory<Item>>() {Label=0};
+            CategoryTree = new SortedAutoTree<int, ItemCategory>() {Label=0};
             Parser.Parse();
         }
 

@@ -5,7 +5,7 @@ using Terraria;
 
 using InvisibleHand.Utils;
 using InvisibleHand.Items;
-using InvisibleHand.Items.Categories;
+using InvisibleHand.Items.Categories.Types;
 
 namespace InvisibleHand
 {
@@ -82,7 +82,7 @@ namespace InvisibleHand
             return item.type == 0 || item.stack == 0;
         }
 
-        public static ICategory<Item> GetCategory(this Item item)
+        public static ItemCategory GetCategory(this Item item)
         {
             // var iteminfo = (ItemFlagInfo)(item.GetModInfo(IHBase.Instance, "ItemFlagInfo"));
             var iteminfo = item.GetFlagInfo();

@@ -1,12 +1,12 @@
-using System;
+// using System;
 using System.Collections.Generic;
 using Terraria;
 
 namespace InvisibleHand.Items.Categories.Types
 {
-    using ItemCompRule = Func<Item, Item, int>;
+    // using ItemCompRule = Func<Item, Item, int>;
 
-    public class RegularCategory : ItemCategory
+    public class RegularCategory : Sorter
     {
         public IDictionary<string, int> Requirements { get; set; }
         public IDictionary<string, int> Exclusions { get; set; }
@@ -99,46 +99,45 @@ namespace InvisibleHand.Items.Categories.Types
             // If this category has been marked as part of a Union category,
             // return that category; otherwise, return this instance.
             return this.Matches(item_flags) ? this.Category : null;
-
         }
 
         // Handle the Sorting Rules
         // ------------------
 
         /// saved independently in order to make iteration more efficient
-        private int ruleCount = 0;
-
-        private IList<ItemCompRule> _rules;
-        public IList<ItemCompRule> SortRules
-        {
-            get { return _rules; }
-            set
-            {
-                _rules = value;
-                ruleCount = _rules?.Count ?? 0;
-            }
-        }
+        // private int ruleCount = 0;
+        //
+        // private IList<ItemCompRule> _rules;
+        // public IList<ItemCompRule> SortRules
+        // {
+        //     get { return _rules; }
+        //     set
+        //     {
+        //         _rules = value;
+        //         ruleCount = _rules?.Count ?? 0;
+        //     }
+        // }
         // public List<Expression<Func<T, T, int>>> ruleExpressions; // for debugging
 
         /// Given an enumerable of Terraria.Item property names, build and compile
         /// lambda expressions that will return the result of comparing those properties
         /// on two distinct Item objects
-        public void BuildSortRules(IEnumerable<string> properties)
-        {
-            this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
-        }
+        // public void BuildSortRules(IEnumerable<string> properties)
+        // {
+        //     this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
+        // }
 
         /// copy the sorting rules from another category
-        public void CopySortRules(RegularCategory other)
-        {
-            // var target = other as RegularCategory;
-            this.SortRules = other?.SortRules;
-        }
+        // public void CopySortRules(RegularCategory other)
+        // {
+        //     // var target = other as RegularCategory;
+        //     this.SortRules = other?.SortRules;
+        // }
 
-        public void CopyParentRules()
-        {
-            this.SortRules = ((RegularCategory)Parent)?.SortRules;
-        }
+        // public void CopyParentRules()
+        // {
+        //     this.SortRules = ((RegularCategory)Parent)?.SortRules;
+        // }
 
 
         /// IComparer<Item> implementation
