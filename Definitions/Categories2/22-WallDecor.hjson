@@ -2,32 +2,24 @@
   {
     name: Wall Decoration
     parent: Furniture
-    requires: [
-      CreateTile.Furniture wall_decoration
-    ]
+    requires: CreateTile.Furniture wall_decoration
   }
 
   {
     name: Painting
     parent: Wall Decoration
-    requires: [
-      CreateTile.Furniture.WallDecor painting
-    ]
+    requires: CreateTile.Furniture.WallDecor painting
   }
 
   {
     name: Trophy
     parent: Wall Decoration
-    requires: [
-      CreateTile.Furniture.WallDecor trophy
-    ]
+    requires: CreateTile.Furniture.WallDecor trophy
   }
 
   {
     name: Rack
     parent: Wall Decoration
-    requires: [
-      CreateTile.Furniture.WallDecor rack
-    ]
+    requires: CreateTile.Furniture.WallDecor rack
   }
 ]

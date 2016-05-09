@@ -2,17 +2,13 @@
   {
     name: Crafting Station
     parent: Furniture
-    requires: [
-      CreateTile.Furniture crafting_station
-    ]
+    requires: CreateTile.Furniture crafting_station
   }
 
   {
     name: Container
     parent: Furniture
-    requires: [
-      CreateTile.Furniture container
-    ]
+    requires: CreateTile.Furniture container
   }
 
   {
@@ -35,7 +31,7 @@
     # necessitates using quotes.
     include: {
       Lighting: {
-        requires: ["CreateTile.Furniture room_needs_light"]
+        requires: CreateTile.Furniture room_needs_light
         include: {
           Torch: Furniture.Lighting torch
           Candelabra: Furniture.Lighting candelabra
@@ -46,7 +42,7 @@
           "Holiday Light": Furniture.Lighting holiday_light
         } }
       Tables: {
-        requires: ["CreateTile.Furniture room_needs_table"]
+        requires: CreateTile.Furniture room_needs_table
         include: {
           Table: Furniture.Tables table
           Bathtub: Furniture.Tables bathtub
@@ -56,13 +52,13 @@
           "Work Bench": Furniture.Tables workbench
         } }
       Doors: {
-        requires: ["CreateTile.Furniture room_needs_door"]
+        requires: CreateTile.Furniture room_needs_door
         include: {
           Door: Furniture.Doors door
           Platform: Furniture.Doors platform
         } }
       Chairs: {
-        requires: ["CreateTile.Furniture room_needs_chair"]
+        requires: CreateTile.Furniture room_needs_chair
         include: {
           Chair: Furniture.Chairs chair
           Bench: Furniture.Chairs bench

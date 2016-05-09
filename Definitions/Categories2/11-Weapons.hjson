@@ -8,27 +8,19 @@
     ]
   }*/
   ######################
-  # Melee
-  ######################
 
   {
     name: Melee
     parent: Weapon
-    requires: [
-      Weapon melee
-    ]
+    requires: Weapon melee
   }
 
-  ######################
-  # Ranged
   ######################
 
   {
     name: Ranged
     parent: Weapon
-    requires: [
-      Weapon ranged
-    ]
+    requires: Weapon ranged
   }
 
   ######################
@@ -38,9 +30,7 @@
   {
     name: Magic
     parent: Weapon
-    requires: [
-      Weapon magic
-    ]
+    requires: Weapon magic
     include: {
       Area: Weapon.Magic area
       /*Bouncing: Weapon.Magic bounce_heavy | bounce_hyper*/
@@ -55,16 +45,12 @@
   {
     name: Bounce (Heavy)
     parent: Magic
-    requires: [
-      Weapon.Magic bounce_heavy
-    ]
+    requires: Weapon.Magic bounce_heavy
   }
   {
     name: Bounce (Hyper)
     parent: Magic
-    requires: [
-      Weapon.Magic bounce_hyper
-    ]
+    requires: Weapon.Magic bounce_hyper
   }
 
   // A union category
@@ -82,14 +68,10 @@
   }
 
   ######################
-  # Summon
-  ######################
   {
     name: Summon
     parent: Weapon
-    requires: [
-      Weapon summon
-    ]
+    requires: Weapon summon
     include: {
       Minion: Weapon.Summon minion
       # seriously...that's about the only way to tell them apart
@@ -98,13 +80,9 @@
   }
 
   ######################
-  # Throwing
-  ######################
   {
     name: Throwing
     parent: Weapon
-    requires: [
-      Weapon throwing
-    ]
+    requires: Weapon throwing
   }
 ]
