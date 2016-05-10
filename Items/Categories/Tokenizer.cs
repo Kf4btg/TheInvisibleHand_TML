@@ -19,8 +19,8 @@ namespace InvisibleHand.Items.Categories
         public RequirementEntry(string trait_group, IEnumerable<string> exclude = null, IEnumerable<string> include = null)
         {
             TraitGroup = trait_group;
-            this.includes = include?.ToList() ?? new List<string>();// ?? new string[5];
-            this.excludes = exclude?.ToList() ?? new List<string>();// ?? new string[5];
+            this.includes = include?.ToList() ?? new List<string>();
+            this.excludes = exclude?.ToList() ?? new List<string>();
         }
 
         public void AddInclude(string trait)
@@ -46,10 +46,8 @@ namespace InvisibleHand.Items.Categories
         }
     }
 
-    // FIXME: The "|" OR operator is no longer allowed
     public static class Tokenizer
     {
-        private const string PARENT_NAME = @"@?(\w+\s?)+$";
         // trait grp names begin with capital letters, may contain underscores and numbers
         private const string TRAIT_GROUP_NAME = @"[A-Z][\w\d]+";
 

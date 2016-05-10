@@ -19,8 +19,6 @@ namespace InvisibleHand.Items.Categories.Types
         void ToggleEnabled();
     }
 
-
-
     public interface IUnion<T> : ICategory
     {
         ISet<IMergeable<T>> UnionMembers { get; }

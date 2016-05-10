@@ -1,19 +1,39 @@
-// using System;
+using System;
 using System.Collections.Generic;
 using Terraria;
 
 namespace InvisibleHand.Items.Categories.Types
 {
-    // using ItemCompRule = Func<Item, Item, int>;
 
-    public class RegularCategory : Sorter
+    ///<summary>
+    /// The most common type of category, this is the "worker" category.
+    /// It contains rules defining how to match and sort Items based
+    /// on their properties.
+    ///</summary>
+    public class MatchCategory : Sorter
     {
-        public IDictionary<string, int> Requirements { get; set; }
+        public bool NoRequirements { get; private set; }
+
+        ///<summary>A swappable function to define how to perform the actual match</summary>
+        private Func<IDictionary<string, int>, bool> checkMatch;
+
+        public IDictionary<string, int> Requirements { get; set ; }
         public IDictionary<string, int> Exclusions { get; set; }
 
         // constructors
         // ------------------
-        public RegularCategory(string name, int cat_id,
+        /// Create a MatchCategory that explicitly has no requirements or exclusions.
+        /// Its only purpose is to act as a container to other categories. The "Match"
+        /// functions will be short-circuited to return false.
+        public MatchCategory(string name, int cat_id, int parent_id = 0, int priority = 0)
+                            : base(name, cat_id, parent_id, priority)
+        {
+            NoRequirements = true;
+            //short-circuit to false
+            checkMatch = (d) => false;
+        }
+
+        public MatchCategory(string name, int cat_id,
                                 int parent_id = 0, int priority = 0,
                                IDictionary<string, int> requirements = null,
                                IDictionary<string, int> exclusions = null
@@ -22,27 +42,17 @@ namespace InvisibleHand.Items.Categories.Types
         {
             Requirements = requirements ?? new Dictionary<string, int>();
             Exclusions = exclusions ?? new Dictionary<string, int>();
+
+            //enable the check function
+            NoRequirements = false;
+            checkMatch = this._Matches;
         }
-
-        public RegularCategory(string name, int cat_id,
-                                ItemCategory parent = null, int priority = 0,
-                               IDictionary<string, int> requirements = null,
-                               IDictionary<string, int> exclusions = null
-                               )
-                               : this(name, cat_id, parent?.ID ?? 0, priority,
-                                requirements, exclusions) {}
-
 
         // Adding/excluding a trait
         // ------------------
         public void RequireTrait(string trait_family, int flag_value)
         {
             SetTraitValue(Requirements, trait_family, flag_value);
-
-            // if (Requirements.ContainsKey(trait_family))
-            //     Requirements[trait_family] |= flag_value;
-            // else
-            //     Requirements[trait_family] = flag_value;
         }
 
         public void ExcludeTrait(string trait_family, int flag_value)
@@ -62,6 +72,12 @@ namespace InvisibleHand.Items.Categories.Types
         // Abstract method overrides
         // ---------------------------
         public override bool Matches(IDictionary<string, int> item_flags)
+        {
+            return checkMatch(item_flags);
+        }
+
+        /// If this category is enabled, this function will called for checkMatch()
+        private bool _Matches(IDictionary<string, int> item_flags)
         {
             // if (!Enabled) return false;
 
@@ -87,9 +103,11 @@ namespace InvisibleHand.Items.Categories.Types
             return true;
         }
 
+
         public override bool Matches(Item item)
         {
-            return Matches(item.GetFlagInfo().Flags);
+            // return Matches(item.GetFlagInfo().Flags);
+            return checkMatch(item.GetFlagInfo().Flags);
         }
 
         public override ICategory<Item> Match(IDictionary<string, int> item_flags)
@@ -100,45 +118,6 @@ namespace InvisibleHand.Items.Categories.Types
             // return that category; otherwise, return this instance.
             return this.Matches(item_flags) ? this.Category : null;
         }
-
-        // Handle the Sorting Rules
-        // ------------------
-
-        /// saved independently in order to make iteration more efficient
-        // private int ruleCount = 0;
-        //
-        // private IList<ItemCompRule> _rules;
-        // public IList<ItemCompRule> SortRules
-        // {
-        //     get { return _rules; }
-        //     set
-        //     {
-        //         _rules = value;
-        //         ruleCount = _rules?.Count ?? 0;
-        //     }
-        // }
-        // public List<Expression<Func<T, T, int>>> ruleExpressions; // for debugging
-
-        /// Given an enumerable of Terraria.Item property names, build and compile
-        /// lambda expressions that will return the result of comparing those properties
-        /// on two distinct Item objects
-        // public void BuildSortRules(IEnumerable<string> properties)
-        // {
-        //     this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
-        // }
-
-        /// copy the sorting rules from another category
-        // public void CopySortRules(RegularCategory other)
-        // {
-        //     // var target = other as RegularCategory;
-        //     this.SortRules = other?.SortRules;
-        // }
-
-        // public void CopyParentRules()
-        // {
-        //     this.SortRules = ((RegularCategory)Parent)?.SortRules;
-        // }
-
 
         /// IComparer<Item> implementation
         /// using the pre-compiled Sorting rules
@@ -154,5 +133,4 @@ namespace InvisibleHand.Items.Categories.Types
             return 0;
         }
     }
-
 }

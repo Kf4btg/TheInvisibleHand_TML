@@ -301,11 +301,15 @@ namespace InvisibleHand.Items.Categories.Types
         }
     }
 
+    /// Base class for categories supporting sorting by Generated rules
     public abstract class Sorter : ItemCategory, ISorter<Item>
     {
 
+        /// saved independently in order to make iteration more efficient
         protected int ruleCount = 0;
+        ///<summary>backing store for the rules-collection</summary>
         protected IList<Func<Item, Item, int>> _rules;
+        ///<summary>Get/Set the Rules Collection for this category</summary>
         public virtual IList<Func<Item, Item, int>> SortRules
         {
             get { return _rules; }
@@ -320,17 +324,24 @@ namespace InvisibleHand.Items.Categories.Types
         {
         }
 
+        ///<summary>
+        /// Given an enumerable of Terraria.Item property names, build and compile
+        /// lambda expressions that will return the result of comparing those properties
+        /// on two distinct Item objects.
+        ///</summary>
         public virtual void BuildSortRules(IEnumerable<string> properties)
         {
             this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
         }
 
+        /// copy the sorting rules from another category
         public virtual void CopySortRules(ISorter<Item> other)
         {
             // var target = other as RegularCategory;
             this.SortRules = other?.SortRules;
         }
 
+        /// duplicate the sorting rules of the category's parent
         public virtual void CopyParentRules()
         {
             this.SortRules = ((ISorter<Item>)Parent)?.SortRules;

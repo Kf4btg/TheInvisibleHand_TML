@@ -268,7 +268,7 @@ namespace InvisibleHand.Items.Categories
                         {
                             // set name to "ParentName - ThisName"
                             // e.g. "Arrows - Endless"
-                            var subcat = new RegularCategory($"{child.Name} - {name}", ++_currentCount, child.ID, priority, reqs, excls);
+                            var subcat = new MatchCategory($"{child.Name} - {name}", ++_currentCount, child.ID, priority, reqs, excls);
                             subcat.Enabled = enable;
 
                             assignSortingRules(subcat, sort_fields);
@@ -278,7 +278,7 @@ namespace InvisibleHand.Items.Categories
                         return;
                     }
 
-                    var newcategory = new RegularCategory(name, ++_currentCount, parentID, priority, reqs, excls);
+                    var newcategory = new MatchCategory(name, ++_currentCount, parentID, priority, reqs, excls);
                     newcategory.Enabled = enable;
 
                     // create/get the Sorting Rules for the category
@@ -339,7 +339,7 @@ namespace InvisibleHand.Items.Categories
                 // category requirements are held in the single string value for the key
                 if (parseRequirements(new[] { value.Qs() }, out requirements, out exclusions))
                 {
-                    var newcategory = new RegularCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                    var newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
                     newcategory.Enabled = true;
 
                     // assign sorting rules from parent
@@ -357,7 +357,7 @@ namespace InvisibleHand.Items.Categories
                 Sorter newcategory;
                 if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
                 {
-                    newcategory = new RegularCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                    newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
                     newcategory.Enabled = true;
 
                     // assign sorting rules from parent
