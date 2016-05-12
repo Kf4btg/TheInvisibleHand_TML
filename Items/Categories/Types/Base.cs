@@ -16,6 +16,7 @@ namespace InvisibleHand.Items.Categories.Types
         public static IDictionary<int, ItemCategory> Registry =
             new Dictionary<int, ItemCategory>();
 
+        /// set containing the IDs of each currently enabled category
         public static ISet<int> ActiveCategories { get; private set; } = new HashSet<int>();
 
 
@@ -28,7 +29,7 @@ namespace InvisibleHand.Items.Categories.Types
         }
 
         /// this is what will be returned when an item somehow doesn't match any defined category
-        public static readonly ItemCategory None = new ContainerCategory("Unknown", int.MaxValue, 0, priority: int.MaxValue);
+        public static readonly ItemCategory None = new MatchCategory("Unknown", int.MaxValue, 0, priority: int.MaxValue);
 
         //------------------------------------------------------------------
         //------------------------------------------------------------------
@@ -62,6 +63,13 @@ namespace InvisibleHand.Items.Categories.Types
         /// from their configuration files. If the User changes the order of a category
         /// during gameplay (not yet implemented), this will need to be recalculated
         public int Ordinal { get; internal set; } // TODO: add checks to make sure this is always unique
+
+        /// These two numbers indicate the range of ordinal-addresses assigned to this category and its
+        /// child categories. For any given Item, if the ordinal of that Item's matched category
+        /// falls within this range, it must necessarily belong either to this category or to one
+        /// of its children.
+        protected int child_range_start;
+        protected int child_range_end;
 
         // public int Ordinal => (Priority << 16) | (ID);
         // id is now involved in the creation of this number, so no need to shift anything
@@ -248,6 +256,21 @@ namespace InvisibleHand.Items.Categories.Types
 
         #region interface implementations
 
+        /// set the ordinal range
+        public void SetOrdinalRange(int range_start, int range_end)
+        {
+            this.child_range_start = range_start;
+            this.child_range_end = range_end;
+
+            this.Ordinal = range_end;
+        }
+
+        /// returns True if the given category is within the child hierarchy of this category.
+        public bool Contains(ICategory<Item> category)
+        {
+            return category.Ordinal >= this.child_range_start && category.Ordinal <= this.child_range_end;
+        }
+
         // public int CompareTo(ItemCategory other) => this.Ordinal.CompareTo(other.Ordinal);
         public int CompareTo(ICategory<Item> other) => this.Ordinal.CompareTo(other?.Ordinal);
 
@@ -301,8 +324,8 @@ namespace InvisibleHand.Items.Categories.Types
         }
     }
 
-    /// Base class for categories supporting sorting by Generated rules
-    public abstract class Sorter : ItemCategory, ISorter<Item>
+    /// Base class for categories which support sorting  Items by Generated rules
+    public abstract class ItemSorter : ItemCategory, ISorter<Item>
     {
 
         /// saved independently in order to make iteration more efficient
@@ -310,7 +333,7 @@ namespace InvisibleHand.Items.Categories.Types
         ///<summary>backing store for the rules-collection</summary>
         protected IList<Func<Item, Item, int>> _rules;
         ///<summary>Get/Set the Rules Collection for this category</summary>
-        public virtual IList<Func<Item, Item, int>> SortRules
+        public IList<Func<Item, Item, int>> SortRules
         {
             get { return _rules; }
             set
@@ -320,7 +343,7 @@ namespace InvisibleHand.Items.Categories.Types
             }
         }
 
-        public Sorter(string name, int category_id, int parent_id = 0, int priority = 0) : base (name, category_id, parent_id, priority)
+        public ItemSorter(string name, int category_id, int parent_id = 0, int priority = 0) : base (name, category_id, parent_id, priority)
         {
         }
 
@@ -329,22 +352,37 @@ namespace InvisibleHand.Items.Categories.Types
         /// lambda expressions that will return the result of comparing those properties
         /// on two distinct Item objects.
         ///</summary>
-        public virtual void BuildSortRules(IEnumerable<string> properties)
+        public void BuildSortRules(IEnumerable<string> properties)
         {
             this.SortRules = ItemRuleBuilder.BuildSortRules(properties);
         }
 
         /// copy the sorting rules from another category
-        public virtual void CopySortRules(ISorter<Item> other)
+        public void CopySortRules(ISorter<Item> other)
         {
             // var target = other as RegularCategory;
             this.SortRules = other?.SortRules;
         }
 
         /// duplicate the sorting rules of the category's parent
-        public virtual void CopyParentRules()
+        public void CopyParentRules()
         {
             this.SortRules = ((ISorter<Item>)Parent)?.SortRules;
+        }
+
+        ///<summary>
+        /// IComparer<Item> implementation using the pre-compiled Sorting rules
+        ///</summary>
+        public override int Compare(Item t1, Item t2)
+        {
+            int res;
+            for (int i = 0; i < ruleCount; i++)
+            {
+                res = SortRules[i](t1, t2);
+                if (res != 0)
+                    return res;
+            }
+            return 0;
         }
     }
 }

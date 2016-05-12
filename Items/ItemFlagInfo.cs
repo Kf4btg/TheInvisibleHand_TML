@@ -15,11 +15,15 @@ namespace InvisibleHand.Items
         public IDictionary<string, int> Flags { get; set; }
 
         private ItemCategory _category = null;
-        /// The category for an item is looked up the first time it is queried, then cached.
-        public ItemCategory Category => _category?.Category ?? find_category().Category;
 
-        /// if something really needs access to the REAL category, use this.
+        /// if something needs access to the REAL, non-redirected category, use this.
         public ItemCategory ActualCategory => _category ?? find_category();
+
+        /// The category for an item is looked up the first time it is queried, then cached.
+        /// The category returned may be redirected if the item's primary category has been
+        /// merged into a different union category.
+        public ItemCategory Category => ActualCategory.Category;
+        // public ItemCategory Category => _category?.Category ?? find_category().Category;
 
         /// Conflict resolution is currently done by using the first matching category
         /// (at each tree level), as determined by the ordinal value of the categories
@@ -42,6 +46,9 @@ namespace InvisibleHand.Items
             {
                 var childtree = branch.Value; // The AutoDict container
                 var category = childtree.Data; // The Category object this AutoDict represents
+
+                // when traversing the tree, always be sure to call Matches() with the Flags
+                // collection rather than the Item itself
                 if (category.Matches(Flags))
                 {
                     // if we found a match, update the reference

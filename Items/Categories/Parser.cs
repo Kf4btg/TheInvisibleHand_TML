@@ -292,8 +292,8 @@ namespace InvisibleHand.Items.Categories
             else
             {
                 // if "requires" and "union" were null or empty, consider this
-                // a "Container" category
-                var new_container = new ContainerCategory(name, ++_currentCount, parentID, priority);
+                // a "Container" category (a match category with no requirements)
+                var new_container = new MatchCategory(name, ++_currentCount, parentID, priority);
                 new_container.Enabled = enable;
                 assignSortingRules(new_container, sort_fields);
 
@@ -354,7 +354,7 @@ namespace InvisibleHand.Items.Categories
             {
                 var minicatobj = value.Qo();
 
-                Sorter newcategory;
+                MatchCategory newcategory;
                 if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
                 {
                     newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
@@ -367,7 +367,7 @@ namespace InvisibleHand.Items.Categories
                 }
                 else
                 {
-                    newcategory = new ContainerCategory(category_name, ++_currentCount, parent_id);
+                    newcategory = new MatchCategory(category_name, ++_currentCount, parent_id);
                     newcategory.Enabled = true;
                     // assign sorting rules from parent
                     newcategory.CopyParentRules();
@@ -390,7 +390,7 @@ namespace InvisibleHand.Items.Categories
         ███████  ██████  ██   ██    ██        ██   ██  ██████  ███████ ███████ ███████
         */
 
-        private static void assignSortingRules(Sorter category, JsonArray property_names)
+        private static void assignSortingRules(ItemSorter category, JsonArray property_names)
         {
             if (property_names != null)
                 category.SortRules = ItemRuleBuilder.BuildSortRules(property_names.Select(jv => jv.Qs()));
@@ -637,7 +637,9 @@ namespace InvisibleHand.Items.Categories
                 var range_end = range_start + bucket_size - 1;
 
                 // each category will receive an address that is just 1 below the minimum range of it's sibling.
-                r.category.Ordinal = range_end;
+                // r.category.Ordinal = range_end;
+                // store the range on the category so it can know if an item belongs to one of its children
+                r.category.SetOrdinalRange(range_start, range_end);
 
                 // If this child is itself a parent, recursively call this function for its children
                 if (child_category_lookup.Contains(r.category.ID))

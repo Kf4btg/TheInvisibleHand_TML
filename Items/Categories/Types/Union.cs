@@ -51,8 +51,6 @@ namespace InvisibleHand.Items.Categories.Types
             UnionMembers = members == null ? new SortedSet<IMergeable<Item>>() : new SortedSet<IMergeable<Item>>(members);
         }
 
-        public UnionCategory(string name, int cat_id, ItemCategory parent = null, int priority = 0, IEnumerable<IMergeable<Item>> members=null) : this(name, cat_id, parent?.ID ?? 0, priority, members) {}
-
 
         // Tracking member Categories
         // ---------------------------

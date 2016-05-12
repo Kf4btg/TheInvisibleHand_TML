@@ -8,7 +8,7 @@ namespace InvisibleHand.Items.Categories.Types
     /// A category that has no requirements, but is simply meant to be a "parent" to other categories.
     /// Intended mostly as an organizational aid.
     /// Inherits the "Sorter" class so that it can have rules defined on it to pass down to children
-    public class ContainerCategory : Sorter
+    public class ContainerCategory : ItemSorter
     {
         public override bool Enabled
         {
