@@ -54,11 +54,7 @@ namespace InvisibleHand.Items.Categories.Types
 
         // Tracking member Categories
         // ---------------------------
-        // public void AddMember(ItemCategory new_member)
-        // {
-        //     this.UnionMembers.Add(new_member);
-        // }
-
+        
         /// Add a category as a member of this union. If the given category is already in a different
         /// union, an exception will be thrown unless `force_replace` is true, in which case
         /// the category will be removed from the memberset of its current union before being added
@@ -121,25 +117,6 @@ namespace InvisibleHand.Items.Categories.Types
         /// using the sorting rules for the union members
         public override int Compare(Item t1, Item t2)
         {
-            // ItemCategory c1, c2;
-            //
-            // c1 = c2 = null;
-            // if (Matches(t1))
-            //     c1 = Matched;
-            // if (Matches(t2))
-            //     c2 = Matched;
-            //
-            // // if either or both of the items do not belong to this union:
-            // if (c1 == null)
-            //     return (c2 == null) ? 0 : -1;
-            // if (c2 == null)
-            //     return 1;
-
-            // get the (sub-)categories for the items; for now we're just going to assume
-            // that each item belongs to one of the UnionMembers
-            // I thought that might happen...infinite recursive oblivion!
-
-
             // Ok, since the Unions are no longer in the Category Tree, it should
             // be safe to do this:
             var c1 = t1.GetFlagInfo().ActualCategory;
@@ -148,14 +125,6 @@ namespace InvisibleHand.Items.Categories.Types
             // if the items belong to the same category, get the comparison value from that category;
             // if they're different categories, just return the category order:
             return c1 == c2 ? c1.Compare(t1, t2) : c1.CompareTo(c2);
-
-
-            // if the items belong to the same category:
-            // if (c1 == c2)
-            //     return c1.Compare(t1, t2);
-            // or, if they're different categories, return the category order:
-
-            // return c1.CompareTo(c2);
         }
     }
 

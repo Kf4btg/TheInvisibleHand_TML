@@ -12,8 +12,27 @@ namespace InvisibleHand.Items.Categories.Types
     ///</summary>
     public class MatchCategory : ItemSorter
     {
+        private bool __skip;
         /// If this returns true, this category should be skipped when matching items
-        public bool SkipMatch { get; private set; }
+        public bool SkipMatch
+        {
+            get { return __skip; }
+            private set
+            {
+                if (value) // don't match items to this category
+                {
+                    //short-circuit to false
+                    checkFlagMatch = (d) => false;
+                    checkItemMatch = this._MatchesChild;
+                }
+                else // enable matching via the requirements/exclusions collections
+                {
+                    checkFlagMatch = this._Matches;
+                    checkItemMatch = (i) => this.Matches(i.GetFlagInfo().Flags);
+                }
+                __skip = value;
+            }
+        }
 
         ///<summary>A swappable function to define how to perform the match on a flag collection</summary>
         private Func<IDictionary<string, int>, bool> checkFlagMatch;
@@ -25,22 +44,27 @@ namespace InvisibleHand.Items.Categories.Types
 
         // constructors
         // ------------------
+        /// <summary>
         /// Create a MatchCategory that explicitly has no requirements or exclusions.
         /// Its only purpose is to act as a container to other categories. The "Matches"
         /// function for the flag_collection will be short-circuited to return false.
         /// The Matches function for an Item object will return whether the given Item
         /// belongs to one of the children of this ItemCategory.
         /// Item-sorting will function as normal, using any defined Sort Rules
+        /// </summary>
+        /// <remarks>
+        /// A MatchCategory can be turned from a "container" category to a regular
+        /// matching category simply by adding a trait or exclusion using RequireTrait(...)
+        /// or ExcludeTrait(...).
+        /// </remarks>
         public MatchCategory(string name, int cat_id, int parent_id = 0, int priority = 0)
                             : base(name, cat_id, parent_id, priority)
         {
+            // setting this sets up the matching functions for a container category
             SkipMatch = true;
-            //short-circuit to false
-            checkFlagMatch = (d) => false;
-            checkItemMatch = this._MatchesChild;
         }
 
-        /// create a new MatchCategory and optionally set its requirement and exclusion collections
+        /// create a new MatchCategory and set its requirement and exclusion collections
         public MatchCategory(string name, int cat_id,
                                 int parent_id, int priority,
                                IDictionary<string, int> requirements,
@@ -48,13 +72,16 @@ namespace InvisibleHand.Items.Categories.Types
                                )
                                : base (name, cat_id, parent_id, priority)
         {
-            Requirements = requirements ?? new Dictionary<string, int>();
-            Exclusions = exclusions ?? new Dictionary<string, int>();
+            Requirements = requirements;
+            Exclusions = exclusions;
+
+            // if both reqs and excls were passed as null, this is the
+            // same as if the other constructor were called
+            SkipMatch = (Requirements == null && Exclusions == null);
 
             //enable the check function
-            SkipMatch = false;
-            checkFlagMatch = this._Matches;
-            checkItemMatch = (i) => this.Matches(i.GetFlagInfo().Flags);
+            // checkFlagMatch = this._Matches;
+            // checkItemMatch = (i) => this.Matches(i.GetFlagInfo().Flags);
         }
 
         // Adding/excluding a trait
@@ -74,6 +101,13 @@ namespace InvisibleHand.Items.Categories.Types
         /// internal helper for Require-/ExcludeTrait()
         private void SetTraitValue(IDictionary<string, int> flagmap, string trait_family, int flag_value)
         {
+            // disable Skipping (a.k.a. enable matching) if need be
+            if (SkipMatch) SkipMatch = false;
+
+            // initialize collections if necessary
+            if (Requirements == null) Requirements = new Dictionary<string, int>();
+            if (Exclusions == null) Exclusions = new Dictionary<string, int>();
+
             if (flagmap.ContainsKey(trait_family))
                 flagmap[trait_family] |= flag_value;
             else
@@ -123,10 +157,7 @@ namespace InvisibleHand.Items.Categories.Types
         /// using the ordinal of the item's calculated category, decide if the item belongs
         /// to one of the child (or grandchild, etc.) categories of this container. This method
         /// can be used as the callable for checkItemMatch
-        public bool _MatchesChild(Item item)
-        {
-            return this.Contains(item.GetFlagInfo().ActualCategory);
-        }
+        public bool _MatchesChild(Item item) => this.Contains(item.GetFlagInfo().ActualCategory);
 
         public override ICategory<Item> Match(IDictionary<string, int> item_flags)
         {
@@ -136,20 +167,5 @@ namespace InvisibleHand.Items.Categories.Types
             // return that category; otherwise, return this instance.
             return this.Matches(item_flags) ? this.Category : null;
         }
-
-        ///<summary>
-        /// IComparer<Item> implementation using the pre-compiled Sorting rules
-        ///</summary>
-        // public override int Compare(Item t1, Item t2)
-        // {
-        //     int res;
-        //     for (int i = 0; i < ruleCount; i++)
-        //     {
-        //         res = SortRules[i](t1, t2);
-        //         if (res != 0)
-        //             return res;
-        //     }
-        //     return 0;
-        // }
     }
 }

@@ -10,6 +10,7 @@ using InvisibleHand.Items.Categories.Types;
 
 namespace InvisibleHand.Items.Categories
 {
+    using ReqExcTuple = Tuple<IDictionary<string, int>, IDictionary<string, int>>;
     /// read in the category specs from the hjson files and convert to something useable
     public static class Parser
     {
@@ -191,7 +192,7 @@ namespace InvisibleHand.Items.Categories
                             name         : catobj.ContainsKey("name")     ? catobj["name"]    ?.Qs() ?? ""    : "",
                             parent       : catobj.ContainsKey("parent")   ? catobj["parent"]  ?.Qs() ?? ""    : "",
                             // TODO: actually use this:
-                            inherit      : catobj.ContainsKey("inherit")  ? catobj["inherit"] ?.Qs() ?? ""    : "",
+                            inherit      : catobj.ContainsKey("inherit")  ? catobj["inherit"] ?.Qs()          : "", // can be null or ""
                             enable       : catobj.ContainsKey("display")  ? catobj["display"] ?.Qb() ?? true  : true,
                             // TODO: actually use this:
                             display      : catobj.ContainsKey("display")  ? catobj["display"] ?.Qb() ?? true  : true,
@@ -231,8 +232,19 @@ namespace InvisibleHand.Items.Categories
             ItemCategory new_category = null;
             var parent_name = parent != String.Empty && parent[0] == '@' ? parent.Substring(1) : parent;
             var parentID    = getParentID(parent_name);
-            var inheritsID  = getCategoryID(inherit);
+            // var inheritsID  = getCategoryID(inherit);
             var priority    = prio ?? 0;
+
+            // get inherited requirements, if any
+            // ---------------------------------
+            var inheritsID =
+                // an explicitly null "inherit" value always means "Do not inherit from anything"
+                inherit == null ? 0
+                // an unspecified inherit value infers "inherit from parent" (which may be nothing[id of 0])
+                : inherit == String.Empty ? parentID
+                // for anything else, use the category ID for the name given
+                : getCategoryID(inherit);
+
 
             // A union category
             // ------------------
@@ -250,56 +262,54 @@ namespace InvisibleHand.Items.Categories
                 CategoryDefinitions[union.Name] = union;
             }
 
-            // a 'Regular' category
-            // ------------------
-            else if (requires != null)
+            // generated sub-categories (matching-categories) for each child under parent
+            // ------------------------------
+            else if (parent_name != parent) // check will succeed if we removed the '@'
             {
-                IDictionary<string, int> reqs;
-                IDictionary<string, int> excls;
+                // initialize this category as a non-matching "container" category
+                // var newcategory = new MatchCategory(name, ++_currentCount, parentID, priority);
 
-                // if there are requirements, create new reqular category
-                if (parseRequirements(getRequirementLines(requires), out reqs, out excls))
-                {
-                    // if the parent's name starts with '@', this is the special case where we
-                    // generate subcategories for every child
-                    if (parent_name != parent) // check will succeed if we removed the '@'
-                    {
-                        foreach (var child in ItemCategory.Registry.Values.Where(cat => cat.ParentID == parentID))
-                        {
-                            // set name to "ParentName - ThisName"
-                            // e.g. "Arrows - Endless"
-                            var subcat = new MatchCategory($"{child.Name} - {name}", ++_currentCount, child.ID, priority, reqs, excls);
-                            subcat.Enabled = enable;
+                // IDictionary<string, int> requirements; // = new Dictionary<string, int>();
+                // IDictionary<string, int> exclusions; // = new Dictionary<string, int>();
 
-                            assignSortingRules(subcat, sort_fields);
-                            CategoryDefinitions[subcat.Name] = subcat;
-                        }
-                        // no "include" allowed for this type
-                        return;
-                    }
+                generateSubCategories(name, parentID, inheritsID, priority, enable, requires, sort_fields);
+                // no "include" allowed for this type
+                return;
 
-                    var newcategory = new MatchCategory(name, ++_currentCount, parentID, priority, reqs, excls);
-                    newcategory.Enabled = enable;
-
-                    // create/get the Sorting Rules for the category
-                    assignSortingRules(newcategory, sort_fields);
-
-                    // store the new category in the collections
-                    CategoryDefinitions[newcategory.Name] = newcategory;
-                    new_category = newcategory;
-                }
             }
+
+            // a 'Regular' category
+            // ---------------------
             else
             {
-                // if "requires" and "union" were null or empty, consider this
-                // a "Container" category (a match category with no requirements)
-                var new_container = new MatchCategory(name, ++_currentCount, parentID, priority);
-                new_container.Enabled = enable;
-                assignSortingRules(new_container, sort_fields);
 
-                CategoryDefinitions[new_container.Name] = new_container;
+                new_category = createMatchCategory(name, parentID, inheritsID, priority, enable, sort_fields, requires);
+                // if (requires != null)
+                // // actually, we can call getRequirementLines will a null value and it will just
+                // return an empty list
 
-                new_category = new_container;
+                // if the inherited requirements do not come from the parent, then we cannot
+                // rely on tree traversal to ensure that the prerequisites for this category are met;
+                // therefore we must add them explicitly.
+                // var reqex =  parseRequirements(getRequirementLines(requires), (inheritsID > 0 && inheritsID != parentID) ? inheritsID : 0);
+                //
+                //     var newcategory = new MatchCategory(name, ++_currentCount, parentID, priority);
+                //
+                //     // add reqs/excls if any
+                //     foreach (var kvp in reqex.Item1)
+                //         newcategory.RequireTrait(kvp.Key, kvp.Value);
+                //     foreach (var kvp in reqex.Item2)
+                //         newcategory.ExcludeTrait(kvp.Key, kvp.Value);
+                //
+                //     // create/get the Sorting Rules for the category
+                //     assignSortingRules(newcategory, sort_fields);
+                //
+                //     // enable (or disable) the category
+                //     newcategory.Enabled = enable;
+                //
+                //     CategoryDefinitions[newcategory.Name] = newcategory;
+                //     new_category = newcategory;
+
             }
 
             // finally handle the "include" entry
@@ -331,22 +341,24 @@ namespace InvisibleHand.Items.Categories
         /// parent_id is the id number of the category containing the include: block
         private static void parseMiniCategory(int parent_id, string category_name, JsonValue value)
         {
-            IDictionary<string, int> requirements;
-            IDictionary<string, int> exclusions;
+            // IDictionary<string, int> requirements;
+            // IDictionary<string, int> exclusions;
 
             if (value.JsonType == JsonType.String)
             {
                 // category requirements are held in the single string value for the key
-                if (parseRequirements(new[] { value.Qs() }, out requirements, out exclusions))
-                {
-                    var newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
-                    newcategory.Enabled = true;
+                createMatchCategory(category_name, parent_id, 0, 0, true, null, value);
 
-                    // assign sorting rules from parent
-                    newcategory.CopyParentRules();
-
-                    CategoryDefinitions[newcategory.Name] = newcategory;
-                }
+                // if (parseRequirements(new[] { value.Qs() }, parent_id, out requirements, out exclusions))
+                // {
+                //     var newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
+                //     newcategory.Enabled = true;
+                //
+                //     // assign sorting rules from parent
+                //     newcategory.CopyParentRules();
+                //
+                //     CategoryDefinitions[newcategory.Name] = newcategory;
+                // }
             }
 
             // if it's an object, could contain "requires" list and/or nested "include"
@@ -354,31 +366,94 @@ namespace InvisibleHand.Items.Categories
             {
                 var minicatobj = value.Qo();
 
-                MatchCategory newcategory;
-                if (minicatobj.ContainsKey("requires") && parseRequirements(getRequirementLines(minicatobj["requires"]), out requirements, out exclusions))
-                {
-                    newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, requirements, exclusions);
-                    newcategory.Enabled = true;
+                JsonValue requires = minicatobj.ContainsKey("requires") ? minicatobj["requires"] : null;
 
-                    // assign sorting rules from parent
-                    newcategory.CopyParentRules();
+                // Params:
+                //    name=category_name
+                //    parID = parent_id
+                //    inherits_id = 0 (=>inherit from parent, allow tree to ensure parent requirements met)
+                //    priority = 0 (=>do not adjust sort order)
+                //    sort_fields = null (=>copy from parent)
+                //    requires (=>requires[] from definition or null if not there)
+                var newcategory = createMatchCategory(category_name, parent_id, 0, 0, true, null, requires);
 
-                    CategoryDefinitions[newcategory.Name] = newcategory;
-                }
-                else
-                {
-                    newcategory = new MatchCategory(category_name, ++_currentCount, parent_id);
-                    newcategory.Enabled = true;
-                    // assign sorting rules from parent
-                    newcategory.CopyParentRules();
-                    CategoryDefinitions[newcategory.Name] = newcategory;
-                }
+                // if (minicatobj.ContainsKey("requires"))
+                // {
+                //     var reqex = parseRequirements(getRequirementLines(minicatobj["requires"]), parent_id);
+                //     newcategory = new MatchCategory(category_name, ++_currentCount, parent_id, 0, reqex.Item1, reqex.Item2);
+                //     newcategory.Enabled = true;
+                //
+                //     // assign sorting rules from parent
+                //     newcategory.CopyParentRules();
+                //
+                //     CategoryDefinitions[newcategory.Name] = newcategory;
+                // }
+                // else
+                // {
+                //     newcategory = new MatchCategory(category_name, ++_currentCount, parent_id);
+                //     newcategory.Enabled = true;
+                //     // assign sorting rules from parent
+                //     newcategory.CopyParentRules();
+                //     CategoryDefinitions[newcategory.Name] = newcategory;
+                // }
                 // recursively perform this same process for any members of a nested "include" block
                 if (minicatobj.ContainsKey("include"))
                     parseInclude(newcategory.ID, minicatobj["include"]?.Qo());
             }
             else
                 throw new MalformedFieldError($"Could not parse 'include' entry '{category_name}' for category '{_currentCategory}'");
+        }
+
+        /// use pre-determined Requirements and Exclusions
+        private static MatchCategory createMatchCategory(string name, int parent_id, int priority, bool enable, JsonArray sort_fields, ReqExcTuple reqex)
+        {
+            var newcategory = new MatchCategory(name, ++_currentCount, parent_id, priority);
+
+            // add reqs/excls if any
+            foreach (var kvp in reqex.Item1)
+                newcategory.RequireTrait(kvp.Key, kvp.Value);
+            foreach (var kvp in reqex.Item2)
+                newcategory.ExcludeTrait(kvp.Key, kvp.Value);
+
+            // create/get the Sorting Rules for the category
+            assignSortingRules(newcategory, sort_fields);
+
+            // enable (or disable) the category
+            newcategory.Enabled = enable;
+
+            // add to by-name collection
+            CategoryDefinitions[newcategory.Name] = newcategory;
+
+            return newcategory;
+        }
+
+        /// parse out the requirements and exclusions
+        private static MatchCategory createMatchCategory(string name, int parent_id, int inherit_id, int priority, bool enable, JsonArray sort_fields, JsonValue requires)
+        {
+            return createMatchCategory(name, parent_id, priority, enable, sort_fields,
+
+                parseRequirements(getRequirementLines(requires), (inherit_id > 0 && inherit_id != parent_id) ? inherit_id : 0));
+        }
+
+        private static void generateSubCategories(string sub_name, int parent_id, int inherit_id, int priority, bool enable, JsonValue requires, JsonArray sort_fields)
+        {
+            // the requirements will be the same for each of these, so pre-calculate them
+            var reqex = parseRequirements(getRequirementLines(requires), inherit_id > 0 ? inherit_id : 0);
+
+            foreach (var child in ItemCategory.Registry.Values.Where(cat => cat.ParentID == parent_id))
+            {
+
+                // set name to "ParentName - ThisName"
+                // e.g. "Arrows - Endless"
+                createMatchCategory($"{child.Name} - {sub_name}", child.ID, priority, enable, sort_fields, reqex);
+
+                // var subcat = new MatchCategory($"{child.Name} - {sub_name}", ++_currentCount, child.ID, priority, requirements, exclusions);
+                // subcat.Enabled = enable;
+                //
+                // assignSortingRules(subcat, sort_fields);
+                // CategoryDefinitions[subcat.Name] = subcat;
+            }
+            // no "include" allowed for this type
         }
 
 
@@ -463,15 +538,43 @@ namespace InvisibleHand.Items.Categories
             throw new MalformedFieldError();
         }
 
+        /// <summary>
         /// Get the tokenizer to analyze each line in the requires_list and return an object containing any found
-        /// requirements or exclusions. The values for each line are accumulated and placed into the out parameters
-        /// as appropriate. Returns true if any requirements or exclusions were found, false if for some reason none
-        /// were (e.g. the requires_list was empty)
-        private static bool parseRequirements(IEnumerable<string> requires_list, out IDictionary<string, int> requirements, out IDictionary<string, int> exclusions)
+        /// requirements or exclusions. The values for each line are accumulated and placed into the returned tuple
+        /// as appropriate. If for some reason no requirements or exclusions were found, (e.g. the requires_list was empty),
+        /// the items of the returned tuple will both have a Count of 0.
+        /// </summary>
+        /// <returns>
+        /// Tuple&lt;IDictionary&lt;string, int&gt;, IDictionary&lt;string, int&gt;&gt; where Item1 is the Requirements map
+        /// for the category and Item2 is the Exclusions map.
+        /// </returns>
+        private static ReqExcTuple parseRequirements(IEnumerable<string> requires_list, int inherit_from_id)
         {
-            var reqs = new Dictionary<string, int>();
-            var excls = new Dictionary<string, int>();
+            // out IDictionary<string, int> requirements, out IDictionary<string, int> excludements)
+            // var inheritments = (inherit_from_id > 0)
+            //                     ? ItemCategory.Registry[inherit_from_id] as MatchCategory
+            //                     : null;
+            //
+            // requirements = (inheritments == null || inheritments.Requirements == null)
+            //                     ? new Dictionary<string, int>()
+            //                     : new Dictionary<string, int>(inheritments.Requirements);
+            //
+            // excludements = (inheritments == null || inheritments.Exclusions == null)
+            //                     ? new Dictionary<string, int>()
+            //                     : new Dictionary<string, int>(inheritments.Exclusions);
 
+            // if the inherited requirements do not come from the parent, we cannot
+            // rely on tree traversal to ensure that the prerequisites for this category are met;
+            // therefore we must add them explicitly.
+            var inherited = getInheritedRequirements(inherit_from_id);
+
+            // since the tuple returnded from getInherited... contains a pointer to the actual collections of the
+            // inherited category, we want to copy them before making any changes
+            var requirements = new Dictionary<string, int>(inherited.Item1);
+            var excludements = new Dictionary<string, int>(inherited.Item2);
+
+            // if the "requires" entry on the category was null, empty, or missing, then "requires_list" will be an
+            // empty string[] and this loop will not run
             foreach (var line in requires_list)
             {
                 try
@@ -480,11 +583,16 @@ namespace InvisibleHand.Items.Categories
 
                     var trait_group = entry.TraitGroup;
 
-                    foreach (var trait in entry.includes)
-                        reqs.Add(trait, getValueForFlag(trait_group, trait));
+                    // use Update to overwrite any inherited reqs w/ the same name
+                    requirements.Update(entry.includes.ToDictionary(t=>t, t=>getValueForFlag(trait_group, t)));
+                    excludements.Update(entry.excludes.ToDictionary(t=>t, t=>getValueForFlag(trait_group, t)));
 
-                    foreach (var trait in entry.excludes)
-                        excls.Add(trait, getValueForFlag(trait_group, trait));
+                    // foreach (var trait in entry.includes)
+                    //     if (requirements.ContainsKey(trait_group))
+                    //     requirements.Add(trait, getValueForFlag(trait_group, trait));
+
+                    // foreach (var trait in entry.excludes)
+                    //     exclusions.Add(trait, getValueForFlag(trait_group, trait));
 
                 }
                 catch (TokenizerException e)
@@ -492,11 +600,19 @@ namespace InvisibleHand.Items.Categories
                     throw new MalformedFieldError($"Could not parse requirement entry '{e.Line}' for category '{_currentCategory}'");
                 }
             }
+            return new ReqExcTuple(requirements, excludements);
+            // return new ReqExcTuple(requirements, excludements);
+            // return (requirements.Count + excludements.Count) > 0;
+        }
 
-            requirements = reqs.Count > 0 ? reqs : null;
-            exclusions = excls.Count > 0 ? excls : null;
+        private static ReqExcTuple getInheritedRequirements(int inherit_from_id)
+        {
+            var inherited = inherit_from_id > 0 ? ItemCategory.Registry[inherit_from_id] as MatchCategory : null;
 
-            return (reqs.Count + excls.Count) > 0;
+            return new ReqExcTuple(
+                inherited?.Requirements ?? new Dictionary<string, int>(),
+                inherited?.Exclusions ?? new Dictionary<string, int>()
+            );
         }
 
         private static IDictionary<string, int> getFlagValues(string trait_group)

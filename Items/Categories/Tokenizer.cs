@@ -3,15 +3,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-// using InvisibleHand.Utils;
-
 namespace InvisibleHand.Items.Categories
 {
-
+    /// Represent a single line in the requirements array for a category definition
     public class RequirementEntry
     {
-        // public ReqType Type;
-
         public string TraitGroup;
         public IList<string> includes;
         public IList<string> excludes;
@@ -54,47 +50,33 @@ namespace InvisibleHand.Items.Categories
         // a fully-specified trait group may contain a hierarchy of names separated by ".";
         // e.g. "Placeable.Furniture.Tables"
         // This checks that any period is followed by an uppercase letter.
-        // --Captured in group named 'TGroup'
+        // --Captured in group named 'TraitGroup'
         private const string TRAIT_GROUP = @"(?<TraitGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
 
         // trait names are always lowercase, may contain underscores and numbers
-        // eg:"yellow"
-        private const string TRAIT_SIMPLE_NAME = @"[a-z\d_]+"; // eg:"yellow"
-        // private const string TRAIT_SIMPLE_NAME = @"(?<TraitName>[a-z\d_]+)"; // eg:"yellow"
-        // private const string TRAIT_SIMPLE_NAME_GROUP = @"(?<TraitName>" + TRAIT_SIMPLE_NAME + @")"; // eg:"yellow"
-
-        // private const string TRAIT_NEGATED_NAME = @"(?<NegTraitName>!" + TRAIT_SIMPLE_NAME + @")"; // eg:"yellow"
-        // eg:"yellow" or "!trophy_2"
-        // private const string TRAIT_OPTION = @"(?(!)(?<TraitOption>!" + TRAIT_SIMPLE_NAME + @")|" + TRAIT_SIMPLE_NAME + @")";
-        private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_SIMPLE_NAME + @")";
-        // private const string TRAIT_OPTION = @"(?(!)" + TRAIT_NEGATED_NAME + @"|" + TRAIT_SIMPLE_NAME_GROUP + @")";
-
-        // "And" traits from same group together by separating trait names w/ spaces
-        // e.g. "purple green spiked"
-        // private const string SIMPLE_TRAIT_LIST = @"(" + TRAIT_SIMPLE_NAME_GROUP + @"\s)*" + TRAIT_SIMPLE_NAME_GROUP;
+        // eg:"yellow_2"
+        private const string TRAIT_NAME = @"[a-z\d_]+";
 
         // as above, but optionally negated
+        // --Captured in group named 'TraitName'
+        private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
+
+        // "And" traits from same group together by separating trait names w/ spaces
         // e.g. "purple !green !blue spiked"
         private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
 
-        // optionally include the trait group for full specification
-        // e.g. "Property.Ident !wand" or "create_tile"
-        // private const string TRAIT_SPEC = @"(?<TraitSpec>" + TRAIT_GROUP + @"\s+" + TRAIT_OPTION + @")";
-
-        // put it all together
+        // put it all together:
+        // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
         private const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
 
+        /// Given a line from the requirements array, parse out the group and in-/ex-cluded traits
         public static RequirementEntry ParseRequirementLine(string line)
         {
-
+            // only capture the named groups to keep things simpler
             var match = Regex.Match(line, REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
 
             if (match.Success)
             {
-
-                // Console.WriteLine();
-                // Console.WriteLine(line);
-
                 var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
                 var tnames = match.Groups["TraitName"].Captures;
                 var req = new RequirementEntry(trait_group);
@@ -107,18 +89,11 @@ namespace InvisibleHand.Items.Categories
                     else
                         req.AddInclude(trait);
                 }
-
-                // Console.WriteLine("Trait Group: {0}", req.TraitGroup);
-                // ConsoleHelper.PrintList(req.includes, "   includes");
-                // ConsoleHelper.PrintList(req.excludes, "   excludes");
                 return req;
-
             }
             else
             {
                 throw new TokenizerException(line, "Error while parsing line.");
-                // Console.WriteLine("Tokenizer Exception: {0}", line);
-                // return new RequirementEntry("");
             }
 
         }
