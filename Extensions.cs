@@ -12,17 +12,6 @@ namespace InvisibleHand
 {
     public static class IHExtensions
     {
-
-        // #region backports
-
-        /// Backport the generic GetModPlayer from TModLoader-devel version
-        // public static T GetModPlayer<T>(this Player player, Mod mod) where T : ModPlayer
-        // {
-        //     return (T)player.GetModPlayer(mod, typeof(T).Name);
-        // }
-        // #endregion
-
-
         #region generic extensions
 
         /// Updates (creates new key-value pairs and overwrites existing pairs) a dictionary
@@ -34,7 +23,7 @@ namespace InvisibleHand
                     self[kvp.Key] = kvp.Value;
         }
 
-        /// Extend (add all elements from other to this, which, for collections of
+        /// Extend (add all elements from other, which, for collections of
         /// key-value-pairs like IDictionary, will throw exceptions if a key in `other`
         /// is null or already present) this collection with the entries from the other enumerable
         public static void Extend<T>(this ICollection<T> self, IEnumerable<T> other)
@@ -91,20 +80,11 @@ namespace InvisibleHand
 
         #region itemExensions
 
+        // category stuff:
+
         public static ItemFlagInfo GetFlagInfo(this Item item)
         {
             return item.GetModInfo<ItemFlagInfo>(IHBase.Instance);
-        }
-
-        public static bool CanStackWith(this Item src_item, Item dest_item)
-        {
-            return !dest_item.IsBlank() && dest_item.IsTheSameAs(src_item) && dest_item.stack < dest_item.maxStack;
-        }
-
-        public static bool IsBlank(this Item item)
-        {
-
-            return item.type == 0 || item.stack == 0;
         }
 
         public static ItemCategory GetCategory(this Item item)
@@ -117,26 +97,19 @@ namespace InvisibleHand
             return iteminfo.Category;
         }
 
-        // public static bool IsBomb(this Item item)
-        // {   //grenades, bombs, etc
-        //     var proj = ProjectileLoader.GetProjectile(item.shoot);
-        //     return proj != null && proj.projectile.aiStyle == 16;
-        //
-        //     // return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
-        // }
+        // sorting/movement stuff:
 
-        // // FIXME: glowstick and flaregun and...the whole thing, really
-        // public static bool IsTool(this Item item)
-        // {
-        //     return item.createTile == TileID.Rope || item.createTile == TileID.Chain || item.name.EndsWith("Bucket") ||
-        //     item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() ||
-        //     // ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
-        //     item.type == 1991 || item.type == 50 || item.type == 1326 ||
-        //     // ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
-        //     item.name.Contains("Paintbrush") || item.name.Contains("Paint Roller") || item.name.Contains("Paint Scraper") ||
-        //     (item.type >= 1543 && item.type <= 1545);
-        //     //bucket, bug net, magic mirror, rod of discord, spectre paint tools
-        // }
+        public static bool CanStackWith(this Item src_item, Item dest_item)
+        {
+            return !dest_item.IsBlank() && dest_item.IsTheSameAs(src_item) && dest_item.stack < dest_item.maxStack;
+        }
+
+        public static bool IsBlank(this Item item)
+        {
+
+            return item.type == 0 || item.stack == 0;
+        }
+
     #endregion
 
     #region misc
