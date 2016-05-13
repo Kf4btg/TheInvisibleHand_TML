@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 // using System;
@@ -21,6 +22,28 @@ namespace InvisibleHand
         // }
         // #endregion
 
+
+        #region generic extensions
+
+        /// Updates (creates new key-value pairs and overwrites existing pairs) a dictionary
+        /// with the entries from a second dictionary
+        public static void Update<K,V>(this IDictionary<K, V> self, IDictionary<K, V> other)
+        {
+            if (other != null)
+                foreach (var kvp in other)
+                    self[kvp.Key] = kvp.Value;
+        }
+
+        /// Extend (add all elements from other to this, which, for collections of
+        /// key-value-pairs like IDictionary, will throw exceptions if a key in `other`
+        /// is null or already present) this collection with the entries from the other enumerable
+        public static void Extend<T>(this ICollection<T> self, IEnumerable<T> other)
+        {
+            if (other != null)
+                foreach (var item in other)
+                    self.Add(item);
+        }
+
         /// <summary>
         /// Get the array slice between the two indexes.
         /// ... Inclusive for start index, exclusive for end index.</summary>
@@ -36,6 +59,8 @@ namespace InvisibleHand
         //
         //     return sub;
         // }
+
+        #endregion
 
         /// query the Main (current) keystate about the given key
         public static bool Down(this Keys key)
