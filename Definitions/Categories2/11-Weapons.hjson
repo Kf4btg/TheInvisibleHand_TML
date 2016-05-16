@@ -33,7 +33,6 @@
     requires: Weapon magic
     include: {
       Area: Weapon.Magic area
-      /*Bouncing: Weapon.Magic bounce_heavy | bounce_hyper*/
       Controlled: Weapon.Magic controllable
       Homing: Weapon.Magic homing
       Piercing: Weapon.Magic pierce
@@ -41,7 +40,7 @@
     }
   }
 
-  //merge 2 smaller categories into one
+  // will merge these 2 smaller categories into one
   {
     name: Bounce (Heavy)
     parent: Magic

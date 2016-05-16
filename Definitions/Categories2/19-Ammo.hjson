@@ -1,9 +1,7 @@
 [
   {
     name: Ammo
-    requires: [
-      Property.Ident ammo
-    ]
+    requires: Property.Ident ammo
     include:
     {
       Arrows: Ammo arrow
@@ -57,8 +55,6 @@
     # this creates a sub-category within each of those child-categories
     # for items that also match the requirements given below
     parent: @Ammo
-    requires: [
-      Property !consumable
-    ]
+    requires: Property !consumable
   }
 ]

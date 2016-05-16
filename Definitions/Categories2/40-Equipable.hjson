@@ -8,84 +8,131 @@
       /*Equipable any_equipable*/
       Types equipable
     ]
+    include:
+    {
+      Armor:
+      {
+        requires: Types armor
+        include: {
+          Helm: EquipSlot head
+          Cuirass: EquipSlot body
+          Greaves: EquipSlot leg
+        }
+      }
+
+      Accessory: Property accessory !vanity
+      "Grappling Hook": Equipable grapple
+      "Mount": Equipable mount
+      "Mine Cart": Equipable minecart
+      "Pet": Equipable vanity_pet
+      "Light Pet": Equipable light_pet
+
+      "Vanity Item":
+      {
+        requires: Property vanity
+        include:
+        {
+          "Vanity Clothing":
+          {
+            include:
+            {
+              Headwear: EquipSlot head
+              Shirt: EquipSlot body
+              Pants: EquipSlot leg
+            }
+          }
+
+          "Vanity Accessory":
+          {
+            requires: Property accessory
+            include:
+            {
+              "Vanity Wings": EquipSlot wings
+              "Fashion Facewear": EquipSlot face
+              "Vanity Neckwear": EquipSlot neck
+              "Vanity Boots": EquipSlot shoe
+
+              # Note about capes/cloaks:
+              # Theyre the ONLY vanilla items that have a value for 'frontSlot',
+              # but they're also the only vanilla VANITY items that have a value for
+              # 'backSlot'. So...yeah.
+              "Capes": EquipSlot front back
+
+              # NOTE: there are none of these in Vanilla
+              "Vanity Balloon": EquipSlot balloon
+              "Vanity Belt": EquipSlot waist
+              "Vanity Shields": EquipSlot shield
+
+              # NOTE: there are none* of these in Vanilla
+              # *see note above about Capes
+              "Back Vanity Slot": EquipSlot back
+              "Front Vanity Slot": EquipSlot front
+
+              "Main-Hand Glove": EquipSlot main_hand
+              "Off-Hand Glove": EquipSlot off_hand
+            }
+          }
+        }
+      }
+    }
   }
 
-  {
+  /*{
     name: Vanity Item
     parent: Equipable
     inherits: null
-    requires: [
-      Property vanity
-    ]
+    requires: Property vanity
   }
 
   {
     name: Grappling Hook
     parent: Equipable
     inherits: null
-    requires: [
-      Equipable grapple
-    ]
+    requires: Equipable grapple
   }
 
   {
     name: Mount
     parent: Equipable
     inherits: null
-    requires: [
-      Equipable mount
-    ]
+    requires: Equipable mount
   }
 
   {
     name: Mine Cart
     parent: Equipable
     inherits: null
-    requires: [
-      Equipable minecart
-    ]
+    requires: Equipable minecart
   }
 
   {
     name: Light Pet
     parent: Equipable
     inherits: null
-    requires: [
-      Equipable light_pet
-    ]
+    requires: Equipable light_pet
   }
 
   {
     name: Pet
     parent: Equipable
     inherits: null
-    requires: [
-      Equipable vanity_pet
-    ]
-  }
+    requires: Equipable vanity_pet
+  }*/
 
   {
     name: Armor
     parent: Equipable
     # inheriting from Equipable would lead to some redundancy
-    inherits: null
     # armor doesn't necessarily need to give defense
-    requires: [
-      Property !vanity
-      EquipSlot head | body | leg
-    ]
-  }
-
-  {
-    name: Accessory
-    parent: Equipable
-    # the large check of Equipable is not necessary here.
-    inherits: null
-    requires: [
-      # vanity accys go elsewhere
-      Property !vanity
-      Property accessory
-    ]
+    requires: Property !vanity
+    include: {
+      Helm: EquipSlot head
+      Cuirass: EquipSlot body
+      Greaves: EquipSlot leg
+    }
+    /*TODO: experimental; if match=false, then items that match this category's requirements but not any of its
+    children will NOT be considered matched and will continue to be checked against any remaining categories*/
+    match: false
   }
 
 ]

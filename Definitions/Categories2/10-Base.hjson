@@ -1,43 +1,16 @@
 [
   {
     name: Placeable
-    requires: [
-      Types placeable
-      /*Property create_tile | create_wall
-      Property.Ident !wand*/
-    ]
+    requires: Types placeable
   }
 
   {
     name: Weapon
-    requires: [
-      Types weapon
-      /*Property damage
-      Property !not_ammo | UseStyle use_style_any*/
-    ]
+    requires: Types weapon
   }
-
-  //{
-  //  name: Armor
-  //  requires: [
-  //    Types armor
-  //    /*Property !vanity
-  //    EquipSlot head | body | leg*/
-  //  ]
-  //}
 
   {
     name: Tool
-    requires: [
-      Types tool
-      /*Tool tool_any*/
-    ]
+    requires: Types tool
   }
-
-  /*{
-    name: Ammo
-    requires: [
-      Property.Ident ammo
-    ]
-  }*/
 ]

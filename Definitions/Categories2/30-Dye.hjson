@@ -1,9 +1,7 @@
 [
   {
     name: Dye
-    requires: [
-      Property.Ident dye
-    ]
+    requires: Property.Ident dye
     include:
     {
       "Basic Dyes": Dye basic
@@ -15,6 +13,11 @@
       Strange: Dye strange
       Lunar: Dye lunar
     }
+    sort: [
+      value
+      type
+      stack
+    ]
   }
 
   /*{

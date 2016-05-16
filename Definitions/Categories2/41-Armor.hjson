@@ -1,14 +1,9 @@
 {
   name: Armor
   parent: Equipable
-  # inheriting from Equipable would lead to some redundancy
   inherits: null
   # armor doesn't necessarily need to give defense
-  requires: [
-    Types armor
-  /*Property !vanity*/
-    /*EquipSlot head | body | leg*/
-  ]
+  requires: Types armor
   include:
   {
     Helm: EquipSlot head

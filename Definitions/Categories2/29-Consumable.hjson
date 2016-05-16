@@ -31,18 +31,14 @@
     # unless 'inherits' is null or a different category
     parent: Consumable
     inherits: null
-    requires: [
-      Consumable food
-    ]
+    requires: Consumable food
   }
 
   {
     name: Flask
     parent: Consumable
     inherits: null
-    requires: [
-      Consumable flask
-    ]
+    requires: Consumable flask
   }
 
   {
@@ -64,34 +60,23 @@
     # (Potion in this case). Those requirements will
     # be checked before continuing to check the requirements
     # listed below
-    requires: [
-      # these are not | (or'd) together because we want this
-      # category to match items that are BOTH, not EITHER
-      Property heal_life heal_mana
-      /*Property heal_mana*/
-    ]
+    requires: Property heal_life heal_mana
   }
   {
     name: Healing Potion
     parent: Potion
     //inherits: "Potion" // redundant
-    requires: [
-      Property heal_life
-    ]
+    requires: Property heal_life
   }
   {
     name: Mana Potion
     parent: Potion
-    requires: [
-      Property heal_mana
-    ]
+    requires: Property heal_mana
   }
 
   {
     name: Buff Potion
     parent: Potion
-    requires: [
-      Property buff_time
-    ]
+    requires: Property buff_time
   }
 ]

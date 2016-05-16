@@ -2,27 +2,19 @@
   {
     name: Banner
     parent: Placeable
-    requires: [
-      CreateTile banner
-    ]
+    requires: CreateTile banner
   }
-
-
 
   {
     name: Herb Seed
     parent: Placeable
-    requires: [
-      CreateTile herb
-    ]
+    requires: CreateTile herb
   }
 
   {
     name: Wall
     parent: Placeable
-    requires: [
-      Property create_wall
-    ]
+    requires: Property create_wall
   }
 
   /*{
@@ -36,27 +28,15 @@
   {
     name: Music Box
     parent: Placeable
-    requires: [
-      CreateTile music_box
-    ]
+    requires: CreateTile music_box
   }
 
   {
     name: Furniture
     parent: Placeable
     inheritable: false
-    requires: [ ]
-    # @include other-category:
-    #   means if it matches that category, it also
-    #   matches this one. Can be used to merge categories
-    #   or create a parent w/ no requirements of its own
-    /*requires: [
-      @include Room Needs
-      @include Container
-      @include Crafting Station
-    ]*/
+    /*requires: [ ]*/
   }
-
 
 
   /*{
@@ -90,9 +70,7 @@
   {
     name: Wood
     parent: Block
-    requires: [
-      CreateTile.Block wood
-    ]
+    requires: CreateTile.Block wood
   }
 
   # TODO: implement an 'enabled' key for every category.

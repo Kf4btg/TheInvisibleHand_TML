@@ -2,28 +2,16 @@
   {
     name: Gun
     parent: Ranged
-    requires: [
-      Weapon.Ranged use_ammo_bullet
-    ]
+    requires: Weapon.Ranged use_ammo_bullet
     include: {
       "Automatic Gun": Property auto_reuse
     }
   }
 
-  /*{
-    name: Automatic Gun
-    parent: Gun
-    requires: [
-      Property auto_reuse
-    ]
-  }*/
-
   {
     name: Bow
     parent: Ranged
-    requires: [
-      Weapon.Ranged use_ammo_arrow
-    ]
+    requires: Weapon.Ranged use_ammo_arrow
     include: {
       # this will obviously include some of the high-level "bows", too
       # ...oh well
@@ -31,30 +19,16 @@
     }
   }
 
-  /*{
-    name: Repeater
-    parent: Bow
-    # this will obviously include some of the high-level "bows", too
-    # ...oh well
-    requires: [
-      Property auto_reuse
-    ]
-  }*/
-
   {
     name: Launcher
     parent: Ranged
-    requires: [
-      Weapon.Ranged use_ammo_rocket
-    ]
+    requires: Weapon.Ranged use_ammo_rocket
   }
 
   {
     name: Dart Weapon
     parent: Ranged
-    requires: [
-      Weapon.Ranged use_ammo_dart
-    ]
+    requires: Weapon.Ranged use_ammo_dart
   }
 
   {
@@ -62,16 +36,12 @@
     parent: Ranged
     # this could be use_ammo_gel, but i think flamethrowers are
     # defined moreso by their manner of attack than their fuel
-    requires: [
-      Weapon.Ranged flame_thrower
-    ]
+    requires: Weapon.Ranged flame_thrower
   }
 
   {
     name: Special
     parent: Ranged
-    requires: [
-      Weapon.Ranged use_ammo_none
-    ]
+    requires: Weapon.Ranged use_ammo_none
   }
 ]

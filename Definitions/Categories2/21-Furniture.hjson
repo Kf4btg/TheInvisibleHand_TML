@@ -14,9 +14,6 @@
   {
     name: Room Needs
     parent: Furniture
-    /*requires: [
-      CreateTile.Furniture room_needs_door | room_needs_table | room_needs_chair | room_needs_light
-    ]*/
     # use 'include:' to quickly add child categories with
     # simple requirements. The Child will have this category
     # as its parent.
@@ -33,36 +30,36 @@
       Lighting: {
         requires: CreateTile.Furniture room_needs_light
         include: {
-          Torch: Furniture.Lighting torch
-          Candelabra: Furniture.Lighting candelabra
-          Candle: Furniture.Lighting candle
-          Chandelier: Furniture.Lighting chandelier
-          "Hanging Lantern": Furniture.Lighting hanging_lantern
-          Lamp: Furniture.Lighting lamp
-          "Holiday Light": Furniture.Lighting holiday_light
+          Torch: CreateTile.Furniture.Lighting torch
+          Candelabra: CreateTile.Furniture.Lighting candelabra
+          Candle: CreateTile.Furniture.Lighting candle
+          Chandelier: CreateTile.Furniture.Lighting chandelier
+          "Hanging Lantern": CreateTile.Furniture.Lighting hanging_lantern
+          Lamp: CreateTile.Furniture.Lighting lamp
+          "Holiday Light": CreateTile.Furniture.Lighting holiday_light
         } }
       Tables: {
         requires: CreateTile.Furniture room_needs_table
         include: {
-          Table: Furniture.Tables table
-          Bathtub: Furniture.Tables bathtub
-          Bookcase: Furniture.Tables bookcase
-          Dresser: Furniture.Tables dresser
-          Piano: Furniture.Tables piano
-          "Work Bench": Furniture.Tables workbench
+          Table: CreateTile.Furniture.Tables table
+          Bathtub: CreateTile.Furniture.Tables bathtub
+          Bookcase: CreateTile.Furniture.Tables bookcase
+          Dresser: CreateTile.Furniture.Tables dresser
+          Piano: CreateTile.Furniture.Tables piano
+          "Work Bench": CreateTile.Furniture.Tables workbench
         } }
       Doors: {
         requires: CreateTile.Furniture room_needs_door
         include: {
-          Door: Furniture.Doors door
-          Platform: Furniture.Doors platform
+          Door: CreateTile.Furniture.Doors door
+          Platform: CreateTile.Furniture.Doors platform
         } }
       Chairs: {
         requires: CreateTile.Furniture room_needs_chair
         include: {
-          Chair: Furniture.Chairs chair
-          Bench: Furniture.Chairs bench
-          Bed: Furniture.Chairs bed
+          Chair: CreateTile.Furniture.Chairs chair
+          Bench: CreateTile.Furniture.Chairs bench
+          Bed: CreateTile.Furniture.Chairs bed
         } }
     } }
 ]
