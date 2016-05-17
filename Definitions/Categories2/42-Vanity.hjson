@@ -1,5 +1,5 @@
 [
-  {
+  /*{
     name: Vanity Clothing
     parent: Vanity Item
     include:
@@ -51,5 +51,5 @@
       Off-Hand Glove
     ]
     merge: true
-  }
+  }*/
 ]

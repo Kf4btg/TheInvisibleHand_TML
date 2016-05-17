@@ -1,11 +1,11 @@
 [
   // TODO: figure out how to handle some of the corner-cases
   // where a single accy fills multiple slots: e.g. Master Ninja Gear
-  {
+  /*{
     name: Accessory
     parent: Equipable
     inherit: null
-    requires: !vanity accessory
+    requires: accessory !vanity
     include:
     {
       Wings: EquipSlot wings
@@ -32,5 +32,5 @@
       Off-Hand Gauntlet
     ]
     merge: true
-  }
+  }*/
 ]

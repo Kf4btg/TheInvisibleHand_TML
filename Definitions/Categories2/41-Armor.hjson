@@ -1,4 +1,5 @@
-{
+[
+/*{
   name: Armor
   parent: Equipable
   inherits: null
@@ -10,4 +11,5 @@
     Cuirass: EquipSlot body
     Greaves: EquipSlot leg
   }
-}
+}*/
+]
