@@ -30,6 +30,9 @@ namespace InvisibleHand.Items.Categories
 
         public static IDictionary<string, ItemCategory> CategoryDefinitions { get; private set; }
 
+        // track placeholders
+        private static Dictionary<string, MatchCategory> placeholders = new Dictionary<string, MatchCategory>();
+
 
         /// Call this method to run all the other class methods
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
@@ -205,6 +208,12 @@ namespace InvisibleHand.Items.Categories
                             sort_fields  : catobj.ContainsKey("sort")     ? catobj["sort"]    ?.Qa()          : null
                         );
                 }
+
+            // when we're done, make sure there are no unfulfilled placeholders
+            if (placeholders.Count > 0)
+            {
+                throw new ParserException("The following place-holder(s) never received a full definition: "+ string.Join(", ", placeholders.Keys));
+            }
         }
 
         /*
@@ -288,7 +297,13 @@ namespace InvisibleHand.Items.Categories
         /// an object that can hold two optional keys: a "requires" array, and a nested "include" block</param>
         private static void parseMiniCategory(int parent_id, string category_name, JsonValue value)
         {
-            if (value.JsonType == JsonType.String)
+            // if the "value" of a include-entry is null, it shall be understood as a placeholder for
+            // a category that will defined at a later time. It is being included here to reserve its
+            // sort order, so we need to make sure it gets a proper ID
+            if (value == null)
+                createPlaceholder(category_name, parent_id);
+
+            else if (value.JsonType == JsonType.String)
                 // category requirements are held in the single string value for the key
                 createMatchCategory(category_name, parent_id, 0, 0, true, null, value);
 
@@ -329,7 +344,12 @@ namespace InvisibleHand.Items.Categories
             /// <param name="include"> Optional object containing nested child-categories; provided as a convenience feature for defining multiple, simple categories. Entries in the object will be parsed and recursively turned into a hierarchy of child-categories for this category.</param>
         private static void createMatchCategory(string name, int parent_id, int priority, bool enable, JsonArray sort_fields, ReqExcTuple reqex, JsonObject include = null)
         {
-            var new_category = new MatchCategory(name, ++_currentCount, parent_id, priority);
+
+            // if this is the definition of a previously-referenced placeholder, pull it from that collection;
+            // otherwise create it anew
+            var new_category = placeholders.ContainsKey(name)
+                                ? placeholders[name]
+                                : new MatchCategory(name, ++_currentCount, parent_id, priority);
 
             // add reqs/excls if any
             foreach (var kvp in reqex.Item1)
@@ -344,7 +364,7 @@ namespace InvisibleHand.Items.Categories
             new_category.Enabled = enable;
 
             // add to by-name collection
-            CategoryDefinitions[new_category.Name] = new_category;
+            addCategoryDefinition(new_category);
 
             // finally handle the "include" entry
             if (include != null)
@@ -370,6 +390,18 @@ namespace InvisibleHand.Items.Categories
                 // we can call getRequirementLines with a null value and it will just return an empty list
                 parseRequirements(getRequirementLines(requires), (inherit_id > 0 && inherit_id != parent_id) ? inherit_id : 0),
                 include);
+        }
+
+        /// create an empty category simply to reserve the name and id.
+        /// Track placeholders to ensure that all have been
+        /// defined by the time we're done parsing.
+        private static void createPlaceholder(string name, int parent_id)
+        {
+            var new_category = new MatchCategory(name, ++_currentCount, parent_id, 0);
+            // copy sort fields from parent
+            // assignSortingRules(new_category, null);
+
+            placeholders[name] = new_category;
         }
 
         /// Note: using "include" in a generational-category definition can quickly lead to an explosion of categories!
@@ -454,13 +486,13 @@ namespace InvisibleHand.Items.Categories
         */
 
         /// <summary>
-        /// obtain a list of requirement-definition lines from the raw <see cref="JsonValue"/> in the definition file
-        /// </summary>
-        /// <param name="requires"> can be a single string, an array of strings (possibly empty), or <see langword="null"/> </param>
-        /// <returns> if the requires list is null, return an empty list; if the requires "list" is just a single string,
-        /// return a list containing that string; otherwise return the list of strings found in the array.
-        /// </returns>
-        /// <exception cref="MalformedFieldError">if the "requires" value is neither null, string, nor array</exception>
+            /// obtain a list of requirement-definition lines from the raw <see cref="JsonValue"/> in the definition file
+            /// </summary>
+            /// <param name="requires"> can be a single string, an array of strings (possibly empty), or <see langword="null"/> </param>
+            /// <returns> if the requires list is null, return an empty list; if the requires "list" is just a single string,
+            /// return a list containing that string; otherwise return the list of strings found in the array.
+            /// </returns>
+            /// <exception cref="MalformedFieldError">if the "requires" value is neither null, string, nor array</exception>
         private static IEnumerable<string> getRequirementLines(JsonValue requires)
         {
             if (requires == null)
@@ -476,15 +508,15 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// <summary>
-        /// Get the tokenizer to analyze each line in the requires_list and return an object containing any found
-        /// requirements or exclusions. The values for each line are accumulated and placed into the returned tuple
-        /// as appropriate. If for some reason no requirements or exclusions were found, (e.g. the requires_list was empty),
-        /// the items of the returned tuple will both have a Count of 0.
-        /// </summary>
-        /// <returns>
-        /// Tuple&lt;IDictionary&lt;string, int&gt;, IDictionary&lt;string, int&gt;&gt; where Item1 is the Requirements map
-        /// for the category and Item2 is the Exclusions map.
-        /// </returns>
+            /// Get the tokenizer to analyze each line in the requires_list and return an object containing any found
+            /// requirements or exclusions. The values for each line are accumulated and placed into the returned tuple
+            /// as appropriate. If for some reason no requirements or exclusions were found, (e.g. the requires_list was empty),
+            /// the items of the returned tuple will both have a Count of 0.
+            /// </summary>
+            /// <returns>
+            /// Tuple&lt;IDictionary&lt;string, int&gt;, IDictionary&lt;string, int&gt;&gt; where Item1 is the Requirements map
+            /// for the category and Item2 is the Exclusions map.
+            /// </returns>
         private static ReqExcTuple parseRequirements(IEnumerable<string> requires_list, int inherit_from_id)
         {
             // if the inherited requirements do not come from the parent, we cannot
@@ -557,11 +589,11 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// <summary>
-        /// return the bit-flag value for the given trait (flag_name) from the given trait family (trait_group)
-        /// </summary>
-        /// <param name="trait_group"> </param>
-        /// <param name="flag_name"> </param>
-        /// <returns>  </returns>
+            /// return the bit-flag value for the given trait (flag_name) from the given trait family (trait_group)
+            /// </summary>
+            /// <param name="trait_group"> </param>
+            /// <param name="flag_name"> </param>
+            /// <returns>  </returns>
         private static int getValueForFlag(string trait_group, string flag_name)
         {
             try
@@ -580,10 +612,10 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// <summary>
-        /// Get the id of the pre-existing parent with the given name. If that parent is disabled, will walk up the parent
-        /// hierarchy until an enabled parent (or the root) is found.
-        /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
-        /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
+            /// Get the id of the pre-existing parent with the given name. If that parent is disabled, will walk up the parent
+            /// hierarchy until an enabled parent (or the root) is found.
+            /// <param name="parent_name"> name pulled from the JsonObject, or String.Empty if the 'parent' field was missing or null</param>
+            /// <returns> The parent with the given name or `null` if String.Empty is passed for parent_name</returns>
         private static int getParentID(string parent_name)
         {
             int pid = getCategoryID(parent_name);
@@ -615,6 +647,17 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
+        private static void addCategoryDefinition(ItemCategory category)
+        {
+            // check to see if it's the definition of a previous
+            // placeholder and untrack it if so
+            if (placeholders.ContainsKey(category.Name))
+                placeholders.Remove(category.Name);
+
+            // record in Category Defs
+            CategoryDefinitions[category.Name] = category;
+        }
+
         /*
          ██████  ██████  ██████  ██ ███    ██  █████  ██      ███████
         ██    ██ ██   ██ ██   ██ ██ ████   ██ ██   ██ ██      ██
@@ -640,27 +683,27 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// <summary>
-        /// According to their weighted loadorder, each category is assigned a range (or 'bucket')
-        /// of priority numbers ('addresses') that they and their children can use. The size of
-        /// these buckets is determined by dividing the maximum addressable space (0, int.MaxValue]
-        /// by the number of items currently requiring an address,
-        /// here the number of toplevel categories. Each top category is assigned an address
-        /// within its respective range, and later will perform the same process for its children,
-        /// dividing its addressable space among them, and then the same will happen for those
-        /// children's children and so on and so forth. Those categories created first (with lower IDs)
-        /// will receive the lower addresses (and thus be sorted first later on), unless the user has
-        /// given preference to some categories and changed their initial priority values in the definition
-        /// files, in which case that order will be considered before creation order.
-        /// It's basic European primogeniture, but with abstract conceptualizations of directed
-        /// electrical impulses rather than scheming dukes...unless of course you have a very 'modern' view
-        /// of human conciousness; then it's exactly the same.
-        /// </summary>
-        /// <remarks>
-        /// Each category receives an address that is just 1 below the minimum range of its next sibling.
-        /// This ensures that the children of this category receive lower addresses than the category itself
-        /// and are sorted before it while still making sure that the parent is sorted before its siblings.
-        /// In this way, we encoding a post-order tree-traversal into the priority values.
-        /// </remarks>
+            /// According to their weighted loadorder, each category is assigned a range (or 'bucket')
+            /// of priority numbers ('addresses') that they and their children can use. The size of
+            /// these buckets is determined by dividing the maximum addressable space (0, int.MaxValue]
+            /// by the number of items currently requiring an address,
+            /// here the number of toplevel categories. Each top category is assigned an address
+            /// within its respective range, and later will perform the same process for its children,
+            /// dividing its addressable space among them, and then the same will happen for those
+            /// children's children and so on and so forth. Those categories created first (with lower IDs)
+            /// will receive the lower addresses (and thus be sorted first later on), unless the user has
+            /// given preference to some categories and changed their initial priority values in the definition
+            /// files, in which case that order will be considered before creation order.
+            /// It's basic European primogeniture, but with abstract conceptualizations of directed
+            /// electrical impulses rather than scheming dukes...unless of course you have a very 'modern' view
+            /// of human conciousness; then it's exactly the same.
+            /// </summary>
+            /// <remarks>
+            /// Each category receives an address that is just 1 below the minimum range of its next sibling.
+            /// This ensures that the children of this category receive lower addresses than the category itself
+            /// and are sorted before it while still making sure that the parent is sorted before its siblings.
+            /// In this way, we encoding a post-order tree-traversal into the priority values.
+            /// </remarks>
         private static void assignAddresses(int min_address, int max_address,
                                             int parent_id,
                                             ILookup<int, ItemCategory> child_category_lookup)
