@@ -33,6 +33,9 @@ namespace InvisibleHand.Items.Categories
         // track placeholders
         private static Dictionary<string, MatchCategory> placeholders = new Dictionary<string, MatchCategory>();
 
+        // track any "&using" commands
+        private static Stack<string> using_trait_group = new Stack<string>();
+
 
         /// Call this method to run all the other class methods
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
@@ -297,6 +300,9 @@ namespace InvisibleHand.Items.Categories
         /// an object that can hold two optional keys: a "requires" array, and a nested "include" block</param>
         private static void parseMiniCategory(int parent_id, string category_name, JsonValue value)
         {
+
+
+
             // if the "value" of a include-entry is null, it shall be understood as a placeholder for
             // a category that will defined at a later time. It is being included here to reserve its
             // sort order, so we need to make sure it gets a proper ID
@@ -368,8 +374,24 @@ namespace InvisibleHand.Items.Categories
 
             // finally handle the "include" entry
             if (include != null)
+            {
+                var set_using = false;
                 foreach (var minicat in include)
-                    parseMiniCategory(new_category.ID, minicat.Key, minicat.Value);
+                {
+                    // check for special value that defines the Trait Group to use for the rest of the include entries
+                    if (minicat.Key == "&using")
+                    {
+                        using_trait_group.Push(minicat.Value.Qs());
+                        set_using = true;
+                    }
+                    else
+                    {
+                        parseMiniCategory(new_category.ID, minicat.Key, minicat.Value);
+                    }
+                }
+                // if we set a trait group to use for these include entries, pop it off the stack now that we're done
+                if (set_using) using_trait_group.Pop();
+            }
         }
 
         /// <summary>
@@ -524,10 +546,15 @@ namespace InvisibleHand.Items.Categories
             // therefore we must add them explicitly.
             var inherited = getInheritedRequirements(inherit_from_id);
 
-            // since the tuple returnded from getInherited... contains a pointer to the actual collections of the
+            // since the tuple returned from getInherited... contains a pointer to the actual collections of the
             // inherited category, we want to copy them before making any changes
             var requirements = new Dictionary<string, int>(inherited.Item1);
             var excludements = new Dictionary<string, int>(inherited.Item2);
+
+            string use_group = null;
+            if (using_trait_group.Count > 0)
+                // if there's something in the stack of "use this group plz", use the topmost entry
+                use_group = using_trait_group.Peek();
 
             // if the "requires" entry on the category was null, empty, or missing, then "requires_list" will be an
             // empty string[] and this loop will not run
@@ -535,7 +562,7 @@ namespace InvisibleHand.Items.Categories
             {
                 try
                 {
-                    var entry = Tokenizer.ParseRequirementLine(line);
+                    var entry = Tokenizer.ParseRequirementLine(line, use_group);
 
                     var trait_group = entry.TraitGroup;
 
