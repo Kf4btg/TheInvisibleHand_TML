@@ -5,11 +5,6 @@
   }
 
   {
-    name: Weapon
-    requires: Types weapon
-  }
-
-  {
     name: Tool
     requires: Types tool
   }

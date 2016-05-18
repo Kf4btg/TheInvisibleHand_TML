@@ -89,12 +89,20 @@ namespace InvisibleHand.Items.Categories.Types
         ///<summary>Add a trait to this category's Requirements map</summary>
         public void RequireTrait(string trait_family, int flag_value)
         {
+            // initialize collections if necessary
+            if (Requirements == null) Requirements = new Dictionary<string, int>();
+            if (Exclusions == null) Exclusions = new Dictionary<string, int>();
+
             SetTraitValue(Requirements, trait_family, flag_value);
         }
 
         ///<summary>Add a trait to this category's Exclusions map</summary>
         public void ExcludeTrait(string trait_family, int flag_value)
         {
+            // initialize collections if necessary
+            if (Requirements == null) Requirements = new Dictionary<string, int>();
+            if (Exclusions == null) Exclusions = new Dictionary<string, int>();
+
             SetTraitValue(Exclusions, trait_family, flag_value);
         }
 
@@ -103,10 +111,6 @@ namespace InvisibleHand.Items.Categories.Types
         {
             // disable Skipping (a.k.a. enable matching) if need be
             if (SkipMatch) SkipMatch = false;
-
-            // initialize collections if necessary
-            if (Requirements == null) Requirements = new Dictionary<string, int>();
-            if (Exclusions == null) Exclusions = new Dictionary<string, int>();
 
             if (flagmap.ContainsKey(trait_family))
                 flagmap[trait_family] |= flag_value;

@@ -1,15 +1,30 @@
 [
   {
+    name: Placeable
+    requires: Types placeable
+    include: {
+      &: CreateTile
+
+      Banner: & banner
+      "Herb Seed": & herb
+      "Music Box": & music_box
+
+      Furniture: null
+      Block: null
+    }
+  }
+
+  /*{
     name: Banner
     parent: Placeable
     requires: CreateTile banner
-  }
+  }*/
 
-  {
+  /*{
     name: Herb Seed
     parent: Placeable
     requires: CreateTile herb
-  }
+  }*/
 
   {
     name: Wall
@@ -25,16 +40,15 @@
     ]
   }*/
 
-  {
+  /*{
     name: Music Box
     parent: Placeable
     requires: CreateTile music_box
-  }
+  }*/
 
   {
     name: Furniture
     parent: Placeable
-    inheritable: false
     /*requires: [ ]*/
   }
 
@@ -60,7 +74,6 @@
   {
     name: Block
     parent: Placeable
-    inheritable: false
     requires: [
       // FIXME: this is not the best choice for this
       CreateTile.Block tile_brick

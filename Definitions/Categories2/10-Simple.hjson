@@ -1,18 +1,9 @@
 [
-  /*{
-    name: Dye
-    requires: Property.Ident dye
-  }*/
   {
     name: Paint
     requires: Property.Ident paint
   }
-  /*{
-    name: Fishing Pole
-    requires: {
-      Property.Ident: ["fishing_pole"]
-    }
-  }*/
+
   {
     name: Bait
     requires: Property.Ident bait

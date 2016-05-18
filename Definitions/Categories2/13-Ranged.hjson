@@ -1,0 +1,35 @@
+[
+  {
+    name: Ranged
+    parent: Weapon
+    requires: Weapon ranged
+    include: {
+      &: Weapon.Ranged
+
+      Gun: {
+        requires: & use_ammo_bullet
+        include: {
+          "Automatic Gun": Property auto_reuse
+        }
+      }
+
+      Bow: {
+        requires: & use_ammo_arrow
+        include: {
+          # this will obviously include some of the high-level "bows", too...oh well
+          "Repeater": Property auto_reuse
+        }
+      }
+
+      Launcher: & use_ammo_rocket
+      "Dart Shooter": & use_ammo_dart
+
+      # this could be use_ammo_gel, but i think flamethrowers are
+      # defined moreso by their manner of attack than their fuel
+      Flamethrower: & flame_thrower
+
+      # "ammo-less" ranged weapons like the piranha gun. May try to divide this category up later
+      Special: & use_ammo_none
+    }
+  }
+]

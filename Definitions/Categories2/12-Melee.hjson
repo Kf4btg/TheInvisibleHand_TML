@@ -1,71 +1,55 @@
 [
   {
-    name: Broadsword
-    parent: Melee
-    requires: [
-      # this includes items swung overhead
-      Weapon.Melee swing
-      # we don't want tools here
-      Property.Ident !pick !axe !hammer
-      # helps exclude some unrelated weapons
-      Property !no_use_graphic
-    ]
-  }
+    name: Melee
+    parent: Weapon
+    requires: Weapon melee
+    include: {
+      # you can define a variable by making the first entry of an "include" block a string labeled "&";
+      # For any remaining entries, everytime an "&" appears in a requires line,
+      # it will be replaced with the string you defined earlier, saving what could be a
+      # lot of redundant text.
+      #
+      # For example, here we define a variable with the value "Weapon.Melee". Now, each time
+      # an "&" is encountered below, it will be as if we had instead written "Weapon.Melee"
+      &: Weapon.Melee
 
-  {
-    name: Shortsword
-    parent: Melee
-    requires: [
-      // it's really the only thing that has this style
-      Weapon.Melee stab
-    ]
-  }
+      # this catches things beyond broadsword like the deathscythe, sickle,
+      # some other things swung overhead; but I can't think of any more-
+      # encompassing name, nor can I figure out a way to separate those items.
+      # I don't feel like it's too much of an issue, though.
+      Broadsword: {
+        requires: [
+          # this includes items swung overhead
+          & swing
+          # we don't want tools here
+          Property.Ident !pick !axe !hammer
+          # helps exclude some unrelated weapons
+          Property !no_use_graphic
+        ]
+      }
 
-  {
-    name: Melee Thrown
-    parent: Melee
-    requires: [
-      Weapon.Melee throw
-    ]
-  }
+      # it's really the only thing that has this style
+      Shortsword: & stab
 
-  {
-    name: Boomerang
-    parent: Melee Thrown
-    requires: [
-      Weapon.Melee boomerang
-    ]
-  }
+      # while the "directional" requirement is somewhat unnecessary
+      # (since, e.g., only spears have the "spear" property), I thought
+      # it should be included to separate vanilla spear/flail/yoyo weapons
+      # from any crazy mod weapons that have those properties but aren't
+      # directional types (directional=fire/stab/whatever in direction of
+      # mouse click)
+      Spear: & directional spear
+      Flail: & directional flail
+      Yoyo: & directional yoyo
 
-  {
-    name: Spear
-    parent: Melee
-    requires: [
-      Weapon.Melee directional spear
-      /*Weapon.Melee.spear*/
-    ]
-  }
-  {
-    name: Flail
-    parent: Melee
-    requires: [
-      Weapon.Melee directional flail
-      /*Weapon.Melee.flail*/
-    ]
-  }
-  {
-    name: Yoyo
-    parent: Melee
-    requires: [
-      Weapon.Melee directional yoyo
-      /*Weapon.Melee.yoyo*/
-    ]
-  }
-  {
-    name: Chain Weapons
-    parent: Melee
-    requires: [
-      Weapon.Melee chained
-    ]
+      # This will be interpreted as "Weapon.Melee chained"
+      "Chain Weapons": & chained
+
+      "Melee Thrown": {
+        requires: & throw
+        include: {
+          Boomerang: & boomerang
+        }
+      }
+    }
   }
 ]

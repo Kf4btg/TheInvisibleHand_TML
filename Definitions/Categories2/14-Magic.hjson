@@ -1,0 +1,32 @@
+[
+  {
+    name: Magic
+    requires: Weapon magic
+    include: {
+      &: Weapon.Magic
+
+      Area: & area
+      Controlled: & controllable
+      Homing: & homing
+      Piercing: & pierce
+      Stream: & stream
+
+      "Bounce (Heavy)": & bounce_heavy
+      "Bounce (Hyper)": & bounce_hyper
+    }
+  }
+
+  # Merge the "bounce" magic weapon types into one category
+  {
+    name: Bouncing
+    parent: Magic
+    union: [
+      Bounce (Heavy)
+      Bounce (Hyper)
+    ]
+    # "merge" is whether items matching the union members will still be
+    # sorted within their actual category or if the items from all the
+    # members will be merged into one sorting pool.
+    merge: true
+  }
+]

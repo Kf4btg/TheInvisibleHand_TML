@@ -1,87 +1,33 @@
 [
-  /*{
+  {
     name: Weapon
-    // this is how the game decides an item is a "weapon"
-    requires: [
-      Property damage
-      Property !not_ammo | UseStyle use_style_any
+    requires: Types weapon
+    sort: [
+      rare
+      damage
+      type
+      value
+      stack
     ]
-  }*/
-  ######################
-
-  {
-    name: Melee
-    parent: Weapon
-    requires: Weapon melee
-  }
-
-  ######################
-
-  {
-    name: Ranged
-    parent: Weapon
-    requires: Weapon ranged
-  }
-
-  ######################
-  # Magic
-  ######################
-
-  {
-    name: Magic
-    parent: Weapon
-    requires: Weapon magic
     include: {
-      Area: Weapon.Magic area
-      Controlled: Weapon.Magic controllable
-      Homing: Weapon.Magic homing
-      Piercing: Weapon.Magic pierce
-      Stream: Weapon.Magic stream
+
+      ## "null" can be used as a placeholder to define sort order for a child category that will be
+      ## defined in a later definition file
+      Melee: null
+      Ranged: null
+      Magic: null
+
+      Summon: {
+        requires: Weapon summon
+        include: {
+          Minion: Weapon.Summon minion
+          # this is about the only way to tell them apart...
+          Sentry: Weapon.Summon !minion
+        }
+      }
+
+      Throwing: Weapon throwing
     }
   }
 
-  // will merge these 2 smaller categories into one
-  {
-    name: Bounce (Heavy)
-    parent: Magic
-    requires: Weapon.Magic bounce_heavy
-  }
-  {
-    name: Bounce (Hyper)
-    parent: Magic
-    requires: Weapon.Magic bounce_hyper
-  }
-
-  // A union category
-  {
-    name: Bouncing
-    parent: Magic
-    union: [
-      Bounce (Heavy)
-      Bounce (Hyper)
-    ]
-    # "merge" is whether items matching the union members will still be sorted
-    # within their actual category or if the items from all the members will be
-    # merged into one sorting pool.
-    merge: true
-  }
-
-  ######################
-  {
-    name: Summon
-    parent: Weapon
-    requires: Weapon summon
-    include: {
-      Minion: Weapon.Summon minion
-      # seriously...that's about the only way to tell them apart
-      Sentry: Weapon.Summon !minion
-    }
-  }
-
-  ######################
-  {
-    name: Throwing
-    parent: Weapon
-    requires: Weapon throwing
-  }
 ]

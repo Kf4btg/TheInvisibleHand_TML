@@ -1,4 +1,4 @@
-// using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -69,6 +69,9 @@ namespace InvisibleHand.Items.Categories
         // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
         private const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
 
+        // same as above, but the group is optional (will be provided separately)
+        private const string REQUIREMENTS_LINE_NO_GROUP = @"^(" + TRAIT_GROUP + @"\s+)?" + TRAIT_LIST + @"$";
+
         /// Given a line from the requirements array, parse out the group and in-/ex-cluded traits
         public static RequirementEntry ParseRequirementLine(string line)
         {
@@ -95,6 +98,45 @@ namespace InvisibleHand.Items.Categories
             {
                 throw new TokenizerException(line, "Error while parsing line.");
             }
+
+        }
+
+        public static RequirementEntry ParseRequirementLine(string line, string using_group)
+        {
+            // if called with a null or empty group, just return the normal method
+            if (using_group == null || using_group == String.Empty)
+                return ParseRequirementLine(line);
+
+            // otherwise, use the group provided in 'using_group' UNLESS a group is encountered on the line
+            var match = Regex.Match(line, REQUIREMENTS_LINE_NO_GROUP, RegexOptions.ExplicitCapture);
+
+            if (match.Success)
+            {
+                // otherwise, use the group provided in 'using_group'...
+                var trait_group = using_group;
+
+                // ...UNLESS a group name is encountered on the line
+                if (match.Groups["TraitGroup"].Captures.Count > 0)
+                    trait_group = match.Groups["TraitGroup"].Captures[0].Value;
+
+                var tnames = match.Groups["TraitName"].Captures;
+                var req = new RequirementEntry(trait_group);
+                for (int i = 0; i < tnames.Count; i++)
+                {
+                    string trait = tnames[i].Value;
+
+                    if (trait[0] == '!')
+                        req.AddExclude(trait.Substring(1));
+                    else
+                        req.AddInclude(trait);
+                }
+                return req;
+            }
+            else
+            {
+                throw new TokenizerException(line, "Error while parsing line.");
+            }
+
 
         }
 

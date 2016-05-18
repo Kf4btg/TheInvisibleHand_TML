@@ -59,6 +59,11 @@ namespace InvisibleHand
         }
     }
 
+    public class ParserException : Exception
+    {
+        public ParserException(string msg) : base(msg) {}
+    }
+
     public class MalformedFieldError : Exception
     {
         public MalformedFieldError(string msg="Hjson field wrong type or bad format") : base(msg) {}

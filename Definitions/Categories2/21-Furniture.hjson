@@ -27,39 +27,66 @@
     # Note that having spaces in the category name
     # necessitates using quotes.
     include: {
+
+      // if the first entry of an "include" block is a string labeled simply "&", then
+      // the value for that entry can be used as a variable in the remaining
+      // entries, saving what could be a lot of redundant text
+      &: CreateTile.Furniture
+
       Lighting: {
-        requires: CreateTile.Furniture room_needs_light
+        // now we can just write "& room_needs_light" instead of "CreateTile.Furniture room_needs_light",
+        requires: & room_needs_light
         include: {
-          Torch: CreateTile.Furniture.Lighting torch
-          Candelabra: CreateTile.Furniture.Lighting candelabra
-          Candle: CreateTile.Furniture.Lighting candle
-          Chandelier: CreateTile.Furniture.Lighting chandelier
-          "Hanging Lantern": CreateTile.Furniture.Lighting hanging_lantern
-          Lamp: CreateTile.Furniture.Lighting lamp
-          "Holiday Light": CreateTile.Furniture.Lighting holiday_light
+          // IMPORTANT: note that the '&' from above trickles down to this nested include: block.
+          // It will not "wear off" until all the entries for the include: block in which it was defined
+          // have been processed. However, we can define a new value for the variable
+          // that will override the original '&' for the children of this block;
+          // when the child-block is finished, the original value of the variable will again be in place.
+          // Also note that '&' can be cumulative; i.e. we can write "&.Lighting" here, and it will
+          // turn into "CreateTile.Furniture.Lighting", since "CreateTile.Furniture" is the current
+          // value of '&'
+          &: &.Lighting
+
+          // now we can just write "& torch" instead of "CreateTile.Furniture.Lighting torch",
+          // and so on for each other entry
+          Torch: & torch
+          Candelabra: & candelabra
+          Candle: & candle
+          Chandelier: & chandelier
+          "Hanging Lantern": & hanging_lantern
+          Lamp: & lamp
+          "Holiday Light": & holiday_light
         } }
+
+      // now '&' has returned to the original value of 'CreateTile.Furniture'
       Tables: {
-        requires: CreateTile.Furniture room_needs_table
+        requires: & room_needs_table
         include: {
-          Table: CreateTile.Furniture.Tables table
-          Bathtub: CreateTile.Furniture.Tables bathtub
-          Bookcase: CreateTile.Furniture.Tables bookcase
-          Dresser: CreateTile.Furniture.Tables dresser
-          Piano: CreateTile.Furniture.Tables piano
-          "Work Bench": CreateTile.Furniture.Tables workbench
+          &: &.Tables
+
+          Table: & table
+          Bathtub: & bathtub
+          Bookcase: & bookcase
+          Dresser: & dresser
+          Piano: & piano
+          "Work Bench": & workbench
         } }
       Doors: {
-        requires: CreateTile.Furniture room_needs_door
+        requires: & room_needs_door
         include: {
-          Door: CreateTile.Furniture.Doors door
-          Platform: CreateTile.Furniture.Doors platform
+          // sometimes it may not be worth the trouble to set a new '&' variable.
+          // So we can just add .Doors to the current value of '&' on a per-line basis
+          Door: &.Doors door
+          Platform: &.Doors platform
         } }
       Chairs: {
-        requires: CreateTile.Furniture room_needs_chair
+        requires: & room_needs_chair
         include: {
-          Chair: CreateTile.Furniture.Chairs chair
-          Bench: CreateTile.Furniture.Chairs bench
-          Bed: CreateTile.Furniture.Chairs bed
+          &: &.Chairs
+
+          Chair: & chair
+          Bench: & bench
+          Bed: & bed
         } }
     } }
 ]

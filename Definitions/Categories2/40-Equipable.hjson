@@ -73,19 +73,21 @@
     requires: accessory !vanity
     include:
     {
-      Wings: EquipSlot wings
-      Balloon: EquipSlot balloon
-      Neckwear: EquipSlot neck
-      Shields: EquipSlot shield
-      Boots: EquipSlot shoe
-      "Face Accessory": EquipSlot face
-      "Belt Accessory": EquipSlot waist
-      "Back Accessory": EquipSlot back
+      &: EquipSlot
 
-      "Main-Hand Gauntlet": EquipSlot main_hand
-      "Off-Hand Gauntlet": EquipSlot off_hand
+      Wings: & wings
+      Balloon: & balloon
+      Neckwear: & neck
+      Shields: & shield
+      Boots: & shoe
+      "Face Accessory": & face
+      "Belt Accessory": & waist
+      "Back Accessory": & back
+
+      "Main-Hand Gauntlet": & main_hand
+      "Off-Hand Gauntlet": & off_hand
       # Note: there are none of these in Vanilla
-      "Front Accessory": EquipSlot front
+      "Front Accessory": & front
     }
   }
 
@@ -110,40 +112,41 @@
     requires: Property vanity
     include:
     {
+      &: EquipSlot
       "Vanity Clothing": {
         include: {
-          Headwear: EquipSlot head
-          Shirt: EquipSlot body
-          Pants: EquipSlot leg
+          Headwear: & head
+          Shirt: & body
+          Pants: & leg
         }
       }
 
       "Vanity Accessory": {
         requires: Property accessory
         include: {
-          "Vanity Wings": EquipSlot wings
-          "Fashion Facewear": EquipSlot face
-          "Vanity Neckwear": EquipSlot neck
-          "Vanity Boots": EquipSlot shoe
+          "Vanity Wings": & wings
+          "Fashion Facewear": & face
+          "Vanity Neckwear": & neck
+          "Vanity Boots": & shoe
 
           # Note about capes/cloaks:
           # Theyre the ONLY vanilla items that have a value for 'frontSlot',
           # but they're also the only vanilla VANITY items that have a value for
           # 'backSlot'. So...yeah.
-          "Capes": EquipSlot front back
+          "Capes": & front back
 
           # NOTE: there are none of these in Vanilla
-          "Vanity Balloon": EquipSlot balloon
-          "Vanity Belt": EquipSlot waist
-          "Vanity Shields": EquipSlot shield
+          "Vanity Balloon": & balloon
+          "Vanity Belt": & waist
+          "Vanity Shields": & shield
 
           # NOTE: there are none* of these in Vanilla
           # *see note above about Capes
-          "Back Vanity Slot": EquipSlot back
-          "Front Vanity Slot": EquipSlot front
+          "Back Vanity Slot": & back
+          "Front Vanity Slot": & front
 
-          "Main-Hand Glove": EquipSlot main_hand
-          "Off-Hand Glove": EquipSlot off_hand
+          "Main-Hand Glove": & main_hand
+          "Off-Hand Glove": & off_hand
         }
       }
     }
