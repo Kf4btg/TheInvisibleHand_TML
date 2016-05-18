@@ -33,8 +33,8 @@ namespace InvisibleHand.Items.Categories
         // track placeholders
         private static Dictionary<string, MatchCategory> placeholders = new Dictionary<string, MatchCategory>();
 
-        // track any "&using" commands
-        private static Stack<string> using_trait_group = new Stack<string>();
+        // track any "&" variables
+        private static Stack<string> use_variables = new Stack<string>();
 
 
         /// Call this method to run all the other class methods
@@ -375,22 +375,29 @@ namespace InvisibleHand.Items.Categories
             // finally handle the "include" entry
             if (include != null)
             {
-                var set_using = false;
+                var set_var = false;
                 foreach (var minicat in include)
                 {
-                    // check for special value that defines the Trait Group to use for the rest of the include entries
-                    if (minicat.Key == "&using")
+                    // check for variable definition to use for the rest of the include entries
+                    if (minicat.Key == "&")
                     {
-                        using_trait_group.Push(minicat.Value.Qs());
-                        set_using = true;
+                        if (use_variables.Count > 0)
+                            // this allows "stacking" the variables:
+                            // e.g.:
+                            //  &: A   => A
+                            //  &: &.B => A.B
+                            use_variables.Push(minicat.Value.Qs().Replace("&", use_variables.Peek()));
+                        else
+                            use_variables.Push(minicat.Value.Qs());
+                        set_var = true;
                     }
                     else
                     {
                         parseMiniCategory(new_category.ID, minicat.Key, minicat.Value);
                     }
                 }
-                // if we set a trait group to use for these include entries, pop it off the stack now that we're done
-                if (set_using) using_trait_group.Pop();
+                // if we set a variable to use for these include entries, pop it off the stack now that we're done
+                if (set_var) use_variables.Pop();
             }
         }
 
@@ -551,10 +558,12 @@ namespace InvisibleHand.Items.Categories
             var requirements = new Dictionary<string, int>(inherited.Item1);
             var excludements = new Dictionary<string, int>(inherited.Item2);
 
-            string use_group = null;
-            if (using_trait_group.Count > 0)
-                // if there's something in the stack of "use this group plz", use the topmost entry
-                use_group = using_trait_group.Peek();
+            string replace_amp = null;
+            if (use_variables.Count > 0)
+                // if there's something in the &variable stack, use the topmost entry
+                replace_amp = use_variables.Peek();
+
+            bool use_var = replace_amp != null;
 
             // if the "requires" entry on the category was null, empty, or missing, then "requires_list" will be an
             // empty string[] and this loop will not run
@@ -562,7 +571,7 @@ namespace InvisibleHand.Items.Categories
             {
                 try
                 {
-                    var entry = Tokenizer.ParseRequirementLine(line, use_group);
+                    var entry = Tokenizer.ParseRequirementLine(use_var ? line.Replace("&", replace_amp) : line);
 
                     var trait_group = entry.TraitGroup;
 
