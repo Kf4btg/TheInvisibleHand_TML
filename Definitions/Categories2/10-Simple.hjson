@@ -2,20 +2,39 @@
   {
     name: Paint
     requires: Property.Ident paint
+    sort: [
+      paint
+      stack
+    ]
   }
 
   {
     name: Bait
     requires: Property.Ident bait
+    sort: [
+      bait
+      type
+      stack
+    ]
   }
 
   {
     name: Coin
     requires: Property.Ident coin
+    sort: [
+      type
+      stack
+    ]
   }
 
   {
     name: Quest Item
     requires: Property quest_item
+    sort: [
+      uniqueStack
+      name
+      type
+      stack
+    ]
   }
 ]

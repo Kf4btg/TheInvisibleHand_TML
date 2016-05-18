@@ -24,6 +24,12 @@
           # this is about the only way to tell them apart...
           Sentry: Weapon.Summon !minion
         }
+        sort: [
+          rare
+          shoot
+          type
+          value
+        ]
       }
 
       Throwing: Weapon throwing

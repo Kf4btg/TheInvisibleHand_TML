@@ -75,7 +75,7 @@
     {
       &: EquipSlot
 
-      Wings: & wings
+      Wings: & wings; wingSlot
       Balloon: & balloon
       Neckwear: & neck
       Shields: & shield
@@ -90,6 +90,12 @@
       "Front Accessory": & front
     }
   }
+
+  /*
+  C:Equipable.Accessory;enable=true; accessory !vanity;;
+  C:Equipable.Accessory.Wings;; EquipSlot wings; wingSlot type value name;
+  U:Accessory.Gauntlets;enable=false,merge=true; Main-Hand Gauntlet, Off-Hand Gauntlet
+   */
 
   # union of the two hand-types
   {

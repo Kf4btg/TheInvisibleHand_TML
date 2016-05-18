@@ -300,9 +300,6 @@ namespace InvisibleHand.Items.Categories
         /// an object that can hold two optional keys: a "requires" array, and a nested "include" block</param>
         private static void parseMiniCategory(int parent_id, string category_name, JsonValue value)
         {
-
-
-
             // if the "value" of a include-entry is null, it shall be understood as a placeholder for
             // a category that will defined at a later time. It is being included here to reserve its
             // sort order, so we need to make sure it gets a proper ID
@@ -321,8 +318,12 @@ namespace InvisibleHand.Items.Categories
                 // requires string or array
                 var requires = minicatobj.ContainsKey("requires") ? minicatobj["requires"] : null;
 
+                // properties on which to sort
+                var sort = minicatobj.ContainsKey("sort") ? minicatobj["sort"]?.Qa() : null;
+
                 // recursively perform this same process for any members of a nested "include" block
                 var include = minicatobj.ContainsKey("include") ? minicatobj["include"]?.Qo() : null;
+
 
                 // Params:
                 //    name=category_name
@@ -332,7 +333,7 @@ namespace InvisibleHand.Items.Categories
                 //    sort_fields = null (=>copy from parent)
                 //    requires (=>requires[] from definition or null if not there)
                 //    include (=> include object from definition or null if not present)
-                createMatchCategory(category_name, parent_id, 0, 0, true, null, requires, include);
+                createMatchCategory(category_name, parent_id, 0, 0, true, sort, requires, include);
             }
             else
                 throw new MalformedFieldError($"Could not parse 'include' entry '{category_name}' for category '{_currentCategory}'");
@@ -427,8 +428,6 @@ namespace InvisibleHand.Items.Categories
         private static void createPlaceholder(string name, int parent_id)
         {
             var new_category = new MatchCategory(name, ++_currentCount, parent_id, 0);
-            // copy sort fields from parent
-            // assignSortingRules(new_category, null);
 
             placeholders[name] = new_category;
         }

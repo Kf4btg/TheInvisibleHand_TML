@@ -46,11 +46,7 @@
     requires: CreateTile music_box
   }*/
 
-  {
-    name: Furniture
-    parent: Placeable
-    /*requires: [ ]*/
-  }
+  
 
 
   /*{

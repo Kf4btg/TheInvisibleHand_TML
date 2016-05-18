@@ -15,6 +15,7 @@
     }
     sort: [
       value
+      name
       type
       stack
     ]

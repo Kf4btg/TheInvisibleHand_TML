@@ -1,5 +1,20 @@
 [
+
   {
+    name: Furniture
+    parent: Placeable
+    sort: [
+      createTile
+      type
+      stack
+    ]
+    include: {
+      "Crafting Station": CreateTile.Furniture crafting_station
+      "Container": CreateTile.Furniture container
+    }
+  }
+
+  /*{
     name: Crafting Station
     parent: Furniture
     requires: CreateTile.Furniture crafting_station
@@ -9,7 +24,7 @@
     name: Container
     parent: Furniture
     requires: CreateTile.Furniture container
-  }
+  }*/
 
   {
     name: Room Needs
@@ -52,9 +67,9 @@
           Torch: & torch
           Candelabra: & candelabra
           Candle: & candle
+          Lamp: & lamp
           Chandelier: & chandelier
           "Hanging Lantern": & hanging_lantern
-          Lamp: & lamp
           "Holiday Light": & holiday_light
         } }
 

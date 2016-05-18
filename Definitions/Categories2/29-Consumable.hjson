@@ -16,9 +16,11 @@
 
   {
     name: Consumable
-    requires: [
-      // shortcut
-      Types consumable
+    // shortcut
+    requires: Types consumable
+    sort: [
+      type
+      stack
     ]
   }
 
@@ -32,6 +34,12 @@
     parent: Consumable
     inherits: null
     requires: Consumable food
+    sort: [
+      buffTime
+      value
+      type
+      stack
+    ]
   }
 
   {
@@ -39,49 +47,45 @@
     parent: Consumable
     inherits: null
     requires: Consumable flask
+    sort: [
+      value
+      type
+      stack
+    ]
   }
 
   {
     name: Potion
     parent: Consumable
     inherits: null
+    # potions fall into a bit of a "all the other consumables" hole, but all also have use_style_2
+    # (aka the "quaff" style)
     requires: [
       UseStyle use_style_2
       Consumable !food !flask
       # alchemy_result // there are some non-potions here
     ]
     include: {
-      "Restoration Potion": Property heal_life heal_mana
-      "Healing Potion": Property heal_life
-      "Mana Potion": Property heal_mana
-      "Buff Potion": Property buff_time
+
+      "Restoration Potion": {
+        requires: Property heal_life heal_mana
+        sort: ["healLife" "healMana" "type" "stack"]
+      }
+
+      "Healing Potion": {
+        requires: Property heal_life
+        sort: ["healLife" "type" "stack"]
+      }
+
+      "Mana Potion": {
+        requires: Property heal_mana
+        sort: ["healMana" "type" "stack"]
+      }
+
+      "Buff Potion": {
+        requires: Property buff_time
+        sort: ["buffType" "buffTime" "type" "stack"]
+      }
     }
   }
-  /*{
-    name: Restoration Potion
-    parent: Potion
-    # without 'inherits' explicitly set, this category will
-    # inherit the requirements of its parent by default
-    # (Potion in this case). Those requirements will
-    # be checked before continuing to check the requirements
-    # listed below
-    requires: Property heal_life heal_mana
-  }
-  {
-    name: Healing Potion
-    parent: Potion
-    //inherits: "Potion" // redundant
-    requires: Property heal_life
-  }
-  {
-    name: Mana Potion
-    parent: Potion
-    requires: Property heal_mana
-  }
-
-  {
-    name: Buff Potion
-    parent: Potion
-    requires: Property buff_time
-  }*/
 ]
