@@ -70,12 +70,12 @@
     name: Accessory
     parent: Equipable
     inherit: null
-    requires: accessory !vanity
+    requires: Property accessory !vanity
     include:
     {
       &: EquipSlot
 
-      Wings: & wings; wingSlot
+      Wings: & wings
       Balloon: & balloon
       Neckwear: & neck
       Shields: & shield
