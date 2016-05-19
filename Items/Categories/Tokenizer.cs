@@ -42,6 +42,15 @@ namespace InvisibleHand.Items.Categories
         }
     }
 
+    public struct ParsedCategory
+    {
+        public char TypeCode;
+        public string Name;
+        public string[] Options;
+        public string[] Requires;
+        public string[] SortFields;
+    }
+
     public static class Tokenizer
     {
         // trait grp names begin with capital letters, may contain underscores and numbers
@@ -67,7 +76,7 @@ namespace InvisibleHand.Items.Categories
 
         // put it all together:
         // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
-        private const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
+        public const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
 
         // same as above, but the group is optional (will be provided separately)
         private const string REQUIREMENTS_LINE_NO_GROUP = @"^(" + TRAIT_GROUP + @"\s+)?" + TRAIT_LIST + @"$";
@@ -225,4 +234,216 @@ namespace InvisibleHand.Items.Categories
         //     }
         // }
     }
+
+
+    /// Tokenize the 1-line category definition.
+    /// A def will consist of the following sections,
+    /// where each section other than TYPE and NAME may be empty:
+    ///
+    /// [TYPE]:[NAME];[OPTIONS];[REQUIRES];[SORTBY]
+    ///
+    /// TYPE: either 'c' for category or 'u' for union
+    /// NAME: the name of the Category; may be preceded
+    /// 	by a number of periods indicating child depth
+    /// OPTIONS:a list of "option_name=[true|false]", separated
+    /// 	by commas
+    /// REQUIRES: a list of Requirement lines, described elsewhere
+    /// SORTBY: a list of Item properties by which to sort items
+    /// 	in the category
+    ///
+    /// Example:
+    /// 	c:Consumable;;Types consumable;type stack
+    /// 	c:Equipable;;Types equipable;
+    /// 	c:.Armor;match=false;Property !vanity;defense, rare, type, value
+    /// 	u:..Gauntlets;merge=true;Main-Hand Gauntlet, Off-Hand Gauntlet;
+    ///
+    public class Tokenizer2
+    {
+        // private static char[] types = new[] { 'c', 'u' };
+
+        // a word that start with a capital letter followed by any other letters or numbers
+        private const string CAPWORD = @"[A-Z][\w\d]+";
+
+
+        private const string BRACKETS_OPENING = @"[\(\[\{]";
+        // private const string BRACKETS_OPENING = @"";
+        private const string BRACKETS_CLOSING = @"[\)\]\}]";
+        // private const string BRACKETS_CLOSING = @"";
+
+        // a category name can be a phrase where each word begins with a capital letter.
+        // Surrounding parentheses or brackets are allowed as well
+        private const string CATEGORY_NAME = @"
+            (" + BRACKETS_OPENING + @"?
+            [A-Z][\w\d-]+
+            " + BRACKETS_CLOSING + @"?\s+)*
+
+            " + BRACKETS_OPENING + @"?
+            [A-Z][\w\d-]+
+            " + BRACKETS_CLOSING + @"?";
+
+
+        // private const string TRAIT_GROUP = @"((" + CAPWORD + @")(\.(?=[A-Z]))?)+";
+        // private const string TRAIT_NAME = @"[a-z\d_]+";
+        // private const string TRAIT_OPTION = @"[!]?" + TRAIT_NAME;
+        // private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
+        // private const string REQUIREMENTS_LINE = TRAIT_GROUP + @"\s+" + TRAIT_LIST;
+        private const string TRAIT_GROUP = @"(?<TraitGroup>((" + CAPWORD + @")(\.(?=[A-Z]))?)+)";
+        private const string TRAIT_NAME = @"[a-z\d_]+";
+        private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
+        private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
+        private const string REQUIREMENTS_LINE = TRAIT_GROUP + @"\s+" + TRAIT_LIST;
+        // private const string REQUIREMENTS_LINE = @"\b" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"\b";
+
+        // the fourth section can be a list of requirements or category names, depending
+        // on whether this is a regular or union category
+        private const string FOURTH_SECTION_ITEM = @"(" + REQUIREMENTS_LINE + @"|" + CATEGORY_NAME + @")";
+
+        // option_name = True|False|true|false|T|F|0|1
+        private const string OPTION = @"\w+\s*=\s*([TF01]|[Tt]rue|[Ff]alse)";
+
+        // single word optionally surrounded by quotes (single or double).
+        // the quotation marks were giving me troubles, that's why they're separated out like that
+        private const string SORT_PROPERTY = @"
+                        [" + "\"" + @"']?
+                        [A-Za-z0-9_-]+
+                        [" + "\"" + @"']?
+                        ";
+
+        /// Combine everything into one super regex that should be able to identify
+        /// a valid definition line
+        private const string DEFINITION_LINE = @"(?x)       # ignore whitespace
+                        ^[CcUu]:                # the type code, followed by a colon.
+
+                        \.*                     # any number of periods.
+                        @?                      # optional @ sign
+                        " + CATEGORY_NAME + @"  # The Category name
+
+                        \s*;\s*                 # the first semicolon.
+
+                        # the options list is a comma-separated list of items
+                        # with the form 'word=True|true|False|False|T|F|0|1'
+                        (
+                        (" + OPTION + @",\s*)*  # any number of options followed by a comma,
+                        "  + OPTION + @"        # then a final/single option.
+                        )?                      # the entire section is optional
+
+                        \s*;\s*                 # the second semicolon
+
+                        (
+                        (" + FOURTH_SECTION_ITEM + @"\s*,\s*)*  # list of requirements/categories
+                        "  + FOURTH_SECTION_ITEM + @"           # final/single requirement/category
+                        )?                      # the entire section is optional.
+
+                        \s*;\s*                 # the third semicolon
+
+                        # optional list of words, optionally separated by commas
+                        (
+                            (" + SORT_PROPERTY + @" # property name.
+                                (,\s*|\s+)              # comma or whitespace separation.
+                            )*
+                        " + SORT_PROPERTY + @"
+                        )?        # again, section optional
+                        $"; // the end.
+
+
+        private string current_path;
+
+        // allow instantiation so that multiple tokenizers can be running in parallel
+        public Tokenizer2()
+        {
+
+        }
+
+        /// given a definition line, extract the various sections
+        public ParsedCategory TokenizeCategory(string definition)
+        {
+            // this could be be done using regular expressions, but for just
+            // getting the sections it's probably easier to use normal
+            // string processing functions
+
+            // strip ws
+            var def_line = definition.Trim();
+
+            // validate line structure
+            if (!Regex.Match(def_line, DEFINITION_LINE).Success)
+                throw new TokenizerException(def_line, "Malformed Definition");
+
+
+            // Trim all extra whitespace
+            var sections = def_line.Split(':', ';').Select(s=>s.Trim()).ToArray();
+
+            // struct to return.
+            return new ParsedCategory
+            {
+                TypeCode = sections[0].ToLower()[0],
+                Name = sections[1],
+                Options = sections[2] == String.Empty ? new string[0] : sections[2].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                Requires = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                SortFields = sections[4] == String.Empty ? new string[0] : sections[4].Split(',', ' ').Where(s => s != String.Empty).ToArray()
+            };
+
+            // bool union = def.type == "u";
+        }
+
+        public RequirementEntry ParseRequirementLine(string line)
+        {
+            // only capture the named groups to keep things simpler
+            var match = Regex.Match(line, @"^"+REQUIREMENTS_LINE+@"$", RegexOptions.ExplicitCapture);
+
+            if (match.Success)
+            {
+                var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
+                var tnames = match.Groups["TraitName"].Captures;
+                var req = new RequirementEntry(trait_group);
+                for (int i = 0; i < tnames.Count; i++)
+                {
+                    string trait = tnames[i].Value;
+
+                    if (trait[0] == '!')
+                        req.AddExclude(trait.Substring(1));
+                    else
+                        req.AddInclude(trait);
+                }
+                return req;
+            }
+            else
+            {
+                throw new TokenizerException(line, "Error while parsing line.");
+            }
+
+        }
+
+        // static void Main()
+        // {
+        //     // var t = new Tokenizer2();
+        //
+        //     var tests = new[] {
+        //         "c:Dye;;Property.Ident dye;value name type stack",
+        //         "C:Quest Item;;Property quest_item; uniqueStack, name, type, stack",
+        //         "C:..Broadsword;;Weapon.Melee swing, Property.Ident !pick !axe !hammer, Property !no_use_graphic;",
+        //         "c:..Restoration;;Property heal_life heal_mana;\"healLife\" \"healMana\" \"type\" \"stack\"",
+        //         "c:..Buff;;Property buff_time;\"buffType\" \"buffTime\" \"type\" \"stack\"",
+        //         "C:..Bounce (Heavy);;Weapon.Magic bounce_heavy;",
+        //         "U:..Bouncing;merge = true, display=F;Bounce (Heavy), Bounce (Hyper);",
+        //         "u:....Gloves;merge=true;Main-Hand Glove, Off-Hand Glove;",
+        //
+        //         // these should fail:
+        //         "C:..Bounce (Heavy);;Weapon.Magic bounce_heavy",
+        //         "C:Quest Item;Property quest_item; uniqueStack, name, type, stack",
+        //         "u....Gloves;merge=true;Main-Hand Glove, Off-Hand Glove;"
+        //     };
+        //
+        //     foreach (var test in tests)
+        //     {
+        //         Console.WriteLine(test);
+        //         if (Regex.Match(test, DEFINITION_LINE).Success)
+        //             Console.WriteLine("    Success");
+        //         else
+        //             Console.WriteLine("    Failure");
+        //
+        //     }
+        // }
+
+    }
+
 }
