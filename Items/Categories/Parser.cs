@@ -175,10 +175,13 @@ namespace InvisibleHand.Items.Categories
         ███████  ██████  ██   ██ ██████       ██████    ██     ██████    ██    ███████
         */
 
+        private static Tokenizer2 tokenizer;
 
         private static void LoadCategories(string category_def_file="InvisibleHand.Definitions.Categories.conf")
         {
-            var tokenizer = new Tokenizer2();
+            tokenizer = new Tokenizer2();
+
+            _currentCount = 0; // track absolute order of added categories (this will be the unique ID for each category)
             using (Stream s = assembly.GetManifestResourceStream(category_def_file))
             {
                 using (StreamReader sr = new StreamReader(s))
@@ -187,6 +190,7 @@ namespace InvisibleHand.Items.Categories
                     var parent = "";
                     var parents = new Stack<string>();
                     int depth = 0;
+                    bool merge, enable, display;
                     while (sr.Peek() >= 0)
                     {
                         var line = sr.ReadLine().Trim();
@@ -224,9 +228,9 @@ namespace InvisibleHand.Items.Categories
 
                         // update these values
                         current = category_def.Name;
+                        _currentCategory = current;
                         depth = category_def.Depth;
 
-                        bool merge, enable, display;
                         merge = enable = display = true;
 
                         // FIXME: don't do this stupid thing. Use a dictionary
@@ -260,7 +264,6 @@ namespace InvisibleHand.Items.Categories
                                         union ? null : category_def.Requires,
                                         union ? category_def.Requires : null,
                                         category_def.SortFields);
-
                     }
                 }
             }
