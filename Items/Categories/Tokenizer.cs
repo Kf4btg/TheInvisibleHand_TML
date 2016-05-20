@@ -45,6 +45,7 @@ namespace InvisibleHand.Items.Categories
     public struct ParsedCategory
     {
         public char TypeCode;
+        public int Depth;
         public string Name;
         public string[] Options;
         public string[] Requires;
@@ -346,7 +347,7 @@ namespace InvisibleHand.Items.Categories
                         $"; // the end.
 
 
-        private string current_path;
+        // private string current_path;
 
         // allow instantiation so that multiple tokenizers can be running in parallel
         public Tokenizer2()
@@ -376,7 +377,8 @@ namespace InvisibleHand.Items.Categories
             return new ParsedCategory
             {
                 TypeCode = sections[0].ToLower()[0],
-                Name = sections[1],
+                Depth = sections[1].Substring(0, sections[1].LastIndexOf('.')+1).Length,
+                Name = sections[1].Substring(sections[1].LastIndexOf('.')+1),
                 Options = sections[2] == String.Empty ? new string[0] : sections[2].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
                 Requires = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
                 SortFields = sections[4] == String.Empty ? new string[0] : sections[4].Split(',', ' ').Where(s => s != String.Empty).ToArray()
@@ -411,6 +413,31 @@ namespace InvisibleHand.Items.Categories
                 throw new TokenizerException(line, "Error while parsing line.");
             }
 
+        }
+
+        /// extract the name and value from an option-spec of
+        /// form "option_name = true|false|T|F|0|1"
+        public KeyValuePair<string, bool> ParseOption(string option)
+        {
+            var split = option.Split('=').Select(s => s.Trim()).ToArray();
+
+            string opt_name = split[0];
+            bool opt_value = false;
+
+            switch (split[1])
+            {
+                case "T":
+                case "True":
+                case "true":
+                case "1":
+                    opt_value = true;
+                    break;
+                default:
+                    opt_value = false;
+                    break;
+            }
+
+            return new KeyValuePair<string, bool>(split[0], opt_value);
         }
 
         // static void Main()

@@ -175,6 +175,75 @@ namespace InvisibleHand.Items.Categories
         ███████  ██████  ██   ██ ██████       ██████    ██     ██████    ██    ███████
         */
 
+
+        private static void LoadCategories(string category_def_file="InvisibleHand.Definitions.Categories.conf")
+        {
+            var tokenizer = new Tokenizer2();
+            using (Stream s = assembly.GetManifestResourceStream(category_def_file))
+            {
+                using (StreamReader sr = new StreamReader(s))
+                {
+                    var current = "";
+                    var parents = new Stack<string>();
+                    int depth = 0;
+                    while (sr.Peek() >= 0)
+                    {
+                        var line = sr.ReadLine().Trim();
+
+                        // lines starting with # are comments.
+                        // Skip comments and empty lines
+                        if (line.StartsWith("#") || line == String.Empty)
+                            continue;
+
+                        var category_def = tokenizer.TokenizeCategory(line);
+
+                        // new category is top-level category
+                        if (category_def.Depth == 0)
+                        {
+                            parents.Clear();
+                        }
+
+                        // new category is child of previous category
+                        else if (category_def.Depth > depth)
+                        {
+                            parents.Push(current);
+                        }
+
+                        // new category is sibling of previous category's ancestor
+                        else if (category_def.Depth < depth)
+                        {
+                            // remove items from stack until we get back to proper depth
+                            while (parents.Count > category_def.Depth)
+                                parents.Pop();
+                        }
+
+                        // update these values
+                        current = category_def.Name;
+                        depth = category_def.Depth;
+
+                        bool merge, enable;
+                        merge = enable = true;
+
+                        // FIXME: don't do this stupid thing. Use a dictionary
+                        foreach (var opt in category_def.Options)
+                        {
+                            var parsed_opt = tokenizer.ParseOption(opt);
+
+                            switch (parsed_opt.Key)
+                            {
+                                case "merge":
+                                    merge = parsed_opt.Value;
+                                    break;
+                                case "enable":
+                                    enable = parsed_opt.Value;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /// After all the trait-definitions have been loaded, read in all the Category definition
         /// files and assign each Category a List of {Trait-Family: combined_flag_value} pairs
         /// using the bit-flag-values assigned in AssignFlagValues(). These family::flags maps
