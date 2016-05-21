@@ -190,7 +190,8 @@ namespace InvisibleHand.Items.Categories
                     var parent = "";
                     var parents = new Stack<string>();
                     int depth = 0;
-                    bool merge, enable, display;
+
+                    var options = new Dictionary<string, bool>();
                     while (sr.Peek() >= 0)
                     {
                         var line = sr.ReadLine().Trim();
@@ -231,32 +232,22 @@ namespace InvisibleHand.Items.Categories
                         _currentCategory = current;
                         depth = category_def.Depth;
 
-                        merge = enable = display = true;
+                        // reset options to defaults
+                        options["enable"] = true;
+                        options["display"] = true;
+                        options["merge"] = false;
 
-                        // FIXME: don't do this stupid thing. Use a dictionary
                         foreach (var opt in category_def.Options)
                         {
                             var parsed_opt = tokenizer.ParseOption(opt);
-
-                            switch (parsed_opt.Key)
-                            {
-                                case "merge":
-                                    merge = parsed_opt.Value;
-                                    break;
-                                case "enable":
-                                    enable = parsed_opt.Value;
-                                    break;
-                                case "display":
-                                    display = parsed_opt.Value;
-                                    break;
-                            }
+                            options[parsed_opt.Key] = parsed_opt.Value;
                         }
 
                         bool union = category_def.TypeCode == 'u';
 
                         // TODO: remove the 'priority' stuff; only load order matters for initial sorting;
                         // priority may become settable at run-time
-                        buildCategory(current, parent, enable, display, merge, 0,
+                        buildCategory(current, parent, options["enable"], options["display"], options["merge"], 0,
                                         // right now, I'm using the 'requires' property to hold either
                                         // the list of requirements (for regular categories)
                                         // OR the list of member categories (for unions).
@@ -305,14 +296,17 @@ namespace InvisibleHand.Items.Categories
             else if (name != _name) // check will succeed if we removed the '@'
                 generateSubCategories(name, parentID, priority, enable, requires, sort_fields);
 
-                // a 'Regular' category
-                // ---------------------
+            // a 'Regular' category
+            // ---------------------
             else
                 createMatchCategory(name, parentID, priority, enable, requires, sort_fields);
         }
 
         /// This override is independent of the Hjson trappings
-        private static void createMatchCategory(string name, int parent_id, int priority, bool enable, IEnumerable<string> requires, IEnumerable<string> sort_fields)
+        private static void createMatchCategory(string name, int parent_id,
+                                                int priority, bool enable,
+                                                IEnumerable<string> requires,
+                                                IEnumerable<string> sort_fields)
         {
             var reqex = getRequirements(requires);
 
@@ -361,7 +355,9 @@ namespace InvisibleHand.Items.Categories
                 category.SortRules = new[] { ItemRuleBuilder.GetRule("type") }.ToList();
         }
 
-        private static void generateSubCategories(string sub_name, int parent_id, int priority, bool enable, IEnumerable<string> requires, IEnumerable<string> sort_fields)
+        private static void generateSubCategories(
+            string sub_name, int parent_id, int priority, bool enable,
+            IEnumerable<string> requires, IEnumerable<string> sort_fields)
         {
             // var reqex = getRequirements(requires);
 
