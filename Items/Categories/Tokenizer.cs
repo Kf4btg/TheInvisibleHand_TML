@@ -52,190 +52,6 @@ namespace InvisibleHand.Items.Categories
         public string[] SortFields;
     }
 
-    // public static class Tokenizer
-    // {
-    //     // trait grp names begin with capital letters, may contain underscores and numbers
-    //     private const string TRAIT_GROUP_NAME = @"[A-Z][\w\d]+";
-    //
-    //     // a fully-specified trait group may contain a hierarchy of names separated by ".";
-    //     // e.g. "Placeable.Furniture.Tables"
-    //     // This checks that any period is followed by an uppercase letter.
-    //     // --Captured in group named 'TraitGroup'
-    //     private const string TRAIT_GROUP = @"(?<TraitGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
-    //
-    //     // trait names are always lowercase, may contain underscores and numbers
-    //     // eg:"yellow_2"
-    //     private const string TRAIT_NAME = @"[a-z\d_]+";
-    //
-    //     // as above, but optionally negated
-    //     // --Captured in group named 'TraitName'
-    //     private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
-    //
-    //     // "And" traits from same group together by separating trait names w/ spaces
-    //     // e.g. "purple !green !blue spiked"
-    //     private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
-    //
-    //     // put it all together:
-    //     // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
-    //     public const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
-    //
-    //     // same as above, but the group is optional (will be provided separately)
-    //     private const string REQUIREMENTS_LINE_NO_GROUP = @"^(" + TRAIT_GROUP + @"\s+)?" + TRAIT_LIST + @"$";
-    //
-    //     /// Given a line from the requirements array, parse out the group and in-/ex-cluded traits
-    //     public static RequirementEntry ParseRequirementLine(string line)
-    //     {
-    //         // only capture the named groups to keep things simpler
-    //         var match = Regex.Match(line, REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
-    //
-    //         if (match.Success)
-    //         {
-    //             var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
-    //             var tnames = match.Groups["TraitName"].Captures;
-    //             var req = new RequirementEntry(trait_group);
-    //             for (int i = 0; i < tnames.Count; i++)
-    //             {
-    //                 string trait = tnames[i].Value;
-    //
-    //                 if (trait[0] == '!')
-    //                     req.AddExclude(trait.Substring(1));
-    //                 else
-    //                     req.AddInclude(trait);
-    //             }
-    //             return req;
-    //         }
-    //         else
-    //         {
-    //             throw new TokenizerException(line, "Error while parsing line.");
-    //         }
-    //
-    //     }
-    //
-    //     public static RequirementEntry ParseRequirementLine(string line, string using_group)
-    //     {
-    //         // if called with a null or empty group, just return the normal method
-    //         if (using_group == null || using_group == String.Empty)
-    //             return ParseRequirementLine(line);
-    //
-    //         // otherwise, use the group provided in 'using_group' UNLESS a group is encountered on the line
-    //         var match = Regex.Match(line, REQUIREMENTS_LINE_NO_GROUP, RegexOptions.ExplicitCapture);
-    //
-    //         if (match.Success)
-    //         {
-    //             // otherwise, use the group provided in 'using_group'...
-    //             var trait_group = using_group;
-    //
-    //             // ...UNLESS a group name is encountered on the line
-    //             if (match.Groups["TraitGroup"].Captures.Count > 0)
-    //                 trait_group = match.Groups["TraitGroup"].Captures[0].Value;
-    //
-    //             var tnames = match.Groups["TraitName"].Captures;
-    //             var req = new RequirementEntry(trait_group);
-    //             for (int i = 0; i < tnames.Count; i++)
-    //             {
-    //                 string trait = tnames[i].Value;
-    //
-    //                 if (trait[0] == '!')
-    //                     req.AddExclude(trait.Substring(1));
-    //                 else
-    //                     req.AddInclude(trait);
-    //             }
-    //             return req;
-    //         }
-    //         else
-    //         {
-    //             throw new TokenizerException(line, "Error while parsing line.");
-    //         }
-    //
-    //
-    //     }
-
-        // testing
-        // static void Main()
-        // {
-        //     Console.WriteLine(REQUIREMENTS_LINE);
-        //
-        //     // foreach (var str in new[]{
-        //     //     "Property", "Property.Ident", "property", "property.ident", "Property_Ident"
-        //     //     })
-        //     //     {
-        //     //         var m = Regex.Match(str, TRAIT_GROUP);
-        //     //         Console.WriteLine("'{0}': {1}", str, m.Success ? "VALID trait group" : "INVALID trait group");
-        //     //     }
-        //
-        //     // foreach (var str in new[] {
-        //     //     "Property.Ident !(pick | hammer | axe)",
-        //     //     "Property !(pick | hammer | axe)",
-        //     //     "Property.Ident hammer",
-        //     //     "PropertyIdent hammer",
-        //     //     "PropertyIdent hammer axe2",
-        //     //     "Prop_erty pick_3",
-        //     //     "Property !pick__4_1",
-        //     //     "Property2 pick hammer",
-        //     //     "Property pick !hammer",
-        //     //     "Property pick | Property.Ident hammer",
-        //     //     "Property pick | Property.Ident !hammer",
-        //     //
-        //     //     // these should fail
-        //     //     "PropertyIdent hammer axe | pick",
-        //     //     "Property pick | Property.Ident hammer fish",
-        //     //     "Property.Ident hammer | Weapon !(ranged | magic)",
-        //     //     "PropertyIdent hammer | axe pick",
-        //     //     "Property Pick", "Property Ident pick", "Property.ident hammer",
-        //     //     "Property !(all | none) | Weapon ranged",
-        //     //     })
-        //     //     {
-        //     //         var m = Regex.Match(str, REQUIREMENTS_LINE);
-        //     //         Console.WriteLine("'{0}': {1}", str, m.Success ? "YES" : "NO");
-        //     // }
-        //
-        //     // var newm = Regex.Match("Property pick | Property.Ident !hammer", REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
-        //
-        //     foreach (var str in new[] {
-        //         "Property.Ident !(pick | hammer | axe)",
-        //         "Property !(pick | hammer | axe)",
-        //         "Property pick | hammer | axe",
-        //         "Property.Ident hammer",
-        //         "PropertyIdent hammer",
-        //         "PropertyIdent hammer axe2",
-        //         "Prop_erty pick_3",
-        //         "Property !pick__4_1",
-        //         "Property2 pick hammer",
-        //         "Property pick !hammer",
-        //         "Property !pick !hammer axe",
-        //         "Property pick | Property.Ident hammer",
-        //         "Property pick | Property.Ident hammer | Weapon !melee",
-        //         "Property pick | Property.Ident !hammer"})
-        //     {
-        //         ParseRequirementLine(str);
-        //         // var newm = Regex.Match(str, REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
-        //         //
-        //         //
-        //         // if (newm.Success)
-        //         // {
-        //         //     Console.WriteLine("Matched '{0}'", newm.Value);
-        //         //     // for (int ctr = 1; ctr < newm.Groups.Count; ctr++)
-        //         //     foreach (var groupname in new[] {"MultiGroupOr","SingleGroupEntry", "TraitSpec", "TGroup", /*"NegTraitName",*/ "TraitName", "NotOrList","OrList"})
-        //         //     {
-        //         //         // Console.WriteLine("   Group {0}:  {1}", ctr, newm.Groups[ctr].Value);
-        //         //         Console.WriteLine("   Group {0}:  {1}", groupname, newm.Groups[groupname].Value);
-        //         //         int captureCtr = 0;
-        //         //         // var captures = newm.Groups[ctr].Captures;
-        //         //         // foreach (Capture capture in newm.Groups[ctr].Captures)
-        //         //         foreach (Capture capture in newm.Groups[groupname].Captures)
-        //         //         {
-        //         //             Console.WriteLine("      Capture {0}: {1}", captureCtr, capture.Value);
-        //         //             // Console.WriteLine("      Capture {0}: {1}", captureCtr, captures[capname].Value);
-        //         //             captureCtr++;
-        //         //         }
-        //         //     }
-        //         //     Console.WriteLine();
-        //         // }
-        //         // else Console.WriteLine("Match Failed");
-        //     }
-        // }
-    // }
-
 
     /// Tokenize the 1-line category definition.
     /// A def will consist of the following sections,
@@ -254,25 +70,19 @@ namespace InvisibleHand.Items.Categories
     ///
     /// Example:
     /// 	c:Consumable;;Types consumable;type stack
-    /// 	c:Equipable;;Types equipable;
+    /// 	c:Equipable;priority=-1;Types equipable;
     /// 	c:.Armor;match=false;Property !vanity;defense, rare, type, value
     /// 	u:..Gauntlets;merge=true;Main-Hand Gauntlet, Off-Hand Gauntlet;
     ///
     public class Tokenizer
     {
-        // private static char[] types = new[] { 'c', 'u' };
-
-        // a word that start with a capital letter followed by any other letters or numbers
+        /// a word that start with a capital letter followed by any other letters or numbers
         private const string CAPWORD = @"[A-Z][\w\d]+";
 
-
+        /// a category name can be a phrase where each word begins with a capital letter.
+        /// Surrounding parentheses or brackets are allowed as well
         private const string BRACKETS_OPENING = @"[\(\[\{]";
-        // private const string BRACKETS_OPENING = @"";
         private const string BRACKETS_CLOSING = @"[\)\]\}]";
-        // private const string BRACKETS_CLOSING = @"";
-
-        // a category name can be a phrase where each word begins with a capital letter.
-        // Surrounding parentheses or brackets are allowed as well
         private const string CATEGORY_NAME = @"
             (" + BRACKETS_OPENING + @"?
             [A-Z][\w\d-]+
@@ -282,36 +92,49 @@ namespace InvisibleHand.Items.Categories
             [A-Z][\w\d-]+
             " + BRACKETS_CLOSING + @"?";
 
+        /// option_name = Yes|No|True|False|true|false|T|F|0|1|-42
+        /// actually, all that matters is that the first non-space character
+        /// after the = is a 'T', 'F', 'Y', or 'N' or that the entire value after the = is
+        /// a number.
+        private const string OPTION = @"\w+\s*=\s*([TtFfYyNn][\w]*|-?[\d]+)";
 
-        // private const string TRAIT_GROUP = @"((" + CAPWORD + @")(\.(?=[A-Z]))?)+";
-        // private const string TRAIT_NAME = @"[a-z\d_]+";
-        // private const string TRAIT_OPTION = @"[!]?" + TRAIT_NAME;
-        // private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
-        // private const string REQUIREMENTS_LINE = TRAIT_GROUP + @"\s+" + TRAIT_LIST;
+        #region requirement entry syntax
+        /// a fully-specified trait group may contain a hierarchy of names separated by ".";
+        /// e.g. "Placeable.Furniture.Tables"
+        /// This checks that any period is followed by an uppercase letter.
+        /// --Captured in group named 'TraitGroup'
         private const string TRAIT_GROUP = @"(?<TraitGroup>((" + CAPWORD + @")(\.(?=[A-Z]))?)+)";
+        /// trait names are always lowercase, may contain underscores and numbers
+        /// eg:"yellow_2"
         private const string TRAIT_NAME = @"[a-z\d_]+";
+        /// as above, but optionally negated
+        /// --Captured in group named 'TraitName'
         private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
+        /// "And" traits from same group together by separating trait names w/ spaces
+        /// e.g. "purple !green !blue spiked"
         private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
+        // put it all together:
+        // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
         private const string REQUIREMENTS_LINE = TRAIT_GROUP + @"\s+" + TRAIT_LIST;
-        // private const string REQUIREMENTS_LINE = @"\b" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"\b";
 
-        // the fourth section can be a list of requirements or category names, depending
-        // on whether this is a regular or union category
+        #endregion
+
+        /// the fourth section can be a list of requirements or category names, depending
+        /// on whether this is a regular or union category
         private const string FOURTH_SECTION_ITEM = @"(" + REQUIREMENTS_LINE + @"|" + CATEGORY_NAME + @")";
 
-        // option_name = True|False|true|false|T|F|0|1
-        private const string OPTION = @"\w+\s*=\s*([TF01]|[Tt]rue|[Ff]alse)";
 
-        // single word optionally surrounded by quotes (single or double).
-        // the quotation marks were giving me troubles, that's why they're separated out like that
+
+        /// single word optionally surrounded by quotes (single or double).
+        /// the quotation marks were giving me troubles, that's why they're separated out like that
         private const string SORT_PROPERTY = @"
                         [" + "\"" + @"']?
                         [A-Za-z0-9_-]+
                         [" + "\"" + @"']?
                         ";
 
-        /// Combine everything into one super regex that should be able to identify
-        /// a valid definition line
+        /// Combine everything into one super regex that should be able to
+        /// identify a valid definition line
         private const string DEFINITION_LINE = @"(?x)       # ignore whitespace
                         ^[CcUu]:                # the type code, followed by a colon.
 
@@ -322,7 +145,7 @@ namespace InvisibleHand.Items.Categories
                         \s*;\s*                 # the first semicolon.
 
                         # the options list is a comma-separated list of items
-                        # with the form 'word=True|true|False|False|T|F|0|1'
+                        # with the form 'word=True|true|False|False|T|F|0|1|<some-integer>'
                         (
                         (" + OPTION + @",\s*)*  # any number of options followed by a comma,
                         "  + OPTION + @"        # then a final/single option.
@@ -347,8 +170,6 @@ namespace InvisibleHand.Items.Categories
                         $"; // the end.
 
 
-        // private string current_path;
-
         // allow instantiation so that multiple tokenizers can run in parallel
         public Tokenizer()
         {
@@ -369,22 +190,23 @@ namespace InvisibleHand.Items.Categories
             if (!Regex.Match(def_line, DEFINITION_LINE).Success)
                 throw new TokenizerException(def_line, "Malformed Definition");
 
-
-            // Trim all extra whitespace
+            // Split on [semi]colons, trim all extra whitespace from sections
             var sections = def_line.Split(':', ';').Select(s=>s.Trim()).ToArray();
 
             // struct to return.
             return new ParsedCategory
             {
-                TypeCode = sections[0].ToLower()[0],
-                Depth = sections[1].Substring(0, sections[1].LastIndexOf('.')+1).Length,
-                Name = sections[1].Substring(sections[1].LastIndexOf('.')+1),
-                Options = sections[2] == String.Empty ? new string[0] : sections[2].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
-                Requires = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                TypeCode   = sections[0].ToLower()[0], // lowercase for easier comparisons
+                // number of periods in name section
+                Depth      = sections[1].Substring(0, sections[1].LastIndexOf('.')+1).Length,
+                // name section - periods
+                Name       = sections[1].Substring(sections[1].LastIndexOf('.')+1),
+                // split on commas, strip extra spaces, remove empty entries and convert to string[]
+                Options    = sections[2] == String.Empty ? new string[0] : sections[2].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                Requires   = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                // split on commas and spaces, remove empty entries and convert to string[]
                 SortFields = sections[4] == String.Empty ? new string[0] : sections[4].Split(',', ' ').Where(s => s != String.Empty).ToArray()
             };
-
-            // bool union = def.type == "u";
         }
 
         public RequirementEntry ParseRequirementLine(string line)
@@ -419,6 +241,8 @@ namespace InvisibleHand.Items.Categories
         /// form "option_name = true|false|T|F|0|1|some-number-like-1234"
         public KeyValuePair<string, int> ParseOption(string option)
         {
+            // split on '='
+            // only deal w/ lower case names and values
             var split = option.Split('=').Select(s => s.Trim().ToLower()).ToArray();
 
             string opt_name = split[0];
@@ -426,11 +250,11 @@ namespace InvisibleHand.Items.Categories
 
             var val = split[1];
 
-            // any value starting with "t" will be considered "true"
-            if (val.StartsWith("t"))
+            // any value starting with "t" or "y" will be considered "true"
+            if ("ty".Contains(val[0]))
                 opt_value = 1;
-            // likewise, any value starting with "f" will be considered "false"
-            else if (val.StartsWith("f"))
+            // likewise, any value starting with "f" or "n" will be considered "false"
+            else if ("fn".Contains(val[0]))
                 opt_value = 0;
             // any other value should be an integer
             else
@@ -461,26 +285,10 @@ namespace InvisibleHand.Items.Categories
         // getting here.
         private const string TRAIT_ENTRY = @"^\s*["+"\""+@"']?(?<TraitName>[a-z0-9_]+)["+"\""+@"']?$";
 
-        // returns the non-comment content from a line
-        public string TokenizeTraitEntry(string line)
-        {
-            var match = Regex.Match(line, TRAIT_ENTRY, RegexOptions.ExplicitCapture);
-
-            if (match.Success)
-            {
-                var trait_cap = match.Groups["TraitName"].Captures;
-
-                if (trait_cap.Count > 0)
-                    return trait_cap[0].Value;
-            }
-
-            return String.Empty;
-        }
-
         /// tokenize an ini-style section header (e.g. "[..GroupName]").
         /// which might have periods before the name indicating child depth.
         /// Return a tuple where Item1 is the name given in the header
-        /// and Item2 is the depth (number of periods) 
+        /// and Item2 is the depth (number of periods)
         public Tuple<string, int> GetSectionName(string line)
         {
             var match = Regex.Match(line, TRAIT_SECTION, RegexOptions.ExplicitCapture);
@@ -499,13 +307,31 @@ namespace InvisibleHand.Items.Categories
             throw new TokenizerException(line, "Invalid section header");
         }
 
+        /// returns the non-comment content from a line
+        public string TokenizeTraitEntry(string line)
+        {
+            var match = Regex.Match(line, TRAIT_ENTRY, RegexOptions.ExplicitCapture);
+
+            if (match.Success)
+            {
+                var trait_cap = match.Groups["TraitName"].Captures;
+
+                if (trait_cap.Count > 0)
+                    return trait_cap[0].Value;
+            }
+
+            return String.Empty;
+        }
+
+
+        // ///testing
         // static void Main()
         // {
         //     // var t = new Tokenizer();
         //
         //     var tests = new[] {
         //         "c:Dye;;Property.Ident dye;value name type stack",
-        //         "C:Quest Item;;Property quest_item; uniqueStack, name, type, stack",
+        //         "C:Quest Item;priority=1000;Property quest_item; uniqueStack, name, type, stack",
         //         "C:..Broadsword;;Weapon.Melee swing, Property.Ident !pick !axe !hammer, Property !no_use_graphic;",
         //         "c:..Restoration;;Property heal_life heal_mana;\"healLife\" \"healMana\" \"type\" \"stack\"",
         //         "c:..Buff;;Property buff_time;\"buffType\" \"buffTime\" \"type\" \"stack\"",
