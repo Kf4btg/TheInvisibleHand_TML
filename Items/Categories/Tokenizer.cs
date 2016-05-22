@@ -450,6 +450,55 @@ namespace InvisibleHand.Items.Categories
             return new KeyValuePair<string, int>(split[0], opt_value);
         }
 
+        /// ini-style section header (e.g. "[GroupName]").
+        /// might have periods before the name indicating child depth
+        private const string TRAIT_SECTION = @"^\s*\[(?<Depth>\.*)(?<GroupName>[A-Z][\w\d]+)\]$";
+
+        // allows whole-line and inline comments starting with '#' or ";"
+        // also allows the trait names to be quoted. For some reason.
+        // public const string TRAIT_ENTRY = @"^\s*(["+"\""+@"']?(?<TraitName>[a-z0-9_]+)["+"\""+@"']?\s*)?([#;].*)?$";
+        // don't worry about checking for comments; they should have been removed before
+        // getting here.
+        private const string TRAIT_ENTRY = @"^\s*["+"\""+@"']?(?<TraitName>[a-z0-9_]+)["+"\""+@"']?$";
+
+        // returns the non-comment content from a line
+        public string TokenizeTraitEntry(string line)
+        {
+            var match = Regex.Match(line, TRAIT_ENTRY, RegexOptions.ExplicitCapture);
+
+            if (match.Success)
+            {
+                var trait_cap = match.Groups["TraitName"].Captures;
+
+                if (trait_cap.Count > 0)
+                    return trait_cap[0].Value;
+            }
+
+            return String.Empty;
+        }
+
+        /// tokenize an ini-style section header (e.g. "[..GroupName]").
+        /// which might have periods before the name indicating child depth.
+        /// Return a tuple where Item1 is the name given in the header
+        /// and Item2 is the depth (number of periods) 
+        public Tuple<string, int> GetSectionName(string line)
+        {
+            var match = Regex.Match(line, TRAIT_SECTION, RegexOptions.ExplicitCapture);
+
+            if (match.Success)
+            {
+                var trait_group = match.Groups["GroupName"].Captures[0].Value;
+
+                // depth is the number of periods preceding the name
+                var depth_cap = match.Groups["Depth"].Captures;
+                if (depth_cap.Count > 0)
+                    return Tuple.Create(trait_group, depth_cap[0].Value.Length);
+
+                return Tuple.Create(trait_group, 0);
+            }
+            throw new TokenizerException(line, "Invalid section header");
+        }
+
         // static void Main()
         // {
         //     // var t = new Tokenizer();

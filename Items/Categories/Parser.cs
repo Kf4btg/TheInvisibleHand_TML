@@ -7,6 +7,8 @@ using System.Reflection;
 using Hjson;
 
 using InvisibleHand.Items.Categories.Types;
+using Terraria.ModLoader;
+
 
 namespace InvisibleHand.Items.Categories
 {
@@ -34,16 +36,21 @@ namespace InvisibleHand.Items.Categories
         // public static void Parse(string category_dir = "Definitions/Categories", string trait_file = "Definitions/Traits/0-All.hjson")
         // public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits.0-All.hjson")
         // public static void Parse(string category_path = "Definitions.Categories", string trait_path = "Definitions.Traits")
-        public static void Parse(string category_path = "Definitions.Categories.conf", string trait_path = "Definitions.Traits")
+        // public static void Parse(string category_path = "Definitions.Categories.conf", string trait_path = "Definitions.Traits")
+        public static void Parse(string category_path = "Definitions.Categories.conf", string trait_path = "Definitions.Traits.ini")
         {
             assembly = Assembly.GetExecutingAssembly();
 
             CategoryDefsPath = "InvisibleHand." + category_path;
             TraitDefsPath = "InvisibleHand." + trait_path;
 
+            tokenizer = new Tokenizer();
+
+
             // the order is important here
             // LoadTraitDefinitions(TraitFilePath);
-            LoadFromTraitDefinitions(TraitDefsPath);
+            // LoadFromTraitDefinitions(TraitDefsPath);
+            LoadTraits(TraitDefsPath);
             AssignFlagValues();
             // LoadCategoryDefinitions(CategoryDefsPath);
             LoadCategories(CategoryDefsPath);
@@ -136,6 +143,114 @@ namespace InvisibleHand.Items.Categories
             }
         }
 
+        // Load the trait groups and their contained trait names from the ini-style
+        // definitions file
+        private static void LoadTraits(string trait_defs_path)
+        {
+            TraitDefinitions = new Dictionary<string, IList<string>>();
+
+            using (Stream s = assembly.GetManifestResourceStream(trait_defs_path))
+            {
+                using (StreamReader sr = new StreamReader(s))
+                {
+                    var current_group = "";
+                    var full_group_spec = ""; // the fully-dereferenced name, like "CreateTile.Furniture.Door"
+                    var depth = 0;
+                    var comment_chars = "#;".ToCharArray();
+                    var strip_chars = " \t\n\"'".ToCharArray();
+
+                    var section = (Tuple<string, int>)null;
+
+                    var parents = new LinkedList<string>();
+
+                    while (sr.Peek() >= 0)
+                    {
+                        // read a single line, stripping comments/whitespace/other stuff
+                        var line = _getLine(sr.ReadLine());
+
+                        // skip blank lines or full-line comments
+                        if (line == String.Empty)
+                            continue;
+
+                        // if we're not in a section, skip lines until we
+                        // find a valid one
+                        if (section == null)
+                        {
+                            if (line[0] == '[')
+                                section = _getSectionHeader(line);
+                        }
+                        // we were in a section, but found start of a new one
+                        else if (line[0] == '[')
+                        {
+                            // if there's an error during parsing, this will return
+                            // null which will re-start the check above (skipping
+                            // lines to the next valid section)
+                            section = _getSectionHeader(line);
+                        }
+                        else // we're in the trait-list of a section
+                        {
+                            // we have a new section, but haven't done anything with it yet
+                            if (current_group != section.Item1)
+                            {
+                                // just have it modify the parents list
+                                _getParent(parents, current_group, section.Item2, depth);
+
+                                // update current group name & depth
+                                current_group = section.Item1;
+                                depth = section.Item2;
+
+                                // get the dot-qualified full name of the group if it has
+                                // any ancestors
+                                full_group_spec = parents.Count > 0 ? string.Join(".", parents) + "." + current_group : current_group;
+
+                                // create a container for this new group
+                                TraitDefinitions[full_group_spec] = new List<string>();
+                            }
+
+                            // now we can handle the line, which should just be the
+                            // name of a trait
+                            var trait_name = tokenizer.TokenizeTraitEntry(line);
+
+                            // if it was a comment or blank line (should have been
+                            // caught already, though...), ignore it
+                            if (trait_name == String.Empty) continue;
+
+                            // otherwise add it to the members for the current group
+                            TraitDefinitions[current_group].Add(trait_name);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static char[] comment_chars = "#;".ToCharArray();
+        private static char[] strip_chars = " \t\n\"'".ToCharArray();
+
+        private static string _getLine(string line)
+        {
+            var comment_start = line.IndexOfAny(comment_chars);
+
+            //Remove comments, strip any leading/trailing whitespace and quotes
+            return comment_start >= 0 ? line.Substring(0, comment_start).Trim(strip_chars) : line.Trim(strip_chars);
+        }
+
+        /// attempt to get the value for an ini-style section header ("[Section]");
+        /// log any errors encountered during parsing and  return null
+        private static Tuple<string, int> _getSectionHeader(string line)
+        {
+            try
+            {
+                // returns Tuple(group_name, depth)
+                return tokenizer.GetSectionName(line);
+            }
+            catch (TokenizerException te)
+            {
+                ErrorLogger.Log(te.Message + ": " + te.Line);
+                // error in section header
+                return null;
+            }
+        }
+
         /// After reading in the Trait families in LoadTraitDefinitions(),
         /// assign each trait a flag-bit-value (power of 2) based on its location
         /// within the family. As we're using ints, there should not be more than
@@ -145,7 +260,7 @@ namespace InvisibleHand.Items.Categories
             // make sure trait-defs were loaded
             if (TraitDefinitions == null)
                 // LoadTraitDefinitions(TraitFilePath);
-                LoadFromTraitDefinitions(TraitDefsPath);
+                LoadTraits(TraitDefsPath);
 
             foreach (var tgroup in TraitDefinitions)
             {
@@ -182,7 +297,6 @@ namespace InvisibleHand.Items.Categories
         /// its parent), and secondarily by the order in which it was loaded from the definition file.
         private static void LoadCategories(string category_def_file)
         {
-            tokenizer = new Tokenizer();
 
             _currentCount = 0; // track absolute order of added categories (this will be the unique ID for each category)
             using (Stream s = assembly.GetManifestResourceStream(category_def_file))
@@ -193,7 +307,7 @@ namespace InvisibleHand.Items.Categories
                     int prev_depth = 0;
 
                     var parent = "";
-                    var parents = new Stack<string>();
+                    var parents = new LinkedList<string>();
 
                     Dictionary<string, int> options;
 
@@ -218,33 +332,35 @@ namespace InvisibleHand.Items.Categories
                         // Using the 'parents' stack, we can utilize this depth value to track
                         // the ancestor hierarchy of the current category. Thus, the order of the
                         // definitions in the definition file is very significant to the final result.
+                        parent = _getParent(parents, prev_name, category_def.Depth, prev_depth);
+
 
                         // if this category is NOT a top-level category
-                        if (category_def.Depth != 0)
-                        {
-                            // new category is child of previous category
-                            if (category_def.Depth > prev_depth)
-                                parents.Push(prev_name);
-
-                            // new category is sibling of previous category's ancestor
-                            else if (category_def.Depth < prev_depth)
-                                // remove items from stack until we get back to proper depth
-                                while (parents.Count > category_def.Depth)
-                                    parents.Pop();
-
-                            // if neither of the previous checks were true, then the current
-                            // category is a sibling of the previous category and the parents
-                            // stack remains the same
-
-                            // regardless, current parent is the item on top of the stack
-                            parent = parents.Peek();
-                        }
-                        // otherwise depth == 0 and new category is top-level category
-                        else
-                        {
-                            parents.Clear();
-                            parent = "";
-                        }
+                        // if (category_def.Depth != 0)
+                        // {
+                        //     // new category is child of previous category
+                        //     if (category_def.Depth > prev_depth)
+                        //         parents.Push(prev_name);
+                        //
+                        //     // new category is sibling of previous category's ancestor
+                        //     else if (category_def.Depth < prev_depth)
+                        //         // remove items from stack until we get back to proper depth
+                        //         while (parents.Count > category_def.Depth)
+                        //             parents.Pop();
+                        //
+                        //     // if neither of the previous checks were true, then the current
+                        //     // category is a sibling of the previous category and the parents
+                        //     // stack remains the same
+                        //
+                        //     // regardless, current parent is the item on top of the stack
+                        //     parent = parents.Peek();
+                        // }
+                        // // otherwise depth == 0 and new category is top-level category
+                        // else
+                        // {
+                        //     parents.Clear();
+                        //     parent = "";
+                        // }
 
                         // reset options to defaults
                         options = new Dictionary<string, int>()
@@ -281,6 +397,35 @@ namespace InvisibleHand.Items.Categories
                     }
                 }
             }
+        }
+
+        /// For handling of tracking the current parent for nested traits/categories
+        /// where the only information we have is the names seen so far and the current
+        /// "child-depth" of the trait/category being considered
+        /// None of the ints here should ever be passed as a negative number. That would
+        /// be a bad time.
+        private static string _getParent(LinkedList<string> ancestry, string prev_name, int curr_depth, int prev_depth)
+        {
+            // if (ancestry.Count == 0)
+            //     // keep the empty string as the first ("root") item of the stack
+            //     ancestry.Push(String.Empty);
+
+            // if we're at a new top-level element, just nuke the list
+            if (curr_depth == 0)
+                ancestry.Clear();
+            // if we've gone deeper, append the previous element to the
+            // ancestors list
+            else if (curr_depth > prev_depth)
+                ancestry.AddLast(prev_name);
+            // if we've moved back up, pop elements off the list
+            // until we reach the proper depth
+            else if (curr_depth < prev_depth)
+                while (ancestry.Count > curr_depth)
+                    ancestry.RemoveLast();
+            // otherwise depth hasn't changed
+
+            // parent is on top of stack (Last will be null if list empty)
+            return ancestry.Last?.Value ?? String.Empty;
         }
 
         // ------------------------------------
