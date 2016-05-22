@@ -60,7 +60,7 @@ namespace InvisibleHand.Items.Categories
     /// [TYPE]:[NAME];[OPTIONS];[REQUIRES];[SORTBY]
     ///
     /// TYPE: either 'c' for category or 'u' for union
-    /// NAME: the name of the Category; may be preceded
+    /// NAME: the name of the Category; must be quoted; may be preceded
     /// 	by a number of periods indicating child depth
     /// OPTIONS:a list of "option_name=[true|false]", separated
     /// 	by commas
@@ -68,11 +68,14 @@ namespace InvisibleHand.Items.Categories
     /// SORTBY: a list of Item properties by which to sort items
     /// 	in the category
     ///
+    /// Note: separators can be either colons or semicolons; consequently,
+    ///     colons and semicolons are not valid characters in Category names
+    ///
     /// Example:
-    /// 	c:Consumable;;Types consumable;type stack
-    /// 	c:Equipable;priority=-1;Types equipable;
-    /// 	c:.Armor;match=false;Property !vanity;defense, rare, type, value
-    /// 	u:..Gauntlets;merge=true;Main-Hand Gauntlet, Off-Hand Gauntlet;
+    /// 	c:"Consumable";;Types consumable;type stack
+    /// 	c:"Equipable";priority=-1;Types equipable;
+    /// 	c:."Armor";match=false;Property !vanity;defense, rare, type, value
+    /// 	u:.."Gauntlets";merge=true;"Main-Hand Gauntlet", "Off-Hand Gauntlet";
     ///
     public class Tokenizer
     {
@@ -80,17 +83,24 @@ namespace InvisibleHand.Items.Categories
         private const string CAPWORD = @"[A-Z][\w\d]+";
 
         /// a category name can be a phrase where each word begins with a capital letter.
-        /// Surrounding parentheses or brackets are allowed as well
-        private const string BRACKETS_OPENING = @"[\(\[\{]";
-        private const string BRACKETS_CLOSING = @"[\)\]\}]";
-        private const string CATEGORY_NAME = @"
-            (" + BRACKETS_OPENING + @"?
-            [A-Z][\w\d-]+
-            " + BRACKETS_CLOSING + @"?\s+)*
+        /// Surrounding parentheses or brackets are allowed as well.
+        /// the entire phrase may be surrounded by quotes
+        // private const string BRACKETS_OPENING = @"[\(\[\{]";
+        // private const string BRACKETS_CLOSING = @"[\)\]\}]";
+        // private const string CATEGORY_NAME = "[\"']?"+@"
+        //     (" + BRACKETS_OPENING + @"?
+        //     [A-Z][\w\d-]+
+        //     " + BRACKETS_CLOSING + @"?\s+)*
+        //
+        //     " + BRACKETS_OPENING + @"?
+        //     [A-Z][\w\d-]+
+        //     " + BRACKETS_CLOSING + @"?" + "[\"']?";
 
-            " + BRACKETS_OPENING + @"?
-            [A-Z][\w\d-]+
-            " + BRACKETS_CLOSING + @"?";
+        /// This regex matches the category name/phrase between balanced quotes
+        private const string CATEGORY_LABEL = @"(?<OpenQuote>" + "\"" +
+            @")[^:;," + "\"" + @"]+" +      // stuff that's not [:;,"]
+            @"(?<CloseQuote-OpenQuote>" +
+            "\"" + @")";
 
         /// option_name = Yes|No|True|False|true|false|T|F|0|1|-42
         /// actually, all that matters is that the first non-space character
@@ -121,7 +131,7 @@ namespace InvisibleHand.Items.Categories
 
         /// the fourth section can be a list of requirements or category names, depending
         /// on whether this is a regular or union category
-        private const string FOURTH_SECTION_ITEM = @"(" + REQUIREMENTS_LINE + @"|" + CATEGORY_NAME + @")";
+        private const string FOURTH_SECTION_ITEM = @"(" + REQUIREMENTS_LINE + @"|" + CATEGORY_LABEL + @")";
 
 
 
@@ -136,13 +146,12 @@ namespace InvisibleHand.Items.Categories
         /// Combine everything into one super regex that should be able to
         /// identify a valid definition line
         private const string DEFINITION_LINE = @"(?x)       # ignore whitespace
-                        ^[CcUu]:                # the type code, followed by a colon.
+                        ^[CcUuSs][:;]                # the type code, followed by a colon.
 
                         \.*                     # any number of periods.
-                        @?                      # optional @ sign
-                        " + CATEGORY_NAME + @"  # The Category name
+                        " + CATEGORY_LABEL + @"  # The Category name
 
-                        \s*;\s*                 # the first semicolon.
+                        \s*[:;]\s*                 # the second colon.
 
                         # the options list is a comma-separated list of items
                         # with the form 'word=True|true|False|False|T|F|0|1|<some-integer>'
@@ -151,14 +160,14 @@ namespace InvisibleHand.Items.Categories
                         "  + OPTION + @"        # then a final/single option.
                         )?                      # the entire section is optional
 
-                        \s*;\s*                 # the second semicolon
+                        \s*[:;]\s*                 # the third colon
 
                         (
                         (" + FOURTH_SECTION_ITEM + @"\s*,\s*)*  # list of requirements/categories
                         "  + FOURTH_SECTION_ITEM + @"           # final/single requirement/category
                         )?                      # the entire section is optional.
 
-                        \s*;\s*                 # the third semicolon
+                        \s*[:;]\s*                 # the fourth colon
 
                         # optional list of words, optionally separated by commas
                         (
@@ -199,11 +208,13 @@ namespace InvisibleHand.Items.Categories
                 TypeCode   = sections[0].ToLower()[0], // lowercase for easier comparisons
                 // number of periods in name section
                 Depth      = sections[1].Substring(0, sections[1].LastIndexOf('.')+1).Length,
-                // name section - periods
-                Name       = sections[1].Substring(sections[1].LastIndexOf('.')+1),
+                // name section - periods, remove quotes
+                Name       = sections[1].Substring(sections[1].LastIndexOf('.')+1).Trim(' ', '"'),
                 // split on commas, strip extra spaces, remove empty entries and convert to string[]
                 Options    = sections[2] == String.Empty ? new string[0] : sections[2].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
-                Requires   = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim()).Where(s => s != String.Empty).ToArray(),
+                // for the 'requires' section, also trim quotes as this section could contain
+                // category names if we're dealing with a union category
+                Requires   = sections[3] == String.Empty ? new string[0] : sections[3].Split(',').Select(s => s.Trim('"', ' ', '\t')).Where(s => s != String.Empty).ToArray(),
                 // split on commas and spaces, remove empty entries and convert to string[]
                 SortFields = sections[4] == String.Empty ? new string[0] : sections[4].Split(',', ' ').Where(s => s != String.Empty).ToArray()
             };

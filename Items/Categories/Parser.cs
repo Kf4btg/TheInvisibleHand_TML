@@ -277,7 +277,7 @@ namespace InvisibleHand.Items.Categories
 
                         // TODO: remove the 'priority' stuff; only load order matters for initial sorting;
                         // priority may become settable at run-time
-                        buildCategory(category_def.Name, parent, Bool(options["enable"]), Bool(options["display"]), Bool(options["merge"]), options["priority"],
+                        buildCategory(category_def.TypeCode, category_def.Name, parent, Bool(options["enable"]), Bool(options["display"]), Bool(options["merge"]), options["priority"],
                                         // right now, I'm using the 'requires' property to hold either
                                         // the list of requirements (for regular categories)
                                         // OR the list of member categories (for unions).
@@ -334,54 +334,75 @@ namespace InvisibleHand.Items.Categories
         */
 
 
-        private static void buildCategory(string _name, string parent = "",
+        private static void buildCategory(char type, string name, string parent = "",
                                   bool enable = true, bool display = true,
                                   bool merge = true, int priority = 0,
                                   IEnumerable<string> requires = null,
                                   IEnumerable<string> union_members = null,
                                   IEnumerable<string> sort_fields = null)
         {
-            string name;
-            try
-            {
-                name = _name[0] == '@' ? _name.Substring(1) : _name;
-                char _ = name[0]; // dummy assignment to catch empty name
-            }
-            catch (IndexOutOfRangeException)
-            {
-                throw new ParserException("Categories must have a unique, non-empty name");
-            }
 
-            // track the (real) name of our in-construction category
+            if (name == String.Empty)
+                throw new ParserException("Categories must have a unique, non-empty name");
+
+
+            // track the  name of our in-construction category
             _currentCategory = name;
 
             var parentID = getParentID(parent);
             // var priority = prio;
+            //
+            switch (type)
+            {
+                case 'u': //Union
+                    // A union category
+                    var union = new UnionCategory(name, ++_currentCount, parentID, priority: priority);
+
+                    // TODO: allow enable/disable at runtime
+
+                    addUnionMembers(union, union_members);
+                    union.MergeItems = merge;
+
+                    union.Enabled = enable;
+                    CategoryDefinitions[union.Name] = union;
+                    break;
+
+                case 's': //Sub
+                    // generate sub-categories (matchers) for each child under parent
+                    generateSubCategories(name, parentID, priority, enable, requires, sort_fields);
+                    break;
+
+                case 'c': // Category
+                    // a 'Regular' category
+                    createMatchCategory(name, parentID, priority, enable, requires, sort_fields);
+                    break;
+
+            }
 
             // A union category
             // ------------------
-            if (union_members != null && union_members.Count() > 0)
-            {
-                var union = new UnionCategory(name, ++_currentCount, parentID, priority: priority);
-
-                // TODO: allow enable/disable at runtime
-
-                addUnionMembers(union, union_members);
-                union.MergeItems = merge;
-
-                union.Enabled = enable;
-                CategoryDefinitions[union.Name] = union;
-            }
-
-            // generate sub-categories (matchers) for each child under parent
-            // ------------------------------
-            else if (name != _name) // check will succeed if we removed the '@'
-                generateSubCategories(name, parentID, priority, enable, requires, sort_fields);
-
-            // a 'Regular' category
-            // ---------------------
-            else
-                createMatchCategory(name, parentID, priority, enable, requires, sort_fields);
+            // if (union_members != null && union_members.Count() > 0)
+            // {
+            //     var union = new UnionCategory(name, ++_currentCount, parentID, priority: priority);
+            //
+            //     // TODO: allow enable/disable at runtime
+            //
+            //     addUnionMembers(union, union_members);
+            //     union.MergeItems = merge;
+            //
+            //     union.Enabled = enable;
+            //     CategoryDefinitions[union.Name] = union;
+            // }
+            //
+            // // generate sub-categories (matchers) for each child under parent
+            // // ------------------------------
+            // else if (name != _name) // check will succeed if we removed the '@'
+            //     generateSubCategories(name, parentID, priority, enable, requires, sort_fields);
+            //
+            // // a 'Regular' category
+            // // ---------------------
+            // else
+            //     createMatchCategory(name, parentID, priority, enable, requires, sort_fields);
         }
 
         /*
