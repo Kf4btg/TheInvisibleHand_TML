@@ -144,7 +144,7 @@
     <Compile Include="Utils\SoundManager.cs" />
     <!-- <Compile Include="Utils\IDecision.cs" /> -->
   </ItemGroup>
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Compile Include="Hjson\HjsonOptions.cs" />
     <Compile Include="Hjson\JsonValue.cs" />
     <Compile Include="Hjson\JsonWriter.cs" />
@@ -160,9 +160,12 @@
     <Compile Include="Hjson\JsonArray.cs" />
     <Compile Include="Hjson\HjsonReader.cs" />
     <Compile Include="Hjson\JsonObject.cs" />
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
-    <EmbeddedResource Include="Definitions\Traits\10-All.hjson" />
+      <EmbeddedResource Include="Definitions\Traits.ini" />
+      <EmbeddedResource Include="Definitions\Categories.conf" />
+
+    <!-- <EmbeddedResource Include="Definitions\Traits\10-All.hjson" />
     <EmbeddedResource Include="Definitions\Categories\00-General.hjson" />
     <EmbeddedResource Include="Definitions\Categories\05-Tool.hjson" />
     <EmbeddedResource Include="Definitions\Categories\06-Exploration.hjson" />
@@ -188,7 +191,7 @@
     <EmbeddedResource Include="Definitions\Categories\70-Consumable.hjson" />
     <EmbeddedResource Include="Definitions\Categories\80-Material.hjson" />
     <EmbeddedResource Include="Definitions\Categories\90-Misc.hjson" />
-    <EmbeddedResource Include="Definitions\Categories\99-Merge.hjson" />
+    <EmbeddedResource Include="Definitions\Categories\99-Merge.hjson" /> -->
   </ItemGroup>
   <ItemGroup>
     <Content Include="build.txt" />
