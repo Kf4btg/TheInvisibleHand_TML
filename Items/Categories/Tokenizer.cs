@@ -52,103 +52,103 @@ namespace InvisibleHand.Items.Categories
         public string[] SortFields;
     }
 
-    public static class Tokenizer
-    {
-        // trait grp names begin with capital letters, may contain underscores and numbers
-        private const string TRAIT_GROUP_NAME = @"[A-Z][\w\d]+";
-
-        // a fully-specified trait group may contain a hierarchy of names separated by ".";
-        // e.g. "Placeable.Furniture.Tables"
-        // This checks that any period is followed by an uppercase letter.
-        // --Captured in group named 'TraitGroup'
-        private const string TRAIT_GROUP = @"(?<TraitGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
-
-        // trait names are always lowercase, may contain underscores and numbers
-        // eg:"yellow_2"
-        private const string TRAIT_NAME = @"[a-z\d_]+";
-
-        // as above, but optionally negated
-        // --Captured in group named 'TraitName'
-        private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
-
-        // "And" traits from same group together by separating trait names w/ spaces
-        // e.g. "purple !green !blue spiked"
-        private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
-
-        // put it all together:
-        // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
-        public const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
-
-        // same as above, but the group is optional (will be provided separately)
-        private const string REQUIREMENTS_LINE_NO_GROUP = @"^(" + TRAIT_GROUP + @"\s+)?" + TRAIT_LIST + @"$";
-
-        /// Given a line from the requirements array, parse out the group and in-/ex-cluded traits
-        public static RequirementEntry ParseRequirementLine(string line)
-        {
-            // only capture the named groups to keep things simpler
-            var match = Regex.Match(line, REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
-
-            if (match.Success)
-            {
-                var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
-                var tnames = match.Groups["TraitName"].Captures;
-                var req = new RequirementEntry(trait_group);
-                for (int i = 0; i < tnames.Count; i++)
-                {
-                    string trait = tnames[i].Value;
-
-                    if (trait[0] == '!')
-                        req.AddExclude(trait.Substring(1));
-                    else
-                        req.AddInclude(trait);
-                }
-                return req;
-            }
-            else
-            {
-                throw new TokenizerException(line, "Error while parsing line.");
-            }
-
-        }
-
-        public static RequirementEntry ParseRequirementLine(string line, string using_group)
-        {
-            // if called with a null or empty group, just return the normal method
-            if (using_group == null || using_group == String.Empty)
-                return ParseRequirementLine(line);
-
-            // otherwise, use the group provided in 'using_group' UNLESS a group is encountered on the line
-            var match = Regex.Match(line, REQUIREMENTS_LINE_NO_GROUP, RegexOptions.ExplicitCapture);
-
-            if (match.Success)
-            {
-                // otherwise, use the group provided in 'using_group'...
-                var trait_group = using_group;
-
-                // ...UNLESS a group name is encountered on the line
-                if (match.Groups["TraitGroup"].Captures.Count > 0)
-                    trait_group = match.Groups["TraitGroup"].Captures[0].Value;
-
-                var tnames = match.Groups["TraitName"].Captures;
-                var req = new RequirementEntry(trait_group);
-                for (int i = 0; i < tnames.Count; i++)
-                {
-                    string trait = tnames[i].Value;
-
-                    if (trait[0] == '!')
-                        req.AddExclude(trait.Substring(1));
-                    else
-                        req.AddInclude(trait);
-                }
-                return req;
-            }
-            else
-            {
-                throw new TokenizerException(line, "Error while parsing line.");
-            }
-
-
-        }
+    // public static class Tokenizer
+    // {
+    //     // trait grp names begin with capital letters, may contain underscores and numbers
+    //     private const string TRAIT_GROUP_NAME = @"[A-Z][\w\d]+";
+    //
+    //     // a fully-specified trait group may contain a hierarchy of names separated by ".";
+    //     // e.g. "Placeable.Furniture.Tables"
+    //     // This checks that any period is followed by an uppercase letter.
+    //     // --Captured in group named 'TraitGroup'
+    //     private const string TRAIT_GROUP = @"(?<TraitGroup>((" + TRAIT_GROUP_NAME + @")(\.(?=[A-Z]))?)+)";
+    //
+    //     // trait names are always lowercase, may contain underscores and numbers
+    //     // eg:"yellow_2"
+    //     private const string TRAIT_NAME = @"[a-z\d_]+";
+    //
+    //     // as above, but optionally negated
+    //     // --Captured in group named 'TraitName'
+    //     private const string TRAIT_OPTION = @"(?<TraitName>!?" + TRAIT_NAME + @")";
+    //
+    //     // "And" traits from same group together by separating trait names w/ spaces
+    //     // e.g. "purple !green !blue spiked"
+    //     private const string TRAIT_LIST = @"(" + TRAIT_OPTION + @"\s)*" + TRAIT_OPTION;
+    //
+    //     // put it all together:
+    //     // A requirement line is a Group Name followed by one or more traits (which can optionally begin with !)
+    //     public const string REQUIREMENTS_LINE = @"^" + TRAIT_GROUP + @"\s+" + TRAIT_LIST + @"$";
+    //
+    //     // same as above, but the group is optional (will be provided separately)
+    //     private const string REQUIREMENTS_LINE_NO_GROUP = @"^(" + TRAIT_GROUP + @"\s+)?" + TRAIT_LIST + @"$";
+    //
+    //     /// Given a line from the requirements array, parse out the group and in-/ex-cluded traits
+    //     public static RequirementEntry ParseRequirementLine(string line)
+    //     {
+    //         // only capture the named groups to keep things simpler
+    //         var match = Regex.Match(line, REQUIREMENTS_LINE, RegexOptions.ExplicitCapture);
+    //
+    //         if (match.Success)
+    //         {
+    //             var trait_group = match.Groups["TraitGroup"].Captures[0].Value;
+    //             var tnames = match.Groups["TraitName"].Captures;
+    //             var req = new RequirementEntry(trait_group);
+    //             for (int i = 0; i < tnames.Count; i++)
+    //             {
+    //                 string trait = tnames[i].Value;
+    //
+    //                 if (trait[0] == '!')
+    //                     req.AddExclude(trait.Substring(1));
+    //                 else
+    //                     req.AddInclude(trait);
+    //             }
+    //             return req;
+    //         }
+    //         else
+    //         {
+    //             throw new TokenizerException(line, "Error while parsing line.");
+    //         }
+    //
+    //     }
+    //
+    //     public static RequirementEntry ParseRequirementLine(string line, string using_group)
+    //     {
+    //         // if called with a null or empty group, just return the normal method
+    //         if (using_group == null || using_group == String.Empty)
+    //             return ParseRequirementLine(line);
+    //
+    //         // otherwise, use the group provided in 'using_group' UNLESS a group is encountered on the line
+    //         var match = Regex.Match(line, REQUIREMENTS_LINE_NO_GROUP, RegexOptions.ExplicitCapture);
+    //
+    //         if (match.Success)
+    //         {
+    //             // otherwise, use the group provided in 'using_group'...
+    //             var trait_group = using_group;
+    //
+    //             // ...UNLESS a group name is encountered on the line
+    //             if (match.Groups["TraitGroup"].Captures.Count > 0)
+    //                 trait_group = match.Groups["TraitGroup"].Captures[0].Value;
+    //
+    //             var tnames = match.Groups["TraitName"].Captures;
+    //             var req = new RequirementEntry(trait_group);
+    //             for (int i = 0; i < tnames.Count; i++)
+    //             {
+    //                 string trait = tnames[i].Value;
+    //
+    //                 if (trait[0] == '!')
+    //                     req.AddExclude(trait.Substring(1));
+    //                 else
+    //                     req.AddInclude(trait);
+    //             }
+    //             return req;
+    //         }
+    //         else
+    //         {
+    //             throw new TokenizerException(line, "Error while parsing line.");
+    //         }
+    //
+    //
+    //     }
 
         // testing
         // static void Main()
@@ -234,7 +234,7 @@ namespace InvisibleHand.Items.Categories
         //         // else Console.WriteLine("Match Failed");
         //     }
         // }
-    }
+    // }
 
 
     /// Tokenize the 1-line category definition.
@@ -258,7 +258,7 @@ namespace InvisibleHand.Items.Categories
     /// 	c:.Armor;match=false;Property !vanity;defense, rare, type, value
     /// 	u:..Gauntlets;merge=true;Main-Hand Gauntlet, Off-Hand Gauntlet;
     ///
-    public class Tokenizer2
+    public class Tokenizer
     {
         // private static char[] types = new[] { 'c', 'u' };
 
@@ -349,8 +349,8 @@ namespace InvisibleHand.Items.Categories
 
         // private string current_path;
 
-        // allow instantiation so that multiple tokenizers can be running in parallel
-        public Tokenizer2()
+        // allow instantiation so that multiple tokenizers can run in parallel
+        public Tokenizer()
         {
 
         }
@@ -416,33 +416,43 @@ namespace InvisibleHand.Items.Categories
         }
 
         /// extract the name and value from an option-spec of
-        /// form "option_name = true|false|T|F|0|1"
-        public KeyValuePair<string, bool> ParseOption(string option)
+        /// form "option_name = true|false|T|F|0|1|some-number-like-1234"
+        public KeyValuePair<string, int> ParseOption(string option)
         {
-            var split = option.Split('=').Select(s => s.Trim()).ToArray();
+            var split = option.Split('=').Select(s => s.Trim().ToLower()).ToArray();
 
             string opt_name = split[0];
-            bool opt_value = false;
+            int opt_value = 0;
 
-            switch (split[1])
+            var val = split[1];
+
+            // any value starting with "t" will be considered "true"
+            if (val.StartsWith("t"))
+                opt_value = 1;
+            // likewise, any value starting with "f" will be considered "false"
+            else if (val.StartsWith("f"))
+                opt_value = 0;
+            // any other value should be an integer
+            else
             {
-                case "T":
-                case "True":
-                case "true":
-                case "1":
-                    opt_value = true;
-                    break;
-                default:
-                    opt_value = false;
-                    break;
+                try
+                {
+                    opt_value = Int32.Parse(val);
+                }
+                catch //(FormatException)
+                {
+                    // TODO: log error
+                    // on error, (probably format error) default to false/0
+                    opt_value = 0;
+                }
             }
 
-            return new KeyValuePair<string, bool>(split[0], opt_value);
+            return new KeyValuePair<string, int>(split[0], opt_value);
         }
 
         // static void Main()
         // {
-        //     // var t = new Tokenizer2();
+        //     // var t = new Tokenizer();
         //
         //     var tests = new[] {
         //         "c:Dye;;Property.Ident dye;value name type stack",
